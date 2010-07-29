@@ -9,8 +9,6 @@ import com.percussion.server.IPSRequestContext;
 
 import gov.cancer.wcm.util.CGVConstants;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.File;
@@ -30,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CGV_URLEncoding implements IPSFieldValidator
 {
-	private static Log LOGGER = LogFactory.getLog(CGov_TitlePopulate.class);
+	private static Log LOGGER = LogFactory.getLog(CGV_TitlePopulate.class);
  
 	/* (non-Javadoc)
 	 * @see com.percussion.extension.IPSUdfProcessor#processUdf(java.lang.Object[], com.percussion.server.IPSRequestContext)
@@ -40,7 +38,6 @@ public class CGV_URLEncoding implements IPSFieldValidator
   
 		LOGGER.debug("******INVOKING friendlyURLencoding validation");
 		  
-		PSExtensionParams ep = new PSExtensionParams(params);
 		String friendlyURL = request.getParameter(CGVConstants.FRIENDLY_URL_FLD);
 	  
 		return validatePrettyUrl(friendlyURL);
