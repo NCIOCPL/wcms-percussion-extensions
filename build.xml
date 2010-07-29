@@ -2,6 +2,11 @@
 
 <project name="CGV_Extensions" default="build" basedir=".">
 	
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+	</target>
+		
 	<path id="project.class.path">
 		<pathelement path="."/>
 		<pathelement path="./bin"/>
@@ -33,5 +38,5 @@
 	</target>
 
 	<target name="build"
-		depends="clean,compile"/>
+		depends="init,clean,compile"/>
 </project>
