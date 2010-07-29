@@ -4,13 +4,13 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import java.lang.reflect.Method;
 
-import gov.cancer.wcm.extensions.CGov_TitlePopulate;
+import gov.cancer.wcm.extensions.CGV_TitlePopulate;
 
 public class TitlePopulateTest {
 
 	@Test
 	public void testModifyTitle() throws Exception {
-		Method p = CGov_TitlePopulate.class.getDeclaredMethod("modifyTitle",
+		Method p = CGV_TitlePopulate.class.getDeclaredMethod("modifyTitle",
 				new Class[]{String.class});
 		p.setAccessible(true);
 		String title = "Test Title";
