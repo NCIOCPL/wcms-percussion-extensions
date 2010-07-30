@@ -19,7 +19,7 @@
 		<echo message="Removing build directory"/>
 		<delete dir="./bin" />
 		<delete verbose="true">
-			<fileset dir="./output" includes="**/CGV_Extensions.jar"/>
+			<fileset dir="./output" includes="**/cgv_extensions.jar"/>
 		</delete>
 	</target>
 
@@ -31,7 +31,7 @@
 				destdir="./bin">
 			<classpath refid = "project.class.path" />
 		</javac>
-		<jar destfile = "./output/CGV_Extensions.jar"
+		<jar destfile = "./output/cgv_extensions.jar"
 			basedir="./bin"
 			includes="**gov/**"/>
 				
