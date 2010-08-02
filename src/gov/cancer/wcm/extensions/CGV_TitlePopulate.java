@@ -1,8 +1,7 @@
 package gov.cancer.wcm.extensions;
 
 import gov.cancer.wcm.util.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import java.util.Random;
 
 import com.percussion.extension.IPSRequestPreProcessor;
@@ -27,7 +26,7 @@ import com.percussion.webservices.content.PSContentWsLocator;
  */
 public class CGV_TitlePopulate extends PSDefaultExtension implements
 		IPSRequestPreProcessor {
-	private static Log LOGGER = LogFactory.getLog(CGV_TitlePopulate.class);
+	private static Logger LOGGER = CGV_Logger.getLogger(CGV_TitlePopulate.class);
 	private static IPSContentWs cws = null;
 	
 	public CGV_TitlePopulate() {
