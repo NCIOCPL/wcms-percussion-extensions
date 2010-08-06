@@ -2,6 +2,7 @@ package gov.cancer.wcm.util;
 
 import java.util.List;
 
+import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
@@ -116,6 +117,39 @@ public class CGV_ParentChildManager {
 	 */
 	public List getChildren() throws PSErrorException {
 		return getChildren(this.guid);
+	}
+	
+	/**
+	 * Checks to see if a specific IPSGuid is a shared child, meaning it
+	 * has more then 1 parent.
+	 * 
+	 * @param source - the IPSGuid to check if it is shared or not.
+	 * @return	True if the GUID is shared, false if not.
+	 * @throws PSErrorException
+	 */
+	public boolean isSharedChild(IPSGuid source) throws PSErrorException {
+		List<PSItemSummary> owners = null;
+		try {
+			owners = getParents(guid);
+		} catch (PSErrorException e) {
+			e.printStackTrace();
+		}
+		if( owners.size() > 1 ){
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Convenience method call.  Calls isSharedChild(IPSGuid) with this.guid.
+	 * @return True if the GUID is a shared child (>1 parent), false if not.
+	 * @throws PSErrorException
+	 */
+	public boolean isSharedChild() throws PSErrorException{
+		return isSharedChild(this.guid);
 	}
 
 }
