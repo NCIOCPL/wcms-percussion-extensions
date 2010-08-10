@@ -1,10 +1,16 @@
 package gov.cancer.wcm.extensions;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import gov.cancer.wcm.util.*;
+import gov.cancer.wcm.util.CGV_StateHelper.StateName;
 
 import com.percussion.design.objectstore.PSLocator;
+import com.percussion.error.PSException;
 import com.percussion.extension.IPSWorkFlowContext;
 import com.percussion.extension.IPSWorkflowAction;
 import com.percussion.extension.PSDefaultExtension;					//exception
@@ -14,6 +20,9 @@ import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
+import com.percussion.services.workflow.data.PSState;
+import com.percussion.services.workflow.data.PSTransition;
+import com.percussion.services.workflow.data.PSWorkflow;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorsException;
@@ -21,6 +30,9 @@ import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 import com.percussion.webservices.content.PSContentWsLocator;
+import com.percussion.pso.workflow.IPSOWorkflowInfoFinder;
+import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
+import com.percussion.services.contentmgr.IPSContentPropertyConstants;
 
 
 /**
@@ -50,50 +62,157 @@ IPSWorkflowAction {
 	 */
 	public void performAction(IPSWorkFlowContext wfContext, 
 			IPSRequestContext request) throws PSExtensionProcessingException{
+
 		
 		System.out.println("Debugging the workflow action for parent child");
 		IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
 		IPSGuid cid = gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid")));
 		
-		CGV_ParentChildManager pcm = new CGV_ParentChildManager(cid);
-		List<PSItemSummary> children = null;
+		System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
+		//IPSOWorkflowInfoFinder workFinder = IPSOWorkflowInfoFinder();
+		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
+		PSState destState = null;
 		try {
-			children = pcm.getChildren();
-		} catch (PSErrorException e) {
+			destState = workInfo.findWorkflowState(request.getParameter("sys_contentid"));
+		} catch (PSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
+		System.out.println("\t\tDestination State: " + destState.getName());
 		
-		System.out.println("\tPrinting children content ids");
-		for( PSItemSummary a : children ){
-			System.out.println("\t\tType: " + a.getContentTypeId());
-			System.out.println("\t\tGUID: " + a.getGUID());
-			System.out.println("\t\tContent id: " + gmgr.makeLocator(a.getGUID()).getId());
-			List<IPSGuid> items = Collections.<IPSGuid>singletonList(a.getGUID());
-			try {
-				PSSystemWsLocator.getSystemWebservice().transitionItems(items, "DirecttoPublic");
-			} catch (PSMissingBeanConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (PSErrorsException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (PSErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-//		if( request.getParameter("syts_contentid") == "322" )
-//		{
-//			System.out.println("kicking into the if statement for the debug");
-//			IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
-//			IPSGuid cid = gmgr.makeGuid(new PSLocator(322));
-//			List<IPSGuid> glist = Collections.<IPSGuid>singletonList(cid);
-//			IPSSystemWs sws = PSSystemWsLocator.getSystemWebservice();
+		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
+		CGV_StateHelper a = new CGV_StateHelper();
+		System.out.println("\t\tCurrent State: " + a.getCurrState(tranID));
+		//System.out.println("\t\tCurrent State: " + );
+		
+		
+//		try {
+//			Set<IPSGuid> auditList = PSSystemWsLocator.getSystemWebservice().loadAuditTrails(Collections.<IPSGuid>singletonList(cid)).keySet();
+//			
+//			IPSGuid lastState = null;
+//			for( IPSGuid last : auditList ){
+//				lastState = last;
+//			}
+//			System.out.println("the guid is " + lastState.toString());
+//			PSLocator loc = gmgr.makeLocator(lastState);
+//			
+//			PSState currState = null;
+//			int locale = loc.getId();
+//			String current = null;
+//			current += locale;
 //			try {
-//				sws.transitionItems(glist, "DirecttoPublic");
+//				currState = workInfo.findWorkflowState(current);
+//			} catch (PSException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			System.out.println("\t\tCurrent State: " + currState.getName());
+//			
+//		} catch (PSMissingBeanConfigurationException e) {
+//			// TODO Auto-generated catch block
+//			System.out.println("psmissingbeanconfig exception eeeeeee");
+//			e.printStackTrace();
+//		} catch (PSErrorException e) {
+//			// TODO Auto-generated catch block
+//			System.out.println("pserrorexception e");
+//			e.printStackTrace();
+//		} 
+		
+		
+		
+		//boolean pending = false;	//There are no dependents.
+		//PSItemStatus item = request.getParameterObject(CGVConstant.PSITEMSTATUS);
+		//String currentCid = request.getParameter("sys_contentid");
+		//String guid = request.getParameter(CGVConstants.GUID);
+		
+		//FUNCTIONALITY
+		//PSLocator loc = PSOItemSummaryFinder.getCurrentOrEditLocator(request.getParameter("sys_contentid"));
+//		String currStateString = request.getParameter("sys_contentstateid");
+//		StateName currentState = getStateName(currStateString);
+//		StateName destinationState = ;	//TODO: Find the destination state of the workflow for the current item
+//		PSItemSummary current = request.getParameterObject("currentItem");
+//		String currentType = request.getParameter("sys_contenttypeid"); 	//current.getContentTypeName();
+//		
+//		if( currentType == "page")
+//		{
+//			List<PSItemSummary> children = getChildren(current.getGUID());
+//			//List<PSItemSummary> children = cws.findDependents(current.getGUID(), null, true);
+//			for( PSItemSummary currChild : children ){
+//				StateName childState = currChild.state;
+//				if( StateName.compare(childState, destinationState) == -1){ //currChild.state < destinationState 
+//					List<PSItemSummary> childParents = cws.findOwners(currChild.getGUID(), null, false);
+//					if(childParents.size() > 1){
+//						//Find lowest parent state
+//						StateName lowState = StateName.PUBLIC;
+//						//PSState lowState = staticHighestState;
+//						for( PSItemSummary currParent : childParents ){
+//							StateName parState = currParent.state;
+//							if( (StateName.compare(parState, lowState)== -1)
+//									&& (currParent.getGUID() != current.getGUID()) ){ //if( currParent.state < lowState && currParent != current )
+//								lowState = parState;
+//							}
+//						}
+//						if( ((StateName.compare(destinationState,childState)==0)||(StateName.compare(destinationState,childState)==1))
+//								&& ((StateName.compare(childState,lowState)==0)||(StateName.compare(childState,lowState)==1))){ 
+//							//if( destinationState >= currChild.state && currChild.state >= lowState )
+//							//currChild.transition( findTransition(currChild.state, lowerState(destinationState, lowState));
+//							transition(currChild, childState, destinationState);
+//							if( currChild.state == lowState){
+//								pending = true;
+//							}
+//						}
+//					}
+//					else{	// !sharedChild(cws, currChild.getGUID())
+//						transition(currChild, childState, destinationState);
+//					}
+//				}
+//			}
+//			if(pending && destinationState == StateName.REVIEW){
+//				//current.transition( findTransition(current.state, destinationState));
+//				transition(current, current.state, destinationState);
+//			}
+//			else if(!pending){
+//				//current.transition(findTransition(current.state, destinationState));
+//				transition(current, current.state, destinationState);
+//			}
+//			else{
+//				//TODO: error msg
+//				//LOGGER.debug("Cannot move the current item into the destinationState, there are dependencies.");
+//			}
+//		}
+//		else{	//currType != page
+//			if( destinationState > current.state ){
+//				//current.transition(findTransition(current.state, destinationState));
+//			}
+//
+//		}
+		
+		//DEBUG CODE-----------------------------------------------------------
+//		System.out.println("Debugging the workflow action for parent child");
+//		IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
+//		IPSGuid cid = gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid")));
+//		
+//		CGV_ParentChildManager pcm = new CGV_ParentChildManager(cid);
+//		List<PSItemSummary> children = null;
+//		try {
+//			children = pcm.getChildren();
+//		} catch (PSErrorException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
+//		
+//		System.out.println("\tPrinting children content ids");
+//		for( PSItemSummary a : children ){
+//			System.out.println("\t\tType: " + a.getContentTypeId());
+//			System.out.println("\t\tGUID: " + a.getGUID());
+//			System.out.println("\t\tContent id: " + gmgr.makeLocator(a.getGUID()).getId());
+//			List<IPSGuid> items = Collections.<IPSGuid>singletonList(a.getGUID());
+//			try {
+//				PSSystemWsLocator.getSystemWebservice().transitionItems(items, "DirecttoPublic");
+//			} catch (PSMissingBeanConfigurationException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
 //			} catch (PSErrorsException e) {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
@@ -102,13 +221,104 @@ IPSWorkflowAction {
 //				e.printStackTrace();
 //			}
 //		}
-
 	}
 
 
 
 	public boolean canModifyStyleSheet() {
 		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	public static boolean transition(PSItemSummary source, StateName currState, StateName destState){
+		List<IPSGuid> temp = Collections.<IPSGuid>singletonList(source.getGUID());
+		String transition;
+		switch (currState){
+		case DRAFT:
+			switch (destState){
+			case REVIEW:
+				transition = "Submit";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case REVIEW:
+			switch (destState){
+			case DRAFT:
+				transition = "Disapprove";
+				break;
+			case PUBLIC:
+				transition = "ForcetoPublic";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case PUBLIC:
+			switch (destState){
+			case ARCHIVED:
+				transition = "Archive";
+				break;
+			case EDITING:
+				transition = "Quick Edit";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case EDITING:
+			switch (destState){
+			case REAPPROVAL:
+				transition = "Resubmit";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case REAPPROVAL:
+			switch (destState){
+			case EDITING:
+				transition = "Disapprove";
+				break;
+			case PUBLIC:
+				transition = "Approve";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case ARCHIVED:
+			switch (destState){
+			case EDITING:
+				transition = "Revive";
+				break;
+			case PUBLIC:
+				transition = "Republish";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		default:
+			transition = "Null";
+			break;	
+		}
+		if( transition != "Null"){
+			try {
+				PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
+			} catch (PSMissingBeanConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (PSErrorsException e) {
+				// TODO Auto-generated catch blocks
+				e.printStackTrace();
+			} catch (PSErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return true;
+		}
 		return false;
 	}
 	
