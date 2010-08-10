@@ -67,13 +67,12 @@ public class CGV_ParentChildManager {
 	 * @return List of PSItemSummary objects for the parents of the guid passed in.
 	 * @throws PSErrorException
 	 */
-	public List getParents(IPSGuid source) throws PSErrorException {
+	public List<PSItemSummary> getParents(IPSGuid source) throws PSErrorException {
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		filter.limitToEditOrCurrentOwnerRevision(true);
 		filter.setCategory("rs_activeassembly");
 		System.out.println("finding the parents");	//TODO: Change to use LOGGER
-		List result = PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
-		return result;
+		return PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
 	}
 	
 	/**
@@ -86,13 +85,12 @@ public class CGV_ParentChildManager {
 	 * @return List of PSItemSummary objects for the child of the guid passed in.
 	 * @throws PSErrorException
 	 */
-	public List getChildren(IPSGuid source) throws PSErrorException {
+	public List<PSItemSummary> getChildren(IPSGuid source) throws PSErrorException {
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		filter.limitToEditOrCurrentOwnerRevision(true);
 		filter.setCategory("rs_activeassembly");
 		System.out.println("finding the children");		//TODO: Change to use LOGGER
-		List result = PSContentWsLocator.getContentWebservice().findDependents(source, filter, false);
-		return result;
+		return PSContentWsLocator.getContentWebservice().findDependents(source, filter, false);
 	}
 	
 	/**
@@ -103,7 +101,7 @@ public class CGV_ParentChildManager {
 	 * @return List of PSItemSummary objects for the parents.
 	 * @throws PSErrorException
 	 */
-	public List getParents() throws PSErrorException {
+	public List<PSItemSummary> getParents() throws PSErrorException {
 		return getParents(this.guid);
 	}
 	
@@ -115,7 +113,7 @@ public class CGV_ParentChildManager {
 	 * @return List of PSItemSummary objects for the children.
 	 * @throws PSErrorException
 	 */
-	public List getChildren() throws PSErrorException {
+	public List<PSItemSummary> getChildren() throws PSErrorException {
 		return getChildren(this.guid);
 	}
 	
