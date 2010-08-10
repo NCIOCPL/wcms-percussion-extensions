@@ -177,5 +177,6 @@
 	<classpathentry kind="lib" path="lib/XmlSchema-1.4.2.jar"/>
 	<classpathentry kind="lib" path="lib/xpp3.jar"/>
 	<classpathentry kind="lib" path="lib/xstream.jar"/>
+	<classpathentry kind="lib" path="lib/PSOToolkit-6.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
