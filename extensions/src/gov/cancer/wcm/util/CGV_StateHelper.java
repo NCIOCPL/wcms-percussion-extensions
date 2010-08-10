@@ -170,6 +170,34 @@ public class CGV_StateHelper {
 			return "Null";
 	}
 	
+	public String getCurrState(int transitionID){
+		//TODO: Customize for Blue, and add config file parse.
+		switch (transitionID) {
+		case 1:
+			return "Draft";
+		case 2:
+			return "Review";
+		case 3:
+			return "Review";
+		case 4:
+			return "Public";
+		case 5:
+			return "Public";
+		case 6:
+			return "Editing";
+		case 7:
+			return "Editing";
+		case 8:
+			return "Editing";
+		case 9:
+			return "Archived";
+		case 10:
+			return "Archived";
+			default:
+				return null;
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
