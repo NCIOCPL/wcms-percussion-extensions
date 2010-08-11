@@ -1,5 +1,10 @@
 package gov.cancer.wcm.util;
 
+import com.percussion.error.PSException;
+import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
+import com.percussion.server.IPSRequestContext;
+import com.percussion.services.workflow.data.PSState;
+
 /**
  * Wrapper class for the StateName enum.
  * Provides the enum and functionality to transform it back
@@ -14,7 +19,8 @@ public class CGV_StateHelper {
 	 */
 	public CGV_StateHelper(){
 		name = null;
-		state = null;
+		currState = null;
+		destState = null;
 	}
 	
 	//TODO: Eventually add a constructor and methods to allow stateid to be passed in.
@@ -23,64 +29,70 @@ public class CGV_StateHelper {
 	 * Constructor that allows a string to be passed in.
 	 * That string will setup the name/statename enum object
 	 * for the CGV_StateHelper object.
-	 * @param stateName - the name of the state.
+	 * @param current - the name of the current state.
 	 */
-	public CGV_StateHelper(String stateName){
-		name = stateName;
-		state = toStateName(name);
+	public CGV_StateHelper(String current, String destination){
+		name = current;
+		currState = toStateName(current);
+		destState = toStateName(destination);
 	}
 	
 	/**
-	 * Constructor that allows a StateName enum type to be passed
-	 * in, and the object (name/stateName) is build around that.
-	 * @param stateNameObj - the StateName enum object.
+	 * Constructor that allows the request context to be passed in
+	 * and that sets up the current, destination, and the transition id.
+	 * @param req
 	 */
-	public CGV_StateHelper(StateName stateNameObj){
-		state = stateNameObj;
-		name = toString(stateNameObj);
+	public CGV_StateHelper(IPSRequestContext req){
+		setup(req);
 	}
 	
 	/**
-	 * Gets the StateName enum object.
-	 * @return the StateName enum object
-	 */
-	public StateName getState() {
-		return state;
-	}
-
-	/**
-	 * Sets the StateName enum object.
-	 * @param state - the new StateName enum to set this.state to.
-	 */
-	public void setState(StateName state) {
-		this.state = state;
-	}
-
-	/**
-	 * Gets the name of the object.
-	 * @return the string form of the state name.
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Sets the string form of the state name.
-	 * @param name - the string this.name is set to.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
+	 * The current state of the object.
 	 * The StateName enum object type for this CGV_StateHelper object.
 	 */
-	private StateName state;
+	private StateName currState;
+	
+	/**
+	 * The destination state of the object.
+	 * The StateName enum object type for this CGV_StateHelper object.
+	 */
+	private StateName destState;
 	
 	/**
 	 * The name of the object's state.
 	 */
 	private String name;
+	
+	/**
+	 * The transition ID for the object.
+	 */
+	private int transitionID;
+	
+	private void setup(IPSRequestContext request){
+		//IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
+		//IPSGuid cid = gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid")));
+		
+		//System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
+		//IPSOWorkflowInfoFinder workFinder = IPSOWorkflowInfoFinder();
+		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
+		PSState destinationState = null;
+		try {
+			destinationState = workInfo.findWorkflowState(request.getParameter("sys_contentid"));
+		} catch (PSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		//System.out.println("\t\tDestination State: " + destinationState.getName());
+				
+		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
+		CGV_StateHelper a = new CGV_StateHelper();
+		//System.out.println("\t\tCurrent State: " + a.getCurrState(tranID));
+		
+		currState = toStateName(a.getCurrState(tranID));		//Set the current state for the object.
+		destState = toStateName(destinationState.getName());	//Set the destination state for the object.
+		transitionID = tranID;									//Set the transition ID for the object.
+	}
+	
 
 	/**
 	 * Enum containing the different state names for the system.
@@ -198,10 +210,42 @@ public class CGV_StateHelper {
 		}
 	}
 	
+	public StateName getCurrState() {
+		return currState;
+	}
+
+	public void setCurrState(StateName currState) {
+		this.currState = currState;
+	}
+
+	public StateName getDestState() {
+		return destState;
+	}
+
+	public void setDestState(StateName destState) {
+		this.destState = destState;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public int getTransitionID() {
+		return transitionID;
+	}
+
+	public void setTransitionID(int transitionID) {
+		this.transitionID = transitionID;
+	}
+
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString(){
-		return toString(state);
+		return toString(currState);
 	}
 }
