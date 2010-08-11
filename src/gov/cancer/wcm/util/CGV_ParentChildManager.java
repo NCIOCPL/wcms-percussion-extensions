@@ -4,11 +4,13 @@ import java.util.Collections;
 import java.util.List;
 
 import com.percussion.services.content.data.PSItemSummary;
+import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
+import com.percussion.design.objectstore.PSLocator;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
 
@@ -208,7 +210,26 @@ public class CGV_ParentChildManager {
 		}
 		return item;
 	}
-
+	
+	
+	/**
+	 * Loads a String content id, into a PSCoreItem object.
+	 * @param currItemId - the String form of the content ID we want the PSCoreItem of.
+	 * @return the PSCoreItem representation of cid.
+	 */
+	public static PSCoreItem loadItem(String currItemId) {
+		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(PSGuidManagerLocator.getGuidMgr().makeGuid(new PSLocator(currItemId)));
+		List<PSCoreItem> items = null;
+		PSCoreItem item = null;
+		try {
+			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
+			item = items.get(0);
+		} catch (PSErrorResultsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return item;
+	}
 	
 	
 	/**
