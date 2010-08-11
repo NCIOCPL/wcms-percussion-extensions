@@ -206,7 +206,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	private List<Integer> getParents(int currItemId) {
 		List<Integer>localPublishList = null;
         List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currItemId)));
-        List<PSCoreItem> items = null;
+        List<PSCoreItem> items = null;	//TODO: use the parentchild manager codeS
         PSCoreItem item = null;
         try {
         	items = cmgr.loadItems(glist, true, false, false, false);
