@@ -45,7 +45,9 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 		String displaytitle = request.getParameter(CGVConstants.DISPLAY_TITLE_FLD);
 		LOGGER.debug("******INVOKING titlePopulate");
 		String sysTitle = modifyTitle(displaytitle);
-		request.setParameter("sys_title", sysTitle);
+		if(request.getParameter("sys_title") == null){
+			request.setParameter("sys_title", sysTitle);
+		}
 	}
 
 	/**
