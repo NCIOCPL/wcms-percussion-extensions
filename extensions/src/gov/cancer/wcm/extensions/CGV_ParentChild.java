@@ -65,7 +65,7 @@ IPSWorkflowAction {
 			IPSRequestContext request) throws PSExtensionProcessingException{
 
 				
-		boolean pending = false;	//There are no dependents.
+		//boolean pending = false;	//There are no dependents.
 		//PSItemStatus item = request.getParameterObject(CGVConstant.PSITEMSTATUS);
 		//String currentCid = request.getParameter("sys_contentid");
 		//String guid = request.getParameter(CGVConstants.GUID);
@@ -77,13 +77,19 @@ IPSWorkflowAction {
 		//StateName destinationState = ;	//TODO: Find the destination state of the workflow for the current item
 		//PSItemSummary current = request.getParameterObject("currentItem");
 		//String currentType = request.getParameter("sys_contenttypeid"); 	//current.getContentTypeName();
+
+
 		
-		System.out.println("DEBUG: type id is: " + request.getParameter("sys_contenttypeid"));
+		
+		
 		
 		CGV_StateHelper stateHelp = new CGV_StateHelper(request);
+		CGV_ParentChildManager pcmgr = new CGV_ParentChildManager();
 		//StateName currState = stateHelp.getCurrState();
 		//StateName destState = stateHelp.getDestState();
+		String currCID = request.getParameter("sys_contentid");
 		
+		System.out.println("DEBUG: typeID: " + pcmgr.loadItem(currCID).getContentTypeId());
 		System.out.println("DEBUG: currentState: " + stateHelp.currStateToString());
 		System.out.println("DEBUG: destinationState: " + stateHelp.destStateToString());
 		System.out.println("DEBUG: transitionID: " + stateHelp.getTransitionID());
