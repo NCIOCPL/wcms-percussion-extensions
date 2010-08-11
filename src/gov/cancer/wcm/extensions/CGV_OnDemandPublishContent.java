@@ -43,10 +43,11 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
     */
    private static void initServices()
    {
-      if(svc == null)
-      {
-         svc =  CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
-      }
+//      if(svc == null)
+//      {
+//         svc =  CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
+//      }
+	   svc = new CGV_OnDemandPublishService();
    }
    /**
     * This is the action method for the workflow action.  It adds the content id of the content item 
@@ -57,11 +58,17 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
     */
    public void performAction(IPSWorkFlowContext wfContext, 
 		   IPSRequestContext request) throws PSExtensionProcessingException{
+	   
+	   System.out.println("D");
 	   initServices();
+	   System.out.println("Initied services");
 //       int contentId = 0;		//TODO: what is this, what should go here? John thinks 0 has special meaning
 	   							//Following line is what I think it should be
 	   int contentId = wfContext.getContentID();
-	   int typeId = Integer.parseInt(request.getParameter(IPSHtmlParameters.SYS_CONTENTTYPEID));
-	   svc.queueItemSet(contentId, typeId);
+	   System.out.println("content id is " + contentId);
+	   //int typeId = Integer.parseInt(request.getParameter("sys_contenttypeid"));
+	   //svc.queueItemSet(contentId, typeId);
+	   svc.queueItemSet(contentId);
+	   System.out.println("queue item set is done running");
    }
 }
