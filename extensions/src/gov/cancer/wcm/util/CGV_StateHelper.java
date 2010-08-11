@@ -74,25 +74,83 @@ public class CGV_StateHelper {
 		
 		//System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
 		//IPSOWorkflowInfoFinder workFinder = IPSOWorkflowInfoFinder();
-		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
-		PSState destinationState = null;
-		try {
-			destinationState = workInfo.findWorkflowState(request.getParameter("sys_contentid"));
-		} catch (PSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
+//		PSState destinationState = null;
+//		try {
+//			destinationState = workInfo.findWorkflowState(request.getParameter("sys_contentid"));
+//		} catch (PSException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		//System.out.println("\t\tDestination State: " + destinationState.getName());
 				
 		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
-		CGV_StateHelper a = new CGV_StateHelper();
-		//System.out.println("\t\tCurrent State: " + a.getCurrState(tranID));
+		//CGV_StateHelper a = new CGV_StateHelper();
+		//System.out.println("\t\tCurrent State: " + getCurrState(tranID));
 		
-		currState = toStateName(a.getCurrState(tranID));		//Set the current state for the object.
-		destState = toStateName(destinationState.getName());	//Set the destination state for the object.
+		currState = toStateName(getCurrState(tranID));		//Set the current state for the object.
+		destState = toStateName(getDestState(tranID));		//Set the destination state for the object.
+		//destState = toStateName(destinationState.getName());	//Set the destination state for the object.
 		transitionID = tranID;									//Set the transition ID for the object.
+		//System.out.println("\t\tTransitionID: " + transitionID);
 	}
 	
+	public String getCurrState(int tranID){
+		//TODO: Customize for Blue, and add config file parse.
+		switch (tranID) {
+		case 1:
+			return "Draft";
+		case 2:
+			return "Review";
+		case 3:
+			return "Review";
+		case 4:
+			return "Public";
+		case 5:
+			return "Public";
+		case 6:
+			return "Editing";
+		case 7:
+			return "Reapproval";
+		case 8:
+			return "Reapproval";
+		case 9:
+			return "Archived";
+		case 10:
+			return "Archived";
+			default:
+				return null;
+		}
+	}
+
+	private String getDestState(int tranID) {
+		//TODO: Customize for Blue, and add config file parse.
+		switch (tranID) {
+		case 1:
+			return "Review";
+		case 2:
+			return "Draft";
+		case 3:
+			return "Public";
+		case 4:
+			return "Editing";
+		case 5:
+			return "Archived";
+		case 6:
+			return "Reapproval";
+		case 7:
+			return "Public";
+		case 8:
+			return "Editing";
+		case 9:
+			return "Public";
+		case 10:
+			return "Editing";
+			default:
+				return null;
+		}
+	}
+
 
 	/**
 	 * Enum containing the different state names for the system.
@@ -202,34 +260,6 @@ public class CGV_StateHelper {
 			return "Reapproval";
 		else
 			return "Null";
-	}
-	
-	public String getCurrState(int transitionID){
-		//TODO: Customize for Blue, and add config file parse.
-		switch (transitionID) {
-		case 1:
-			return "Draft";
-		case 2:
-			return "Review";
-		case 3:
-			return "Review";
-		case 4:
-			return "Public";
-		case 5:
-			return "Public";
-		case 6:
-			return "Editing";
-		case 7:
-			return "Editing";
-		case 8:
-			return "Editing";
-		case 9:
-			return "Archived";
-		case 10:
-			return "Archived";
-			default:
-				return null;
-		}
 	}
 	
 	public StateName getCurrState() {
