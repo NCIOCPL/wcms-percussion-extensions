@@ -1,10 +1,13 @@
 package gov.cancer.wcm.util;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
+import com.percussion.webservices.PSErrorResultsException;
+import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
@@ -139,6 +142,73 @@ public class CGV_ParentChildManager {
 			return false;
 		}
 	}
+	
+	
+	/**
+	 * Returns a list of Integers (content ids) of a specific IPSGuid item.
+	 * @param src - the source item, gets the parents content ids.
+	 * @return A list of the parent content ids for IPSGuid src.
+	 * @throws PSErrorException 
+	 */
+	@SuppressWarnings("null")
+	public List<Integer> getParentCIDs(IPSGuid src) throws PSErrorException{
+		List<PSItemSummary> parents = getParents(src);
+		List<Integer> returnThis = null;
+		for( PSItemSummary item : parents ){
+			returnThis.add(loadItem(item.getGUID()).getContentId());
+		}
+		return returnThis;
+	}
+	
+	/**
+	 * Convenience call to List<Integer> getParentCIDs(IPSGuid src),
+	 * passes in this.guid as the IPSGuid to be used.
+	 * @return A list of the parent content ids for this.guid.
+	 * @throws PSErrorException 
+	 */
+	public List<Integer> getParentCIDs() throws PSErrorException{
+		return getParentCIDs(this.guid);
+	}
+	
+	/**
+	 * Returns the IPSGuid item's content id in a list or integers.
+	 * @param item - the IPSGuide item we need the content id of.
+	 * @return List containing only the integer value for the IPSGuid item's content id.
+	 * @throws PSErrorException
+	 */
+	public List<Integer> getCID(IPSGuid item) throws PSErrorException{
+		return Collections.<Integer> singletonList(loadItem(item).getContentId());
+	}
+	
+	/**
+	 * Convenience call, calls getCID(IPSGuid item) with 
+	 * this.guid as the IPSGuid object.
+	 * @return List containing only the integer value for this.guid's content id.
+	 * @throws PSErrorException
+	 */
+	public List<Integer> getCID() throws PSErrorException{
+		return getCID(this.guid);
+	}
+
+	/**
+	 * Loads a IPSGuid item, into a PSCoreItem object.
+	 * @param cid - the IPSGuid that we are finding the PSCoreItem of.
+	 * @return the PSCoreItem representation of cid.
+	 */
+	public static PSCoreItem loadItem(IPSGuid cid) {
+		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(cid);
+		List<PSCoreItem> items = null;
+		PSCoreItem item = null;
+		try {
+			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
+			item = items.get(0);
+		} catch (PSErrorResultsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return item;
+	}
+
 	
 	
 	/**
