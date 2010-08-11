@@ -30,6 +30,7 @@ import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 import com.percussion.webservices.content.PSContentWsLocator;
+import com.percussion.pso.utils.PSOItemSummaryFinder;
 import com.percussion.pso.workflow.IPSOWorkflowInfoFinder;
 import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.services.contentmgr.IPSContentPropertyConstants;
@@ -63,76 +64,29 @@ IPSWorkflowAction {
 	public void performAction(IPSWorkFlowContext wfContext, 
 			IPSRequestContext request) throws PSExtensionProcessingException{
 
-		
-		System.out.println("Debugging the workflow action for parent child");
-		IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
-		IPSGuid cid = gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid")));
-		
-		System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
-		//IPSOWorkflowInfoFinder workFinder = IPSOWorkflowInfoFinder();
-		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
-		PSState destState = null;
-		try {
-			destState = workInfo.findWorkflowState(request.getParameter("sys_contentid"));
-		} catch (PSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("\t\tDestination State: " + destState.getName());
-		
-		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
-		CGV_StateHelper a = new CGV_StateHelper();
-		System.out.println("\t\tCurrent State: " + a.getCurrState(tranID));
-		//System.out.println("\t\tCurrent State: " + );
-		
-		
-//		try {
-//			Set<IPSGuid> auditList = PSSystemWsLocator.getSystemWebservice().loadAuditTrails(Collections.<IPSGuid>singletonList(cid)).keySet();
-//			
-//			IPSGuid lastState = null;
-//			for( IPSGuid last : auditList ){
-//				lastState = last;
-//			}
-//			System.out.println("the guid is " + lastState.toString());
-//			PSLocator loc = gmgr.makeLocator(lastState);
-//			
-//			PSState currState = null;
-//			int locale = loc.getId();
-//			String current = null;
-//			current += locale;
-//			try {
-//				currState = workInfo.findWorkflowState(current);
-//			} catch (PSException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			System.out.println("\t\tCurrent State: " + currState.getName());
-//			
-//		} catch (PSMissingBeanConfigurationException e) {
-//			// TODO Auto-generated catch block
-//			System.out.println("psmissingbeanconfig exception eeeeeee");
-//			e.printStackTrace();
-//		} catch (PSErrorException e) {
-//			// TODO Auto-generated catch block
-//			System.out.println("pserrorexception e");
-//			e.printStackTrace();
-//		} 
-		
-		
-		
-		//boolean pending = false;	//There are no dependents.
+				
+		boolean pending = false;	//There are no dependents.
 		//PSItemStatus item = request.getParameterObject(CGVConstant.PSITEMSTATUS);
 		//String currentCid = request.getParameter("sys_contentid");
 		//String guid = request.getParameter(CGVConstants.GUID);
 		
 		//FUNCTIONALITY
 		//PSLocator loc = PSOItemSummaryFinder.getCurrentOrEditLocator(request.getParameter("sys_contentid"));
-//		String currStateString = request.getParameter("sys_contentstateid");
-//		StateName currentState = getStateName(currStateString);
-//		StateName destinationState = ;	//TODO: Find the destination state of the workflow for the current item
-//		PSItemSummary current = request.getParameterObject("currentItem");
-//		String currentType = request.getParameter("sys_contenttypeid"); 	//current.getContentTypeName();
-//		
+		//String currStateString = request.getParameter("sys_contentstateid");
+		//StateName currentState = getStateName(currStateString);
+		//StateName destinationState = ;	//TODO: Find the destination state of the workflow for the current item
+		//PSItemSummary current = request.getParameterObject("currentItem");
+		//String currentType = request.getParameter("sys_contenttypeid"); 	//current.getContentTypeName();
+		
+		System.out.println("DEBUG: type id is: " + request.getParameter("sys_contenttypeid"));
+		
+		CGV_StateHelper stateHelp = new CGV_StateHelper(request);
+		//StateName currState = stateHelp.getCurrState();
+		//StateName destState = stateHelp.getDestState();
+		
+		System.out.println("DEBUG: currentState: " + stateHelp.currStateToString());
+		System.out.println("DEBUG: destinationState: " + stateHelp.destStateToString());
+		System.out.println("DEBUG: transitionID: " + stateHelp.getTransitionID());
 //		if( currentType == "page")
 //		{
 //			List<PSItemSummary> children = getChildren(current.getGUID());
