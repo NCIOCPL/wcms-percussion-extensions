@@ -84,12 +84,12 @@ IPSWorkflowAction {
 		
 		
 		CGV_StateHelper stateHelp = new CGV_StateHelper(request);
-		CGV_ParentChildManager pcmgr = new CGV_ParentChildManager();
+		//CGV_ParentChildManager pcmgr = new CGV_ParentChildManager();
 		//StateName currState = stateHelp.getCurrState();
 		//StateName destState = stateHelp.getDestState();
 		String currCID = request.getParameter("sys_contentid");
 		
-		System.out.println("DEBUG: typeID: " + pcmgr.loadItem(currCID).getContentTypeId());
+		System.out.println("DEBUG: typeID: " + CGV_ParentChildManager.loadItem(currCID).getContentTypeId());
 		System.out.println("DEBUG: currentState: " + stateHelp.currStateToString());
 		System.out.println("DEBUG: destinationState: " + stateHelp.destStateToString());
 		System.out.println("DEBUG: transitionID: " + stateHelp.getTransitionID());
