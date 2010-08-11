@@ -161,22 +161,44 @@ public class CGV_StateHelper {
 	}
 
 	/**
-	 * Takes a StateName enum type and converts it to its string name.
-	 * @param curr - the StateName object
+	 * Gets the string version of the enum value for the
+	 * current state of the object.
 	 * @return the string value of that enum.
 	 */
-	public String toString(StateName curr){
-		if(curr == StateName.DRAFT )
+	public String currStateToString(){
+		if(currState == StateName.DRAFT )
 			return "Draft";
-		else if(curr == StateName.REVIEW )
+		else if(currState == StateName.REVIEW )
 			return "Review";
-		else if(curr == StateName.PUBLIC )
+		else if(currState == StateName.PUBLIC )
 			return "Public";		
-		else if(curr == StateName.ARCHIVED )
+		else if(currState == StateName.ARCHIVED )
 			return "Archived";		
-		else if(curr == StateName.EDITING )
+		else if(currState == StateName.EDITING )
 			return "Editing";		
-		else if(curr == StateName.REAPPROVAL )
+		else if(currState == StateName.REAPPROVAL )
+			return "Reapproval";
+		else
+			return "Null";
+	}
+	
+	/**
+	 * Gets the string version of the enum value for the
+	 * current state of the object.
+	 * @return the string value of that enum.
+	 */
+	public String destStateToString(){
+		if(destState == StateName.DRAFT )
+			return "Draft";
+		else if(destState == StateName.REVIEW )
+			return "Review";
+		else if(destState == StateName.PUBLIC )
+			return "Public";		
+		else if(destState == StateName.ARCHIVED )
+			return "Archived";		
+		else if(destState == StateName.EDITING )
+			return "Editing";		
+		else if(destState == StateName.REAPPROVAL )
 			return "Reapproval";
 		else
 			return "Null";
@@ -240,12 +262,5 @@ public class CGV_StateHelper {
 
 	public void setTransitionID(int transitionID) {
 		this.transitionID = transitionID;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString(){
-		return toString(currState);
 	}
 }
