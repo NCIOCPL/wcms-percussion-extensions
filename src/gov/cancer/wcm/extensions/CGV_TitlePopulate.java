@@ -3,6 +3,8 @@ package gov.cancer.wcm.extensions;
 import gov.cancer.wcm.util.*;
 import org.apache.log4j.Logger;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.percussion.extension.IPSRequestPreProcessor;
 import com.percussion.extension.PSDefaultExtension;
@@ -45,9 +47,15 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 		String displaytitle = request.getParameter(CGVConstants.DISPLAY_TITLE_FLD);
 		LOGGER.debug("******INVOKING titlePopulate");
 		String sysTitle = modifyTitle(displaytitle);
-		if(request.getParameter("sys_title") == null){
+				
+		Pattern p = Pattern.compile("*\\[#[0-9]\\]");
+		Pattern q = Pattern.compile("[a-zA-Z0-9]+\\[#[0-9]{4}\\]");
+		Matcher m = q.matcher(request.getParameter("sys_title"));
+		if( !m.matches() ){		//TODO: add regex
+			System.out.println("regex didnt match");
 			request.setParameter("sys_title", sysTitle);
 		}
+		else{System.out.println("regex matched");}
 	}
 
 	/**
