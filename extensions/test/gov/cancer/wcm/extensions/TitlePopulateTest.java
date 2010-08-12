@@ -17,17 +17,9 @@ public class TitlePopulateTest {
 		p.setAccessible(true);
 		String title = "Title Test";
 		String sysTitle = "test";
-		System.out.println(sysTitle);
 		sysTitle = (String)p.invoke(null, new Object[]{title});
 		assertEquals(sysTitle.length(), title.length() + 7);
-		System.out.println(sysTitle);
-		assertFalse(sysTitle.substring(0, 4) == "test" );
 		
-		String temp = sysTitle;
-		sysTitle = (String)p.invoke(null, new Object[]{title});
-		System.out.println(temp);
-		System.out.println(sysTitle);
-		assertEquals(sysTitle, temp);
 		
 	}
 }
