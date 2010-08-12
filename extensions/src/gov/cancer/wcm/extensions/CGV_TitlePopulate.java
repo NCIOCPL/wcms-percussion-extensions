@@ -46,16 +46,18 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 			PSParameterMismatchException, PSExtensionProcessingException {
 		String displaytitle = request.getParameter(CGVConstants.DISPLAY_TITLE_FLD);
 		LOGGER.debug("******INVOKING titlePopulate");
-		String sysTitle = modifyTitle(displaytitle);
-				
-		Pattern p = Pattern.compile("*\\[#[0-9]\\]");
+		String newTitle = modifyTitle(displaytitle);
+
 		Pattern q = Pattern.compile("[a-zA-Z0-9]+\\[#[0-9]{4}\\]");
-		Matcher m = q.matcher(request.getParameter("sys_title"));
-		if( !m.matches() ){		//TODO: add regex
-			System.out.println("regex didnt match");
-			request.setParameter("sys_title", sysTitle);
+		if(request.getParameter(CGVConstants.DISPLAY_TITLE_FLD) != null){
+			Matcher m = q.matcher(displaytitle);
+			if( !m.matches() ){		
+				request.setParameter("sys_title", newTitle);
+			}
 		}
-		else{System.out.println("regex matched");}
+		else{
+			request.setParameter("sys_title", newTitle);
+		}
 	}
 
 	/**
