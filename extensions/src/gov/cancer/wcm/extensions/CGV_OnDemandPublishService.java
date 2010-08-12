@@ -23,7 +23,6 @@ import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.rx.publisher.data.PSDemandWork;
 import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.content.data.PSContentTypeSummary;
-import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
@@ -38,21 +37,21 @@ import com.percussion.webservices.content.PSContentWsLocator;
  * @author whole based on mudumby
  *
  */
-public class CGV_OnDemandPublishService /*implements InitializingBean */{
-	private static final Log log = LogFactory
-	.getLog(CGV_OnDemandPublishService.class);
-
+public class CGV_OnDemandPublishService /*implements InitializingBean*/ {
+	private static final Log log = LogFactory.getLog(CGV_OnDemandPublishService.class);
+	private boolean bDebug = true;	//if true print statements to console
+	
 	protected static IPSGuidManager gmgr = null;
 	protected static IPSRxPublisherService rps = null;
 	protected static IPSContentWs cmgr = null;
 	protected static CGV_ParentChildManager pcm = null;
 
-	private int onDemandEditionId;
-	private boolean waitForStatus = true;	//TODO: set to true in BEAN and false in the class
+	private int onDemandEditionId = 315;
+	private boolean waitForStatus = true;	//TODO: change this back to false
 	private int timeOut = 20000;
 	private int waitTime = 100;
 
-	private List<String> doNotPublishParentTypes;
+//	private List<String> doNotPublishParentTypes;
 
 	/**
 	 * Initialize service pointers.
@@ -89,48 +88,45 @@ public class CGV_OnDemandPublishService /*implements InitializingBean */{
 	 * @param contentTypeId
 	 */
 	public void queueItemSet(int contentId) {
-		System.out.println("start of queue item set");
+		if (bDebug) System.out.println("start of queue item set");
 
 		//log.debug("CGV_OnDemandPublishService::queueItemSet executing...");
 		initServices();
-		System.out.println("after init services has run!");		
+		if (bDebug) System.out.println("after init services has run!");		
 		// get edition id
 		//TODO: is the constant correct?
 		onDemandEditionId = CGVConstants.EDITION_ID;
 
 		List<Integer> idsToPublish = null;	//the list to publish
 		Long contentTypeId = CGV_ParentChildManager.loadItem(Integer.toString(contentId)).getContentTypeId();
-		System.out.println("before checking of the top type");
+		if (bDebug) System.out.println("before checking of the top type");
 		//if (!topType(contentTypeId.intValue())) {
 		//if this is not the ultimate parent, get parents
 		idsToPublish = getParents(contentId);
-		System.out.println("\n\tItem CID: " + contentId);
-		//log.debug("Need to publish " + idsToPublish.size() + " items");
-		//}
+		if (bDebug) System.out.println("\n\tItem CID: " + contentId);
+		log.debug("Need to publish " + idsToPublish.size() + " items");
 		try {
 			IPSRxPublisherService rxsvc = PSRxPublisherServiceLocator
 			.getRxPublisherService();
 			PSDemandWork work = new PSDemandWork();
 			if (idsToPublish == null || idsToPublish.size() == 0) {
 				log.debug("queueItemSet: no items");
-				System.out.println("DEBUG: queueItemSet: no items");
+				if (bDebug) System.out.println("DEBUG: queueItemSet: no items");
 			}
 			else {
-				System.out.println("DEBUG: Processing parents");
+				if (bDebug) System.out.println("DEBUG: Processing parents");
 				//add the parents and children to the queue
 				for (int i : idsToPublish) {
 					IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
-					//TODO: is this correct?
-					//					IPSGuid itemGuid = i.getGUID();
-					System.out.println("DEBUG: the item guid is " + itemGuid);
+					if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
 					String path = cmgr.findFolderPaths(itemGuid)[0];
 					IPSGuid folderGuid = cmgr.getIdByPath(path);
 					if (folderGuid != null){
-						System.out.println("DEBUG: Adding item");
-						System.out.println("folder id is " + folderGuid);
-						System.out.println("item guid is " + itemGuid );
+						if (bDebug) System.out.println("DEBUG: Adding item");
+						if (bDebug) System.out.println("folder id is " + folderGuid);
+						if (bDebug) System.out.println("item guid is " + itemGuid );
 						work.addItem(folderGuid, itemGuid);
-						System.out.println("after adding the item");
+						if (bDebug) System.out.println("after adding the item");
 					}
 				}
 			}
@@ -161,16 +157,17 @@ public class CGV_OnDemandPublishService /*implements InitializingBean */{
 					if (state == IPSPublisherJobStatus.State.QUEUEING)
 						count = -1;
 					else {
-						IPSPublisherJobStatus status = rxsvc
-						.getPublishingJobStatus(jobId.longValue());
+						IPSPublisherJobStatus status = rxsvc.getPublishingJobStatus(jobId.longValue());
 						count = status.countTotalItems();
 
 					}
 				}
 				if (count == -1) {
 					log.debug("Took a long time to queue items");
+					if (bDebug) System.out.println("Took a long time to queue items");
 				} else {
 					log.debug("Queued " + count + " items");
+					if (bDebug) System.out.println("Queued " + count + " items");
 				}
 			} else {
 				log.debug("Tried to send " + idsToPublish.size()
@@ -258,11 +255,14 @@ public class CGV_OnDemandPublishService /*implements InitializingBean */{
 	 * @return true if in list
 	 */
 	private boolean topType(int contentTypeId) {
+		//get array of type names
 		String[] doNotPublishParentTypes = CGVConstants.TOP_CONTENT_TYPE_NAMES;
 		for (String s : doNotPublishParentTypes) {
-			System.out.print("DEBUG: do not publish parent types " + s);
+			if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
+			//get all summaries matching the current type
 			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
-			System.out.println("the size of the content type summary list is " + summaries.size());
+			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
+			//get the first item
 			PSContentTypeSummary summaryItem = summaries.get(0);
 			if (contentTypeId == summaryItem.getGuid().getUUID()) {
 				return true;
@@ -277,8 +277,8 @@ public class CGV_OnDemandPublishService /*implements InitializingBean */{
 	 * @return List of parent items
 	 */
 	private List<Integer> getParents(int currItemId) {
-		System.out.println("beginning of get parent");
-		List<Integer>localPublishList = null;
+		if (bDebug) System.out.println("beginning of get parent");
+		List<Integer>localPublishList = null;	//list of items to return
 		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currItemId)));
 		List<PSCoreItem> items = null;	//TODO: use the parentchild manager codeS
 		PSCoreItem item = null;
@@ -289,13 +289,14 @@ public class CGV_OnDemandPublishService /*implements InitializingBean */{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("before checking the top type");
+		if (bDebug) System.out.println("before checking the top type");
 
 		Long typeId = item.getContentTypeId();
 		if (!topType(typeId.intValue())) {
-			System.out.println("!top type statement");
+			//if this is a topmost content type, don't get the parents
+			if (bDebug) System.out.println("!top type statement");
 			try {
-				System.out.println("get parents before get parents cids");
+				if (bDebug) System.out.println("getParents before get parents cids");
 				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
 				localPublishList = pcm.getParentCIDs(cid);	//gets 1 layer of parents
 			} catch (PSErrorException e) {
@@ -310,12 +311,12 @@ public class CGV_OnDemandPublishService /*implements InitializingBean */{
 					List<Integer> parentsList = this.getParents(sItem);	//recurses! foiled again! 
 					if (parentsList != null) {
 						for (int p : parentsList) {
-							System.out.println("DEBUG: parent item CID: " + p);
+							if (bDebug) System.out.println("DEBUG: parent item CID: " + p);
 							tempList.add(p);
 						}
 					}
 				}
-				System.out.println("before temp list");
+				if (bDebug) System.out.println("before temp list");
 				for (int tItem : tempList) {
 					//add the items to the list to be returned
 					localPublishList.add(tItem);
@@ -323,7 +324,8 @@ public class CGV_OnDemandPublishService /*implements InitializingBean */{
 			}
 		}
 		if (localPublishList == null) {
-			System.out.println("got into the null list");
+			//if didn't get any parents, create list and add current item to it
+			if (bDebug) System.out.println("got into the null list");
 			localPublishList = new ArrayList<Integer>();
 			localPublishList.add(currItemId);
 		}
