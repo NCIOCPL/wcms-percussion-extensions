@@ -6,9 +6,7 @@ import com.percussion.extension.IPSWorkFlowContext;
 import com.percussion.extension.IPSWorkflowAction;
 import com.percussion.extension.PSDefaultExtension;
 import com.percussion.extension.PSExtensionProcessingException;
-//import com.percussion.pso.workflow.PSOPublishContent;
 import com.percussion.server.IPSRequestContext;
-import com.percussion.util.IPSHtmlParameters;
 
 
 /**
@@ -22,10 +20,9 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
    /**
     * Logger for this class
     */
-//   private static final Log LOGGER = LogFactory.getLog(PSOPublishContent.class);
-//TODO: what's with PSOPublishContent? Following line is what I think it should be
 	private static final Log LOGGER = LogFactory.getLog(CGV_OnDemandPublishContent.class);
-   /**
+	private boolean bDebug = true;	//print to console if true
+	/**
     * Service class to invoke publishing routine
     */
    private static CGV_OnDemandPublishService svc = null;
@@ -46,9 +43,10 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
 //      if(svc == null)
 //      {
 //         svc =  CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
+    	  svc = new CGV_OnDemandPublishService();
 //      }
-	   svc = new CGV_OnDemandPublishService();
    }
+   
    /**
     * This is the action method for the workflow action.  It adds the content id of the content item 
     * that got updated to the queue set.  It invokes the util method of the CGV_OnDemandPublishService()
@@ -59,16 +57,12 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
    public void performAction(IPSWorkFlowContext wfContext, 
 		   IPSRequestContext request) throws PSExtensionProcessingException{
 	   
-	   System.out.println("D");
+	   if (bDebug) System.out.println("DEBUG: performAction");
 	   initServices();
-	   System.out.println("Initied services");
-//       int contentId = 0;		//TODO: what is this, what should go here? John thinks 0 has special meaning
-	   							//Following line is what I think it should be
+	   if (bDebug) System.out.println("DEBUG: performAction Initted services");
 	   int contentId = wfContext.getContentID();
-	   System.out.println("content id is " + contentId);
-	   //int typeId = Integer.parseInt(request.getParameter("sys_contenttypeid"));
-	   //svc.queueItemSet(contentId, typeId);
+	   if (bDebug) System.out.println("DEBUG: performAction content id is " + contentId);
 	   svc.queueItemSet(contentId);
-	   System.out.println("queue item set is done running");
+	   if (bDebug) System.out.println("DEBUG: performAction queue item set is done running");
    }
 }
