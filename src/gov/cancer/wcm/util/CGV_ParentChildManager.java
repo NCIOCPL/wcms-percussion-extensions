@@ -1,5 +1,6 @@
 package gov.cancer.wcm.util;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -155,7 +156,7 @@ public class CGV_ParentChildManager {
 	@SuppressWarnings("null")
 	public List<Integer> getParentCIDs(IPSGuid src) throws PSErrorException{
 		List<PSItemSummary> parents = getParents(src);
-		List<Integer> returnThis = null;
+		List<Integer> returnThis = new ArrayList<Integer>();
 		for( PSItemSummary item : parents ){
 			returnThis.add(loadItem(item.getGUID()).getContentId());
 		}
