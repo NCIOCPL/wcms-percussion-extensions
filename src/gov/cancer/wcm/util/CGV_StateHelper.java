@@ -162,18 +162,18 @@ public class CGV_StateHelper {
 	public enum StateName implements Comparable<StateName>
 	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL;
 
-		public String toString(StateName state){
-			if( state == StateName.DRAFT )
+		public String toString(){
+			if( this == StateName.DRAFT )
 				return "Draft";
-			else if(state == StateName.REVIEW )
+			else if(this == StateName.REVIEW )
 				return "Review";
-			else if(state == StateName.PUBLIC )
+			else if(this == StateName.PUBLIC )
 				return "Public";		
-			else if(state == StateName.ARCHIVED )
+			else if(this == StateName.ARCHIVED )
 				return "Archived";		
-			else if(state == StateName.EDITING )
+			else if(this == StateName.EDITING )
 				return "Editing";		
-			else if(state == StateName.REAPPROVAL )
+			else if(this == StateName.REAPPROVAL )
 				return "Reapproval";
 			else
 				return "Null";
@@ -278,6 +278,41 @@ public class CGV_StateHelper {
 		this.transitionID = transitionID;
 	}
 
+//	/**
+//	 * Compares two StateName objects and returns the operator that figures how they are related.
+//	 * To call, create the Helper object, and pass in two new objects.
+//	 * Exp: CGV_StateHelper( )  //TODO: Fix this, does not provide correct functionality from this space.
+//	 * 
+//	 * @param left - the left side of the compare (exp: left < right)
+//	 * @param right - the right side of the compare (exp: left < right)
+//	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
+//	 */
+//	public static int compare(StateName left, StateName right){
+//		if( (left == StateName.DRAFT) || (left == StateName.EDITING) || (left == StateName.REAPPROVAL) ){
+//			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) )
+//				return 0;
+//			else if( (right == StateName.REVIEW) || (right == StateName.PUBLIC) )
+//				return -1;
+//			else if ((right == StateName.ARCHIVED))
+//				return 1;
+//		}
+//		else if( left == StateName.REVIEW ){
+//			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) )
+//				return 1;
+//			else if((right == StateName.REVIEW))
+//				return 0;
+//			else if ((right == StateName.PUBLIC))
+//				return 1;			
+//		}
+//		else if( left == StateName.PUBLIC ){
+//			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) || (right == StateName.REVIEW))
+//				return 1;
+//			else if ((right == StateName.PUBLIC))
+//				return 0;			
+//		}
+//		return 2;
+//	}
+	
 	/**
 	 * Compares two StateName objects and returns the operator that figures how they are related.
 	 * To call, create the Helper object, and pass in two new objects.
@@ -287,27 +322,27 @@ public class CGV_StateHelper {
 	 * @param right - the right side of the compare (exp: left < right)
 	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
 	 */
-	public static int compare(StateName left, StateName right){
-		if( (left == StateName.DRAFT) || (left == StateName.EDITING) || (left == StateName.REAPPROVAL) ){
-			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) )
+	public static int compare(String left, String right){
+		if( (left == "Draft") || (left == "Editing") || (left == "Reapproval") ){
+			if( (right == "Draft") || (right == "Editing") || (right == "Reapproval") )
 				return 0;
-			else if( (right == StateName.REVIEW) || (right == StateName.PUBLIC) )
+			else if( (right == "Review") || (right == "Public") )
 				return -1;
-			else if ((right == StateName.ARCHIVED))
+			else if ((right == "Archived"))
 				return 1;
 		}
-		else if( left == StateName.REVIEW ){
-			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) )
+		else if( left == "Review" ){
+			if( (right == "Draft") || (right ==  "Editing") || (right == "Reapproval") || (right == "Archived") )
 				return 1;
-			else if((right == StateName.REVIEW))
+			else if((right == "Review"))
 				return 0;
-			else if ((right == StateName.PUBLIC))
+			else if ((right == "Public"))
 				return 1;			
 		}
-		else if( left == StateName.PUBLIC ){
-			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) || (right == StateName.REVIEW))
+		else if( left == "Public" ){
+			if( (right == "Draft") || (right ==  "Editing") || (right == "Reapproval") || (right == "Archived") || (right == "Review"))
 				return 1;
-			else if ((right == StateName.PUBLIC))
+			else if ((right == "Public"))
 				return 0;			
 		}
 		return 2;
