@@ -129,6 +129,7 @@ IPSWorkflowAction {
 			e.printStackTrace();
 		}
 		//List<PSItemSummary> children = cws.findDependents(current.getGUID(), null, true);
+		System.out.println("Parent/Child: checking " + children.size() + " child items");
 		for( PSItemSummary currChild : children ){
 			PSState childState = null;
 			try {
@@ -143,11 +144,18 @@ IPSWorkflowAction {
 				e.printStackTrace();
 			}
 			StateName childStateName = stateHelp.toStateName(childState.getName());
+			String childStateString = childState.getName();
+			System.out.println("before the if statement: "+childState.getName());
 			//StateName childState = currChild.state;
-			if( CGV_StateHelper.compare( childStateName , destState) == -1){ //currChild.state < destinationState 
+			System.out.println("Parent/Child: about to compare child state to destination state...");
+			//System.out.println("\t" + childStateName.toString() +" to " + destState.toString());
+			if( CGV_StateHelper.compare( childStateString , destState.toString()) == -1){ //currChild.state < destinationState 
+				System.out.println("Parent/Child: the child's state was < the destination");
 //				List<PSItemSummary> childParents = cws.findOwners(currChild.getGUID(), null, false);
 				try {
+					System.out.println("Parent/Child: Checking for shared, "+ currChild.getGUID());
 					if(pcmgr.isSharedChild(currChild.getGUID())){
+						System.out.println("Parent/Child: shared child "+currChild.getGUID());
 						List<PSItemSummary> childParents = pcmgr.getParents(currChild.getGUID());
 						//Find lowest parent state
 						StateName lowState = StateName.PUBLIC;
@@ -155,13 +163,14 @@ IPSWorkflowAction {
 						for( PSItemSummary currParent : childParents ){
 							PSState parentsState = workInfo.findWorkflowState(Integer.toString(pcmgr.getCID(currParent.getGUID()).get(0)));
 							StateName parState = stateHelp.toStateName(parentsState.getName());
-							if( (CGV_StateHelper.compare(parState, lowState)== -1)
+							if( (CGV_StateHelper.compare(parentsState.getName(), lowState.toString())== -1)
 									&& (currParent.getGUID() != currentItem) ){ //if( currParent.state < lowState && currParent != current )
 								lowState = parState;
 							}
 						}
-						if( ((CGV_StateHelper.compare(destState,childStateName)==0)||(CGV_StateHelper.compare(destState,childStateName)==1))
-								&& ((CGV_StateHelper.compare(childStateName,lowState)==0)||(CGV_StateHelper.compare(childStateName,lowState)==1))){ 
+						System.out.println("Parent/Child: the lowest state of all the parents is... " + lowState.toString());
+						if( ((CGV_StateHelper.compare(destState.toString(),childStateString)==0)||(CGV_StateHelper.compare(destState.toString(),childStateString)==1))
+								&& ((CGV_StateHelper.compare(childStateString,lowState.toString())==0)||(CGV_StateHelper.compare(childStateString,lowState.toString())==1))){ 
 							//if( destinationState >= currChild.state && currChild.state >= lowState )
 							//currChild.transition( findTransition(currChild.state, lowerState(destinationState, lowState));
 							//transition(currChild, childState, destState);
@@ -176,6 +185,8 @@ IPSWorkflowAction {
 					}
 					else{	// !sharedChild(cws, currChild.getGUID())
 						//transition(currChild, childState, destinationState);
+						System.out.println("Parent/Child: not a shared child " +currChild.getGUID());
+						System.out.println("Parent/Child: trying to transition the child...");
 						transition(currChild, childStateName, destState);
 					}
 				} catch (PSErrorException e) {
@@ -190,6 +201,7 @@ IPSWorkflowAction {
 			}
 		}
 		if(pending && (destState == StateName.REVIEW)){
+			System.out.println("if(pending && (destState == StateName.REVIEW))");
 			//current.transition( findTransition(current.state, destinationState));
 			//transition(current, current.state, destinationState);
 			transition(currentItem, currState, destState);
@@ -332,7 +344,7 @@ IPSWorkflowAction {
 		}
 		if( transition != "Null"){
 			System.out.println("Parent/Child: transition being called from...");
-			System.out.println("\t"+transition+" = "+ currState.toString(currState)+"-->"+destState.toString(destState));
+			System.out.println("\t"+transition+" = "+ currState.toString()+"-->"+destState.toString());
 			try {
 				PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
 			} catch (PSMissingBeanConfigurationException e) {
@@ -355,6 +367,10 @@ IPSWorkflowAction {
 	
 	public static boolean transition(IPSGuid source, StateName currState, StateName destState){
 		List<IPSGuid> temp = Collections.<IPSGuid>singletonList(source);
+		System.out.println("Temp should have GUID... " + source);
+		System.out.println("temp has " + temp.size() +" item");
+		System.out.println("\tcurrState = " + currState.toString());
+		System.out.println("\tdestState = " + destState.toString());
 		String transition;
 		switch (currState){
 		case DRAFT:
@@ -428,10 +444,25 @@ IPSWorkflowAction {
 			break;	
 		}
 		if( transition != "Null"){
+			System.out.println("Parent/Child: transition being called from...");
+			System.out.println("\t"+transition+" = "+ currState.toString()+"-->"+destState.toString());
+			System.out.println("\t\tfor GUID "+source);
+			
 			try {
+				PSContentWsLocator.getContentWebservice().checkinItems(temp, "Checking in the items for Parent/Child Movement");
+			} catch (PSMissingBeanConfigurationException e1) {
+				System.out.println("missing bean line 453");
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (PSErrorsException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("458 error");
+				e1.printStackTrace();
+			}
+			
+			try {
+				for(IPSGuid t : temp){System.out.println(t);}
 				PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
-				System.out.println("Parent/Child: transition being called from...");
-				System.out.println("\t"+transition+" = "+ currState.toString(currState)+"-->"+destState.toString(destState));
 			} catch (PSMissingBeanConfigurationException e) {
 				// TODO Auto-generated catch block
 				System.out.println("debug error 434");
@@ -439,6 +470,10 @@ IPSWorkflowAction {
 			} catch (PSErrorsException e) {
 				// TODO Auto-generated catch blocks
 				System.out.println("debug error 438");
+				List<IPSGuid> errorGuid = e.getIds();
+				for( IPSGuid a : errorGuid ){
+					System.out.println(a);
+				}
 				e.printStackTrace();
 			} catch (PSErrorException e) {
 				// TODO Auto-generated catch block
