@@ -37,7 +37,7 @@ import com.percussion.webservices.content.PSContentWsLocator;
  * @author whole based on mudumby
  *
  */
-public class CGV_OnDemandPublishService /*implements InitializingBean*/ {
+public class CGV_OnDemandPublishService implements InitializingBean {
 	private static final Log log = LogFactory.getLog(CGV_OnDemandPublishService.class);
 	private boolean bDebug = true;	//if true print statements to console
 	
@@ -98,7 +98,6 @@ public class CGV_OnDemandPublishService /*implements InitializingBean*/ {
 		onDemandEditionId = CGVConstants.EDITION_ID;
 
 		List<Integer> idsToPublish = null;	//the list to publish
-		Long contentTypeId = CGV_ParentChildManager.loadItem(Integer.toString(contentId)).getContentTypeId();
 		if (bDebug) System.out.println("before checking of the top type");
 		//if (!topType(contentTypeId.intValue())) {
 		//if this is not the ultimate parent, get parents
@@ -310,6 +309,7 @@ public class CGV_OnDemandPublishService /*implements InitializingBean*/ {
 				if (bDebug) System.out.println("getParents before get parents cids");
 				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
 				localPublishList = pcm.getParentCIDs(cid);	//gets 1 layer of parents
+				if (bDebug) System.out.println("got localPublishList");
 			} catch (PSErrorException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

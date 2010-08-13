@@ -40,11 +40,11 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
     */
    private static void initServices()
    {
-//      if(svc == null)
-//      {
-//         svc =  CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
-    	  svc = new CGV_OnDemandPublishService();
-//      }
+      if(svc == null)
+      {
+         svc =  CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
+//    	  svc = new CGV_OnDemandPublishService();
+      }
    }
    
    /**
