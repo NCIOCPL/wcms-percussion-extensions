@@ -1,5 +1,7 @@
 package gov.cancer.wcm.util;
 
+import gov.cancer.wcm.util.CGV_StateHelper.StateName;
+
 import com.percussion.error.PSException;
 import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.server.IPSRequestContext;
@@ -98,25 +100,25 @@ public class CGV_StateHelper {
 	public String getCurrState(int tranID){
 		//TODO: Customize for Blue, and add config file parse.
 		switch (tranID) {
-		case 1:
-			return "Draft";
-		case 2:
-			return "Review";
 		case 3:
+			return "Draft";
+		case 14:
 			return "Review";
-		case 4:
-			return "Public";
-		case 5:
-			return "Public";
 		case 6:
-			return "Editing";
-		case 7:
-			return "Reapproval";
-		case 8:
-			return "Reapproval";
+			return "Review";
 		case 9:
+			return "Public";
+		case 8:
+			return "Public";
+		case 11:
+			return "Editing";
+		case 15:
+			return "Reapproval";
+		case 16:
+			return "Reapproval";
+		case 12:
 			return "Archived";
-		case 10:
+		case 2:
 			return "Archived";
 			default:
 				return null;
@@ -126,25 +128,25 @@ public class CGV_StateHelper {
 	private String getDestState(int tranID) {
 		//TODO: Customize for Blue, and add config file parse.
 		switch (tranID) {
-		case 1:
-			return "Review";
-		case 2:
-			return "Draft";
 		case 3:
-			return "Public";
-		case 4:
-			return "Editing";
-		case 5:
-			return "Archived";
+			return "Review";
+		case 14:
+			return "Draft";
 		case 6:
-			return "Reapproval";
-		case 7:
 			return "Public";
-		case 8:
-			return "Editing";
 		case 9:
+			return "Editing";
+		case 8:
+			return "Archived";
+		case 11:
+			return "Reapproval";
+		case 15:
 			return "Public";
-		case 10:
+		case 16:
+			return "Editing";
+		case 12:
+			return "Public";
+		case 2:
 			return "Editing";
 			default:
 				return null;
@@ -160,40 +162,22 @@ public class CGV_StateHelper {
 	public enum StateName implements Comparable<StateName>
 	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL;
 
-	/**
-	 * Compares two StateName objects and returns the operator that figures how they are related.
-	 * To call, create the Helper object, and pass in two new objects.
-	 * Exp: CGV_StateHelper( )  //TODO: Fix this, does not provide correct functionality from this space.
-	 * 
-	 * @param left - the left side of the compare (exp: left < right)
-	 * @param right - the right side of the compare (exp: left < right)
-	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
-	 */
-	public static int compare(StateName left, StateName right){
-		if( (left == DRAFT) || (left == EDITING) || (left == REAPPROVAL) ){
-			if( (right == DRAFT) || (right == EDITING) || (right == REAPPROVAL) )
-				return 0;
-			else if( (right == REVIEW) || (right == PUBLIC) )
-				return -1;
-			else if ((right == ARCHIVED))
-				return 1;
+		public String toString(StateName state){
+			if( state == StateName.DRAFT )
+				return "Draft";
+			else if(state == StateName.REVIEW )
+				return "Review";
+			else if(state == StateName.PUBLIC )
+				return "Public";		
+			else if(state == StateName.ARCHIVED )
+				return "Archived";		
+			else if(state == StateName.EDITING )
+				return "Editing";		
+			else if(state == StateName.REAPPROVAL )
+				return "Reapproval";
+			else
+				return "Null";
 		}
-		else if( left == REVIEW ){
-			if( (right == DRAFT) || (right == EDITING) || (right == REAPPROVAL) || (right == ARCHIVED) )
-				return 1;
-			else if((right == REVIEW))
-				return 0;
-			else if ((right == PUBLIC))
-				return 1;			
-		}
-		else if( left == PUBLIC ){
-			if( (right == DRAFT) || (right == EDITING) || (right == REAPPROVAL) || (right == ARCHIVED) || (right == REVIEW))
-				return 1;
-			else if ((right == PUBLIC))
-				return 0;			
-		}
-		return 2;
-	}
 	}
 
 	/**
@@ -293,4 +277,40 @@ public class CGV_StateHelper {
 	public void setTransitionID(int transitionID) {
 		this.transitionID = transitionID;
 	}
+
+	/**
+	 * Compares two StateName objects and returns the operator that figures how they are related.
+	 * To call, create the Helper object, and pass in two new objects.
+	 * Exp: CGV_StateHelper( )  //TODO: Fix this, does not provide correct functionality from this space.
+	 * 
+	 * @param left - the left side of the compare (exp: left < right)
+	 * @param right - the right side of the compare (exp: left < right)
+	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
+	 */
+	public static int compare(StateName left, StateName right){
+		if( (left == StateName.DRAFT) || (left == StateName.EDITING) || (left == StateName.REAPPROVAL) ){
+			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) )
+				return 0;
+			else if( (right == StateName.REVIEW) || (right == StateName.PUBLIC) )
+				return -1;
+			else if ((right == StateName.ARCHIVED))
+				return 1;
+		}
+		else if( left == StateName.REVIEW ){
+			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) )
+				return 1;
+			else if((right == StateName.REVIEW))
+				return 0;
+			else if ((right == StateName.PUBLIC))
+				return 1;			
+		}
+		else if( left == StateName.PUBLIC ){
+			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) || (right == StateName.REVIEW))
+				return 1;
+			else if ((right == StateName.PUBLIC))
+				return 0;			
+		}
+		return 2;
+	}
+
 }
