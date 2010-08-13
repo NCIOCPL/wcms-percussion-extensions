@@ -323,28 +323,48 @@ public class CGV_StateHelper {
 	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
 	 */
 	public static int compare(String left, String right){
-		if( (left == "Draft") || (left == "Editing") || (left == "Reapproval") ){
-			if( (right == "Draft") || (right == "Editing") || (right == "Reapproval") )
+		System.out.println("comparing... " + left + " to " + right);
+		if( left.equalsIgnoreCase("Draft") || left.equalsIgnoreCase("Editing") || left.equalsIgnoreCase("Reapproval") ){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval") ){
+				System.out.println(left + " equal " + right);
 				return 0;
-			else if( (right == "Review") || (right == "Public") )
+			}
+			else if( right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Public") ){
+				System.out.println(left + " < " + right);
 				return -1;
-			else if ((right == "Archived"))
+			}
+			else if (right.equalsIgnoreCase("Archived")){
+				System.out.println(left+" > " +right);
 				return 1;
+			}
 		}
-		else if( left == "Review" ){
-			if( (right == "Draft") || (right ==  "Editing") || (right == "Reapproval") || (right == "Archived") )
+		else if( left.equalsIgnoreCase("Review")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval")
+					|| right.equalsIgnoreCase("Archived") ){
+				System.out.println(left+" > " +right);
 				return 1;
-			else if((right == "Review"))
+			}
+			else if(right.equalsIgnoreCase("Review")){
+				System.out.println(left+" equal " +right);
 				return 0;
-			else if ((right == "Public"))
-				return 1;			
+			}
+			else if (right.equalsIgnoreCase("Public")){
+				System.out.println(left+" > " +right);
+				return -1;	//TODO: was at 1... is this right?			
+			}
 		}
-		else if( left == "Public" ){
-			if( (right == "Draft") || (right ==  "Editing") || (right == "Reapproval") || (right == "Archived") || (right == "Review"))
+		else if( left.equalsIgnoreCase("Public") ){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval") 
+				|| right.equalsIgnoreCase("Archived") || right.equalsIgnoreCase("Review")){
+				System.out.println(left+" > " +right);
 				return 1;
-			else if ((right == "Public"))
+			}
+			else if (right.equalsIgnoreCase("Public")){
+				System.out.println(left+" equal " +right);
 				return 0;			
+			}
 		}
+		System.out.println(left+" NULLLLLLL " +right);
 		return 2;
 	}
 
