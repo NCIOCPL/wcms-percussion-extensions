@@ -132,16 +132,21 @@ public class CGV_OnDemandPublishService /*implements InitializingBean*/ {
 			}
 
 			long workId = rxsvc.queueDemandWork(onDemandEditionId, work);
+			System.out.println("work id is = " +workId);
 			Long jobId = rxsvc.getDemandRequestJob(workId);
+			System.out.println("job id is = " + jobId);
 			if (waitForStatus) {
 				int totalTime = 0;
 				while (jobId == null && totalTime < timeOut) {
+					System.out.println("in the while loop");
 					jobId = rxsvc.getDemandRequestJob(workId);
 					if (jobId == null) {
+						System.out.println("in the if (jobid == null)");
 						totalTime += waitTime;
 						Thread.sleep(waitTime);
 					}
 				}
+				System.out.println("job id is = after while = " + jobId);
 				int count;
 				if (jobId == null)
 					count = -2;
@@ -162,12 +167,18 @@ public class CGV_OnDemandPublishService /*implements InitializingBean*/ {
 
 					}
 				}
-				if (count == -1) {
+				switch(count){
+				case -2:
+					log.debug("Queuing the items timed out.");
+					if (bDebug) System.out.println("Queuing the items timed out.");
+					break;
+				case -1:
 					log.debug("Took a long time to queue items");
 					if (bDebug) System.out.println("Took a long time to queue items");
-				} else {
-					log.debug("Queued " + count + " items");
-					if (bDebug) System.out.println("Queued " + count + " items");
+					break;
+					default:
+						log.debug("Queued " + count + " items");
+						if (bDebug) System.out.println("Queued " + count + " items");
 				}
 			} else {
 				log.debug("Tried to send " + idsToPublish.size()
