@@ -480,6 +480,7 @@ IPSWorkflowAction {
 				System.out.println("debug error 442");
 				e.printStackTrace();
 			}
+			System.out.println("returning true");
 			return true;
 		}
 		return false;
