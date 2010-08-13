@@ -48,15 +48,12 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 		LOGGER.debug("******INVOKING titlePopulate");
 		String newTitle = modifyTitle(displaytitle);
 
-		Pattern q = Pattern.compile("[a-zA-Z0-9]+\\[#[0-9]{4}\\]");
+		Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
 		if(request.getParameter(CGVConstants.DISPLAY_TITLE_FLD) != null){
 			Matcher m = q.matcher(displaytitle);
 			if( !m.matches() ){		
 				request.setParameter("sys_title", newTitle);
 			}
-		}
-		else{
-			request.setParameter("sys_title", newTitle);
 		}
 	}
 
