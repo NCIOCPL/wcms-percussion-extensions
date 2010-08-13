@@ -162,22 +162,7 @@ public class CGV_StateHelper {
 	public enum StateName implements Comparable<StateName>
 	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL;
 
-		public String toString(){
-			if( this == StateName.DRAFT )
-				return "Draft";
-			else if(this == StateName.REVIEW )
-				return "Review";
-			else if(this == StateName.PUBLIC )
-				return "Public";		
-			else if(this == StateName.ARCHIVED )
-				return "Archived";		
-			else if(this == StateName.EDITING )
-				return "Editing";		
-			else if(this == StateName.REAPPROVAL )
-				return "Reapproval";
-			else
-				return "Null";
-		}
+
 	}
 
 	/**
@@ -186,20 +171,37 @@ public class CGV_StateHelper {
 	 * @return the StateName enum type for that string, or null.
 	 */
 	public StateName toStateName(String curr){
-		if(curr == "Draft" )
+		if(curr.equalsIgnoreCase("Draft"))
 			return StateName.DRAFT;
-		else if(curr == "Review" )
+		else if(curr.equalsIgnoreCase("Review"))
 			return StateName.REVIEW;
-		else if(curr == "Public" )
+		else if(curr.equalsIgnoreCase("Public"))
 			return StateName.PUBLIC;		
-		else if(curr == "Archived" )
+		else if(curr.equalsIgnoreCase("Archived"))
 			return StateName.ARCHIVED;		
-		else if(curr == "Editing" )
+		else if(curr.equalsIgnoreCase("Editing"))
 			return StateName.EDITING;		
-		else if(curr == "Reapproval" )
+		else if(curr.equalsIgnoreCase("Reapproval"))
 			return StateName.REAPPROVAL;
 		else
 			return null;
+	}
+	
+	public String toString(StateName state){
+		if( state == StateName.DRAFT )
+			return "Draft";
+		else if(state == StateName.REVIEW )
+			return "Review";
+		else if(state == StateName.PUBLIC )
+			return "Public";		
+		else if(state == StateName.ARCHIVED )
+			return "Archived";		
+		else if(state == StateName.EDITING )
+			return "Editing";		
+		else if(state == StateName.REAPPROVAL )
+			return "Reapproval";
+		else
+			return "Null";
 	}
 
 	/**
