@@ -291,10 +291,12 @@ IPSWorkflowAction {
 			}
 		}
 		else{
+			//PSException e = new PSException();
+			//throw new PSExtensionProcessingException("The item cannot transition because of a dependency.",e);
 			//TODO: Find where the current item will go so that it doesnt go into the destState!!!!
-			transition(currentItem, currState, destState, stateHelp);
+			//transition(currentItem, currState, destState, stateHelp);
 			//TODO: error msg
-			System.out.println("debug error 205");
+			//System.out.println("debug error 205");
 			//LOGGER.debug("Cannot move the current item into the destinationState, there are dependencies.");
 		}
 //		else{	//currType != page
