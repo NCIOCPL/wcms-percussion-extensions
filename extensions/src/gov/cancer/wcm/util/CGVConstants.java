@@ -11,7 +11,6 @@ public class CGVConstants {
 
 	 public static String DISPLAY_TITLE_FLD = "long_title";
 	 public static String FRIENDLY_URL_FLD = "pretty_url_name";
-	 public static int EDITION_ID = 315;
 	 public static String[] TOP_CONTENT_TYPE_NAMES = {"cgvSinglePageContent","cgvClinicalTrialResult","cgvDrugInfoSummary","cgvFactSheet","cgvFeaturedClinicalTrial","cgvGeneric","cgvHome","cgvInclude","cgvPressRelease"};
 	 //TODO: get some of these fields from a config file. Ask Mudumby where such file would live
 }

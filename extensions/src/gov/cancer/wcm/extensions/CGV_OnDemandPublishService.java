@@ -40,6 +40,7 @@ import com.percussion.webservices.content.PSContentWsLocator;
 public class CGV_OnDemandPublishService implements InitializingBean {
 	private static final Log log = LogFactory.getLog(CGV_OnDemandPublishService.class);
 	private boolean bDebug = true;	//if true print statements to console
+//TODO: set bDebug to false when done debugging
 	
 	protected static IPSGuidManager gmgr = null;
 	protected static IPSRxPublisherService rps = null;
@@ -47,7 +48,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	protected static CGV_ParentChildManager pcm = null;
 
 	private int onDemandEditionId = 315;
-	private boolean waitForStatus = true;	//TODO: change this back to false
+	private boolean waitForStatus = true;
 	private int timeOut = 20000;
 	private int waitTime = 100;
 
@@ -79,7 +80,8 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 */
 	public void init(IPSExtensionDef extensionDef, File codeRoot)
 	throws PSExtensionException {
-		log.debug("Initializing CGV_OnDemandPublishService...");
+//		log.debug("Initializing CGV_OnDemandPublishService...");
+		if (bDebug) System.out.println("Initializing CGV_OnDemandPublishService...");
 	}
 
 	/**
@@ -93,9 +95,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		//log.debug("CGV_OnDemandPublishService::queueItemSet executing...");
 		initServices();
 		if (bDebug) System.out.println("after init services has run!");		
-		// get edition id
-		//TODO: is the constant correct?
-		onDemandEditionId = CGVConstants.EDITION_ID;
 
 		List<Integer> idsToPublish = null;	//the list to publish
 		if (bDebug) System.out.println("before checking of the top type");
@@ -187,40 +186,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			log.error("GSAOnDemandPublishServce::queueItemSet", nfx);
 		}
 		log.debug("GSAOnDemandPublishServce::queueItemSet done");
-
-
-		//work.
-		//			System.out.println("DEBUG: before queue on demand work");
-		//			
-		//			long workId = rxsvc.queueDemandWork(onDemandEditionId, work);
-		//			
-		//			System.out.println("ondemand edition id is = to " + onDemandEditionId);
-		//			System.out.println("work id is = to " + workId);
-		//			System.out.println("DEBUG before get demand request job");
-		//			
-		//			Long jobId = rxsvc.getDemandRequestJob(workId);
-		//			
-		//			System.out.println("long jobID = " + jobId);
-		//			System.out.println("DEBUG: after getDemandrequest job");
-		//
-		//			//Invoke the Publish routine
-		//			IPSPublisherJobStatus status = rxsvc.getPublishingJobStatus(jobId.longValue());
-		//			System.out.println("get status passed");
-		//			int count = status.countTotalItems();
-		//			System.out.println("count is = to " + count );
-		//			//Undocumented: -1 is apparently a code for something going wrong
-		//			if (count == -1) {
-		//				System.out.println("Took a long time to queue items");
-		//				//log.debug("Took a long time to queue items");
-		//			} else {
-		//				System.out.println("Queued " + count + " items");
-		//				//log.debug("Queued " + count + " items");
-		//			}
-		//		} catch (Exception nfx) {
-		//			System.out.println("Throwing the error, and was caught");
-		//			log.error("CGV_OnDemandPublishServce::queueItemSet", nfx);
-		//		}
-		//		log.debug("CGV_OnDemandPublishServce::queueItemSet done");
 	}
 
 	/**
@@ -228,35 +193,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 */
 	public void afterPropertiesSet() throws Exception {
 		initServices();
-	}
-
-	public void setOnDemandEditionId(int onDemandEditionId) {
-		this.onDemandEditionId = onDemandEditionId;
-	}
-
-	public int getOnDemandEditionId() {
-		return onDemandEditionId;
-	}
-
-
-	public boolean isWaitForStatus() {
-		return waitForStatus;
-	}
-
-	public void setWaitForStatus(boolean waitForStatus) {
-		this.waitForStatus = waitForStatus;
-	}
-
-	public int getWaitTime() {
-		return waitTime;
-	}
-
-	public void setWaitTime(int waitTime) {
-		this.waitTime = waitTime;
-	}
-
-	public void setTimeOut(int timeOut) {
-		this.timeOut = timeOut;
 	}
 
 	/**
@@ -290,7 +226,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		if (bDebug) System.out.println("beginning of get parent");
 		List<Integer>localPublishList = null;	//list of items to return
 		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currItemId)));
-		List<PSCoreItem> items = null;	//TODO: use the parentchild manager codeS
+		List<PSCoreItem> items = null;
 		PSCoreItem item = null;
 		try {
 			items = cmgr.loadItems(glist, true, false, false, false);
@@ -341,6 +277,62 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			localPublishList.add(currItemId);
 		}
 		return localPublishList;
+	}
+
+	/**
+	 * @param onDemandEditionId
+	 */
+	public void setOnDemandEditionId(int onDemandEditionId) {
+		this.onDemandEditionId = onDemandEditionId;
+	}
+
+	/**
+	 * @return int onDemandEditionId
+	 */
+	public int getOnDemandEditionId() {
+		return onDemandEditionId;
+	}
+
+	/**
+	 * @return boolean waitForStatus
+	 */
+	public boolean isWaitForStatus() {
+		return waitForStatus;
+	}
+
+	/**
+	 * @param waitForStatus
+	 */
+	public void setWaitForStatus(boolean waitForStatus) {
+		this.waitForStatus = waitForStatus;
+	}
+
+	/**
+	 * @return int waitTime
+	 */
+	public int getWaitTime() {
+		return waitTime;
+	}
+
+	/**
+	 * @param waitTime
+	 */
+	public void setWaitTime(int waitTime) {
+		this.waitTime = waitTime;
+	}
+
+	/**
+	 * @param timeOut
+	 */
+	public void setTimeOut(int timeOut) {
+		this.timeOut = timeOut;
+	}
+	
+	/**
+	 * @return int timeOut
+	 */
+	public int getTimeOut() {
+		return timeOut;
 	}
 
 }
