@@ -120,6 +120,10 @@ public class CGV_StateHelper {
 			return "Archived";
 		case 2:
 			return "Archived";
+		case 17:
+			return "Pending";
+		case 18:
+			return "Pending";
 			default:
 				return null;
 		}
@@ -133,7 +137,7 @@ public class CGV_StateHelper {
 		case 14:
 			return "Draft";
 		case 6:
-			return "Public";
+			return "Pending";
 		case 9:
 			return "Editing";
 		case 8:
@@ -148,6 +152,10 @@ public class CGV_StateHelper {
 			return "Public";
 		case 2:
 			return "Editing";
+		case 17:
+			return "Review";
+		case 18:
+			return "Public";
 			default:
 				return null;
 		}
@@ -160,7 +168,7 @@ public class CGV_StateHelper {
 	 *
 	 */
 	public enum StateName implements Comparable<StateName>
-	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL;
+	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL, PENDING;
 
 
 	}
@@ -183,6 +191,8 @@ public class CGV_StateHelper {
 			return StateName.EDITING;		
 		else if(curr.equalsIgnoreCase("Reapproval"))
 			return StateName.REAPPROVAL;
+		else if(curr.equalsIgnoreCase("Pending"))
+			return StateName.PENDING;
 		else
 			return null;
 	}
@@ -200,6 +210,8 @@ public class CGV_StateHelper {
 			return "Editing";		
 		else if(state == StateName.REAPPROVAL )
 			return "Reapproval";
+		else if(state == StateName.PENDING)
+			return "Pending";
 		else
 			return "Null";
 	}
@@ -222,6 +234,8 @@ public class CGV_StateHelper {
 			return "Editing";		
 		else if(currState == StateName.REAPPROVAL )
 			return "Reapproval";
+		else if(currState == StateName.PENDING )
+			return "Pending";
 		else
 			return "Null";
 	}
@@ -244,6 +258,8 @@ public class CGV_StateHelper {
 			return "Editing";		
 		else if(destState == StateName.REAPPROVAL )
 			return "Reapproval";
+		else if(destState == StateName.PENDING )
+			return "Pending";
 		else
 			return "Null";
 	}
@@ -325,24 +341,18 @@ public class CGV_StateHelper {
 	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
 	 */
 	public static int compare(String left, String right){
-		System.out.println("comparing... " + left + " to " + right);
-		if( left.equalsIgnoreCase("Draft") || left.equalsIgnoreCase("Editing") || left.equalsIgnoreCase("Reapproval") ){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval") ){
+		System.out.println("JDB: comparing... " + left + " to " + right);
+		if( left.equalsIgnoreCase("Draft")){
+			if(right.equalsIgnoreCase("Draft")){
 				System.out.println(left + " equal " + right);
 				return 0;
 			}
-			else if( right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Public") ){
-				System.out.println(left + " < " + right);
+			else{
 				return -1;
-			}
-			else if (right.equalsIgnoreCase("Archived")){
-				System.out.println(left+" > " +right);
-				return 1;
 			}
 		}
 		else if( left.equalsIgnoreCase("Review")){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval")
-					|| right.equalsIgnoreCase("Archived") ){
+			if( right.equalsIgnoreCase("Draft")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
@@ -350,24 +360,26 @@ public class CGV_StateHelper {
 				System.out.println(left+" equal " +right);
 				return 0;
 			}
-			else if (right.equalsIgnoreCase("Public")){
-				System.out.println(left+" > " +right);
-				return -1;	//TODO: was at 1... is this right?			
+			else {
+				return -1;		
 			}
 		}
-		else if( left.equalsIgnoreCase("Public") ){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval") 
-				|| right.equalsIgnoreCase("Archived") || right.equalsIgnoreCase("Review")){
+		else if (left.equalsIgnoreCase("Pending")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
-			else if (right.equalsIgnoreCase("Public")){
+			else if(right.equalsIgnoreCase("Pending")){
 				System.out.println(left+" equal " +right);
-				return 0;			
+				return 0;
+			}
+			else {
+				return -1;		
 			}
 		}
-		System.out.println(left+" NULLLLLLL " +right);
-		return 2;
+		else{
+			return 0;
+		}
 	}
 
 }
