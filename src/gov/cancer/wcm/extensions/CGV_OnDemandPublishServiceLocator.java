@@ -27,8 +27,7 @@ public class CGV_OnDemandPublishServiceLocator extends PSBaseServiceLocator
    public static CGV_OnDemandPublishService getCGV_OnDemandPublishService(){ 
 	   
 	   System.out.println("DEBUG: Getting the bean...");
-	   System.out.println((CGV_OnDemandPublishService) getBean(CGVONDEMENDPUBLISHSERVICEBEAN));
-      return (CGV_OnDemandPublishService) getBean(CGVONDEMENDPUBLISHSERVICEBEAN);    
+	   return (CGV_OnDemandPublishService) getBean(CGVONDEMENDPUBLISHSERVICEBEAN);
    }
    
    /**
