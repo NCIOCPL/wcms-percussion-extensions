@@ -15,6 +15,8 @@ import com.percussion.extension.IPSWorkFlowContext;
 import com.percussion.extension.IPSWorkflowAction;
 import com.percussion.extension.PSDefaultExtension;					//exception
 import com.percussion.extension.PSExtensionProcessingException;		//exception
+import com.percussion.rx.publisher.IPSRxPublisherService;
+import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSContentTypeSummary;
@@ -51,113 +53,81 @@ import com.percussion.services.contentmgr.IPSContentPropertyConstants;
 public class CGV_ParentChild extends PSDefaultExtension implements
 IPSWorkflowAction {
 	//private static Log LOGGER = LogFactory.getLog(CGov_TitlePopulate.class);
-	private static IPSContentWs cws = null;
+
+	protected static IPSGuidManager gmgr = null;
+	protected static IPSRxPublisherService rps = null;
+	protected static IPSContentWs cmgr = null;
+	protected static CGV_ParentChildManager pcm = null;
+
 	public CGV_ParentChild() {
 		super();
 		initServices();
 	}
-
-	/**
-	 * Takes all children items and moves them along the workflow with their parent item.  Some
-	 * logic determines what state an item can go into.
-	 * @see com.percussion.extension.IPSWorkflowAction#performAction(com.percussion.extension.IPSWorkFlowContext, com.percussion.server.IPSRequestContext)
-	 */
-	public void performAction(IPSWorkFlowContext wfContext, 
-			IPSRequestContext request) throws PSExtensionProcessingException{
-
-				
-		//boolean pending = false;	//There are no dependents.
-		//PSItemStatus item = request.getParameterObject(CGVConstant.PSITEMSTATUS);
-		//String currentCid = request.getParameter("sys_contentid");
-		//String guid = request.getParameter(CGVConstants.GUID);
+	
+	@Override
+	public void performAction(IPSWorkFlowContext arg0, IPSRequestContext request)
+			throws PSExtensionProcessingException {
+		// TODO Auto-generated method stub
 		
-		//FUNCTIONALITY
-		//PSLocator loc = PSOItemSummaryFinder.getCurrentOrEditLocator(request.getParameter("sys_contentid"));
-		//String currStateString = request.getParameter("sys_contentstateid");
-		//StateName currentState = getStateName(currStateString);
-		//StateName destinationState = ;	//TODO: Find the destination state of the workflow for the current item
-		//PSItemSummary current = request.getParameterObject("currentItem");
-		//String currentType = request.getParameter("sys_contenttypeid"); 	//current.getContentTypeName();
-
-
+		System.out.println("Parent/child: Calling extension...");
 		
 		
-		
-		boolean pending = false;	//there are no dependants
 		CGV_StateHelper stateHelp = new CGV_StateHelper(request);
-		CGV_ParentChildManager pcmgr = new CGV_ParentChildManager();
-		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
 		StateName currState = stateHelp.getCurrState();
 		StateName destState = stateHelp.getDestState();
 		String currStateString = stateHelp.currStateToString();
 		String destStateString = stateHelp.destStateToString();
 		String currCID = request.getParameter("sys_contentid");
 		int transitionID = stateHelp.getTransitionID();
-		
-		System.out.println("DEBUG: typeID: " + CGV_ParentChildManager.loadItem(currCID).getContentTypeId());
-		System.out.println("DEBUG: currentState: " + currStateString);
-		System.out.println("DEBUG: destinationState: " + destStateString);
-		System.out.println("DEBUG: transitionID: " + transitionID);
-		
+		System.out.println("Parent/child: Transition = " +transitionID);
+		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
 		IPSGuid currentItem =  PSGuidManagerLocator.getGuidMgr().makeGuid(new PSLocator(currCID));
+		int numSharedChildren = 0;
 		
-		//-----------------------------------------------------------------------------------------
-		//				Check to see if there is a pending parent...
+		boolean pending = false;
 		
-		//Find lowest parent state
-		StateName lowState = StateName.PUBLIC;
 		
-		List<PSItemSummary> children = null;
-		try {
-			children = pcmgr.getChildren(currentItem);
-		} catch (PSErrorException e) {
-			// TODO Auto-generated catch block
-			System.out.println("debug error 128");
-			e.printStackTrace();
-		}
-		//List<PSItemSummary> children = cws.findDependents(current.getGUID(), null, true);
-		System.out.println("Parent/Child: checking " + children.size() + " child items");
-		for( PSItemSummary currChild : children ){
-			PSState childState = null;
+		Long cid = CGV_ParentChildManager.loadItem(currCID).getContentTypeId();
+		//If PAGE TYPE...
+		if(topType(cid.intValue())){
+			StateName lowState = StateName.PUBLIC;
+
+			List<PSItemSummary> children = null;
 			try {
-				childState = workInfo.findWorkflowState(Integer.toString(pcmgr.getCID(currChild.getGUID()).get(0)));
-			} catch (PSException e) {
-				// TODO Auto-generated catch block
-				System.out.println("debug error 138");
-				e.printStackTrace();
+				children = pcm.getChildren(currentItem);
 			} catch (PSErrorException e) {
 				// TODO Auto-generated catch block
-				System.out.println("debug error 142");
 				e.printStackTrace();
 			}
-			StateName childStateName = stateHelp.toStateName(childState.getName());
-			String childStateString = childState.getName();
-			//System.out.println("before the if statement: "+childState.getName());
-			//StateName childState = currChild.state;
-			//System.out.println("Parent/Child: about to compare child state to destination state...");
-			//System.out.println("\t" + childStateName.toString() +" to " + destState.toString());
-			System.out.println("JDEBUG: Checking for shared children.");
-			System.out.println("JDEBUG: Checking : " + childStateString + " " + destState.toString());
-			if( CGV_StateHelper.compare( childStateString , destState.toString()) == -1
-					|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){ //currChild.state < destinationState || ==
+			for( PSItemSummary currChild : children ){
+				PSState childState = null;
+				try {
+					childState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(currChild.getGUID()).get(0)));
+				} catch (PSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (PSErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				StateName childStateName = stateHelp.toStateName(childState.getName());
+				String childStateString = childState.getName();
+				if( CGV_StateHelper.compare( childStateString , destState.toString()) == -1
+						|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){ 
 					
 					List<PSItemSummary> childParents = null;
 					try {
-						childParents = cws.findOwners(currChild.getGUID(), null, false);
+						childParents = cmgr.findOwners(currChild.getGUID(), null, false);
 					} catch (PSErrorException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					if(childParents.size() > 1){
-						//System.out.println("size of the parent list is " + childParents.size());
-						//System.out.println("Parent/Child: shared child "+currChild.getGUID());
-
-
-						//PSState lowState = staticHighestState;
+						numSharedChildren++;
 						for( PSItemSummary currParent : childParents ){
 							PSState parentsState = null;
 							try {
-								parentsState = workInfo.findWorkflowState(Integer.toString(pcmgr.getCID(currParent.getGUID()).get(0)));
+								parentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(currParent.getGUID()).get(0)));
 							} catch (PSException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -171,478 +141,75 @@ IPSWorkflowAction {
 								lowState = parState;
 							}
 						}
-						//System.out.println("Parent/Child: the lowest state of all the parents is... " + lowState.toString());
-						//TODO: this below line might need to be changed...
-//						if( ((CGV_StateHelper.compare(destState.toString(),childStateString)==0)||(CGV_StateHelper.compare(destState.toString(),childStateString)==1))
-//								&& ((CGV_StateHelper.compare(childStateString,lowState.toString())==0)||(CGV_StateHelper.compare(childStateString,lowState.toString())==1))
-//								){ 
-//							pending = true;
-//						}
-						if( CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 1	
+						if( (CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 1 
+								|| CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 0)
 								&& (CGV_StateHelper.compare(childStateString, lowState.toString()) == 1 
 										|| CGV_StateHelper.compare(childStateString, lowState.toString()) == 0)
-								&& CGV_StateHelper.compare(childStateString, destState.toString()) == -1)
+										&& CGV_StateHelper.compare(childStateString, destState.toString()) == -1)
 						{
 							pending = true;
 						}
-//							//if( destinationState >= currChild.state && currChild.state >= lowState )
-//							//currChild.transition( findTransition(currChild.state, lowerState(destinationState, lowState));
-//							//transition(currChild, childState, destState);
-//							
-////							if( lowState.toString().equalsIgnoreCase("Draft")){
-////								if( !destState.toString().equalsIgnoreCase("Draft")){
-////									pending = true;
-////								}
-////							}
-////							else if( lowState.toString().equalsIgnoreCase("Review")){
-////								if( destState.toString().equalsIgnoreCase("")){
-////									
-////								}
-////							}
-////							else{
-////							}
-//						}
-//								
-//								if( destState.toString().equalsIgnoreCase("Review") ){
-//									//transition(currChild, childStateName, destState, stateHelp);	THIS IS BECUASE THE LOW STATE COMES IN PLAY
-//									PSState tempChildState = null;
-//									try {
-//										tempChildState = workInfo.findWorkflowState(Integer.toString(pcmgr.getCID(currChild.getGUID()).get(0)));
-//									} catch (PSException e) {
-//										// TODO Auto-generated catch block
-//										e.printStackTrace();
-//									} catch (PSErrorException e) {
-//										// TODO Auto-generated catch block
-//										e.printStackTrace();
-//									}
-//								}
-//								else{
-//									pending = true;
-//								}
-//							}
-//							else{
-//								//transition(currChild, childStateName, destState, stateHelp);
-//
-//								PSState tempChildState = null;
-//								try {
-//									tempChildState = workInfo.findWorkflowState(Integer.toString(pcmgr.getCID(currChild.getGUID()).get(0)));
-//								} catch (PSException e) {
-//									// TODO Auto-generated catch block
-//									e.printStackTrace();
-//								} catch (PSErrorException e) {
-//									// TODO Auto-generated catch block
-//									e.printStackTrace();
-//								}
-//								StateName childStateCheck = stateHelp.toStateName(tempChildState.getName());
-////								if( childStateCheck == lowState){
-////									pending = true;
-////								}
-//							}
-					
-						
-						
-						
-						
+
 					}
 					else{	
 						//!shared child we do nothing, until we come back later to see if we can change or not....
 					}
-					
-//					else{	// !sharedChild(cws, currChild.getGUID())
-//						//transition(currChild, childState, destinationState);
-//						System.out.println("Parent/Child: not a shared child " +currChild.getGUID());
-//						System.out.println("Parent/Child: trying to transition the child...");
-//						System.out.println("childStateName = " + stateHelp.toString(childStateName));
-//						System.out.println("destinationState = " + stateHelp.toString(destState));
-//						transition(currChild.getGUID(), childStateName, destState, stateHelp);
-//					}
-			}
-		}
-		
-		//-----------------------------------------------------------------------------------------------
-		//				Do transitions... if allowed (based on pending)
-		
-		
-//		if(pending && (destState == StateName.REVIEW)){
-//			System.out.println("if(pending && (destState == StateName.REVIEW))");
-//			//current.transition( findTransition(current.state, destinationState));
-//			//transition(current, current.state, destinationState);
-//			transition(currentItem, currState, destState, stateHelp);
-//			for( PSItemSummary currChild : children ){	//all kids, transition
-//				PSState childState = null;
-//				try {
-//					childState = workInfo.findWorkflowState(Integer.toString(pcmgr.getCID(currChild.getGUID()).get(0)));
-//				} catch (PSException e) {
-//					// TODO Auto-generated catch block
-//					System.out.println("debug error 138");
-//					e.printStackTrace();
-//				} catch (PSErrorException e) {
-//					// TODO Auto-generated catch block
-//					System.out.println("debug error 142");
-//					e.printStackTrace();
-//				}
-//				StateName childStateName = stateHelp.toStateName(childState.getName());
-//				String childStateString = childState.getName();
-//				//transition child, if needed.
-//				if( CGV_StateHelper.compare( childStateString , destState.toString()) == -1
-//						|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){
-//					transition(currChild, childStateName, destState, stateHelp);
-//				}
-//			}
-//		}
-		if(!pending){
-			System.out.println("Parent/Child: Not going into the 'pending' state.");
-			//current.transition(findTransition(current.state, destinationState));
-			//transition(current, current.state, destinationState);
-			//transition(currentItem, currState, destState, stateHelp);
-			transition(currentItem, currState, destState, stateHelp, pending, true);
-			for( PSItemSummary currChild : children ){	//all kids, transition
-				PSState childState = null;
-				try {
-					childState = workInfo.findWorkflowState(Integer.toString(pcmgr.getCID(currChild.getGUID()).get(0)));
-				} catch (PSException e) {
-					// TODO Auto-generated catch block
-					//e.printStackTrace();
-				} catch (PSErrorException e) {
-					// TODO Auto-generated catch block
-					//e.printStackTrace();
-				}
-				StateName childStateName = stateHelp.toStateName(childState.getName());
-				String childStateString = childState.getName();
-				//transition child, if needed.
-				if( CGV_StateHelper.compare( childStateString , destState.toString()) == -1){
-					transition(currChild, childStateName, destState, stateHelp, pending, false);
 				}
 			}
-		}
-		else{
-			transition(currentItem, currState, destState, stateHelp, pending, true);
-			//PSException e = new PSException();
-			//throw new PSExtensionProcessingException("The item cannot transition because of a dependency.",e);
-			//TODO: Find where the current item will go so that it doesnt go into the destState!!!!
-			//transition(currentItem, currState, destState, stateHelp);
-			//TODO: error msg
-			//System.out.println("debug error 205");
-			//LOGGER.debug("Cannot move the current item into the destinationState, there are dependencies.");
-		}
-//		else{	//currType != page
-//			if( destinationState > current.state ){
-//				//current.transition(findTransition(current.state, destinationState));
-//			}
-//
-//		}
-		
-		//DEBUG CODE-----------------------------------------------------------
-//		System.out.println("Debugging the workflow action for parent child");
-//		IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
-//		IPSGuid cid = gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid")));
-//		
-//		CGV_ParentChildManager pcm = new CGV_ParentChildManager(cid);
-//		List<PSItemSummary> children = null;
-//		try {
-//			children = pcm.getChildren();
-//		} catch (PSErrorException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
-//		
-//		System.out.println("\tPrinting children content ids");
-//		for( PSItemSummary a : children ){
-//			System.out.println("\t\tType: " + a.getContentTypeId());
-//			System.out.println("\t\tGUID: " + a.getGUID());
-//			System.out.println("\t\tContent id: " + gmgr.makeLocator(a.getGUID()).getId());
-//			List<IPSGuid> items = Collections.<IPSGuid>singletonList(a.getGUID());
-//			try {
-//				PSSystemWsLocator.getSystemWebservice().transitionItems(items, "DirecttoPublic");
-//			} catch (PSMissingBeanConfigurationException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (PSErrorsException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (PSErrorException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-	}
+			//end of for statement.	
+			if(!pending){
+				transition(currentItem, currState, destState, stateHelp, pending, true);
+				for( PSItemSummary currChild : children ){
+					List<PSItemSummary> parentsSize = null;
+					try {
+						parentsSize = cmgr.findOwners(currChild.getGUID(), null, false);
+					} catch (PSErrorException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+						if(parentsSize.size() == 1 ){
+							transition(currChild.getGUID(), currState, destState, stateHelp, pending, false);
+						}
+				}
+			}
+			else{
+				//send message for pending;
+			}
 
+		}	//end of if statement (if top type)
+		else if(destState == StateName.PENDING){
+			transition(currentItem, currState, destState, stateHelp, pending, false);
+		}
+		
+
+	}
 
 
 	/**
-	 * TODO
-	 * TODO
-	 * TODO
-	 * TODO
-	 * TODO!!!!
-	 * USE THIS ONE ALL THE TIME
-	 * @param guid
-	 * @param childStateString
-	 * @param string
+	 * Returns true if this contentTypeId is in the list of topmost content types
+	 * @param contentTypeId - id to check
+	 * @return true if in list
 	 */
-//	private void transition(IPSGuid source, String childStateString, String destString) {
-//		List<IPSGuid> temp = Collections.<IPSGuid>singletonList(source);
-//		System.out.println("Temp should have GUID... " + source);
-//		System.out.println("temp has " + temp.size() +" item");
-//		System.out.println("\tcurrState = " + childStateString);
-//		System.out.println("\tdestState = " + destState);
-//		String transition;
-//		if()
-//		case DRAFT:
-//			switch (destState){
-//			case REVIEW:
-//				transition = "Submit";
-//				break;
-//			default:
-//				transition = "Null";
-//			}
-//			break;
-//		case REVIEW:
-//			switch (destState){
-//			case DRAFT:
-//				transition = "Disapprove";
-//				break;
-//			case PUBLIC:
-//				transition = "ForcetoPublic";
-//				break;
-//			default:
-//				transition = "Null";
-//			}
-//			break;
-//		case PUBLIC:
-//			switch (destState){
-//			case ARCHIVED:
-//				transition = "Archive";
-//				break;
-//			case EDITING:
-//				transition = "Quick Edit";
-//				break;
-//			default:
-//				transition = "Null";
-//			}
-//			break;
-//		case EDITING:
-//			switch (destState){
-//			case REAPPROVAL:
-//				transition = "Resubmit";
-//				break;
-//			default:
-//				transition = "Null";
-//			}
-//			break;
-//		case REAPPROVAL:
-//			switch (destState){
-//			case EDITING:
-//				transition = "Disapprove";
-//				break;
-//			case PUBLIC:
-//				transition = "Approve";
-//				break;
-//			default:
-//				transition = "Null";
-//			}
-//			break;
-//		case ARCHIVED:
-//			switch (destState){
-//			case EDITING:
-//				transition = "Revive";
-//				break;
-//			case PUBLIC:
-//				transition = "Republish";
-//				break;
-//			default:
-//				transition = "Null";
-//			}
-//			break;
-//		default:
-//			transition = "Null";
-//			break;	
-//		}
-//		if( transition != "Null"){
-//			System.out.println("Parent/Child: transition being called from...");
-//			System.out.println("\t"+transition+" = "+ currState.toString()+"-->"+destState.toString());
-//			System.out.println("\t\tfor GUID "+source);
-//			
-//			try {
-//				PSContentWsLocator.getContentWebservice().checkinItems(temp, "Checking in the items for Parent/Child Movement");
-//			} catch (PSMissingBeanConfigurationException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			} catch (PSErrorsException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//			
-//			try {
-//				for(IPSGuid t : temp){System.out.println(t);}
-//				PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
-//			} catch (PSMissingBeanConfigurationException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (PSErrorsException e) {
-//				// TODO Auto-generated catch blocks
-//				System.out.println("debug error 438");
-//				List<IPSGuid> errorGuid = e.getIds();
-//				for( IPSGuid a : errorGuid ){
-//					System.out.println(a);
-//				}
-//				e.printStackTrace();
-//			} catch (PSErrorException e) {
-//				// TODO Auto-generated catch block
-//				System.out.println("debug error 442");
-//				e.printStackTrace();
-//			}
-//			System.out.println("returning true");
-//			return true;
-//		}
-//		return false;
-//		
-//	}
-
-	public boolean canModifyStyleSheet() {
-		// TODO Auto-generated method stub
+	private boolean topType(int contentTypeId) {
+		//get array of type names
+		String[] doNotPublishParentTypes = CGVConstants.TOP_CONTENT_TYPE_NAMES;
+		for (String s : doNotPublishParentTypes) {
+			//if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
+			//get all summaries matching the current type
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
+			//if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
+			//get the first item
+			PSContentTypeSummary summaryItem = summaries.get(0);
+			if (contentTypeId == summaryItem.getGuid().getUUID()) {
+				return true;
+			}
+		}
 		return false;
 	}
 	
-	public static boolean transition(PSItemSummary source, StateName currState, StateName destState, CGV_StateHelper stateHelp, boolean pending, boolean parent){
-		//TODO: Make this just call the IPSGuid one, pass in the source.getGUID()
-		List<IPSGuid> temp = Collections.<IPSGuid>singletonList(source.getGUID());
-		System.out.println("transition debug: current GUID: " + source.getGUID());
-		System.out.println("transition debug: current state: " + stateHelp.toString(currState));
-		System.out.println("transition debug: destination state: " + stateHelp.toString(destState));
-		String transition;
-		switch (currState){
-		case DRAFT:
-			switch (destState){
-			case REVIEW:
-				transition = "Submit";
-				break;
-			default:
-				transition = "Null";
-			}
-			break;
-		case REVIEW:
-			switch (destState){
-			case DRAFT:
-				transition = "Disapprove";
-				break;
-			case PENDING:
-				transition = "Approve";
-				break;
-			default:
-				transition = "Null";
-			}
-			break;
-		case PUBLIC:
-			switch (destState){
-			case ARCHIVED:
-				transition = "Archive";
-				break;
-			case EDITING:
-				transition = "Quick Edit";
-				break;
-			default:
-				transition = "Null";
-			}
-			break;
-		case EDITING:
-			switch (destState){
-			case REAPPROVAL:
-				transition = "Resubmit";
-				break;
-			default:
-				transition = "Null";
-			}
-			break;
-		case REAPPROVAL:
-			switch (destState){
-			case EDITING:
-				transition = "Disapprove";
-				break;
-			case PUBLIC:
-				transition = "Approve";
-				break;
-			default:
-				transition = "Null";
-			}
-			break;
-		case ARCHIVED:
-			switch (destState){
-			case EDITING:
-				transition = "Revive";
-				break;
-			case PUBLIC:
-				transition = "Republish";
-				break;
-			default:
-				transition = "Null";
-			}
-			break;
-		case PENDING:
-			switch (destState){
-			case REVIEW:
-				transition = "backToReview";
-				break;
-			case PUBLIC:
-				transition = "ForcetoPublic";
-				break;
-			default:
-				transition = "Null";
-			}
-		default:
-			transition = "Null";
-			break;	
-		}
-		if( transition != "Null"){
-			System.out.println("Parent/Child: transition being called from...");
-			System.out.println("\t"+transition+" = "+ stateHelp.toString(currState)+"-->"+stateHelp.toString(destState));
-			try {
-				if(destState == StateName.PENDING ){
-					if(!parent){
-						if(!pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "ForcetoPublic");
-						}
-						else{}	//nothing for children
-					}
-					else{	//parent
-						if(!pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "ForcetoPublic");
-						}
-						else{
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "backToReview");
-						}
-					}
-				}
-				else if(destState == StateName.REVIEW){
-					if(parent){
-						if(pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "Disapprove");
-						}
-					}
-					else{
-						if(!pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
-						}
-					}
-				}
-				else{
-					PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
-				}
 
-			} catch (PSMissingBeanConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (PSErrorsException e) {
-				// TODO Auto-generated catch blocks
-				e.printStackTrace();
-			} catch (PSErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return true;
-		}
+	public boolean canModifyStyleSheet() {
+		// TODO Auto-generated method stub
 		return false;
 	}
 	
@@ -737,101 +304,107 @@ IPSWorkflowAction {
 		if( transition != "Null"){
 			System.out.println("Parent/Child: transition being called from...");
 			System.out.println("\t"+transition+" = "+ stateHelp.toString(currState)+"-->"+stateHelp.toString(destState));
-			try {
+			IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
 				if(destState == StateName.PENDING ){
 					if(!parent){
 						if(!pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "ForcetoPublic");
+							try {
+								sysws.transitionItems(temp, transition);
+							} catch (PSErrorsException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} catch (PSErrorException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							try {
+								sysws.transitionItems(temp, "ForcetoPublic");
+							} catch (PSErrorsException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (PSErrorException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 						else{}	//nothing for children
 					}
 					else{	//parent
 						if(!pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "ForcetoPublic");
+							try {
+								sysws.transitionItems(temp, "ForcetoPublic");
+							} catch (PSErrorsException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (PSErrorException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 						else{
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "backToReview");
+							try {
+								sysws.transitionItems(temp, "backToReview");
+							} catch (PSErrorsException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (PSErrorException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					}
 				}
 				else if(destState == StateName.REVIEW){
 					if(parent){
 						if(pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, "Disapprove");
+							try {
+								sysws.transitionItems(temp, "Disapprove");
+							} catch (PSErrorsException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (PSErrorException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					}
 					else{
 						if(!pending){
-							PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
+							try {
+								sysws.transitionItems(temp, transition);
+							} catch (PSErrorsException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (PSErrorException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					}
 				}
 				else{
-					PSSystemWsLocator.getSystemWebservice().transitionItems(temp, transition);
+					try {
+						sysws.transitionItems(temp, transition);
+					} catch (PSErrorsException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PSErrorException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 
-			} catch (PSMissingBeanConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (PSErrorsException e) {
-				// TODO Auto-generated catch blocks
-				e.printStackTrace();
-			} catch (PSErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			return true;
 		}
 		return false;
 	}
-	
-	public void debugStatement(IPSRequestContext request) {
-		System.out.println(" ");
-
-		String currentCid = request.getParameter("sys_contentid");
-		System.out.println("DEBUG: Current content id = " + currentCid);
-		
-		String currStateString = request.getParameter("sys_contentstateid");
-		System.out.println("DEBUG: Current state = " + currStateString);
-		
-		String state = request.getParameter("sys_state_name");
-		System.out.println("DEBUG: Current state = " +state);
-		
-		String curr = request.getParameter("sys_contenttypeid");
-		System.out.println("DEBUG: Current content type ID = " + curr);
-		
-		String folder = request.getParameter("sys_folderid");
-		System.out.println("DEBUG: Folder if = " + folder);
-		
-		String syspath = request.getParameter("sys_path");
-		System.out.println("DEBUG: The system path is = " + syspath);
-		
-		String trans = request.getParameter("sys_transitionid");
-		System.out.println("DEBUG: The transition id = " + trans);
-		
-		String work = request.getParameter("sys_workflowid");
-		System.out.println("DEBUG: Workflow id = " + work);
-	}
 
 	private static void initServices() {
-		if (cws == null) {
-			cws = PSContentWsLocator.getContentWebservice();
+		if (rps == null) {
+			rps = PSRxPublisherServiceLocator.getRxPublisherService();
+			gmgr = PSGuidManagerLocator.getGuidMgr();
+			cmgr = PSContentWsLocator.getContentWebservice();
+			pcm = new CGV_ParentChildManager();
 		}
 	}
-
-//	@Override
-//	public void performAction(IPSWorkFlowContext arg0, IPSRequestContext arg1)
-//			throws PSExtensionProcessingException {
-//		// TODO Auto-generated method stub
-//
-//		String currentCid = arg1.getParameter("sys_contentid");
-//		System.out.println("DEBUG: Current content id = " + currentCid);
-//		
-//		//String currStateString = arg1.getParameter("sys_statename");
-//		//System.out.println("DEBUG: Current state = " + currStateString);
-//		
-//		System.out.println("DEBUG: The current state ID is " + arg0.getStateID());
-//		
-//	}
 }
