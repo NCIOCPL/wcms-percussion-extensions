@@ -52,6 +52,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	private int timeOut = 20000;
 	private int waitTime = 100;
 
+//TODO: replace doNotPublishParentTypes with String[], remove declaration further down, configure in xml
+//as:
+//<property name="doNotPublishParentTyptes">
+//	<list>
+//		<value>sometype</value>
+//		<value>anothertype</value>
+//	</list>
+//</property>
 //	private List<String> doNotPublishParentTypes;
 
 	/**
