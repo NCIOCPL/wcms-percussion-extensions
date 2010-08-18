@@ -295,41 +295,6 @@ public class CGV_StateHelper {
 	public void setTransitionID(int transitionID) {
 		this.transitionID = transitionID;
 	}
-
-//	/**
-//	 * Compares two StateName objects and returns the operator that figures how they are related.
-//	 * To call, create the Helper object, and pass in two new objects.
-//	 * Exp: CGV_StateHelper( )  //TODO: Fix this, does not provide correct functionality from this space.
-//	 * 
-//	 * @param left - the left side of the compare (exp: left < right)
-//	 * @param right - the right side of the compare (exp: left < right)
-//	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
-//	 */
-//	public static int compare(StateName left, StateName right){
-//		if( (left == StateName.DRAFT) || (left == StateName.EDITING) || (left == StateName.REAPPROVAL) ){
-//			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) )
-//				return 0;
-//			else if( (right == StateName.REVIEW) || (right == StateName.PUBLIC) )
-//				return -1;
-//			else if ((right == StateName.ARCHIVED))
-//				return 1;
-//		}
-//		else if( left == StateName.REVIEW ){
-//			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) )
-//				return 1;
-//			else if((right == StateName.REVIEW))
-//				return 0;
-//			else if ((right == StateName.PUBLIC))
-//				return 1;			
-//		}
-//		else if( left == StateName.PUBLIC ){
-//			if( (right == StateName.DRAFT) || (right == StateName.EDITING) || (right == StateName.REAPPROVAL) || (right == StateName.ARCHIVED) || (right == StateName.REVIEW))
-//				return 1;
-//			else if ((right == StateName.PUBLIC))
-//				return 0;			
-//		}
-//		return 2;
-//	}
 	
 	/**
 	 * Compares two StateName objects and returns the operator that figures how they are related.
@@ -341,7 +306,7 @@ public class CGV_StateHelper {
 	 * @return 0 if equal, -1 if left < right, 1 if left > right, 2 for a null compare.
 	 */
 	public static int compare(String left, String right){
-		System.out.println("JDB: comparing... " + left + " to " + right);
+		//System.out.println("JDB: comparing... " + left + " to " + right);
 		if( left.equalsIgnoreCase("Draft")){
 			if(right.equalsIgnoreCase("Draft")){
 				System.out.println(left + " equal " + right);
@@ -370,6 +335,47 @@ public class CGV_StateHelper {
 				return 1;
 			}
 			else if(right.equalsIgnoreCase("Pending")){
+				System.out.println(left+" equal " +right);
+				return 0;
+			}
+			else {
+				return -1;		
+			}
+		}
+		else if (left.equalsIgnoreCase("Editing")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending")){
+				System.out.println(left+" > " +right);
+				return 1;
+			}
+			else if(right.equalsIgnoreCase("Editing")){
+				System.out.println(left+" equal " +right);
+				return 0;
+			}
+			else {
+				return -1;		
+			}
+		}
+		else if (left.equalsIgnoreCase("Reapproval")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending") ||
+					right.equalsIgnoreCase("Editing")){
+				System.out.println(left+" > " +right);
+				return 1;
+			}
+			else if(right.equalsIgnoreCase("Reapproval")){
+				System.out.println(left+" equal " +right);
+				return 0;
+			}
+			else {
+				return -1;		
+			}
+		}
+		else if (left.equalsIgnoreCase("Archived")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending") ||
+					right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval")){
+				System.out.println(left+" > " +right);
+				return 1;
+			}
+			else if(right.equalsIgnoreCase("Archived")){
 				System.out.println(left+" equal " +right);
 				return 0;
 			}
