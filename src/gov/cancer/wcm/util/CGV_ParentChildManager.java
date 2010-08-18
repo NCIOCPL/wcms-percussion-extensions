@@ -212,6 +212,26 @@ public class CGV_ParentChildManager {
 		return item;
 	}
 	
+	public boolean isCheckedOut(IPSGuid cid){
+		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(cid);
+		List<PSCoreItem> items = null;
+		PSCoreItem item = null;
+		try {
+			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
+			item = items.get(0);
+		} catch (PSErrorResultsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(	item.getCheckedOutByName().length() == 0){
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	
+
 	
 	/**
 	 * Loads a String content id, into a PSCoreItem object.
