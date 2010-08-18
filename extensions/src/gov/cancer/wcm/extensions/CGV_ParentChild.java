@@ -64,7 +64,6 @@ IPSWorkflowAction {
 		initServices();
 	}
 	
-	@Override
 	public void performAction(IPSWorkFlowContext arg0, IPSRequestContext request)
 			throws PSExtensionProcessingException {
 		// TODO Auto-generated method stub
@@ -83,6 +82,13 @@ IPSWorkflowAction {
 		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
 		IPSGuid currentItem =  PSGuidManagerLocator.getGuidMgr().makeGuid(new PSLocator(currCID));
 		int numSharedChildren = 0;
+		StateName childHoldState = null;
+		int childHoldRevision = 0;
+		int pendingCode = 0;
+		
+		if( pcm.isCheckedOut(currentItem) ){
+			return;
+		}
 		
 		boolean pending = false;
 		
@@ -90,8 +96,9 @@ IPSWorkflowAction {
 		Long cid = CGV_ParentChildManager.loadItem(currCID).getContentTypeId();
 		//If PAGE TYPE...
 		if(topType(cid.intValue())){
+			
 			StateName lowState = StateName.PUBLIC;
-
+			
 			List<PSItemSummary> children = null;
 			try {
 				children = pcm.getChildren(currentItem);
@@ -112,8 +119,8 @@ IPSWorkflowAction {
 				}
 				StateName childStateName = stateHelp.toStateName(childState.getName());
 				String childStateString = childState.getName();
-				if( CGV_StateHelper.compare( childStateString , destState.toString()) == -1
-						|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){ 
+				if(CGV_StateHelper.compare( childStateString , destState.toString()) == -1
+						|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){
 					
 					List<PSItemSummary> childParents = null;
 					try {
@@ -124,6 +131,7 @@ IPSWorkflowAction {
 					}
 					if(childParents.size() > 1){
 						numSharedChildren++;
+						//find the low state of all the shared parents.
 						for( PSItemSummary currParent : childParents ){
 							PSState parentsState = null;
 							try {
@@ -141,24 +149,57 @@ IPSWorkflowAction {
 								lowState = parState;
 							}
 						}
+						
 						if( (CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 1 
 								|| CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 0)
 								&& (CGV_StateHelper.compare(childStateString, lowState.toString()) == 1 
 										|| CGV_StateHelper.compare(childStateString, lowState.toString()) == 0)
-										&& CGV_StateHelper.compare(childStateString, destState.toString()) == -1)
+								&& CGV_StateHelper.compare(childStateString, destState.toString()) == -1 
+								/*|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0) */  )
 						{
+							System.out.println("Pending code 2");
+							if(pendingCode < 2 ){pendingCode = 2;}
 							pending = true;
+							if( childHoldState == null ){
+								childHoldState = stateHelp.toStateName(childStateString);
+							}
+							else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
+								childHoldState = stateHelp.toStateName(childStateString);
+							}
+							childHoldRevision = pcm.getRevision(currChild.getGUID());
 						}
-
 					}
-					else{	
-						//!shared child we do nothing, until we come back later to see if we can change or not....
+					if(!stateHelp.existsDirectPath(currState, destState)){	//the child cannot reach the destination state in 1 move.
+						System.out.println("Pending code 3");
+						if(pendingCode < 3 ){pendingCode = 3;}
+						pending = true;
+						if( childHoldState == null ){
+							childHoldState = stateHelp.toStateName(childStateString);
+						}
+						else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
+							childHoldState = stateHelp.toStateName(childStateString);
+						}
+					}
+					if(pcm.isCheckedOut(currChild.getGUID())){	//if the current child is checked out, then pending.
+						System.out.println("Pending code 1");
+						if(pendingCode < 1 ){pendingCode = 1;}
+						pending = true;
+						if( childHoldState == null ){
+							childHoldState = stateHelp.toStateName(childStateString);
+						}
+						else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
+							childHoldState = stateHelp.toStateName(childStateString);
+						}
 					}
 				}
 			}
+			//if(pending){System.out.println("we are pending for something!");}
 			//end of for statement.	
 			if(!pending){
-				transition(currentItem, currState, destState, stateHelp, pending, true);
+				if( stateHelp.getDestState() != null ){
+					transition(currentItem, currState, destState, stateHelp, pending, true);
+				}
+				
 				for( PSItemSummary currChild : children ){
 					List<PSItemSummary> parentsSize = null;
 					try {
@@ -167,13 +208,104 @@ IPSWorkflowAction {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-						if(parentsSize.size() == 1 ){
+					if(parentsSize.size() == 1 ){
+						if(!stateHelp.isBackwardsMove(currState, destState)){
 							transition(currChild.getGUID(), currState, destState, stateHelp, pending, false);
 						}
+					}
 				}
 			}
-			else{
+			else{	//if pending
+				//if(destState != childHoldState && childHoldRevision != 0 ){
+				if(!stateHelp.isMapping(childHoldState,destState)){
+					String transitionFind = stateHelp.backwardsPath(currState, destState);
+					List<IPSGuid> temp = Collections.<IPSGuid>singletonList(currentItem);
+					IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+					if(transitionFind.equalsIgnoreCase("ResubmitReapproveArchive")){
+						try {
+							sysws.transitionItems(temp, "Resubmit");
+						} catch (PSErrorsException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (PSErrorException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						try {
+							sysws.transitionItems(temp, "Reapprove");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						try {
+							sysws.transitionItems(temp, "Archive");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else if(transitionFind.equalsIgnoreCase("ReviseResubmit")){
+						try {
+							sysws.transitionItems(temp, "Revise");
+						} catch (PSErrorsException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (PSErrorException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						try {
+							sysws.transitionItems(temp, "Resubmit");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else if(transitionFind.equalsIgnoreCase("ResubmitReapprove")){
+						try {
+							sysws.transitionItems(temp, "Resubmit");
+						} catch (PSErrorsException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (PSErrorException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						try {
+							sysws.transitionItems(temp, "Reapprove");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else{
+						try {
+							sysws.transitionItems(temp, transitionFind);
+						} catch (PSErrorsException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (PSErrorException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+				
+				
 				//send message for pending;
+				
 			}
 
 		}	//end of if statement (if top type)
@@ -268,7 +400,7 @@ IPSWorkflowAction {
 				transition = "Disapprove";
 				break;
 			case PUBLIC:
-				transition = "Approve";
+				transition = "Reapprove";
 				break;
 			default:
 				transition = "Null";
@@ -305,94 +437,95 @@ IPSWorkflowAction {
 			System.out.println("Parent/Child: transition being called from...");
 			System.out.println("\t"+transition+" = "+ stateHelp.toString(currState)+"-->"+stateHelp.toString(destState));
 			IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
-				if(destState == StateName.PENDING ){
-					if(!parent){
-						if(!pending){
-							try {
-								sysws.transitionItems(temp, transition);
-							} catch (PSErrorsException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							} catch (PSErrorException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-							try {
-								sysws.transitionItems(temp, "ForcetoPublic");
-							} catch (PSErrorsException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (PSErrorException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+			if(destState == StateName.PENDING ){
+				if(!parent){
+					if(!pending){
+						try {
+							sysws.transitionItems(temp, transition);
+						} catch (PSErrorsException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						} catch (PSErrorException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
 						}
-						else{}	//nothing for children
-					}
-					else{	//parent
-						if(!pending){
-							try {
-								sysws.transitionItems(temp, "ForcetoPublic");
-							} catch (PSErrorsException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (PSErrorException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						else{
-							try {
-								sysws.transitionItems(temp, "backToReview");
-							} catch (PSErrorsException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (PSErrorException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+						try {
+							sysws.transitionItems(temp, "ForcetoPublic");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
+					else{}	//nothing for children
 				}
-				else if(destState == StateName.REVIEW){
-					if(parent){
-						if(pending){
-							try {
-								sysws.transitionItems(temp, "Disapprove");
-							} catch (PSErrorsException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (PSErrorException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+				else{	//parent
+					if(!pending){
+						try {
+							sysws.transitionItems(temp, "ForcetoPublic");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
 					else{
-						if(!pending){
-							try {
-								sysws.transitionItems(temp, transition);
-							} catch (PSErrorsException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							} catch (PSErrorException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+						try {
+							sysws.transitionItems(temp, "backToReview");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+			else if(destState == StateName.REVIEW){
+				if(parent){
+					if(pending){
+						try {
+							sysws.transitionItems(temp, "Disapprove");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 					}
 				}
 				else{
-					try {
-						sysws.transitionItems(temp, transition);
-					} catch (PSErrorsException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (PSErrorException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if(!pending){
+						try {
+							sysws.transitionItems(temp, transition);
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
+			}
+			else{
+				System.out.println("!dest review, or dest pending");
+				try {
+					sysws.transitionItems(temp, transition);
+				} catch (PSErrorsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (PSErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 
 			return true;
 		}
