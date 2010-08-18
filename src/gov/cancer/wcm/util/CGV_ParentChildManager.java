@@ -223,12 +223,30 @@ public class CGV_ParentChildManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		System.out.println("name of the user who has the item checked out = " + item.getCheckedOutByName());
 		if(	item.getCheckedOutByName().length() == 0){
+			System.out.println("the name of the user is nothing....");
 			return false;
 		}
 		else{
+			System.out.println("the name of the user is something!!!!");
 			return true;
 		}
+	}
+	
+	public int getRevision(IPSGuid cid){
+		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(cid);
+		List<PSCoreItem> items = null;
+		PSCoreItem item = null;
+		try {
+			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
+			item = items.get(0);
+		} catch (PSErrorResultsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return item.getRevisionCount();
 	}
 	
 
