@@ -297,6 +297,97 @@ public class CGV_StateHelper {
 	}
 	
 	/**
+	 * 
+	 * @param currState
+	 * @param destState
+	 * @return
+	 */
+	public String backwardsPath(StateName currState, StateName destState){
+		//TODO: Make configurable
+		String transition;
+		switch (currState){
+		case DRAFT:
+			switch (destState){
+			case REVIEW:
+				transition = "Disapprove";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case REVIEW:
+			switch (destState){
+			case DRAFT:
+				transition = "Submit";
+				break;
+			case PENDING:
+				transition = "backToReview";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case PUBLIC:
+			switch (destState){
+			case ARCHIVED:
+				transition = "Republish";
+				break;
+			case EDITING:
+				transition = "ResubmitReapprove";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case EDITING:
+			switch (destState){
+			case REAPPROVAL:
+				transition = "Disapprove";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case REAPPROVAL:
+			switch (destState){
+			case EDITING:
+				transition = "Resubmit";
+				break;
+			case PUBLIC:
+				transition = "ReviseResubmit";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case ARCHIVED:
+			switch (destState){
+			case EDITING:
+				transition = "ResubmitReapproveArchive";
+				break;
+			case PUBLIC:
+				transition = "Archive";
+				break;
+			default:
+				transition = "Null";
+			}
+			break;
+		case PENDING:
+			switch (destState){
+			case REVIEW:
+				transition = "Approve";
+				break;
+			default:
+				transition = "Null";
+			}
+		default:
+			transition = "Null";
+			break;	
+		}
+		return transition;
+	}
+	
+	/**
 	 * Compares two StateName objects and returns the operator that figures how they are related.
 	 * To call, create the Helper object, and pass in two new objects.
 	 * Exp: CGV_StateHelper( )  //TODO: Fix this, does not provide correct functionality from this space.
@@ -385,6 +476,227 @@ public class CGV_StateHelper {
 		}
 		else{
 			return 0;
+		}
+	}
+
+	/**
+	 * Returns true if there is a 1 step work flow path from the current to the
+	 * destination state.
+	 * @param currState - current state we are in.
+	 * @param destState - the destination state.
+	 * @return true if the single path exists, if it is more then 1 step, rtn false.
+	 */
+	public boolean existsDirectPath(StateName currState, StateName destState) {
+		switch (currState){
+		case DRAFT:
+			switch (destState){
+			case REVIEW:
+				return true;
+			default:
+				return false;
+			}
+		case REVIEW:
+			switch (destState){
+			case DRAFT:
+				return true;
+			case PENDING:
+				return true;
+			default:
+				return false;
+			}
+		case PUBLIC:
+			switch (destState){
+			case ARCHIVED:
+				return true;
+			case EDITING:
+				return true;
+			default:
+				return false;
+			}
+		case EDITING:
+			switch (destState){
+			case REAPPROVAL:
+				return true;
+			default:
+				return false;
+			}
+		case REAPPROVAL:
+			switch (destState){
+			case EDITING:
+				return true;
+			case PUBLIC:
+				return true;
+			default:
+				return false;
+			}
+		case ARCHIVED:
+			switch (destState){
+			case EDITING:
+				return true;
+			case PUBLIC:
+				return true;
+			default:
+				return false;
+			}
+		case PENDING:
+			switch (destState){
+			case REVIEW:
+				return true;
+			case PUBLIC:
+				return true;
+			default:
+				return false;
+			}
+		default:
+			return false;
+		}
+	}
+	
+	/**
+	 * Returns true if this is a backwards workflow movement.
+	 * @param currState - current state we are in.
+	 * @param destState - the destination state.
+	 * @return true if the single path exists, if it is more then 1 step, rtn false.
+	 */
+	public boolean isBackwardsMove(StateName currState, StateName destState) {
+		switch (currState){
+		case DRAFT:
+			switch (destState){
+			case REVIEW:
+				return false;
+			default:
+				return true;
+			}
+		case REVIEW:
+			switch (destState){
+			case DRAFT:
+				return true;
+			case PENDING:
+				return false;
+			default:
+				return false;
+			}
+		case PUBLIC:
+			switch (destState){
+			case ARCHIVED:
+				return false;
+			case EDITING:
+				return false;
+			default:
+				return false;
+			}
+		case EDITING:
+			switch (destState){
+			case REAPPROVAL:
+				return false;
+			default:
+				return false;
+			}
+		case REAPPROVAL:
+			switch (destState){
+			case EDITING:
+				return true;
+			case PUBLIC:
+				return false;
+			default:
+				return false;
+			}
+		case ARCHIVED:
+			switch (destState){
+			case EDITING:
+				return true;
+			case PUBLIC:
+				return false;
+			default:
+				return false;
+			}
+		case PENDING:
+			switch (destState){
+			case REVIEW:
+				return true;
+			case PUBLIC:
+				return false;
+			default:
+				return false;
+			}
+		default:
+			return false;
+		}
+	}
+
+	public boolean isMapping(StateName childState, StateName parentDestinationState) {
+		switch (childState){
+		case DRAFT:
+			switch (parentDestinationState){
+			case EDITING:
+				return true;
+			case DRAFT:
+				return true;
+			default:
+				return false;
+			}
+		case REVIEW:
+			switch (parentDestinationState){
+			case REAPPROVAL:
+				return true;
+			case REVIEW:
+				return true;
+			default:
+				return false;
+			}
+		case PUBLIC:
+			switch (parentDestinationState){
+			case ARCHIVED:
+				return true;
+			case PUBLIC:
+				return true;
+			case PENDING:
+				return true;
+			default:
+				return false;
+			}
+		case EDITING:
+			switch (parentDestinationState){
+			case DRAFT:
+				return true;
+			case EDITING:
+				return true;
+			default:
+				return false;
+			}
+		case REAPPROVAL:
+			switch (parentDestinationState){
+			case REVIEW:
+				return true;
+			case REAPPROVAL:
+				return true;
+			default:
+				return false;
+			}
+		case ARCHIVED:
+			switch (parentDestinationState){
+			case PUBLIC:
+				return true;
+			case ARCHIVED:
+				return true;
+			case PENDING:
+				return true;
+			default:
+				return false;
+			}
+		case PENDING:
+			switch (parentDestinationState){
+			case PUBLIC:
+				return true;
+			case ARCHIVED:
+				return true;
+			case PENDING:
+				return true;
+			default:
+				return false;
+			}
+		default:
+			return false;
 		}
 	}
 
