@@ -1,7 +1,7 @@
 package gov.cancer.wcm.extensions;
 
-import gov.cancer.wcm.util.CGVConstants;
 import gov.cancer.wcm.util.CGV_ParentChildManager;
+import gov.cancer.wcm.util.CGV_TopTypeChecker;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,7 +22,6 @@ import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.rx.publisher.data.PSDemandWork;
 import com.percussion.services.catalog.PSTypeEnum;
-import com.percussion.services.content.data.PSContentTypeSummary;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
@@ -106,7 +105,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 
 		List<Integer> idsToPublish = null;	//the list to publish
 		if (bDebug) System.out.println("before checking of the top type");
-		//if (!topType(contentTypeId.intValue())) {
 		//if this is not the ultimate parent, get parents
 		idsToPublish = getParents(contentId);
 		if (bDebug) System.out.println("\n\tItem CID: " + contentId);
@@ -204,28 +202,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	}
 
 	/**
-	 * Returns true if this contentTypeId is in the list of topmost content types
-	 * @param contentTypeId - id to check
-	 * @return true if in list
-	 */
-	private boolean topType(int contentTypeId) {
-		//get array of type names
-		String[] doNotPublishParentTypes = CGVConstants.TOP_CONTENT_TYPE_NAMES;
-		for (String s : doNotPublishParentTypes) {
-			if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
-			//get all summaries matching the current type
-			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
-			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
-			//get the first item
-			PSContentTypeSummary summaryItem = summaries.get(0);
-			if (contentTypeId == summaryItem.getGuid().getUUID()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Get recursive list of all parent content items to this item
 	 * @param currItemId
 	 * @return List of parent items
@@ -246,7 +222,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		if (bDebug) System.out.println("before checking the top type");
 
 		Long typeId = item.getContentTypeId();
-		if (!topType(typeId.intValue())) {
+		if (!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)) {
 			//if this is a topmost content type, don't get the parents
 			if (bDebug) System.out.println("!top type statement");
 			try {
