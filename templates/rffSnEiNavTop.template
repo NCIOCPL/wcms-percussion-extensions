@@ -1,0 +1,123 @@
+  <assemblytemplate id="1">
+    <guid>0-4-507</guid>
+    <active-assembly-type>Normal</active-assembly-type>
+    <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
+    <assembly-url>../assembler/render</assembly-url>
+    <bindings>
+      <binding id="2">
+        <execution-order>1</execution-order>
+        <expression>$sys.variables.rxs_navbase</expression>
+        <id>0</id>
+        <jexl-script id="3">
+          <text>$sys.variables.rxs_navbase;</text>
+        </jexl-script>
+        <variable>$rxs_navbase</variable>
+      </binding>
+    </bindings>
+    <charset>UTF-8</charset>
+    <content-ids/>
+    <description>Renders the top nav</description>
+    <global-template/>
+    <global-template-usage>None</global-template-usage>
+    <label>S - EI Nav Top</label>
+    <location-prefix/>
+    <location-suffix/>
+    <mime-type>text/html</mime-type>
+    <name>rffSnEiNavTop</name>
+    <output-format>Snippet</output-format>
+    <publish-when>Never</publish-when>
+    <site-ids>
+      <site-id>301</site-id>
+    </site-ids>
+    <style-sheet-path/>
+    <template>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
+
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;EI Top Nav&lt;/title&gt;
+    &lt;link href="$rxs_navbase/css/rxs_styles.css" 
+	  rel="stylesheet" type="text/css"&gt;
+	&lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+    &lt;script src="$rxs_navbase/js/mouseover.js" 
+	    language="javascript" type="text/javascript"&gt;;&lt;/script&gt;
+
+  &lt;/head&gt;
+  &lt;body&gt;
+    #set($toplevel = $nav.root.getNodes("nav:submenu"))
+    #set($bkimage = "$rxs_navbase/images/navEI_bkgd.gif")
+    #set($selectedImage = $nav.root.getProperty("nav:selectedImage").Node)
+    #set($homelogo = "#imageurl($selectedImage 'active')")
+    #set($homelink = $nav.root.getProperty("nav:url").String)
+    #set($hometitle = $nav.root.getProperty("nav:landingPage").Node.getProperty("displaytitle").String)
+
+#macro(rollover_up $image $title $landing_page)
+    ## Rollover (inactive) image
+  #set ($rolloverimage = "#imageurl($image 'rollover')" )
+  #set ($contentid = $image.getProperty("rx:sys_contentid").String)
+  #set ($img_name = "img_a$contentid" )
+  #set ($inactiveimage = "#imageurl($image 'inactive')")
+  #set ($js_roll = "MM_swapImage('$img_name','','$rolloverimage',1)" )
+    #if ( $landing_page )
+    &lt;a href="$landing_page" onmouseover="$js_roll" onmouseout="MM_swapImgRestore()"&gt;
+      &lt;img src="$inactiveimage" id="$img_name" alt="$title" border="0"/&gt;
+    &lt;/a&gt;
+    #else
+    &lt;img src="$inactiveimage" id="$img_name" alt="$title" border="0"/&gt;
+    #end
+#end
+
+#macro(rollover_down $image $title $landing_page)
+    ## Active image
+  #set ($contentid = $image.getProperty("rx:sys_contentid").String)
+  #set ($img_name = "img_a$contentid" )
+  #set ($activeimage = "#imageurl($image 'active')")
+    #if ( $landing_page )
+	&lt;a href="$landing_page"&gt;
+	  &lt;img src="$activeimage" id="$img_name" alt="$title" border="0"/&gt;
+	&lt;/a&gt;
+    #else
+	&lt;img src="$activeimage" id="$img_name" alt="$title" border="0"/&gt;
+    #end
+#end
+
+#macro(rollover $navon)
+	#set($landing_page = $navon.getProperty("nav:url").String)
+	#set($title = $navon.getProperty("nav:landingPage").Node.getProperty("rx:displaytitle").String)
+	#set($axis = $navon.getProperty("nav:axis").String)
+	#set($nodeiter = $navon.getNodes("nav:image"))
+	#if ($nodeiter.hasNext())
+		#set($image = $nodeiter.next())
+    	#if ($axis == "SELF" || $axis == "ANCESTOR")
+			#rollover_down($image $title $landing_page)
+    	#else
+			#rollover_up($image $title $landing_page)
+		#end
+	#end
+#end
+
+    ## if so, build the div, a, and img tags
+    &lt;div class="logo"&gt;
+      &lt;a href="$homelink"&gt;
+	&lt;img src="$homelogo" alt="$hometitle"&gt;
+      &lt;/a&gt;
+    &lt;/div&gt;
+
+    ## build top nav
+    &lt;table cellpadding="0" cellspacing="0"&gt;
+      &lt;tr&gt;
+	#foreach($navon in $toplevel)
+	&lt;td&gt;
+	  #rollover ($navon)
+	&lt;/td&gt;
+	#end
+	&lt;td width="100%" height="24" style="background-image:url(${bkimage});"/&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+
+  &lt;/body&gt;
+&lt;/html&gt;
+			</template>
+    <template-slot-ids/>
+    <template-type>Local</template-type>
+    <variant>false</variant>
+  </assemblytemplate>

@@ -1,0 +1,94 @@
+  <assemblytemplate id="1">
+    <guid>0-4-536</guid>
+    <active-assembly-type>Normal</active-assembly-type>
+    <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
+    <assembly-url>../assembler/render</assembly-url>
+    <bindings/>
+    <charset>UTF-8</charset>
+    <content-ids/>
+    <description>Renders the breadcrumbs</description>
+    <global-template/>
+    <global-template-usage>None</global-template-usage>
+    <label>S - CI Nav Breadcrumbs</label>
+    <location-prefix/>
+    <location-suffix/>
+    <mime-type>text/html</mime-type>
+    <name>rffSnCiNavBreadcrumbs</name>
+    <output-format>Snippet</output-format>
+    <publish-when>Never</publish-when>
+    <site-ids>
+      <site-id>303</site-id>
+    </site-ids>
+    <style-sheet-path/>
+    <template>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;   
+
+&lt;html&gt;
+      &lt;head&gt;
+	&lt;title&gt;nav breadcrumb snippet&lt;/title&gt;
+    &lt;link href="$rxs_navbase/css/rxs_styles.css" 
+	  rel="stylesheet" type="text/css"&gt;
+    &lt;script src="$rxs_navbase/js/mouseover.js" 
+	    language="javascript" type="text/javascript"&gt;;&lt;/script&gt;
+	&lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+
+#macro(rootlevel $node)
+    &amp;#160;&amp;#160;&amp;#160;
+    #landinglink($node)
+    #apply_macros($node.getNodes("nav:submenu"))
+#end
+
+
+#macro(apply_macros $nodes)
+    #foreach ($node in $nodes)
+    #matchnode($node)
+    #end
+#end
+
+#macro(matchnode $node)
+    #set($axis = $node.getProperty("nav:axis").String)
+    #set ( $image = $node.getNodes("nav:image").next())
+    #if ($axis == "ANCESTOR" || $axis == "PARENT")
+    #ancestornode($node)
+    #elseif($axis == "SELF")
+    #selfnode($node)
+    #else
+    #end
+#end
+
+
+#macro(ancestornode $node)
+    &amp;#160;&amp;gt;&amp;#160;
+    #landinglink($node)
+    #apply_macros($node.getNodes("nav:submenu"))
+#end
+
+#macro(selfnode $node)
+#set($title = $node.getProperty("rx:displaytitle").String)
+    &amp;#160;&amp;gt;&amp;#160;
+    $title
+    #apply_macros($node.getNodes("nav:submenu"))
+#end
+
+#macro(landinglink $node)
+    #set($landing_page = $node.getProperty("nav:url").String)
+    #set($title = $node.getProperty("rx:displaytitle").String)
+    #if ( $landing_page )
+    &lt;a href="$landing_page"&gt;$title&lt;/a&gt;
+    #else
+    $title
+    #end
+#end
+
+       &lt;div class="BreadCrumbs"&gt;
+	 #rootlevel($nav.root)
+       &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+
+</template>
+    <template-slot-ids/>
+    <template-type>Local</template-type>
+    <variant>false</variant>
+  </assemblytemplate>

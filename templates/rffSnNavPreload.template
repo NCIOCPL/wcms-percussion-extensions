@@ -1,0 +1,74 @@
+  <assemblytemplate id="1">
+    <guid>0-4-508</guid>
+    <active-assembly-type>Normal</active-assembly-type>
+    <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
+    <assembly-url>../assembler/render</assembly-url>
+    <bindings>
+      <binding id="2">
+        <execution-order>1</execution-order>
+        <expression>$sys.variables.rxs_navbase</expression>
+        <id>0</id>
+        <jexl-script id="3">
+          <text>$sys.variables.rxs_navbase;</text>
+        </jexl-script>
+        <variable>$rxs_navbase</variable>
+      </binding>
+      <binding id="4">
+        <execution-order>2</execution-order>
+        <expression>0</expression>
+        <id>0</id>
+        <jexl-script id="5">
+          <text>0;</text>
+        </jexl-script>
+        <variable>$context</variable>
+      </binding>
+    </bindings>
+    <charset>UTF-8</charset>
+    <content-ids/>
+    <description>Javascript preload images function</description>
+    <global-template/>
+    <global-template-usage>None</global-template-usage>
+    <label>S - Nav Preload</label>
+    <location-prefix/>
+    <location-suffix/>
+    <mime-type>text/html</mime-type>
+    <name>rffSnNavPreload</name>
+    <output-format>Snippet</output-format>
+    <publish-when>Never</publish-when>
+    <site-ids>
+      <site-id>303</site-id>
+      <site-id>301</site-id>
+    </site-ids>
+    <style-sheet-path/>
+    <template>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
+
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Pre Load&lt;/title&gt;
+    &lt;link href="$rxs_navbase/css/rxs_styles.css" 
+	  rel="stylesheet" type="text/css" /&gt;
+	&lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+    &lt;script src="$rxs_navbase/js/mouseover.js" 
+	    language="javascript" type="text/javascript"&gt;;&lt;/script&gt;
+    
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;script language="JavaScript" type="text/JavaScript"&gt;
+      #set( $toplevel = $nav.root.getNodes("nav:submenu") )
+      function rxs_nav_preloads() { 
+      #foreach ( $navon in $toplevel )
+        #foreach ( $image in $navon.getNodes("nav:image") )
+         #set($rollimage = "#imageurl($image 'rollover')" )
+		 #set($rollimageurl = $rx.codec.decodeFromXml($rollimage) )
+         MM_preloadImages('$rollimageurl');
+        #end
+      #end
+      }
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</template>
+    <template-slot-ids/>
+    <template-type>Local</template-type>
+    <variant>false</variant>
+  </assemblytemplate>

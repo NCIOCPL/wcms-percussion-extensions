@@ -1,0 +1,119 @@
+  <assemblytemplate id="1">
+    <guid>0-4-529</guid>
+    <active-assembly-type>Normal</active-assembly-type>
+    <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
+    <assembly-url>../assembler/render</assembly-url>
+    <bindings>
+      <binding id="2">
+        <execution-order>1</execution-order>
+        <expression>$rx.calendarMonthModel.assign($sys.item.getProperty('rx:calendar_start').Date)</expression>
+        <id>0</id>
+        <jexl-script id="3">
+          <text>$rx.calendarMonthModel.assign($sys.item.getProperty('rx:calendar_start').Date);</text>
+        </jexl-script>
+        <variable>$month</variable>
+      </binding>
+      <binding id="4">
+        <execution-order>2</execution-order>
+        <expression>if ($sys.site.path != null) { $sys.site.path + "%" ;} else {"//Sites/%";}</expression>
+        <id>0</id>
+        <jexl-script id="5">
+          <text>if ($sys.site.path != null) { $sys.site.path + "%" ;} else {"//Sites/%";};</text>
+        </jexl-script>
+        <variable>$slot_params.site_path</variable>
+      </binding>
+      <binding id="6">
+        <execution-order>3</execution-order>
+        <expression>$month.Start</expression>
+        <id>0</id>
+        <jexl-script id="7">
+          <text>$month.Start;</text>
+        </jexl-script>
+        <variable>$slot_params.cal_start</variable>
+      </binding>
+      <binding id="8">
+        <execution-order>4</execution-order>
+        <expression>$month.End</expression>
+        <id>0</id>
+        <jexl-script id="9">
+          <text>$month.End;</text>
+        </jexl-script>
+        <variable>$slot_params.cal_end</variable>
+      </binding>
+    </bindings>
+    <charset>UTF-8</charset>
+    <content-ids/>
+    <description>Full page calendar displaying a single month of events.</description>
+    <global-template/>
+    <global-template-usage>Default</global-template-usage>
+    <label>P - Calendar Month</label>
+    <location-prefix/>
+    <location-suffix/>
+    <mime-type>text/html</mime-type>
+    <name>rffPgCalendarMonth</name>
+    <output-format>Page</output-format>
+    <publish-when>Default</publish-when>
+    <site-ids>
+      <site-id>303</site-id>
+      <site-id>301</site-id>
+    </site-ids>
+    <style-sheet-path/>
+    <template>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
+
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;#displayfield("displaytitle")&lt;/title&gt;
+    &lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="MainContent"&gt;
+      #initslot("rffAutoCalendarEvents" $slot_params)
+      $month.setEvents($sys.currentslot.relresults)
+      
+      &lt;table class="calendar" border="0" cellpadding="0" cellspacing="0"&gt;
+	&lt;tr&gt;
+	  &lt;th class="calmonths" colspan="7"&gt;$tools.date.format('MMMM yyyy', $month.StartDate.Time)&lt;/th&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+	  &lt;th class="caldays" width="14%"&gt;Sun&lt;/th&gt;
+	  &lt;th class="caldays" width="14%"&gt;Mon&lt;/th&gt;
+	  &lt;th class="caldays" width="14%"&gt;Tue&lt;/th&gt;
+	  &lt;th class="caldays" width="14%"&gt;Wed&lt;/th&gt;
+	  &lt;th class="caldays" width="14%"&gt;Thu&lt;/th&gt;
+	  &lt;th class="caldays" width="14%"&gt;Fri&lt;/th&gt;
+	  &lt;th class="caldays" width="14%"&gt;Sat&lt;/th&gt;
+	&lt;/tr&gt;
+	#set($day = 1)
+	#foreach ($week in [1..$month.Weeks])
+	&lt;tr&gt;
+	  #foreach ($dayofweek in [1..7])
+	  #if ( ($week == 1) &amp;&amp; ($dayofweek &lt; $month.FirstDayOfWeek) )
+					      ## blank days before the month starts
+					      &lt;td valign="top" width="14%"&gt;&amp;nbsp;&lt;/td&gt;
+					      #elseif ( ($week == $month.Weeks) &amp;&amp; ($dayofweek &gt; $month.LastDayOfWeek) )
+	    ## blank days after the month ends
+	    &lt;td valign="top" width="14%"&gt;&amp;nbsp;&lt;/td&gt;           
+	    #else
+    	    &lt;td valign="top" width="14%"&gt;
+    	      &lt;p class="calnumbers"&gt;$day&lt;/p&gt;
+    	      #foreach ($event in $month.getEvents($day))
+	      &lt;p class="calcontent"&gt;$rx.doc.extractBody($event)&lt;/p&gt;
+    	      #end
+    	    &lt;/td&gt;
+    	    ## advance to next day
+    	    #set($day = $day + 1)
+	    #end
+	    #end
+	&lt;/tr&gt;    
+	#end
+      &lt;/table&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</template>
+    <template-slot-ids>
+      <template-slot-id>509</template-slot-id>
+    </template-slot-ids>
+    <template-type>Local</template-type>
+    <variant>false</variant>
+  </assemblytemplate>
