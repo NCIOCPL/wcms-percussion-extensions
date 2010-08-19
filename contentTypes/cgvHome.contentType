@@ -9,7 +9,7 @@
       <description>This is the ContentEditorLocaDef for Default ContentType</description>
       <InputDataExits>
         <PSXExtensionCallSet id="0">
-          <PSXExtensionCall id="10407">
+          <PSXExtensionCall id="10019">
             <name>Java/global/percussion/xmldom/sys_xdTextCleanup</name>
             <PSXExtensionParamValue id="0">
               <value>
@@ -54,7 +54,7 @@
               </value>
             </PSXExtensionParamValue>
           </PSXExtensionCall>
-          <PSXExtensionCall id="10406">
+          <PSXExtensionCall id="10018">
             <name>Java/global/percussion/xmldom/sys_xdTextCleanup</name>
             <PSXExtensionParamValue id="0">
               <value>
@@ -98,6 +98,9 @@
                 </PSXTextLiteral>
               </value>
             </PSXExtensionParamValue>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/content/CGV_systitlePopulate</name>
           </PSXExtensionCall>
         </PSXExtensionCallSet>
       </InputDataExits>
@@ -366,10 +369,10 @@
         </PSXUIDefinition>
       </PSXContentEditorMapper>
       <userProperties>
-        <userProperty name="Control10046_Dependency10406">sys_xdTextCleanup</userProperty>
-        <userProperty name="Control10048_DependencyIds">10407</userProperty>
-        <userProperty name="Control10046_DependencyIds">10406</userProperty>
-        <userProperty name="Control10048_Dependency10407">sys_xdTextCleanup</userProperty>
+        <userProperty name="Control10048_DependencyIds">10019</userProperty>
+        <userProperty name="Control10048_Dependency10019">sys_xdTextCleanup</userProperty>
+        <userProperty name="Control10046_DependencyIds">10018</userProperty>
+        <userProperty name="Control10046_Dependency10018">sys_xdTextCleanup</userProperty>
       </userProperties>
     </PSXContentEditorPipe>
     <PSXRequestor directDataStream="no" id="0">

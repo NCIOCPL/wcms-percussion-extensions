@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PSXContentEditor contentType="307" enableRelatedContent="no" iconSource="2" iconValue="img1_ext" objectType="1" workflowId="5">
+  <PSXDataSet id="41">
+    <name>template</name>
+    <description>default template</description>
+    <transactionType>none</transactionType>
+    <PSXContentEditorPipe id="0">
+      <name>cePipe</name>
+      <description>This is the ContentEditorLocaDef for Default ContentType</description>
+      <InputDataExits>
+        <PSXExtensionCallSet id="0">
+          <PSXExtensionCall id="1630">
+            <name>Java/global/percussion/generic/sys_FileInfo</name>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/exit/sys_imageInfoExtractor</name>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/extensions/general/sys_CopyParameter</name>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>img1_filename</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>filename</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/extensions/general/sys_CopyParameter</name>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>img1_ext</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>sys_suffix</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+          </PSXExtensionCall>
+        </PSXExtensionCallSet>
+      </InputDataExits>
+      <PSXContainerLocator>
+        <PSXTableSet>
+          <PSXTableLocator>
+            <PSXBackEndCredential id="275">
+              <alias>contentCredential</alias>
+              <comment></comment>
+              <datasource></datasource>
+            </PSXBackEndCredential>
+          </PSXTableLocator>
+          <PSXTableRef alias="RXS_CT_IMAGE" name="RXS_CT_IMAGE"/>
+        </PSXTableSet>
+      </PSXContainerLocator>
+      <PSXContentEditorMapper>
+        <SystemFieldExcludes>
+          <FieldRef>sys_pathname</FieldRef>
+          <FieldRef>sys_pubdate</FieldRef>
+        </SystemFieldExcludes>
+        <SharedFieldIncludes>
+          <SharedFieldGroupName>shared</SharedFieldGroupName>
+          <SharedFieldGroupName>sharedimage</SharedFieldGroupName>
+          <SharedFieldExcludes>
+            <FieldRef>keywords</FieldRef>
+            <FieldRef>body</FieldRef>
+            <FieldRef>callout</FieldRef>
+          </SharedFieldExcludes>
+        </SharedFieldIncludes>
+        <PSXFieldSet name="RXS_CT_Image" repeatability="zeroOrMore" supportsSequencing="yes" type="parent" userSearchable="yes">
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="img_category" showInPreview="yes" showInSummary="no" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>RXS_CT_IMAGE</tableAlias>
+                <column>IMG_CATEGORY</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>50</DataFormat>
+            <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+            <PSXPropertySet>
+              <PSXProperty locked="no" name="cleanupBrokenInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="no" name="mayHaveInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+            </PSXPropertySet>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+          <PSXFieldSet name="shared" repeatability="oneOrMore" supportsSequencing="no" type="multiPropertySimpleChild" userSearchable="yes">
+            <PSXField forceBinary="no" modificationType="user" name="filename" showInPreview="no" showInSummary="no" type="shared">
+              <DataType></DataType>
+              <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+            </PSXField>
+          </PSXFieldSet>
+          <PSXFieldSet name="sharedimage" repeatability="oneOrMore" supportsSequencing="no" type="multiPropertySimpleChild" userSearchable="yes">
+            <PSXField forceBinary="no" modificationType="user" name="img1_filename" showInPreview="yes" showInSummary="no" type="shared">
+              <DataType></DataType>
+              <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+              <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+            </PSXField>
+            <PSXField forceBinary="no" modificationType="user" name="img1_type" showInPreview="yes" showInSummary="no" type="shared">
+              <DataType></DataType>
+              <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+              <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+            </PSXField>
+          </PSXFieldSet>
+        </PSXFieldSet>
+        <PSXUIDefinition>
+          <PSXDisplayMapper fieldSetRef="RXS_CT_Image" id="0">
+            <PSXDisplayMapping>
+              <FieldRef>sys_title</FieldRef>
+              <PSXUISet accessKey="s"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>displaytitle</FieldRef>
+              <PSXUISet accessKey="t"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_contentstartdate</FieldRef>
+              <PSXUISet accessKey="D"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_contentexpirydate</FieldRef>
+              <PSXUISet accessKey="e"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_reminderdate</FieldRef>
+              <PSXUISet accessKey="r"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>description</FieldRef>
+              <PSXUISet accessKey="D"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1</FieldRef>
+              <PSXUISet accessKey="m"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_filename</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_ext</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_type</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_height</FieldRef>
+              <PSXUISet>
+                <ReadOnlyRules>
+                  <PSXRule boolean="and">
+                    <PSXConditional id="2">
+                      <variable>
+                        <PSXTextLiteral id="0">
+                          <text>1</text>
+                        </PSXTextLiteral>
+                      </variable>
+                      <operator>=</operator>
+                      <value>
+                        <PSXTextLiteral id="0">
+                          <text>1</text>
+                        </PSXTextLiteral>
+                      </value>
+                      <boolean>AND</boolean>
+                    </PSXConditional>
+                  </PSXRule>
+                </ReadOnlyRules>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_width</FieldRef>
+              <PSXUISet>
+                <ReadOnlyRules>
+                  <PSXRule boolean="and">
+                    <PSXConditional id="2">
+                      <variable>
+                        <PSXTextLiteral id="0">
+                          <text>1</text>
+                        </PSXTextLiteral>
+                      </variable>
+                      <operator>=</operator>
+                      <value>
+                        <PSXTextLiteral id="0">
+                          <text>1</text>
+                        </PSXTextLiteral>
+                      </value>
+                      <boolean>AND</boolean>
+                    </PSXConditional>
+                  </PSXRule>
+                </ReadOnlyRules>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img_alt</FieldRef>
+              <PSXUISet accessKey="x"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img_category</FieldRef>
+              <PSXUISet accessKey="g">
+                <Label>
+                  <PSXDisplayText>Image Category:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="3349" name="sys_DropDownSingle"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Image Category:</PSXDisplayText>
+                </ErrorLabel>
+                <PSXChoices sortOrder="ascending" type="global">
+                  <Key>324</Key>
+                </PSXChoices>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_size</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>filename</FieldRef>
+              <PSXUISet accessKey="N"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_suffix</FieldRef>
+              <PSXUISet accessKey="S"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img2</FieldRef>
+              <PSXUISet accessKey="M"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img2_filename</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img2_ext</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img2_type</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img2_height</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img2_width</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img2_size</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_communityid</FieldRef>
+              <PSXUISet accessKey="m"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_workflowid</FieldRef>
+              <PSXUISet accessKey="w"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_lang</FieldRef>
+              <PSXUISet accessKey="l"/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_currentview</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>webdavowner</FieldRef>
+              <PSXUISet accessKey="O"/>
+            </PSXDisplayMapping>
+          </PSXDisplayMapper>
+        </PSXUIDefinition>
+      </PSXContentEditorMapper>
+      <userProperties>
+        <userProperty name="Control86_Dependency1630">sys_FileInfo</userProperty>
+        <userProperty name="Control86_DependencyIds">1630</userProperty>
+        <userProperty name="Control76_Dependency1630">sys_FileInfo</userProperty>
+        <userProperty name="Control76_DependencyIds">1630</userProperty>
+      </userProperties>
+    </PSXContentEditorPipe>
+    <PSXPageDataTank id="40">
+      <schemaSource>file:unspecified</schemaSource>
+      <actionTypeXmlField></actionTypeXmlField>
+    </PSXPageDataTank>
+    <PSXRequestor directDataStream="no" id="0">
+      <requestPage>rffImage</requestPage>
+      <SelectionParams/>
+      <ValidationRules/>
+      <characterEncoding>UTF-8</characterEncoding>
+      <MimeProperties>
+        <html>
+          <PSXTextLiteral id="0">
+            <text>text/html</text>
+          </PSXTextLiteral>
+        </html>
+        <htm>
+          <PSXTextLiteral id="0">
+            <text>text/html</text>
+          </PSXTextLiteral>
+        </htm>
+      </MimeProperties>
+    </PSXRequestor>
+  </PSXDataSet>
+  <PSXValidationRules maxErrorsToStop="10"/>
+  <PSXInputTranslations/>
+  <PSXOutputTranslations/>
+  <PSXWorkflowInfo type="inclusionary" values="4,5"/>
+</PSXContentEditor>

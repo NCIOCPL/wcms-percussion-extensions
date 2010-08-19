@@ -7,6 +7,13 @@
     <PSXContentEditorPipe id="0">
       <name>cePipe</name>
       <description>This is the ContentEditorLocaDef for Default ContentType</description>
+      <InputDataExits>
+        <PSXExtensionCallSet id="0">
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/content/CGV_systitlePopulate</name>
+          </PSXExtensionCall>
+        </PSXExtensionCallSet>
+      </InputDataExits>
       <PSXContainerLocator>
         <PSXTableSet>
           <PSXTableLocator>

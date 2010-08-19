@@ -9,7 +9,7 @@
       <description>This is the ContentEditorLocaDef for Default ContentType</description>
       <InputDataExits>
         <PSXExtensionCallSet id="0">
-          <PSXExtensionCall id="10420">
+          <PSXExtensionCall id="10027">
             <name>Java/global/percussion/xmldom/sys_xdTextCleanup</name>
             <PSXExtensionParamValue id="0">
               <value>
@@ -53,6 +53,9 @@
                 </PSXTextLiteral>
               </value>
             </PSXExtensionParamValue>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/content/CGV_systitlePopulate</name>
           </PSXExtensionCall>
         </PSXExtensionCallSet>
       </InputDataExits>
@@ -251,8 +254,8 @@
         </PSXUIDefinition>
       </PSXContentEditorMapper>
       <userProperties>
-        <userProperty name="Control10046_DependencyIds">10420</userProperty>
-        <userProperty name="Control10046_Dependency10420">sys_xdTextCleanup</userProperty>
+        <userProperty name="Control10046_DependencyIds">10027</userProperty>
+        <userProperty name="Control10046_Dependency10027">sys_xdTextCleanup</userProperty>
       </userProperties>
     </PSXContentEditorPipe>
     <PSXRequestor directDataStream="no" id="0">
