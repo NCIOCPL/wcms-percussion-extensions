@@ -224,13 +224,13 @@ public class CGV_ParentChildManager {
 			e.printStackTrace();
 		}
 		
-		System.out.println("name of the user who has the item checked out = " + item.getCheckedOutByName());
+		//System.out.println("name of the user who has the item checked out = " + item.getCheckedOutByName());
 		if(	item.getCheckedOutByName().length() == 0){
-			System.out.println("the name of the user is nothing....");
+			//System.out.println("the name of the user is nothing....");
 			return false;
 		}
 		else{
-			System.out.println("the name of the user is something!!!!");
+			//System.out.println("the name of the user is something!!!!");
 			return true;
 		}
 	}
