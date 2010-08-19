@@ -85,6 +85,7 @@ IPSWorkflowAction {
 		StateName childHoldState = null;
 		int childHoldRevision = 0;
 		int pendingCode = 0;
+		boolean existsChildNoDirectPath = false;	//is there a child that has no direct path to the destState?
 		
 		if( pcm.isCheckedOut(currentItem) ){
 			return;
@@ -169,7 +170,7 @@ IPSWorkflowAction {
 							childHoldRevision = pcm.getRevision(currChild.getGUID());
 						}
 					}
-					if(!stateHelp.existsDirectPath(currState, destState)){	//the child cannot reach the destination state in 1 move.
+					if(!stateHelp.existsMappedPath(childStateName, destState) && !stateHelp.isMapping(childStateName, destState)){	//the child cannot reach the destination state in 1 move.
 						System.out.println("Pending code 3");
 						if(pendingCode < 3 ){pendingCode = 3;}
 						pending = true;
@@ -199,7 +200,7 @@ IPSWorkflowAction {
 				if( stateHelp.getDestState() != null ){
 					transition(currentItem, currState, destState, stateHelp, pending, true);
 				}
-				
+				System.out.println("the number of children of the parent = "+children.size());
 				for( PSItemSummary currChild : children ){
 					List<PSItemSummary> parentsSize = null;
 					try {
@@ -208,15 +209,33 @@ IPSWorkflowAction {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					System.out.println("\t\tThe size of the parents list is " + parentsSize.size() +" for current item "+currChild.getGUID());
 					if(parentsSize.size() == 1 ){
-						if(!stateHelp.isBackwardsMove(currState, destState)){
-							transition(currChild.getGUID(), currState, destState, stateHelp, pending, false);
+						PSState childState = null;
+						try {
+							childState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(currChild.getGUID()).get(0)));
+						} catch (PSException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (PSErrorException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						StateName childStateName = stateHelp.toStateName(childState.getName());
+						System.out.println("The state of the above item is: "+childStateName.toString());
+						if(!stateHelp.isBackwardsMove(childStateName, destState) && stateHelp.existsMappedPath(childStateName, destState)){
+							System.out.println("\t\t\tCalling transition because the logic on line 226 passed TRUE");
+							transition(currChild.getGUID(), childStateName, destState, stateHelp, pending, false);
+						}
+						else{
+							System.out.println("\t\t\tNot calling transition because of logic on line 226 passed FALSE");
 						}
 					}
 				}
 			}
 			else{	//if pending
 				//if(destState != childHoldState && childHoldRevision != 0 ){
+				//revert back to a different state (pending, makes the action fail, parent needs to revert back)
 				if(!stateHelp.isMapping(childHoldState,destState)){
 					String transitionFind = stateHelp.backwardsPath(currState, destState);
 					List<IPSGuid> temp = Collections.<IPSGuid>singletonList(currentItem);
@@ -347,6 +366,7 @@ IPSWorkflowAction {
 	
 	public static boolean transition(IPSGuid source, StateName currState, StateName destState, CGV_StateHelper stateHelp, boolean pending, boolean parent){
 		List<IPSGuid> temp = Collections.<IPSGuid>singletonList(source);
+		System.out.println("\t\tTRANSITIONING:");
 		System.out.println("transition debug: current GUID: " + source);
 		System.out.println("transition debug: current state: " + stateHelp.toString(currState));
 		System.out.println("transition debug: destination state: " + stateHelp.toString(destState));
@@ -355,6 +375,9 @@ IPSWorkflowAction {
 		case DRAFT:
 			switch (destState){
 			case REVIEW:
+				transition = "Submit";
+				break;
+			case REAPPROVAL:
 				transition = "Submit";
 				break;
 			default:
@@ -368,6 +391,9 @@ IPSWorkflowAction {
 				break;
 			case PENDING:
 				transition = "Approve";
+				break;
+			case PUBLIC:
+				transition = "ApproveForcetoPublic";
 				break;
 			default:
 				transition = "Null";
@@ -433,11 +459,40 @@ IPSWorkflowAction {
 			transition = "Null";
 			break;	
 		}
+		IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+//		if( transition == "ApproveForcetoPublic"){	
+//			/**odd case, where a child is in review, needs to goto public
+//			 * the child needs to move into pending, then into public.
+//			 * this is not being handled in the normal logic of...
+//			 * if a parent is in Review, and moves it AND its children into Public.
+//			 * This case is for when the parent is in Reapproval, and needs to move to
+//			 * public, the child is in Review, needs Review->Pending->Public
+//			 */
+//			try {
+//				sysws.transitionItems(temp, "Approve");
+//			} catch (PSErrorsException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (PSErrorException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			try {
+//				sysws.transitionItems(temp, "ForcetoPublic");
+//			} catch (PSErrorsException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			} catch (PSErrorException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			return true;
+//		}
 		if( transition != "Null"){
 			System.out.println("Parent/Child: transition being called from...");
 			System.out.println("\t"+transition+" = "+ stateHelp.toString(currState)+"-->"+stateHelp.toString(destState));
-			IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
 			if(destState == StateName.PENDING ){
+				System.out.println("DEST = PENDING");
 				if(!parent){
 					if(!pending){
 						try {
@@ -487,6 +542,7 @@ IPSWorkflowAction {
 				}
 			}
 			else if(destState == StateName.REVIEW){
+				System.out.println("DEST = REVIEW");
 				if(parent){
 					if(pending){
 						try {
@@ -515,20 +571,45 @@ IPSWorkflowAction {
 				}
 			}
 			else{
-				System.out.println("!dest review, or dest pending");
-				try {
-					sysws.transitionItems(temp, transition);
-				} catch (PSErrorsException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (PSErrorException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				System.out.println("\t!dest review, or !dest pending");
+				if(currState == StateName.REVIEW && destState == StateName.PUBLIC){
+					System.out.println("currstate is review, destState is public");
+					try {
+						sysws.transitionItems(temp, "Approve");
+					} catch (PSErrorsException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PSErrorException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}						
+					try {
+						sysws.transitionItems(temp, "ForcetoPublic");
+					} catch (PSErrorsException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PSErrorException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}	
+				}
+				else{
+					System.out.println("currstate is NOT review, destState is  NOT public");
+					try {
+						sysws.transitionItems(temp, transition);
+					} catch (PSErrorsException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (PSErrorException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			}
-
+			System.out.println("\t\tTRANSITION WAS NOT NULL, RETURNING TRUE");
 			return true;
 		}
+		System.out.println("\t\tTRANSITION WAS NULL, RETURNING FALSE");
 		return false;
 	}
 
