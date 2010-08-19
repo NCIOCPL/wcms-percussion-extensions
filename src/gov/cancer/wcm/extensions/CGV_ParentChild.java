@@ -1,9 +1,12 @@
 package gov.cancer.wcm.extensions;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import gov.cancer.wcm.util.*;
@@ -86,6 +89,8 @@ IPSWorkflowAction {
 		int childHoldRevision = 0;
 		int pendingCode = 0;
 		boolean existsChildNoDirectPath = false;	//is there a child that has no direct path to the destState?
+		//Queue<Boolean> moveChildList = new LinkedList<Boolean>();
+
 		
 		if( pcm.isCheckedOut(currentItem) ){
 			return;
@@ -120,9 +125,11 @@ IPSWorkflowAction {
 				}
 				StateName childStateName = stateHelp.toStateName(childState.getName());
 				String childStateString = childState.getName();
+				System.out.println("\tComparing "+childStateString+" to "+destState.toString());
 				if(CGV_StateHelper.compare( childStateString , destState.toString()) == -1
 						|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){
-					
+					//moveChildList.add(true);
+					System.out.println("the child state was <= the dest state.");
 					List<PSItemSummary> childParents = null;
 					try {
 						childParents = cmgr.findOwners(currChild.getGUID(), null, false);
@@ -170,7 +177,7 @@ IPSWorkflowAction {
 							childHoldRevision = pcm.getRevision(currChild.getGUID());
 						}
 					}
-					if(!stateHelp.existsMappedPath(childStateName, destState) && !stateHelp.isMapping(childStateName, destState)){	//the child cannot reach the destination state in 1 move.
+					else if(!stateHelp.existsMappedPath(childStateName, destState) && !stateHelp.isMapping(childStateName, destState)){	//the child cannot reach the destination state in 1 move.
 						System.out.println("Pending code 3");
 						if(pendingCode < 3 ){pendingCode = 3;}
 						pending = true;
@@ -223,6 +230,7 @@ IPSWorkflowAction {
 						}
 						StateName childStateName = stateHelp.toStateName(childState.getName());
 						System.out.println("The state of the above item is: "+childStateName.toString());
+
 						if(!stateHelp.isBackwardsMove(childStateName, destState) && stateHelp.existsMappedPath(childStateName, destState)){
 							System.out.println("\t\t\tCalling transition because the logic on line 226 passed TRUE");
 							transition(currChild.getGUID(), childStateName, destState, stateHelp, pending, false);
@@ -230,6 +238,7 @@ IPSWorkflowAction {
 						else{
 							System.out.println("\t\t\tNot calling transition because of logic on line 226 passed FALSE");
 						}
+
 					}
 				}
 			}
