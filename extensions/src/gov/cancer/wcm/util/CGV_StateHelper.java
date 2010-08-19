@@ -486,11 +486,13 @@ public class CGV_StateHelper {
 	 * @param destState - the destination state.
 	 * @return true if the single path exists, if it is more then 1 step, rtn false.
 	 */
-	public boolean existsDirectPath(StateName currState, StateName destState) {
+	public boolean existsMappedPath(StateName currState, StateName destState) {
 		switch (currState){
 		case DRAFT:
 			switch (destState){
 			case REVIEW:
+				return true;
+			case REAPPROVAL:
 				return true;
 			default:
 				return false;
@@ -499,7 +501,11 @@ public class CGV_StateHelper {
 			switch (destState){
 			case DRAFT:
 				return true;
+			case EDITING:
+				return true;
 			case PENDING:
+				return true;
+			case PUBLIC:
 				return true;
 			default:
 				return false;
@@ -564,6 +570,8 @@ public class CGV_StateHelper {
 			switch (destState){
 			case REVIEW:
 				return false;
+			case REAPPROVAL:
+				return false;
 			default:
 				return true;
 			}
@@ -572,6 +580,8 @@ public class CGV_StateHelper {
 			case DRAFT:
 				return true;
 			case PENDING:
+				return false;
+			case PUBLIC:
 				return false;
 			default:
 				return false;
@@ -604,7 +614,7 @@ public class CGV_StateHelper {
 		case ARCHIVED:
 			switch (destState){
 			case EDITING:
-				return true;
+				return false;
 			case PUBLIC:
 				return false;
 			default:
