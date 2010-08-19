@@ -474,6 +474,15 @@ public class CGV_StateHelper {
 				return -1;		
 			}
 		}
+		else if (left.equalsIgnoreCase("Public")){
+			if(right.equalsIgnoreCase("Public")){
+				System.out.println(left+" equal " +right);
+				return 0;
+			}
+			else {
+				return 1;		
+			}
+		}
 		else{
 			return 0;
 		}
