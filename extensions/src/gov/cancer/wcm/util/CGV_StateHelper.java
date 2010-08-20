@@ -1,11 +1,6 @@
 package gov.cancer.wcm.util;
 
-import gov.cancer.wcm.util.CGV_StateHelper.StateName;
-
-import com.percussion.error.PSException;
-import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.server.IPSRequestContext;
-import com.percussion.services.workflow.data.PSState;
 
 /**
  * Wrapper class for the StateName enum.
@@ -71,30 +66,12 @@ public class CGV_StateHelper {
 	private int transitionID;
 	
 	private void setup(IPSRequestContext request){
-		//IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
-		//IPSGuid cid = gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid")));
-		
-		//System.out.println("\n\tParent Item CID: " + request.getParameter("sys_contentid"));
-		//IPSOWorkflowInfoFinder workFinder = IPSOWorkflowInfoFinder();
-//		PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
-//		PSState destinationState = null;
-//		try {
-//			destinationState = workInfo.findWorkflowState(request.getParameter("sys_contentid"));
-//		} catch (PSException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		//System.out.println("\t\tDestination State: " + destinationState.getName());
 				
 		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
-		//CGV_StateHelper a = new CGV_StateHelper();
-		//System.out.println("\t\tCurrent State: " + getCurrState(tranID));
 		
 		currState = toStateName(getCurrState(tranID));		//Set the current state for the object.
 		destState = toStateName(getDestState(tranID));		//Set the destination state for the object.
-		//destState = toStateName(destinationState.getName());	//Set the destination state for the object.
 		transitionID = tranID;									//Set the transition ID for the object.
-		//System.out.println("\t\tTransitionID: " + transitionID);
 	}
 	
 	public String getCurrState(int tranID){
@@ -297,10 +274,12 @@ public class CGV_StateHelper {
 	}
 	
 	/**
-	 * 
-	 * @param currState
-	 * @param destState
-	 * @return
+	 * Returns the correct workflow transition(s) to allow the item
+	 * to move from one state to another.
+	 * @param currState - current state of the item
+	 * @param destState - destination state of the item.
+	 * @return - the string representation of the transition triggers that are called 
+	 * 				to make the item get from current->destination
 	 */
 	public String backwardsPath(StateName currState, StateName destState){
 		//TODO: Make configurable
@@ -490,8 +469,10 @@ public class CGV_StateHelper {
 
 	/**
 	 * Returns true if there is a 1 step work flow path from the current to the
-	 * destination state.
-	 * @param currState - current state we are in.
+	 * destination state.  Uses a mapping so an item not yet in public can
+	 * be moved into a corresponding state when its parent (who might be in public)
+	 * transitions and calls the child to move in sync.
+	 * @param currState - current state the item is in
 	 * @param destState - the destination state.
 	 * @return true if the single path exists, if it is more then 1 step, rtn false.
 	 */
@@ -571,7 +552,7 @@ public class CGV_StateHelper {
 	 * Returns true if this is a backwards workflow movement.
 	 * @param currState - current state we are in.
 	 * @param destState - the destination state.
-	 * @return true if the single path exists, if it is more then 1 step, rtn false.
+	 * @return true if the move from current to destination is a "backwards" move, if not rtn false.
 	 */
 	public boolean isBackwardsMove(StateName currState, StateName destState) {
 		switch (currState){
@@ -643,6 +624,13 @@ public class CGV_StateHelper {
 		}
 	}
 
+	/**
+	 * Creates a mapping for states on both sides of PUBLIC.  Allows parents
+	 * to transition its children in lower states before the child has reached PUBLIC.
+	 * @param childState - the current state of the child item.
+	 * @param parentDestinationState - the parent item's destination state.
+	 * @return - true if a mapping exists, false if not.
+	 */
 	public boolean isMapping(StateName childState, StateName parentDestinationState) {
 		switch (childState){
 		case DRAFT:
