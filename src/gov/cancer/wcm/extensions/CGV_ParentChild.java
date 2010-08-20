@@ -1,13 +1,7 @@
 package gov.cancer.wcm.extensions;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 import gov.cancer.wcm.util.*;
 import gov.cancer.wcm.util.CGV_StateHelper.StateName;
@@ -21,14 +15,11 @@ import com.percussion.extension.PSExtensionProcessingException;		//exception
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.server.IPSRequestContext;
-import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSContentTypeSummary;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.workflow.data.PSState;
-import com.percussion.services.workflow.data.PSTransition;
-import com.percussion.services.workflow.data.PSWorkflow;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorsException;
@@ -36,10 +27,7 @@ import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 import com.percussion.webservices.content.PSContentWsLocator;
-import com.percussion.pso.utils.PSOItemSummaryFinder;
-import com.percussion.pso.workflow.IPSOWorkflowInfoFinder;
 import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
-import com.percussion.services.contentmgr.IPSContentPropertyConstants;
 
 
 /**
@@ -88,7 +76,6 @@ IPSWorkflowAction {
 		StateName childHoldState = null;
 		int childHoldRevision = 0;
 		int pendingCode = 0;
-		boolean existsChildNoDirectPath = false;	//is there a child that has no direct path to the destState?
 		//Queue<Boolean> moveChildList = new LinkedList<Boolean>();
 
 		
@@ -101,7 +88,7 @@ IPSWorkflowAction {
 		
 		Long cid = CGV_ParentChildManager.loadItem(currCID).getContentTypeId();
 		//If PAGE TYPE...
-		if(topType(cid.intValue())){
+		if(!CGV_TopTypeChecker.topType(cid.intValue(),cmgr)){
 			
 			StateName lowState = StateName.PUBLIC;
 			
@@ -112,6 +99,18 @@ IPSWorkflowAction {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			/**
+			 * For all children of the parent, check for a pending state.
+			 * A Pending state is defined as one of three codes:
+			 * 
+			 * 1. There is a child item (in any state) checked out by ANY user.
+			 * 2. A child is a shared item, and is not allowed to go past the lowest state out of all
+			 * 		the parents it is shared in.
+			 * 3. There is no path from the child item to the destination of the parent.
+			 * 		(This deals with the handling checking for if an item is mapped to states)
+			 * 
+			 */
 			for( PSItemSummary currChild : children ){
 				PSState childState = null;
 				try {
@@ -139,7 +138,7 @@ IPSWorkflowAction {
 					}
 					if(childParents.size() > 1){
 						numSharedChildren++;
-						//find the low state of all the shared parents.
+						//find the low state of all the shared parents for this shared child
 						for( PSItemSummary currParent : childParents ){
 							PSState parentsState = null;
 							try {
@@ -158,6 +157,11 @@ IPSWorkflowAction {
 							}
 						}
 						
+						/**
+						 * Check if:    destination >= lowestSharedParentState
+						 * 			&&	child's state >= lowestSharedParentState
+						 * 			&&	child's state < destination
+						 */
 						if( (CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 1 
 								|| CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 0)
 								&& (CGV_StateHelper.compare(childStateString, lowState.toString()) == 1 
@@ -178,6 +182,7 @@ IPSWorkflowAction {
 						}
 					}
 					else if(!stateHelp.existsMappedPath(childStateName, destState) && !stateHelp.isMapping(childStateName, destState)){	//the child cannot reach the destination state in 1 move.
+						//Check if there is a path from the current child to the destination (mapped or direct)
 						System.out.println("Pending code 3");
 						if(pendingCode < 3 ){pendingCode = 3;}
 						pending = true;
@@ -188,7 +193,8 @@ IPSWorkflowAction {
 							childHoldState = stateHelp.toStateName(childStateString);
 						}
 					}
-					if(pcm.isCheckedOut(currChild.getGUID())){	//if the current child is checked out, then pending.
+					if(pcm.isCheckedOut(currChild.getGUID())){	
+						//checks to see if the current child is checked out by ANY user
 						System.out.println("Pending code 1");
 						if(pendingCode < 1 ){pendingCode = 1;}
 						pending = true;
@@ -204,10 +210,13 @@ IPSWorkflowAction {
 			//if(pending){System.out.println("we are pending for something!");}
 			//end of for statement.	
 			if(!pending){
+				//If the current item is not in the correct destination, transition it.
 				if( stateHelp.getDestState() != null ){
 					transition(currentItem, currState, destState, stateHelp, pending, true);
 				}
 				System.out.println("the number of children of the parent = "+children.size());
+				//For all children, check to see if they are moving, then move them if needed.
+				//Shared children do not get moved/dealt with AFTER PUBLIC state.
 				for( PSItemSummary currChild : children ){
 					List<PSItemSummary> parentsSize = null;
 					try {
@@ -217,6 +226,8 @@ IPSWorkflowAction {
 						e.printStackTrace();
 					}
 					System.out.println("\t\tThe size of the parents list is " + parentsSize.size() +" for current item "+currChild.getGUID());
+					//TODO use the isShared method in the util.
+					//Check to see if the child is shared.
 					if(parentsSize.size() == 1 ){
 						PSState childState = null;
 						try {
@@ -231,6 +242,7 @@ IPSWorkflowAction {
 						StateName childStateName = stateHelp.toStateName(childState.getName());
 						System.out.println("The state of the above item is: "+childStateName.toString());
 
+						//If the child needs to be moved, move it.
 						if(!stateHelp.isBackwardsMove(childStateName, destState) && stateHelp.existsMappedPath(childStateName, destState)){
 							System.out.println("\t\t\tCalling transition because the logic on line 226 passed TRUE");
 							transition(currChild.getGUID(), childStateName, destState, stateHelp, pending, false);
@@ -249,6 +261,9 @@ IPSWorkflowAction {
 					String transitionFind = stateHelp.backwardsPath(currState, destState);
 					List<IPSGuid> temp = Collections.<IPSGuid>singletonList(currentItem);
 					IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+					
+					//Logic to deal with an item having to do 1 (or more) transition(s) to get
+					//	back to its previous state.					
 					if(transitionFind.equalsIgnoreCase("ResubmitReapproveArchive")){
 						try {
 							sysws.transitionItems(temp, "Resubmit");
@@ -338,41 +353,32 @@ IPSWorkflowAction {
 
 		}	//end of if statement (if top type)
 		else if(destState == StateName.PENDING){
+			/**
+			 * If the item is not a top type, and is going to the pending state (between Review and Public),
+			 * the item needs to be pushed into the next transition automatically so the user never sees the 
+			 * pending state.
+			*/
 			transition(currentItem, currState, destState, stateHelp, pending, false);
 		}
 		
 
-	}
-
-
-	/**
-	 * Returns true if this contentTypeId is in the list of topmost content types
-	 * @param contentTypeId - id to check
-	 * @return true if in list
-	 */
-	private boolean topType(int contentTypeId) {
-		//get array of type names
-		String[] doNotPublishParentTypes = CGVConstants.TOP_CONTENT_TYPE_NAMES;
-		for (String s : doNotPublishParentTypes) {
-			//if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
-			//get all summaries matching the current type
-			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
-			//if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
-			//get the first item
-			PSContentTypeSummary summaryItem = summaries.get(0);
-			if (contentTypeId == summaryItem.getGuid().getUUID()) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
+	}	
 
 	public boolean canModifyStyleSheet() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	
+	/**
+	 * Logic dealing with the transition of a content item.
+	 * @param source - the GUID for the item that is being transitioned.
+	 * @param currState - the current state that the source is in.
+	 * @param destState - the destination or target state the source is trying to reach.
+	 * @param stateHelp - the CGV_StateHelper object to handle States
+	 * @param pending - if the transition is done with a pending flag. (needs to reverse)
+	 * @param parent - if the item is a parent (true), or a child item (false)
+	 * @return true if the transition was successful, false if not.
+	 */
 	public static boolean transition(IPSGuid source, StateName currState, StateName destState, CGV_StateHelper stateHelp, boolean pending, boolean parent){
 		List<IPSGuid> temp = Collections.<IPSGuid>singletonList(source);
 		System.out.println("\t\tTRANSITIONING:");
@@ -469,38 +475,11 @@ IPSWorkflowAction {
 			break;	
 		}
 		IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
-//		if( transition == "ApproveForcetoPublic"){	
-//			/**odd case, where a child is in review, needs to goto public
-//			 * the child needs to move into pending, then into public.
-//			 * this is not being handled in the normal logic of...
-//			 * if a parent is in Review, and moves it AND its children into Public.
-//			 * This case is for when the parent is in Reapproval, and needs to move to
-//			 * public, the child is in Review, needs Review->Pending->Public
-//			 */
-//			try {
-//				sysws.transitionItems(temp, "Approve");
-//			} catch (PSErrorsException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (PSErrorException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			try {
-//				sysws.transitionItems(temp, "ForcetoPublic");
-//			} catch (PSErrorsException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			} catch (PSErrorException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//			return true;
-//		}
 		if( transition != "Null"){
 			System.out.println("Parent/Child: transition being called from...");
 			System.out.println("\t"+transition+" = "+ stateHelp.toString(currState)+"-->"+stateHelp.toString(destState));
 			if(destState == StateName.PENDING ){
+				//Pending state requires 2 moves to be handled correctly.
 				System.out.println("DEST = PENDING");
 				if(!parent){
 					if(!pending){
@@ -551,6 +530,7 @@ IPSWorkflowAction {
 				}
 			}
 			else if(destState == StateName.REVIEW){
+				//Review state requires some logic from a parent/child POV.
 				System.out.println("DEST = REVIEW");
 				if(parent){
 					if(pending){
