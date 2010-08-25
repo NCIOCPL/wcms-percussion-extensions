@@ -1,5 +1,8 @@
 package gov.cancer.wcm.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.percussion.server.IPSRequestContext;
 
 /**
@@ -19,9 +22,7 @@ public class CGV_StateHelper {
 		currState = null;
 		destState = null;
 	}
-	
-	//TODO: Eventually add a constructor and methods to allow stateid to be passed in.
-	
+		
 	/**
 	 * Constructor that allows a string to be passed in.
 	 * That string will setup the name/statename enum object
@@ -95,13 +96,19 @@ public class CGV_StateHelper {
 			return "Reapproval";
 		case 12:
 			return "Archived";
-		case 2:
-			return "Archived";
+		//case 2:
+		//	return "Archived";
 		case 17:
 			return "Pending";
 		case 18:
 			return "Pending";
-			default:
+		case 19:
+			return "ArchiveApproval";
+		case 20:
+			return "ArchiveApproval";
+		case 21:
+			return "Archived";
+		default:
 				return null;
 		}
 	}
@@ -118,7 +125,7 @@ public class CGV_StateHelper {
 		case 9:
 			return "Editing";
 		case 8:
-			return "Archived";
+			return "ArchiveApproval";
 		case 11:
 			return "Reapproval";
 		case 15:
@@ -127,13 +134,19 @@ public class CGV_StateHelper {
 			return "Editing";
 		case 12:
 			return "Public";
-		case 2:
-			return "Editing";
+		//case 2:
+		//	return "Editing";
 		case 17:
 			return "Review";
 		case 18:
 			return "Public";
-			default:
+		case 19:
+			return "Archived";
+		case 20:
+			return "Public";
+		case 21:
+			return "Editing";
+		default:
 				return null;
 		}
 	}
@@ -145,10 +158,7 @@ public class CGV_StateHelper {
 	 *
 	 */
 	public enum StateName implements Comparable<StateName>
-	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL, PENDING;
-
-
-	}
+	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL, PENDING, ARCHIVEAPPROVAL;}
 
 	/**
 	 * Returns the StateName enum for the string passed in, null if one DNE.
@@ -170,6 +180,8 @@ public class CGV_StateHelper {
 			return StateName.REAPPROVAL;
 		else if(curr.equalsIgnoreCase("Pending"))
 			return StateName.PENDING;
+		else if(curr.equalsIgnoreCase("ArchiveApproval"))
+			return StateName.ARCHIVEAPPROVAL;
 		else
 			return null;
 	}
@@ -189,6 +201,8 @@ public class CGV_StateHelper {
 			return "Reapproval";
 		else if(state == StateName.PENDING)
 			return "Pending";
+		else if(state == StateName.ARCHIVEAPPROVAL)
+			return "ArchiveApproval";
 		else
 			return "Null";
 	}
@@ -199,22 +213,7 @@ public class CGV_StateHelper {
 	 * @return the string value of that enum.
 	 */
 	public String currStateToString(){
-		if(currState == StateName.DRAFT )
-			return "Draft";
-		else if(currState == StateName.REVIEW )
-			return "Review";
-		else if(currState == StateName.PUBLIC )
-			return "Public";		
-		else if(currState == StateName.ARCHIVED )
-			return "Archived";		
-		else if(currState == StateName.EDITING )
-			return "Editing";		
-		else if(currState == StateName.REAPPROVAL )
-			return "Reapproval";
-		else if(currState == StateName.PENDING )
-			return "Pending";
-		else
-			return "Null";
+		return toString(currState);
 	}
 	
 	/**
@@ -223,22 +222,7 @@ public class CGV_StateHelper {
 	 * @return the string value of that enum.
 	 */
 	public String destStateToString(){
-		if(destState == StateName.DRAFT )
-			return "Draft";
-		else if(destState == StateName.REVIEW )
-			return "Review";
-		else if(destState == StateName.PUBLIC )
-			return "Public";		
-		else if(destState == StateName.ARCHIVED )
-			return "Archived";		
-		else if(destState == StateName.EDITING )
-			return "Editing";		
-		else if(destState == StateName.REAPPROVAL )
-			return "Reapproval";
-		else if(destState == StateName.PENDING )
-			return "Pending";
-		else
-			return "Null";
+		return toString(destState);
 	}
 	
 	public StateName getCurrState() {
@@ -278,92 +262,224 @@ public class CGV_StateHelper {
 	 * to move from one state to another.
 	 * @param currState - current state of the item
 	 * @param destState - destination state of the item.
-	 * @return - the string representation of the transition triggers that are called 
+	 * @return - the list of string representation of the transition triggers that are called 
 	 * 				to make the item get from current->destination
 	 */
-	public String backwardsPath(StateName currState, StateName destState){
+	public List<String> backwardsPath(StateName currState, StateName destState){
+		//return forwardTransition(destState, currState);
 		//TODO: Make configurable
-		String transition;
+		List<String> returnThis = new ArrayList<String>();
 		switch (currState){
+		case ARCHIVEAPPROVAL:
+			switch (destState){
+			case PUBLIC:
+				returnThis.add("RequestArchive");
+				break;
+			case ARCHIVED:
+				returnThis.add("Republish");
+				returnThis.add("RequestArchive");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
 		case DRAFT:
 			switch (destState){
 			case REVIEW:
-				transition = "Disapprove";
+				returnThis.add("Disapprove");
 				break;
 			default:
-				transition = "Null";
+				returnThis.add("Null");
 			}
 			break;
 		case REVIEW:
 			switch (destState){
 			case DRAFT:
-				transition = "Submit";
+				returnThis.add("Submit");
 				break;
 			case PENDING:
-				transition = "backToReview";
+				returnThis.add("backToReview");
 				break;
 			default:
-				transition = "Null";
+				returnThis.add("Null");
 			}
 			break;
 		case PUBLIC:
 			switch (destState){
-			case ARCHIVED:
-				transition = "Republish";
+			case ARCHIVEAPPROVAL:
+				returnThis.add("DisapproveArchive");
 				break;
 			case EDITING:
-				transition = "ResubmitReapprove";
+				returnThis.add("Resubmit");
+				returnThis.add("Reapprove");
 				break;
+//			case ARCHIVED:
+//				returnThis.add("Republish");
+//				break;
 			default:
-				transition = "Null";
+				returnThis.add("Null");
 			}
 			break;
 		case EDITING:
 			switch (destState){
 			case REAPPROVAL:
-				transition = "Disapprove";
+				returnThis.add("Disapprove");
 				break;
 			default:
-				transition = "Null";
+				returnThis.add("Null");
 			}
 			break;
 		case REAPPROVAL:
 			switch (destState){
 			case EDITING:
-				transition = "Resubmit";
+				returnThis.add("Resubmit");
 				break;
 			case PUBLIC:
-				transition = "ReviseResubmit";
+				returnThis.add("Revise");
+				returnThis.add("Resubmit");
 				break;
 			default:
-				transition = "Null";
+				returnThis.add("Null");
 			}
 			break;
 		case ARCHIVED:
 			switch (destState){
 			case EDITING:
-				transition = "ResubmitReapproveArchive";
+				returnThis.add("Resubmit");
+				returnThis.add("Reapprove");
+				returnThis.add("RequestArchive");
+				returnThis.add("ApproveArchive");
 				break;
 			case PUBLIC:
-				transition = "Archive";
+				returnThis.add("RequestArchive");
+				returnThis.add("ApproveArchive");
 				break;
+//			case ARCHIVEAPPROVAL:
+//				returnThis.add("ApproveArchive");
+//				break;
 			default:
-				transition = "Null";
+				returnThis.add("Null");
 			}
 			break;
 		case PENDING:
 			switch (destState){
 			case REVIEW:
-				transition = "Approve";
+				returnThis.add("Approve");
 				break;
 			default:
-				transition = "Null";
+				returnThis.add("Null");
 			}
 		default:
-			transition = "Null";
+			returnThis.add("Null");
 			break;	
 		}
-		return transition;
+		return returnThis;
+	}
+	
+	public static List<String> forwardTransition(StateName currState, StateName destState){
+		List<String> returnThis = new ArrayList<String>();
+		switch (currState){
+		case ARCHIVEAPPROVAL:
+			switch(destState){
+			case ARCHIVED:
+				returnThis.add("ApproveArchive");
+				break;
+			case PUBLIC:
+				returnThis.add("DisapproveArchive");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case DRAFT:
+			switch (destState){
+			case REVIEW:
+				returnThis.add("Submit");
+				break;
+			case REAPPROVAL:
+				returnThis.add("Submit");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case REVIEW:
+			switch (destState){
+			case DRAFT:
+				returnThis.add("Disapprove");
+				break;
+			case PENDING:
+				returnThis.add("Approve");
+				break;
+			case PUBLIC:
+				returnThis.add("Approve");
+				returnThis.add("ForcetoPublic");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case PUBLIC:
+			switch (destState){
+			case ARCHIVEAPPROVAL:
+				returnThis.add("RequestArchive");
+				break;
+			case EDITING:
+				returnThis.add("Quick Edit");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case EDITING:
+			switch (destState){
+			case REAPPROVAL:
+				returnThis.add("Resubmit");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case REAPPROVAL:
+			switch (destState){
+			case EDITING:
+				returnThis.add("Disapprove");
+				break;
+			case PUBLIC:
+				returnThis.add("Reapprove");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case ARCHIVED:
+			switch (destState){
+			case EDITING:
+				returnThis.add("Revive");
+				break;
+			case PUBLIC:
+				returnThis.add("Republish");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case PENDING:
+			switch (destState){
+			case REVIEW:
+				returnThis.add("backToReview");
+				break;
+			case PUBLIC:
+				returnThis.add("ForcetoPublic");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+		default:
+			returnThis.add("Null");
+			break;	
+		}
+		return returnThis;
 	}
 	
 	/**
@@ -386,12 +502,12 @@ public class CGV_StateHelper {
 				return -1;
 			}
 		}
-		else if( left.equalsIgnoreCase("Review")){
+		else if( left.equalsIgnoreCase("Review") || left.equalsIgnoreCase("ArchiveApproval")){
 			if( right.equalsIgnoreCase("Draft")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
-			else if(right.equalsIgnoreCase("Review")){
+			else if(right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("ArchiveApproval")){
 				System.out.println(left+" equal " +right);
 				return 0;
 			}
@@ -400,7 +516,7 @@ public class CGV_StateHelper {
 			}
 		}
 		else if (left.equalsIgnoreCase("Pending")){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("ArchiveApproval")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
@@ -413,7 +529,8 @@ public class CGV_StateHelper {
 			}
 		}
 		else if (left.equalsIgnoreCase("Editing")){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") ||
+					right.equalsIgnoreCase("ArchiveApproval") || right.equalsIgnoreCase("Pending")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
@@ -431,7 +548,7 @@ public class CGV_StateHelper {
 				System.out.println(left+" > " +right);
 				return 1;
 			}
-			else if(right.equalsIgnoreCase("Reapproval")){
+			else if(right.equalsIgnoreCase("Reapproval") || right.equalsIgnoreCase("ArchiveApproval")){
 				System.out.println(left+" equal " +right);
 				return 0;
 			}
@@ -441,7 +558,7 @@ public class CGV_StateHelper {
 		}
 		else if (left.equalsIgnoreCase("Archived")){
 			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending") ||
-					right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval")){
+					right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval") || right.equalsIgnoreCase("ArchiveApproval")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
@@ -502,7 +619,9 @@ public class CGV_StateHelper {
 			}
 		case PUBLIC:
 			switch (destState){
-			case ARCHIVED:
+//			case ARCHIVED:
+//				return true;
+			case ARCHIVEAPPROVAL:
 				return true;
 			case EDITING:
 				return true;
@@ -537,6 +656,15 @@ public class CGV_StateHelper {
 		case PENDING:
 			switch (destState){
 			case REVIEW:
+				return true;
+			case PUBLIC:
+				return true;
+			default:
+				return false;
+			}
+		case ARCHIVEAPPROVAL:
+			switch (destState){
+			case ARCHIVED:
 				return true;
 			case PUBLIC:
 				return true;
@@ -578,7 +706,9 @@ public class CGV_StateHelper {
 			}
 		case PUBLIC:
 			switch (destState){
-			case ARCHIVED:
+//			case ARCHIVED:
+//				return false;
+			case ARCHIVEAPPROVAL:
 				return false;
 			case EDITING:
 				return false;
@@ -617,6 +747,15 @@ public class CGV_StateHelper {
 			case PUBLIC:
 				return false;
 			default:
+				return false;
+			}
+		case ARCHIVEAPPROVAL:
+			switch (destState){
+			case ARCHIVED:
+				return false;
+			case PUBLIC:
+				return true;
+			default: 
 				return false;
 			}
 		default:
