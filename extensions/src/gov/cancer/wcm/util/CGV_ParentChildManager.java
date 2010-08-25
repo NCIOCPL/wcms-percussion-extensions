@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
@@ -12,7 +13,6 @@ import com.percussion.webservices.PSErrorResultsException;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
-import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
 
 /**
@@ -24,7 +24,16 @@ import com.percussion.webservices.content.PSContentWsLocator;
  * @author John Walls
  *
  */
+/**
+ * @author Administrator
+ *
+ */
 public class CGV_ParentChildManager {
+	
+	/**
+	 * Boolean to decide if the debug statements are to be printed or not.
+	 */
+	private static boolean bDebug = false;
 	
 	/**
 	 * IPSGuid guid - is the guid (Percussion object) that the
@@ -77,7 +86,7 @@ public class CGV_ParentChildManager {
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		filter.limitToEditOrCurrentOwnerRevision(true);
 		filter.setCategory("rs_activeassembly");
-		System.out.println("finding the parents");	//TODO: Change to use LOGGER
+		if(bDebug){System.out.println("finding the parents");}
 		return PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
 	}
 	
@@ -95,7 +104,7 @@ public class CGV_ParentChildManager {
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		filter.limitToEditOrCurrentOwnerRevision(true);
 		filter.setCategory("rs_activeassembly");
-		System.out.println("finding the children");		//TODO: Change to use LOGGER
+		if(bDebug){System.out.println("finding the children");}
 		return PSContentWsLocator.getContentWebservice().findDependents(source, filter, false);
 	}
 	
@@ -134,9 +143,9 @@ public class CGV_ParentChildManager {
 	public boolean isSharedChild(IPSGuid source) throws PSErrorException {
 		List<PSItemSummary> owners = null;
 		try {
-			owners = getParents(guid);
+			owners = getParents(source);
 		} catch (PSErrorException e) {
-			e.printStackTrace();
+			if(bDebug){e.printStackTrace();}
 		}
 		if( owners.size() > 1 ){
 			return true;
@@ -153,7 +162,6 @@ public class CGV_ParentChildManager {
 	 * @return A list of the parent content ids for IPSGuid src.
 	 * @throws PSErrorException 
 	 */
-	@SuppressWarnings("null")
 	public List<Integer> getParentCIDs(IPSGuid src) throws PSErrorException{
 		List<PSItemSummary> parents = getParents(src);
 		List<Integer> returnThis = new ArrayList<Integer>();
@@ -165,12 +173,48 @@ public class CGV_ParentChildManager {
 	
 	/**
 	 * Convenience call to List<Integer> getParentCIDs(IPSGuid src),
-	 * passes in this.guid as the IPSGuid to be used.
+	 * passes in this.guid as the IPSGuid to be used.y
 	 * @return A list of the parent content ids for this.guid.
 	 * @throws PSErrorException 
 	 */
 	public List<Integer> getParentCIDs() throws PSErrorException{
 		return getParentCIDs(this.guid);
+	}
+	
+	/**
+	 * Returns the greater number, parents in the current revision, or the 
+	 * last public revision.
+	 * @param source - the IPSGuid to check the parents based on revision of.
+	 * @return - the integer representation for how the greatest number of parents source has.
+	 */
+	public int getParentsLivePreview(IPSGuid source){
+		List<PSItemSummary> parentsNow = null;
+		try {
+			parentsNow = getParents(source);
+		} catch (PSErrorException e) {
+			e.printStackTrace();
+		}
+			
+		//Get the older (last public version) parents #
+		PSRelationshipFilter filter = new PSRelationshipFilter();
+		filter.limitToPublicOwnerRevision(true);
+		filter.setCategory("rs_activeassembly");
+		if(bDebug){System.out.println("finding the parents");}
+		List<PSItemSummary> oldParents = null;
+		try {
+			oldParents = PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
+		} catch (PSMissingBeanConfigurationException e) {
+			e.printStackTrace();
+		} catch (PSErrorException e) {
+			e.printStackTrace();
+		}
+		
+		if( oldParents.size() >= parentsNow.size()){
+			return oldParents.size();
+		}
+		else{
+			return parentsNow.size();
+		}
 	}
 	
 	/**
@@ -206,12 +250,16 @@ public class CGV_ParentChildManager {
 			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
 			item = items.get(0);
 		} catch (PSErrorResultsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(bDebug){e.printStackTrace();}
 		}
 		return item;
 	}
 	
+	/**
+	 * Checks to see if the current content item is checked out or not.
+	 * @param cid - the current content id to check in IPSGuid form.
+	 * @return - true if the item is checked out, false if not.
+	 */
 	public boolean isCheckedOut(IPSGuid cid){
 		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(cid);
 		List<PSCoreItem> items = null;
@@ -220,21 +268,22 @@ public class CGV_ParentChildManager {
 			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
 			item = items.get(0);
 		} catch (PSErrorResultsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(bDebug){e.printStackTrace();}
 		}
 		
-		//System.out.println("name of the user who has the item checked out = " + item.getCheckedOutByName());
 		if(	item.getCheckedOutByName().length() == 0){
-			//System.out.println("the name of the user is nothing....");
 			return false;
 		}
 		else{
-			//System.out.println("the name of the user is something!!!!");
 			return true;
 		}
 	}
 	
+	/**
+	 * Returns the current revision of the curret item.
+	 * @param cid - the content id of the item (as an IPSGuid)
+	 * @return the integer value of the current revision.
+	 */
 	public int getRevision(IPSGuid cid){
 		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(cid);
 		List<PSCoreItem> items = null;
@@ -243,8 +292,7 @@ public class CGV_ParentChildManager {
 			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
 			item = items.get(0);
 		} catch (PSErrorResultsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(bDebug){e.printStackTrace();}
 		}
 		return item.getRevisionCount();
 	}
@@ -264,8 +312,7 @@ public class CGV_ParentChildManager {
 			items = PSContentWsLocator.getContentWebservice().loadItems(glist, true, false, false, false);
 			item = items.get(0);
 		} catch (PSErrorResultsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(bDebug){e.printStackTrace();}
 		}
 		return item;
 	}
