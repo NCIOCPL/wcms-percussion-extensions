@@ -25,7 +25,7 @@
     <mime-type>text/html</mime-type>
     <name>nciDsTile</name>
     <output-format>Page</output-format>
-    <publish-when>Default</publish-when>
+    <publish-when>Never</publish-when>
     <site-ids>
       <site-id>307</site-id>
     </site-ids>
