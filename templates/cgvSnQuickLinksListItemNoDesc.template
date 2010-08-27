@@ -15,9 +15,18 @@
       </binding>
       <binding id="4">
         <execution-order>2</execution-order>
-        <expression>if ($sys.item.getProperty("type").String=='nciLink') {$sys.item.getProperty("url").String;} else       {$rx.location.generate($sys.assemblyItem);}</expression>
+        <expression>$sys.variables.rxs_imageBase </expression>
         <id>0</id>
         <jexl-script id="5">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
+      <binding id="6">
+        <execution-order>3</execution-order>
+        <expression>if ($sys.item.getProperty("type").String=='nciLink') {$sys.item.getProperty("url").String;} else       {$rx.location.generate($sys.assemblyItem);}</expression>
+        <id>0</id>
+        <jexl-script id="7">
           <text>if ($sys.item.getProperty("type").String=='nciLink') {$sys.item.getProperty("url").String;} else       {$rx.location.generate($sys.assemblyItem);};</text>
         </jexl-script>
         <variable>$extlink</variable>

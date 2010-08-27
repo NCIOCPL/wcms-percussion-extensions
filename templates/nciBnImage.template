@@ -28,7 +28,7 @@
     <description>Returns the binary stream from the image shared group img1 field, setting the mime type as specified by the Image mime type field.</description>
     <global-template/>
     <global-template-usage>None</global-template-usage>
-    <label>B - Image</label>
+    <label>B - NCI Image</label>
     <location-prefix/>
     <location-suffix/>
     <mime-type/>

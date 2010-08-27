@@ -36,9 +36,9 @@
     <output-format>Binary</output-format>
     <publish-when>Always</publish-when>
     <site-ids>
-      <site-id>307</site-id>
       <site-id>303</site-id>
       <site-id>301</site-id>
+      <site-id>307</site-id>
     </site-ids>
     <style-sheet-path/>
     <template/>

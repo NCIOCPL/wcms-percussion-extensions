@@ -13,6 +13,15 @@
         </jexl-script>
         <variable>$rxs_navbase</variable>
       </binding>
+      <binding id="4">
+        <execution-order>2</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="5">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
     </bindings>
     <charset>UTF-8</charset>
     <content-ids/>
@@ -54,17 +63,17 @@
 ##
 ## Top Navigation
 &lt;tr&gt;##					 	
-&lt;td valign="top"&gt;&lt;img width="10" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;##
+&lt;td valign="top"&gt;&lt;img width="10" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##
 &lt;td valign="bottom"&gt;#slot("rffNav" "" "" "" "" "template=cgvSnTopNav")##
 &lt;/td&gt;##
-&lt;td valign="top"&gt;&lt;img width="10" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;##					
+&lt;td valign="top"&gt;&lt;img width="10" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##					
 &lt;/tr&gt;##			
 ## end Top Navigation
 &lt;/tbody&gt;&lt;/table&gt;##
 &lt;/td&gt;##
 &lt;/tr&gt;##	
 &lt;tr&gt;##
-&lt;td valign="top" bgcolor="#ffffff"&gt;&lt;img width="10" height="15" border="0" src="$rxs_navbase/images/spacer.gif" alt=""&gt;&lt;/td&gt;##
+&lt;td valign="top" bgcolor="#ffffff"&gt;&lt;img width="10" height="15" border="0" src="$rxs_imageBase/spacer.gif" alt=""&gt;&lt;/td&gt;##
 &lt;/tr&gt;##
 &lt;/tbody&gt;##
 &lt;/table&gt;##

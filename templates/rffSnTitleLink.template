@@ -36,9 +36,9 @@
     <output-format>Snippet</output-format>
     <publish-when>Never</publish-when>
     <site-ids>
-      <site-id>307</site-id>
       <site-id>303</site-id>
       <site-id>301</site-id>
+      <site-id>307</site-id>
     </site-ids>
     <style-sheet-path/>
     <template>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;

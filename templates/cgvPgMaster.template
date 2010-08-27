@@ -22,6 +22,15 @@
         </jexl-script>
         <variable>$isPublish</variable>
       </binding>
+      <binding id="6">
+        <execution-order>3</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="7">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
     </bindings>
     <charset>UTF-8</charset>
     <content-ids/>
@@ -98,13 +107,13 @@
 	 
 		#slot("cgvLeftNav" "" "" "$spacer" "" "")    
       &lt;/td&gt;
-	  &lt;td valign="top"&gt;&lt;img width="16" height="1" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;
+	  &lt;td valign="top"&gt;&lt;img width="16" height="1" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;
 
    &lt;/tr&gt;
 &lt;/tbody&gt;&lt;/table&gt;
 &lt;table width="1" cellspacing="0" cellpadding="0" border="0"&gt;
    &lt;tbody&gt;&lt;tr&gt;
-      &lt;td&gt;&lt;img width="1" height="6" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;img width="1" height="6" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;
    &lt;/tr&gt;
 &lt;/tbody&gt;&lt;/table&gt;
 
@@ -125,7 +134,7 @@
 
    &lt;/td&gt;
     ## end Body 
-    &lt;td valign="top"&gt;&lt;img width="10" height="1" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;
+    &lt;td valign="top"&gt;&lt;img width="10" height="1" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;
 			&lt;/tr&gt;
 		&lt;/tbody&gt;&lt;/table&gt;     
     &lt;/div&gt;

@@ -72,9 +72,9 @@
 	#inner()
 	&lt;/body&gt;
   &lt;/html&gt;
-#else
-	#inner()
-#end</template>
+#else##
+#inner()##
+#end##</template>
     <template-slot-ids/>
     <template-type>Shared</template-type>
     <variant>false</variant>

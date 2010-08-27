@@ -22,6 +22,15 @@
         </jexl-script>
         <variable>$pagelink</variable>
       </binding>
+      <binding id="6">
+        <execution-order>3</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="7">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
     </bindings>
     <charset>UTF-8</charset>
     <content-ids/>

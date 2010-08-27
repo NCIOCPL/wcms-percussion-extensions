@@ -6,10 +6,19 @@
     <bindings>
       <binding id="2">
         <execution-order>1</execution-order>
-        <expression>if ($sys.item.hasProperty("rx:usage")) {  $usage = $sys.item.getProperty("rx:usage").String;  } if (! empty($usage) and $usage == 'Image') {       'nciBnImage'; } else {      'nciBnImage';  } </expression>
+        <expression>$tools.number.toNumber($sys.variables.rxs_isLinkingContext)</expression>
         <id>0</id>
         <jexl-script id="3">
-          <text>if ($sys.item.hasProperty("rx:usage")) {  $usage = $sys.item.getProperty("rx:usage").String;  } if (! empty($usage) and $usage == 'Image') {       'nciBnImage'; } else {      'nciBnImage';  };</text>
+          <text>$tools.number.toNumber($sys.variables.rxs_isLinkingContext);</text>
+        </jexl-script>
+        <variable>$rxs_isLinkingContext</variable>
+      </binding>
+      <binding id="4">
+        <execution-order>2</execution-order>
+        <expression>if ($sys.item.hasProperty("rx:usage")) {  $usage = $sys.item.getProperty("rx:usage").String;  }  if (! empty($usage) and $usage == 'Image') {    if ($rxs_isLinkingContext == 1)    {    'nciSnImage'; }    else    { 'nciBnImage'; }  } else  {        'nciBnImage';  }</expression>
+        <id>0</id>
+        <jexl-script id="5">
+          <text>if ($sys.item.hasProperty("rx:usage")) {  $usage = $sys.item.getProperty("rx:usage").String;  }  if (! empty($usage) and $usage == 'Image') {    if ($rxs_isLinkingContext == 1)    {    'nciSnImage'; }    else    { 'nciBnImage'; }  } else  {        'nciBnImage';  };</text>
         </jexl-script>
         <variable>$sys.template</variable>
       </binding>
@@ -25,7 +34,7 @@
     <mime-type>text/html</mime-type>
     <name>nciDsImage</name>
     <output-format>Page</output-format>
-    <publish-when>Default</publish-when>
+    <publish-when>Never</publish-when>
     <site-ids>
       <site-id>307</site-id>
     </site-ids>

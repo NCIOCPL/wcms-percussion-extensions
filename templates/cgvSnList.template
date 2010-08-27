@@ -13,6 +13,15 @@
         </jexl-script>
         <variable>$rxs_navbase</variable>
       </binding>
+      <binding id="4">
+        <execution-order>2</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="5">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
     </bindings>
     <charset>UTF-8</charset>
     <content-ids/>
@@ -35,12 +44,23 @@
 &lt;html&gt;
   &lt;head&gt;
     &lt;title&gt;#displayfield("sys_title")&lt;/title&gt;
-    &lt;link rel="stylesheet" href="${rxs_navbase}/stylesheets/nci.css" type="text/css" /&gt;
-    &lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+    &lt;link rel="stylesheet" href="$rxs_navbase/stylesheets/nci.css" type="text/css"&gt;
+	&lt;link rel="stylesheet" href="$rxs_navbase/stylesheets/nci_general_browsers.css" type="text/css"&gt;
+	&lt;link rel="image_src" href="http://static.cancer.gov/Facebook/Cancer.gov/images/nci_75width.gif" &gt; 
+
+	&lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
   &lt;/head&gt;
 &lt;body&gt;##
-## Start snippet 
-## End snippet
+## Start snippet 	
+&lt;span class="header-a"&gt;#field("list_title")&lt;/span&gt;&lt;br /&gt;##
+&lt;table cellspacing="0" cellpadding="0" border="0"&gt;##
+&lt;tr&gt;##
+&lt;td&gt;&lt;img src="$rxs_imageBase/spacer.gif"  alt="" height="5" alt="" border="0"&gt;&lt;/td&gt;##
+&lt;/tr&gt;##
+&lt;/table&gt;##
+#set ( $linkspacer = '&lt;br /&gt;&lt;img width="1" height="10" border="0" alt="" src="http://www.cancer.gov/images/spacer.gif"&gt;&lt;br /&gt;')##	
+#slot("cgvBody" "" "" $linkspacer "" "")##
+## End snippet 
 &lt;/body&gt;
 &lt;/html&gt;</template>
     <template-slot-ids/>

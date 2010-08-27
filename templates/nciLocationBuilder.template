@@ -3,7 +3,17 @@
     <active-assembly-type>Normal</active-assembly-type>
     <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
     <assembly-url>../assembler/render</assembly-url>
-    <bindings/>
+    <bindings>
+      <binding id="2">
+        <execution-order>1</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="3">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
+    </bindings>
     <charset>UTF-8</charset>
     <content-ids/>
     <description>This template, when paired with the nciLocator slot, renders the location where a content item is located.</description>

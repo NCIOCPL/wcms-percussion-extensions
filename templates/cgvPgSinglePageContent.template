@@ -31,6 +31,15 @@
         </jexl-script>
         <variable>$dateDisplay</variable>
       </binding>
+      <binding id="8">
+        <execution-order>4</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="9">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
     </bindings>
     <charset>UTF-8</charset>
     <content-ids/>
@@ -51,20 +60,22 @@
     <template>#define($bodySlot)##
 &lt;span class="page-title"&gt;#field("long_title")&lt;/span&gt;&lt;br /&gt;##
 #field("body")##
-#slot("cgvBody" "" "" "" "" "")##
-#CGOV_Html_DisplayBackToTop()##
+##slot("cgvBody" "" "" "" "" "")##
+##CGOV_Html_DisplayBackToTop()##
 #{end}##
 ##
 #set($genericHTMLTemplate = "~/SnippetTemplates/GenericHtmlContentSnippet.ascx")##
 ##
 #define($templateSnippets)##
-#CDE_PubXml_CreateTemplateSnippetInfos( "cgvBody" $genericHTMLTemplate $bodySlot)##
+#set($myContentId = "#Get_Content_Item_ID($sys)")
+#CDE_PubXml_CreateTemplateSnippetInfos( "cgvBody" $genericHTMLTemplate $bodySlot $myContentId)##
 #{end}##
 ##
 #if( $isPublish )##
 ## Comma-separated list of slots which should be blocked.
-#set( $blockedSlots = [] )##
-#CDE_PubXml_OutputSinglePageAssemblyInfo("cgvXMLSinglePageContent" $templateSnippets $blockedSlots "en")##
+##set( $blockedSlots = [] )##
+#set( $blockedSlots = ["cgvBodyHeader","cgvContentHeader", "cgvRightNav"] )##
+#CDE_PubXml_OutputSinglePageAssemblyInfo("DefaultCancerGovTemplate" $templateSnippets $blockedSlots "en")##
 #else##
 &lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;##
 ##
@@ -113,7 +124,7 @@
 &lt;table cellspacing="0" width="751" cellpadding="0" border="0" bgcolor="#FFFFFF"&gt;##
 #CGOV_Html_Date_Display()##
 &lt;tr&gt;##
-&lt;td valign="top" bgcolor="#ffffff"&gt;&lt;img width="10" height="15" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;##
+&lt;td valign="top" bgcolor="#ffffff"&gt;&lt;img width="10" height="15" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;##
 &lt;/td&gt;##
 &lt;/tr&gt;##     
 ##end Date/Spanish English Tabs 
@@ -125,7 +136,7 @@
 ## 
 &lt;table width="771" cellspacing="0" cellpadding="0" border="0"&gt;##
 &lt;tr&gt;##		
-&lt;td valign="top"&gt;&lt;img src="$rxs_navbase/images/spacer.gif" width="9" height="1" alt="" border="0"&gt;&lt;/td&gt;##
+&lt;td valign="top"&gt;&lt;img src="$rxs_imageBase/spacer.gif" width="9" height="1" alt="" border="0"&gt;&lt;/td&gt;##
 ##			
 ## LeftNav 
 &lt;td valign="top" id="leftzone"&gt;##    
@@ -136,14 +147,14 @@
 #set($spacer = '&lt;img height="6" border="0" alt="" src="http://www.cancer.gov/images/spacer.gif"&gt;')##
 #slot("cgvLeftNav" "" "" "$spacer" "" "")##    
 &lt;/td&gt;##
-&lt;td valign="top"&gt;&lt;img width="16" height="1" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;##
+&lt;td valign="top"&gt;&lt;img width="16" height="1" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##
 &lt;/tr&gt;##
 &lt;/tbody&gt;##
 &lt;/table&gt;##
 &lt;table width="1" cellspacing="0" cellpadding="0" border="0"&gt;##
 &lt;tbody&gt;##
 &lt;tr&gt;##
-&lt;td&gt;&lt;img width="1" height="6" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;##
+&lt;td&gt;&lt;img width="1" height="6" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##
 &lt;/tr&gt;##
 &lt;/tbody&gt;##
 &lt;/table&gt;##
@@ -179,7 +190,7 @@ $bodySlot
 ##
 &lt;/td&gt;##
 ## end Body 
-&lt;td valign="top"&gt;&lt;img width="10" height="1" border="0" alt="" src="$rxs_navbase/images/spacer.gif"&gt;&lt;/td&gt;##
+&lt;td valign="top"&gt;&lt;img width="10" height="1" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##
 &lt;/tr&gt;##
 &lt;/tbody&gt;##
 &lt;/table&gt;##     

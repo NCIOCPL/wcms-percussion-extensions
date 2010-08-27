@@ -22,13 +22,22 @@
         </jexl-script>
         <variable>$link</variable>
       </binding>
+      <binding id="6">
+        <execution-order>3</execution-order>
+        <expression>$tools.number.toNumber($sys.variables.rxs_isLinkingContext)</expression>
+        <id>0</id>
+        <jexl-script id="7">
+          <text>$tools.number.toNumber($sys.variables.rxs_isLinkingContext);</text>
+        </jexl-script>
+        <variable>$rxs_isLinkingContext</variable>
+      </binding>
     </bindings>
     <charset>UTF-8</charset>
     <content-ids/>
     <description>Snippet template for image.</description>
     <global-template/>
     <global-template-usage>None</global-template-usage>
-    <label>S - Image</label>
+    <label>S - NCI Image</label>
     <location-prefix/>
     <location-suffix/>
     <mime-type>text/html</mime-type>

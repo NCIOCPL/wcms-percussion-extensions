@@ -13,6 +13,15 @@
         </jexl-script>
         <variable>$rxs_navbase</variable>
       </binding>
+      <binding id="4">
+        <execution-order>2</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="5">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
     </bindings>
     <charset>UTF-8</charset>
     <content-ids/>
@@ -45,17 +54,17 @@
 &lt;td valign="top"&gt;##
 &lt;table width="162" cellspacing="0" cellpadding="0" border="0" bgcolor="#FFFFFF"&gt;##
 &lt;tr&gt;##
-&lt;td valign="top" align="left" colspan="3"&gt;&lt;img src="$rxs_navbase/images/spacer.gif"  alt="" width="162" height="8" alt="" border="0"&gt;&lt;/td&gt;##
+&lt;td valign="top" align="left" colspan="3"&gt;&lt;img src="$rxs_imageBase/spacer.gif"  alt="" width="162" height="8" alt="" border="0"&gt;&lt;/td&gt;##
 &lt;/tr&gt;##
 &lt;tr&gt;##
-&lt;td valign="top" align="left"&gt;&lt;img src="$rxs_navbase/images/spacer.gif" width="7" height="1" alt="" border="0"&gt;&lt;/td&gt;##
+&lt;td valign="top" align="left"&gt;&lt;img src="$rxs_imageBase/spacer.gif" width="7" height="1" alt="" border="0"&gt;&lt;/td&gt;##
 &lt;td valign="top" class="leftnav" align="left" width="148" &gt;##
 #field("body")##
 &lt;/td&gt;##
-&lt;td valign="top" align="right"&gt;&lt;img src="$rxs_navbase/images/spacer.gif" width="7" height="1" alt="" border="0"&gt;&lt;/td&gt;##
+&lt;td valign="top" align="right"&gt;&lt;img src="$rxs_imageBase/spacer.gif" width="7" height="1" alt="" border="0"&gt;&lt;/td&gt;##
 &lt;/tr&gt;##
 &lt;tr&gt;##
-&lt;td valign="top" align="left" colspan="3"&gt;&lt;img src="$rxs_navbase/images/spacer.gif" alt="" width="162" height="8" alt="" border="0"&gt;&lt;/td&gt;##
+&lt;td valign="top" align="left" colspan="3"&gt;&lt;img src="$rxs_imageBase/spacer.gif" alt="" width="162" height="8" alt="" border="0"&gt;&lt;/td&gt;##
 &lt;/tr&gt;##
 &lt;/table&gt;##
 &lt;/td&gt;##
