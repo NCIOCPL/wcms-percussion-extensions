@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PSXContentEditor contentType="313" enableRelatedContent="no" iconSource="1" iconValue="rffNavImage.gif" objectType="1" workflowId="4">
   <PSXDataSet id="1180">
-    <name>template</name>
+    <name>rffNavImage</name>
     <description>default template</description>
     <transactionType>none</transactionType>
     <PSXContentEditorPipe id="0">

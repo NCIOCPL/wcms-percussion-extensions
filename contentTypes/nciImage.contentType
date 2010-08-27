@@ -9,8 +9,45 @@
       <description>This is the ContentEditorLocaDef for Default ContentType</description>
       <InputDataExits>
         <PSXExtensionCallSet id="0">
-          <PSXExtensionCall id="10426">
+          <PSXExtensionCall id="10071">
             <name>Java/global/percussion/generic/sys_FileInfo</name>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/exit/sys_imageInfoExtractor</name>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/extensions/general/sys_CopyParameter</name>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>img1_filename</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>filename</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/extensions/general/sys_CopyParameter</name>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>img1_ext</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>sys_suffix</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
           </PSXExtensionCall>
           <PSXExtensionCall id="0">
             <name>Java/global/percussion/content/CGV_systitlePopulate</name>
@@ -36,10 +73,10 @@
           <FieldRef>sys_pathname</FieldRef>
           <FieldRef>sys_pubdate</FieldRef>
           <FieldRef>sys_reminderdate</FieldRef>
-          <FieldRef>sys_suffix</FieldRef>
         </SystemFieldExcludes>
         <SharedFieldIncludes>
           <SharedFieldGroupName>cgvPublishedPageMetaData</SharedFieldGroupName>
+          <SharedFieldGroupName>shared</SharedFieldGroupName>
           <SharedFieldGroupName>sharedimage</SharedFieldGroupName>
           <SharedFieldExcludes>
             <FieldRef>do_not_index</FieldRef>
@@ -49,6 +86,12 @@
             <FieldRef>pretty_url_name</FieldRef>
             <FieldRef>short_description</FieldRef>
             <FieldRef>short_title</FieldRef>
+            <FieldRef>body</FieldRef>
+            <FieldRef>callout</FieldRef>
+            <FieldRef>description</FieldRef>
+            <FieldRef>displaytitle</FieldRef>
+            <FieldRef>keywords</FieldRef>
+            <FieldRef>webdavowner</FieldRef>
             <FieldRef>img2</FieldRef>
             <FieldRef>img2_ext</FieldRef>
             <FieldRef>img2_filename</FieldRef>
@@ -197,6 +240,18 @@
               <PSXUISet/>
             </PSXDisplayMapping>
             <PSXDisplayMapping>
+              <FieldRef>img1_type</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>filename</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_suffix</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
               <FieldRef>placeholder</FieldRef>
               <PSXUISet>
                 <Label>
@@ -207,10 +262,6 @@
                   <PSXDisplayText>Placeholder:</PSXDisplayText>
                 </ErrorLabel>
               </PSXUISet>
-            </PSXDisplayMapping>
-            <PSXDisplayMapping>
-              <FieldRef>img1_type</FieldRef>
-              <PSXUISet/>
             </PSXDisplayMapping>
             <PSXDisplayMapping>
               <FieldRef>type</FieldRef>
@@ -246,8 +297,8 @@
         </PSXUIDefinition>
       </PSXContentEditorMapper>
       <userProperties>
-        <userProperty name="Control76_Dependency10426">sys_FileInfo</userProperty>
-        <userProperty name="Control76_DependencyIds">10426</userProperty>
+        <userProperty name="Control76_Dependency10071">sys_FileInfo</userProperty>
+        <userProperty name="Control76_DependencyIds">10071</userProperty>
       </userProperties>
     </PSXContentEditorPipe>
     <PSXRequestor directDataStream="no" id="0">

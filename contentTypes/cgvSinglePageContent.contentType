@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PSXContentEditor contentType="352" enableRelatedContent="yes" iconSource="0" iconValue="" objectType="1" workflowId="6">
+<PSXContentEditor contentType="398" enableRelatedContent="yes" iconSource="0" iconValue="" objectType="1" workflowId="6">
   <PSXDataSet id="768">
     <name>cgvSinglePageContent</name>
     <description>default template</description>
@@ -9,7 +9,7 @@
       <description>This is the ContentEditorLocaDef for Default ContentType</description>
       <InputDataExits>
         <PSXExtensionCallSet id="0">
-          <PSXExtensionCall id="10434">
+          <PSXExtensionCall id="10451">
             <name>Java/global/percussion/xmldom/sys_xdTextCleanup</name>
             <PSXExtensionParamValue id="0">
               <value>
@@ -54,7 +54,7 @@
               </value>
             </PSXExtensionParamValue>
           </PSXExtensionCall>
-          <PSXExtensionCall id="10433">
+          <PSXExtensionCall id="10450">
             <name>Java/global/percussion/xmldom/sys_xdTextCleanup</name>
             <PSXExtensionParamValue id="0">
               <value>
@@ -280,6 +280,24 @@
               <PSXUISet/>
             </PSXDisplayMapping>
             <PSXDisplayMapping>
+              <FieldRef>usage</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Usage:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10417" name="sys_DropDownSingle"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Usage:</PSXDisplayText>
+                </ErrorLabel>
+                <PSXChoices sortOrder="ascending" type="local">
+                  <PSXEntry default="no" sequence="-1">
+                    <PSXDisplayText>SinglePageContent</PSXDisplayText>
+                    <Value>SinglePageContent</Value>
+                  </PSXEntry>
+                </PSXChoices>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
               <FieldRef>date_first_published</FieldRef>
               <PSXUISet/>
             </PSXDisplayMapping>
@@ -336,24 +354,6 @@
               </PSXDisplayMapper>
             </PSXDisplayMapping>
             <PSXDisplayMapping>
-              <FieldRef>usage</FieldRef>
-              <PSXUISet>
-                <Label>
-                  <PSXDisplayText>Usage:</PSXDisplayText>
-                </Label>
-                <PSXControlRef id="10417" name="sys_DropDownSingle"/>
-                <ErrorLabel>
-                  <PSXDisplayText>Usage:</PSXDisplayText>
-                </ErrorLabel>
-                <PSXChoices sortOrder="ascending" type="local">
-                  <PSXEntry default="no" sequence="-1">
-                    <PSXDisplayText>SinglePageContent</PSXDisplayText>
-                    <Value>SinglePageContent</Value>
-                  </PSXEntry>
-                </PSXChoices>
-              </PSXUISet>
-            </PSXDisplayMapping>
-            <PSXDisplayMapping>
               <FieldRef>type</FieldRef>
               <PSXUISet>
                 <Label>
@@ -369,10 +369,10 @@
         </PSXUIDefinition>
       </PSXContentEditorMapper>
       <userProperties>
-        <userProperty name="Control10048_Dependency10434">sys_xdTextCleanup</userProperty>
-        <userProperty name="Control10046_Dependency10433">sys_xdTextCleanup</userProperty>
-        <userProperty name="Control10048_DependencyIds">10434</userProperty>
-        <userProperty name="Control10046_DependencyIds">10433</userProperty>
+        <userProperty name="Control10046_Dependency10450">sys_xdTextCleanup</userProperty>
+        <userProperty name="Control10048_DependencyIds">10451</userProperty>
+        <userProperty name="Control10048_Dependency10451">sys_xdTextCleanup</userProperty>
+        <userProperty name="Control10046_DependencyIds">10450</userProperty>
       </userProperties>
     </PSXContentEditorPipe>
     <PSXRequestor directDataStream="no" id="0">
