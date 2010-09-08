@@ -1,7 +1,9 @@
 package gov.cancer.wcm.extensions;
 
 import gov.cancer.wcm.util.CGV_ParentChildManager;
+import gov.cancer.wcm.util.CGV_StateHelper;
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
+import gov.cancer.wcm.util.CGV_StateHelper.StateName;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -113,14 +115,21 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	public void queueItemSet(int contentId, IPSRequestContext request) {
 
 		List<String> editions = new ArrayList<String>();
-		//TODO: ADD A STATEMENT HERE TO PARSE THE REQUEST TO FIND THE DEST. STATE.
-		//	BASED ON THE STATE, DO STUFF.  ->PUBLIC, DO PUBLIC.... ->PREVIEW, DO PREVIEW
+		CGV_StateHelper stateHelp = new CGV_StateHelper(request);
+		StateName destState = stateHelp.getDestState();
 		Map<String,List<String>> m = editionList.get("CancerGov Workflow");
-		List<String> mm = m.get("publish_onDemandEditionId");
-		for( String i : mm ){
-			editions.add(i);
+		if (destState == StateName.PUBLIC) {
+			List<String> mm = m.get("publish_onDemandEditionId");
+			for( String i : mm ){
+				editions.add(i);
+			}
 		}
-		
+		else {
+			List<String> mm = m.get("preview_onDemandEditionId");
+			for( String i : mm ){
+				editions.add(i);
+			}
+		}
 		
 		if (bDebug) System.out.println("start of queue item set");
 
