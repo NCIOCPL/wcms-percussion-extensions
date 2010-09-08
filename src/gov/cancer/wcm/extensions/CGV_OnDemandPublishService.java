@@ -7,6 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +22,7 @@ import com.percussion.rx.publisher.IPSPublisherJobStatus;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.rx.publisher.data.PSDemandWork;
+import com.percussion.server.IPSRequestContext;
 import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
@@ -45,12 +47,23 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	protected static IPSRxPublisherService rps = null;
 	protected static IPSContentWs cmgr = null;
 	protected static CGV_ParentChildManager pcm = null;
-
-	private int onDemandEditionId = 315;
+	
+	private IPSRequestContext request = null;
+	private Map<String,Map<String,List<String>>> editionList;
+	//private int onDemandEditionId = 315;
 	private boolean waitForStatus = true;
 	private int timeOut = 20000;
 	private int waitTime = 100;
+	
+	public Map<String, Map<String, List<String>>> getEditionList() {
+		return editionList;
+	}
 
+	public void setEditionList(Map<String, Map<String, List<String>>> editionList) {
+		this.editionList = editionList;
+	}
+	
+	
 //TODO: replace doNotPublishParentTypes with String[], remove declaration further down, configure in xml
 //as:
 //<property name="doNotPublishParentTyptes">
@@ -76,6 +89,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	}
 
 	public CGV_OnDemandPublishService() {
+
 	}
 
 	/**
@@ -96,7 +110,18 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 * @param contentId
 	 * @param contentTypeId
 	 */
-	public void queueItemSet(int contentId) {
+	public void queueItemSet(int contentId, IPSRequestContext request) {
+
+		List<String> editions = new ArrayList<String>();
+		//TODO: ADD A STATEMENT HERE TO PARSE THE REQUEST TO FIND THE DEST. STATE.
+		//	BASED ON THE STATE, DO STUFF.  ->PUBLIC, DO PUBLIC.... ->PREVIEW, DO PREVIEW
+		Map<String,List<String>> m = editionList.get("CancerGov Workflow");
+		List<String> mm = m.get("publish_onDemandEditionId");
+		for( String i : mm ){
+			editions.add(i);
+		}
+		
+		
 		if (bDebug) System.out.println("start of queue item set");
 
 		//log.debug("CGV_OnDemandPublishService::queueItemSet executing...");
@@ -134,59 +159,61 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 					}
 				}
 			}
+			for( String currEdition: editions){
+				long workId = rxsvc.queueDemandWork(Integer.parseInt(currEdition), work);
+				System.out.println("work id is = " +workId);
+				Long jobId = rxsvc.getDemandRequestJob(workId);
+				System.out.println("job id is = " + jobId);
 
-			long workId = rxsvc.queueDemandWork(onDemandEditionId, work);
-			System.out.println("work id is = " +workId);
-			Long jobId = rxsvc.getDemandRequestJob(workId);
-			System.out.println("job id is = " + jobId);
-			if (waitForStatus) {
-				int totalTime = 0;
-				while (jobId == null && totalTime < timeOut) {
-					System.out.println("in the while loop");
-					jobId = rxsvc.getDemandRequestJob(workId);
-					if (jobId == null) {
-						System.out.println("in the if (jobid == null)");
-						totalTime += waitTime;
-						Thread.sleep(waitTime);
+				if (waitForStatus) {
+					int totalTime = 0;
+					while (jobId == null && totalTime < timeOut) {
+						System.out.println("in the while loop");
+						jobId = rxsvc.getDemandRequestJob(workId);
+						if (jobId == null) {
+							System.out.println("in the if (jobid == null)");
+							totalTime += waitTime;
+							Thread.sleep(waitTime);
+						}
 					}
-				}
-				System.out.println("job id is = after while = " + jobId);
-				int count;
-				if (jobId == null)
-					count = -2;
-				else {
-					IPSPublisherJobStatus.State state;
-					totalTime = 0;
-					do {
-						state = rxsvc.getDemandWorkStatus(workId);
-						totalTime += waitTime;
-						Thread.sleep(waitTime);
-					} while (state == IPSPublisherJobStatus.State.QUEUEING
-							&& totalTime < timeOut);
-					if (state == IPSPublisherJobStatus.State.QUEUEING)
-						count = -1;
+					System.out.println("job id is = after while = " + jobId);
+					int count;
+					if (jobId == null)
+						count = -2;
 					else {
-						IPSPublisherJobStatus status = rxsvc.getPublishingJobStatus(jobId.longValue());
-						count = status.countTotalItems();
+						IPSPublisherJobStatus.State state;
+						totalTime = 0;
+						do {
+							state = rxsvc.getDemandWorkStatus(workId);
+							totalTime += waitTime;
+							Thread.sleep(waitTime);
+						} while (state == IPSPublisherJobStatus.State.QUEUEING
+								&& totalTime < timeOut);
+						if (state == IPSPublisherJobStatus.State.QUEUEING)
+							count = -1;
+						else {
+							IPSPublisherJobStatus status = rxsvc.getPublishingJobStatus(jobId.longValue());
+							count = status.countTotalItems();
 
+						}
 					}
-				}
-				switch(count){
-				case -2:
-					log.debug("Queuing the items timed out.");
-					if (bDebug) System.out.println("Queuing the items timed out.");
-					break;
-				case -1:
-					log.debug("Took a long time to queue items");
-					if (bDebug) System.out.println("Took a long time to queue items");
-					break;
+					switch(count){
+					case -2:
+						log.debug("Queuing the items timed out.");
+						if (bDebug) System.out.println("Queuing the items timed out.");
+						break;
+					case -1:
+						log.debug("Took a long time to queue items");
+						if (bDebug) System.out.println("Took a long time to queue items");
+						break;
 					default:
 						log.debug("Queued " + count + " items");
 						if (bDebug) System.out.println("Queued " + count + " items");
+					}
+				} else {
+					log.debug("Tried to send " + idsToPublish.size()
+							+ " to Queue, not waiting for response");
 				}
-			} else {
-				log.debug("Tried to send " + idsToPublish.size()
-						+ " to Queue, not waiting for response");
 			}
 		} catch (Exception nfx) {
 			log.error("GSAOnDemandPublishServce::queueItemSet", nfx);
@@ -263,19 +290,19 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		return localPublishList;
 	}
 
-	/**
-	 * @param onDemandEditionId
-	 */
-	public void setOnDemandEditionId(int onDemandEditionId) {
-		this.onDemandEditionId = onDemandEditionId;
-	}
-
-	/**
-	 * @return int onDemandEditionId
-	 */
-	public int getOnDemandEditionId() {
-		return onDemandEditionId;
-	}
+//	/**
+//	 * @param onDemandEditionId
+//	 */
+//	public void setOnDemandEditionId(int onDemandEditionId) {
+//		this.onDemandEditionId = onDemandEditionId;
+//	}
+//
+//	/**
+//	 * @return int onDemandEditionId
+//	 */
+//	public int getOnDemandEditionId() {
+//		return onDemandEditionId;
+//	}
 
 	/**
 	 * @return boolean waitForStatus
@@ -317,6 +344,10 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 */
 	public int getTimeOut() {
 		return timeOut;
+	}
+
+	public void setRequest(IPSRequestContext request) {
+		this.request = request;
 	}
 
 }
