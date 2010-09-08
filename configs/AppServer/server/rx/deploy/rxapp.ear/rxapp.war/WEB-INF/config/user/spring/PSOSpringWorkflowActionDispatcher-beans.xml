@@ -27,6 +27,13 @@
           <map>
               <entry key="CancerGov Workflow">
                   <map>
+                     <entry key="Preview">
+                         <list>
+				<value>CGV_OnDemandPublishContent</value>
+				<value>sys_TouchParentItems</value>
+                            <value>CGV_ParentChild</value>
+                         </list>
+                     </entry> 
                      <entry key="toPublic">
                          <list>
 				<value>CGV_OnDemandPublishContent</value>

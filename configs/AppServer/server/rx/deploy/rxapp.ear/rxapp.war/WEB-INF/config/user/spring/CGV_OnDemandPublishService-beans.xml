@@ -9,11 +9,28 @@
 		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-   <bean id="CGV_OnDemandPublishService" class="gov.cancer.wcm.extensions.CGV_OnDemandPublishService >
-      <property name="onDemandEditionId" value="315"/>
-      <property name="waitForStatus" value="true"/>
-      <property name="timeOut" value="20000"/>
-      <property name="waitTime" value="100"/>
-   </bean>
-
+	<bean id="CGV_OnDemandPublishService" class="gov.cancer.wcm.extensions.CGV_OnDemandPublishService" >
+		<property name="editionList">
+			<map>
+				<entry key="CancerGov Workflow">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>315</value>
+								<value>345</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>355</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+		<property name="waitForStatus" value="true"/>
+		<property name="timeOut" value="20000"/>
+		<property name="waitTime" value="100"/>
+	</bean>
 </beans>
