@@ -1,5 +1,10 @@
 package gov.cancer.wcm.util;
 
+import gov.cancer.wcm.extensions.CGV_OnDemandPublishService;
+import gov.cancer.wcm.extensions.CGV_OnDemandPublishServiceLocator;
+import gov.cancer.wcm.extensions.CGV_ParentChildService;
+import gov.cancer.wcm.extensions.CGV_ParentChildServiceLocator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,33 +19,40 @@ import com.percussion.server.IPSRequestContext;
  */
 public class CGV_StateHelper {
 	
+	
 	/**
 	 * Default Constructor
 	 */
 	public CGV_StateHelper(){
+		initServices();
 		name = null;
 		currState = null;
 		destState = null;
+		transitionID = 0;
+		trigger = null;
 	}
 		
-	/**
-	 * Constructor that allows a string to be passed in.
-	 * That string will setup the name/statename enum object
-	 * for the CGV_StateHelper object.
-	 * @param current - the name of the current state.
-	 */
-	public CGV_StateHelper(String current, String destination){
-		name = current;
-		currState = toStateName(current);
-		destState = toStateName(destination);
-	}
-	
+//	/**
+//	 * Constructor that allows a string to be passed in.
+//	 * That string will setup the name/statename enum object
+//	 * for the CGV_StateHelper object.
+//	 * @param current - the name of the current state.
+//	 */
+//	public CGV_StateHelper(String current, String destination, int transition){
+//		initServices();
+//		name = current;
+//		currState = toStateName(current);
+//		destState = toStateName(destination);
+//		transitionID = transition;
+//	}
+//	
 	/**
 	 * Constructor that allows the request context to be passed in
 	 * and that sets up the current, destination, and the transition id.
 	 * @param req
 	 */
 	public CGV_StateHelper(IPSRequestContext req){
+		initServices();
 		setup(req);
 	}
 	
@@ -66,90 +78,111 @@ public class CGV_StateHelper {
 	 */
 	private int transitionID;
 	
+	private String trigger;
+
+
+	/**
+	 * Service class to invoke publishing routine
+	 */
+	private static CGV_ParentChildService svc = null;
+	
 	private void setup(IPSRequestContext request){
 				
 		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
-		
-		currState = toStateName(getCurrState(tranID));		//Set the current state for the object.
-		destState = toStateName(getDestState(tranID));		//Set the destination state for the object.
-		transitionID = tranID;									//Set the transition ID for the object.
-	}
-	
-	public String getCurrState(int tranID){
-		//TODO: Customize for Blue, and add config file parse.
-		switch (tranID) {
-		case 3:
-			return "Draft";
-		case 14:
-			return "Review";
-		case 6:
-			return "Review";
-		case 9:
-			return "Public";
-		case 8:
-			return "Public";
-		case 11:
-			return "Editing";
-		case 15:
-			return "Reapproval";
-		case 16:
-			return "Reapproval";
-		case 12:
-			return "Archived";
-		//case 2:
-		//	return "Archived";
-		case 17:
-			return "Pending";
-		case 18:
-			return "Pending";
-		case 19:
-			return "ArchiveApproval";
-		case 20:
-			return "ArchiveApproval";
-		case 21:
-			return "Archived";
-		default:
-				return null;
-		}
+		transitionID = tranID;
+		trigger = svc.getTrigger(tranID);
+		currState = toStateName(svc.getCurrState(tranID));		//Set the current state for the object.
+		destState = toStateName(svc.getDestState(tranID));		//Set the destination state for the object.
+		System.out.println("JOHN TEST: currentState = " + currState.toString());
+		System.out.println("JOHN TEST: destinationState = " +destState.toString());
+		System.out.println("JOHN TEST: trigger = " + trigger);
 	}
 
-	private String getDestState(int tranID) {
-		//TODO: Customize for Blue, and add config file parse.
-		switch (tranID) {
-		case 3:
-			return "Review";
-		case 14:
-			return "Draft";
-		case 6:
-			return "Pending";
-		case 9:
-			return "Editing";
-		case 8:
-			return "ArchiveApproval";
-		case 11:
-			return "Reapproval";
-		case 15:
-			return "Public";
-		case 16:
-			return "Editing";
-		case 12:
-			return "Public";
-		//case 2:
-		//	return "Editing";
-		case 17:
-			return "Review";
-		case 18:
-			return "Public";
-		case 19:
-			return "Archived";
-		case 20:
-			return "Public";
-		case 21:
-			return "Editing";
-		default:
-				return null;
+	/**
+	 * Initializing the Service class. 
+	 */
+	private static void initServices()
+	{
+		if(svc == null)
+		{
+			svc = CGV_ParentChildServiceLocator.getCGV_ParentChildService();
 		}
 	}
+	
+//	public String getCurrState(int tranID){
+//		//TODO: Customize for Blue, and add config file parse.
+//		switch (tranID) {
+//		case 3:
+//			return "Draft";
+//		case 14:
+//			return "Review";
+//		case 6:
+//			return "Review";
+//		case 9:
+//			return "Public";
+//		case 8:
+//			return "Public";
+//		case 11:
+//			return "Editing";
+//		case 15:
+//			return "Reapproval";
+//		case 16:
+//			return "Reapproval";
+//		case 12:
+//			return "Archived";
+//		//case 2:
+//		//	return "Archived";
+//		case 17:
+//			return "Pending";
+//		case 18:
+//			return "Pending";
+//		case 19:
+//			return "ArchiveApproval";
+//		case 20:
+//			return "ArchiveApproval";
+//		case 21:
+//			return "Archived";
+//		default:
+//				return null;
+//		}
+//	}
+//	private String getDestState(int tranID) {
+//		//TODO: Customize for Blue, and add config file parse.
+//		switch (tranID) {
+//		case 3:
+//			return "Review";
+//		case 14:
+//			return "Draft";
+//		case 6:
+//			return "Pending";
+//		case 9:
+//			return "Editing";
+//		case 8:
+//			return "ArchiveApproval";
+//		case 11:
+//			return "Reapproval";
+//		case 15:
+//			return "Public";
+//		case 16:
+//			return "Editing";
+//		case 12:
+//			return "Public";
+//		//case 2:
+//		//	return "Editing";
+//		case 17:
+//			return "Review";
+//		case 18:
+//			return "Public";
+//		case 19:
+//			return "Archived";
+//		case 20:
+//			return "Public";
+//		case 21:
+//			return "Draft";
+//		default:
+//				return null;
+//		}
+//	}
 
 
 	/**
@@ -255,6 +288,14 @@ public class CGV_StateHelper {
 
 	public void setTransitionID(int transitionID) {
 		this.transitionID = transitionID;
+	}
+	
+	public String getTrigger() {
+		return trigger;
+	}
+
+	public void setTrigger(String trigger) {
+		this.trigger = trigger;
 	}
 	
 	/**
