@@ -105,6 +105,27 @@
 								<entry key="trigger" value="ApproveArchive" />
 							</map>
 						</entry>
+						<entry key="22">
+							<map>
+								<entry key="fromState" value="Preview" />
+								<entry key="toState" value="Draft" />
+								<entry key="trigger" value="backToDraft" />
+							</map>
+						</entry>
+						<entry key="23">
+							<map>
+								<entry key="fromState" value="Preview" />
+								<entry key="toState" value="Review" />
+								<entry key="trigger" value="submitForReview" />
+							</map>
+						</entry>
+						<entry key="24">
+							<map>
+								<entry key="fromState" value="Draft" />
+								<entry key="toState" value="Preview" />
+								<entry key="trigger" value="Preview" />
+							</map>
+						</entry>
 					</map>
 				</entry>
 			</map>          
