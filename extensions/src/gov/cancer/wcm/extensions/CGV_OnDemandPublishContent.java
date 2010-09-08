@@ -38,13 +38,14 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
    /**
     * Initializing the Service class. 
     */
-   private static void initServices()
+   private static void initServices(IPSRequestContext request)
    {
       if(svc == null)
       {
-         svc =  CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
+         svc = CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
 //    	  svc = new CGV_OnDemandPublishService();
       }
+      svc.setRequest(request);
    }
    
    /**
@@ -58,11 +59,11 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
 		   IPSRequestContext request) throws PSExtensionProcessingException{
 	   
 	   if (bDebug) System.out.println("DEBUG: performAction");
-	   initServices();
+	   initServices(request);
 	   if (bDebug) System.out.println("DEBUG: performAction Initted services");
 	   int contentId = wfContext.getContentID();
 	   if (bDebug) System.out.println("DEBUG: performAction content id is " + contentId);
-	   svc.queueItemSet(contentId);
+	   svc.queueItemSet(contentId, request);
 	   if (bDebug) System.out.println("DEBUG: performAction queue item set is done running");
    }
 }
