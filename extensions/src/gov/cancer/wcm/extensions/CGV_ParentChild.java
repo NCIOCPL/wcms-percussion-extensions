@@ -17,6 +17,7 @@ import com.percussion.extension.PSExtensionProcessingException;		//exception
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.server.IPSRequestContext;
+import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSContentTypeSummary;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.guidmgr.IPSGuidManager;
@@ -523,7 +524,12 @@ IPSWorkflowAction {
 		if (rps == null) {
 			rps = PSRxPublisherServiceLocator.getRxPublisherService();
 			gmgr = PSGuidManagerLocator.getGuidMgr();
-			cmgr = PSContentWsLocator.getContentWebservice();
+			try {
+				cmgr = PSContentWsLocator.getContentWebservice();
+			} catch (PSMissingBeanConfigurationException e) {
+				System.out.println("PC DEBUG: MISSING BEAN!!!");
+				e.printStackTrace();
+			}
 			pcm = new CGV_ParentChildManager();
 		}
 	}
