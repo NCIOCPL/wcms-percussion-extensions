@@ -30,9 +30,12 @@ public class CGV_TopTypeChecker {
 			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
 			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
 			//get the first item
-			PSContentTypeSummary summaryItem = summaries.get(0);
-			if (contentTypeId == summaryItem.getGuid().getUUID()) {
-				return true;
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+
+				if (contentTypeId == summaryItem.getGuid().getUUID()) {
+					return true;
+				}
 			}
 		}
 		return false;
