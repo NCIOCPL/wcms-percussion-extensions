@@ -108,82 +108,6 @@ public class CGV_StateHelper {
 			svc = CGV_ParentChildServiceLocator.getCGV_ParentChildService();
 		}
 	}
-	
-//	public String getCurrState(int tranID){
-//		//TODO: Customize for Blue, and add config file parse.
-//		switch (tranID) {
-//		case 3:
-//			return "Draft";
-//		case 14:
-//			return "Review";
-//		case 6:
-//			return "Review";
-//		case 9:
-//			return "Public";
-//		case 8:
-//			return "Public";
-//		case 11:
-//			return "Editing";
-//		case 15:
-//			return "Reapproval";
-//		case 16:
-//			return "Reapproval";
-//		case 12:
-//			return "Archived";
-//		//case 2:
-//		//	return "Archived";
-//		case 17:
-//			return "Pending";
-//		case 18:
-//			return "Pending";
-//		case 19:
-//			return "ArchiveApproval";
-//		case 20:
-//			return "ArchiveApproval";
-//		case 21:
-//			return "Archived";
-//		default:
-//				return null;
-//		}
-//	}
-//	private String getDestState(int tranID) {
-//		//TODO: Customize for Blue, and add config file parse.
-//		switch (tranID) {
-//		case 3:
-//			return "Review";
-//		case 14:
-//			return "Draft";
-//		case 6:
-//			return "Pending";
-//		case 9:
-//			return "Editing";
-//		case 8:
-//			return "ArchiveApproval";
-//		case 11:
-//			return "Reapproval";
-//		case 15:
-//			return "Public";
-//		case 16:
-//			return "Editing";
-//		case 12:
-//			return "Public";
-//		//case 2:
-//		//	return "Editing";
-//		case 17:
-//			return "Review";
-//		case 18:
-//			return "Public";
-//		case 19:
-//			return "Archived";
-//		case 20:
-//			return "Public";
-//		case 21:
-//			return "Draft";
-//		default:
-//				return null;
-//		}
-//	}
-
 
 	/**
 	 * Enum containing the different state names for the system.
@@ -191,7 +115,7 @@ public class CGV_StateHelper {
 	 *
 	 */
 	public enum StateName implements Comparable<StateName>
-	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL, PENDING, ARCHIVEAPPROVAL, PREVIEW;}
+	{DRAFT, REVIEW, PUBLIC, ARCHIVED, EDITING, REAPPROVAL, PENDING, ARCHIVEAPPROVAL, STAGING, RESTAGING;}
 
 	/**
 	 * Returns the StateName enum for the string passed in, null if one DNE.
@@ -215,8 +139,10 @@ public class CGV_StateHelper {
 			return StateName.PENDING;
 		else if(curr.equalsIgnoreCase("ArchiveApproval"))
 			return StateName.ARCHIVEAPPROVAL;
-		else if(curr.equalsIgnoreCase("Preview"))
-			return StateName.PREVIEW;
+		else if(curr.equalsIgnoreCase("Staging"))
+			return StateName.STAGING;
+		else if(curr.equalsIgnoreCase("Restaging"))
+			return StateName.RESTAGING;
 		else
 			return null;
 	}
@@ -238,8 +164,10 @@ public class CGV_StateHelper {
 			return "Pending";
 		else if(state == StateName.ARCHIVEAPPROVAL)
 			return "ArchiveApproval";
-		else if(state == StateName.PREVIEW)
-			return "Preview";		
+		else if(state == StateName.STAGING)
+			return "Staging";	
+		else if(state == StateName.RESTAGING)
+			return "Restaging";
 		else
 			return "Null";
 	}
@@ -333,8 +261,21 @@ public class CGV_StateHelper {
 			case REVIEW:
 				returnThis.add("Disapprove");
 				break;
-			case PREVIEW:
+			case STAGING:
 				returnThis.add("backToDraft");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case STAGING:
+			switch (destState){
+			case DRAFT:
+				returnThis.add("Staging");
+				break;
+			case REVIEW:
+				returnThis.add("Disapprove");
+				returnThis.add("Staging");
 				break;
 			default:
 				returnThis.add("Null");
@@ -348,7 +289,7 @@ public class CGV_StateHelper {
 			case PENDING:
 				returnThis.add("backToReview");
 				break;
-			case PREVIEW:
+			case STAGING:
 				returnThis.add("submitForReview");
 				break;
 			default:
@@ -376,6 +317,9 @@ public class CGV_StateHelper {
 			case REAPPROVAL:
 				returnThis.add("Disapprove");
 				break;
+			case RESTAGING:
+				returnThis.add("backToEdit");
+				break;
 			default:
 				returnThis.add("Null");
 			}
@@ -388,6 +332,9 @@ public class CGV_StateHelper {
 			case PUBLIC:
 				returnThis.add("Revise");
 				returnThis.add("Resubmit");
+				break;
+			case RESTAGING:
+				returnThis.add("Resubmit for Review");
 				break;
 			default:
 				returnThis.add("Null");
@@ -412,12 +359,13 @@ public class CGV_StateHelper {
 				returnThis.add("Null");
 			}
 			break;
-		case PREVIEW:
+
+		case RESTAGING:
 			switch (destState){
-			case DRAFT:
+			case EDITING:
 				returnThis.add("Preview");
 				break;
-			case REVIEW:
+			case REAPPROVAL:
 				returnThis.add("Disapprove");
 				returnThis.add("Preview");
 				break;
@@ -460,8 +408,11 @@ public class CGV_StateHelper {
 			case REVIEW:
 				returnThis.add("Submit");
 				break;
-			case PREVIEW:
-				returnThis.add("Preview");
+			case STAGING:
+				returnThis.add("Staging");
+				break;
+			case RESTAGING:
+				returnThis.add("Staging");
 				break;
 			case REAPPROVAL:
 				returnThis.add("Submit");
@@ -470,12 +421,18 @@ public class CGV_StateHelper {
 				returnThis.add("Null");
 			}
 			break;
-		case PREVIEW:
+		case STAGING:
 			switch (destState){
 			case REVIEW:
 				returnThis.add("submitForReview");
 				break;
+			case REAPPROVAL:
+				returnThis.add("submitForReview");
+				break;
 			case DRAFT:
+				returnThis.add("backToDraft");
+				break;
+			case EDITING:
 				returnThis.add("backToDraft");
 				break;
 			default:
@@ -514,6 +471,21 @@ public class CGV_StateHelper {
 			switch (destState){
 			case REAPPROVAL:
 				returnThis.add("Resubmit");
+				break;
+			case RESTAGING:
+				returnThis.add("Preview");
+				break;
+			default:
+				returnThis.add("Null");
+			}
+			break;
+		case RESTAGING:
+			switch (destState){
+			case REAPPROVAL:
+				returnThis.add("Resubmit for Review");
+				break;
+			case EDITING:
+				returnThis.add("backToEdit");
 				break;
 			default:
 				returnThis.add("Null");
@@ -581,12 +553,26 @@ public class CGV_StateHelper {
 				return -1;
 			}
 		}
-		else if( left.equalsIgnoreCase("Preview") ){
+		else if( left.equalsIgnoreCase("Staging") ){
 			if( right.equalsIgnoreCase("Draft")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
-			else if(right.equalsIgnoreCase("Preview")){
+			else if(right.equalsIgnoreCase("Staging")){
+				System.out.println(left+" equal " +right);
+				return 0;
+			}
+			else {
+				return -1;		
+			}
+		}
+		else if( left.equalsIgnoreCase("Restaging") ){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Staging")  
+					|| right.equalsIgnoreCase("ArchiveApproval") || right.equalsIgnoreCase("Pending") || right.equalsIgnoreCase("Editing")){
+				System.out.println(left+" > " +right);
+				return 1;
+			}
+			else if(right.equalsIgnoreCase("Restaging")){
 				System.out.println(left+" equal " +right);
 				return 0;
 			}
@@ -595,7 +581,7 @@ public class CGV_StateHelper {
 			}
 		}
 		else if( left.equalsIgnoreCase("Review") || left.equalsIgnoreCase("ArchiveApproval")){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Preview")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Staging")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
@@ -608,7 +594,7 @@ public class CGV_StateHelper {
 			}
 		}
 		else if (left.equalsIgnoreCase("Pending")){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Preview") 
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Staging") 
 					|| right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("ArchiveApproval")){
 				System.out.println(left+" > " +right);
 				return 1;
@@ -622,7 +608,7 @@ public class CGV_StateHelper {
 			}
 		}
 		else if (left.equalsIgnoreCase("Editing")){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Preview")  
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Staging")  
 					|| right.equalsIgnoreCase("ArchiveApproval") || right.equalsIgnoreCase("Pending")){
 				System.out.println(left+" > " +right);
 				return 1;
@@ -637,7 +623,7 @@ public class CGV_StateHelper {
 		}
 		else if (left.equalsIgnoreCase("Reapproval")){
 			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending") ||
-					right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Preview")){
+					right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Staging") || right.equalsIgnoreCase("Restaging")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
@@ -650,8 +636,8 @@ public class CGV_StateHelper {
 			}
 		}
 		else if (left.equalsIgnoreCase("Archived")){
-			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending") || right.equalsIgnoreCase("Preview") 
-					|| right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval") || right.equalsIgnoreCase("ArchiveApproval")){
+			if( right.equalsIgnoreCase("Draft") || right.equalsIgnoreCase("Review") || right.equalsIgnoreCase("Pending") || right.equalsIgnoreCase("Staging") 
+					|| right.equalsIgnoreCase("Editing") || right.equalsIgnoreCase("Reapproval") || right.equalsIgnoreCase("ArchiveApproval") || right.equalsIgnoreCase("Restaging")){
 				System.out.println(left+" > " +right);
 				return 1;
 			}
@@ -690,10 +676,25 @@ public class CGV_StateHelper {
 		switch (currState){
 		case DRAFT:
 			switch (destState){
-			case PREVIEW:
+			case STAGING:
+				return true;
+			case RESTAGING:
 				return true;
 			case REVIEW:
 				return true;
+			case REAPPROVAL:
+				return true;
+			default:
+				return false;
+			}
+		case STAGING:
+			switch (destState){
+			case DRAFT:
+				return true;
+			case REVIEW:
+				return true;
+			case EDITING:
+				return true;	//TODO: This one might not be needed.
 			case REAPPROVAL:
 				return true;
 			default:
@@ -727,6 +728,17 @@ public class CGV_StateHelper {
 			switch (destState){
 			case REAPPROVAL:
 				return true;
+			case RESTAGING:
+				return true;
+			default:
+				return false;
+			}
+		case RESTAGING:
+			switch (destState){
+			case REAPPROVAL:
+				return true;
+			case EDITING:
+				return true;
 			default:
 				return false;
 			}
@@ -766,17 +778,6 @@ public class CGV_StateHelper {
 			default:
 				return false;
 			}
-		case PREVIEW:
-			switch (destState){
-			case DRAFT:
-				return true;
-			case REVIEW:
-				return true;
-			case EDITING:
-				return true;	//TODO: This one might not be needed.
-			default:
-				return false;
-			}
 		default:
 			return false;
 		}
@@ -794,12 +795,27 @@ public class CGV_StateHelper {
 			switch (destState){
 			case REVIEW:
 				return false;
-			case PREVIEW:
+			case STAGING:
 				return false;
 			case REAPPROVAL:
 				return false;
+			case RESTAGING:
+				return false;
 			default:
 				return true;
+			}
+		case STAGING:
+			switch (destState){
+			case DRAFT:
+				return true;
+			case REVIEW:
+				return false;
+			case REAPPROVAL:
+				return false;
+			case EDITING:
+				return true;
+			default: 
+				return false;
 			}
 		case REVIEW:
 			switch (destState){
@@ -827,7 +843,18 @@ public class CGV_StateHelper {
 			switch (destState){
 			case REAPPROVAL:
 				return false;
+			case RESTAGING:
+				return false;
 			default:
+				return false;
+			}
+		case RESTAGING:
+			switch (destState){
+			case EDITING:
+				return true;
+			case REAPPROVAL:
+				return false;
+			default: 
 				return false;
 			}
 		case REAPPROVAL:
@@ -863,15 +890,6 @@ public class CGV_StateHelper {
 				return false;
 			case PUBLIC:
 				return true;
-			default: 
-				return false;
-			}
-		case PREVIEW:
-			switch (destState){
-			case DRAFT:
-				return true;
-			case REVIEW:
-				return false;
 			default: 
 				return false;
 			}
@@ -907,9 +925,20 @@ public class CGV_StateHelper {
 			default:
 				return false;
 			}
-		case PREVIEW:
+		case STAGING:
 			switch (parentDestinationState){
-			case PREVIEW:
+			case STAGING:
+				return true;
+			case RESTAGING:
+				return true;
+			default:
+				return false;
+			}
+		case RESTAGING:
+			switch (parentDestinationState){
+			case STAGING:
+				return true;
+			case RESTAGING:
 				return true;
 			default:
 				return false;
