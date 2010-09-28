@@ -63,8 +63,10 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 	 * @return String modified title
 	 */
 	private static String modifyTitle(String displayTitle) {
-		if(displayTitle.length() >= 248 ){
-			displayTitle = displayTitle.substring(0, 247);
+		if(displayTitle != null){
+			if(displayTitle.length() >= 248 ){
+				displayTitle = displayTitle.substring(0, 247);
+			}
 		}
 		int randNum=get4DigitRandomNumber();
 		String sysTitle=displayTitle+"[#"+randNum+"]";
