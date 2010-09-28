@@ -51,7 +51,7 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 		Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
 		if(request.getParameter(CGVConstants.DISPLAY_TITLE_FLD) != null){
 			Matcher m = q.matcher(displaytitle);
-			if( !m.matches() ){		
+			if( !m.matches() ){	
 				request.setParameter("sys_title", newTitle);
 			}
 		}
@@ -63,6 +63,9 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 	 * @return String modified title
 	 */
 	private static String modifyTitle(String displayTitle) {
+		if(displayTitle.length() >= 248 ){
+			displayTitle = displayTitle.substring(0, 247);
+		}
 		int randNum=get4DigitRandomNumber();
 		String sysTitle=displayTitle+"[#"+randNum+"]";
 		return sysTitle;
