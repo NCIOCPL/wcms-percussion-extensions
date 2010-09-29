@@ -176,14 +176,24 @@ public class CGV_ParentChildManager {
 	/**
 	 * Returns a list of Integers (content ids) of a specific IPSGuid item.
 	 * @param src - the source item, gets the parents content ids.
+	 * @param autoSlot - if true, then call the auto slot parent generator.
+	 * @param type - the needed type variable passed in for the autp slot generator.
 	 * @return A list of the parent content ids for IPSGuid src.
 	 * @throws PSErrorException 
 	 */
-	public List<Integer> getParentCIDs(IPSGuid src) throws PSErrorException{
-		List<PSItemSummary> parents = getParents(src);
+	public List<Integer> getParentCIDs(IPSGuid src, boolean autoSlot, int type) throws PSErrorException{
+		List<PSItemSummary> parents = null;
+		if(autoSlot){
+			parents = getAutoSlot(src, type);
+		}
+		else{
+			parents = getParents(src);
+		}
 		List<Integer> returnThis = new ArrayList<Integer>();
-		for( PSItemSummary item : parents ){
-			returnThis.add(loadItem(item.getGUID()).getContentId());
+		if(!parents.isEmpty()){
+			for( PSItemSummary item : parents ){
+				returnThis.add(loadItem(item.getGUID()).getContentId());
+			}
 		}
 		return returnThis;
 	}
@@ -195,7 +205,7 @@ public class CGV_ParentChildManager {
 	 * @throws PSErrorException 
 	 */
 	public List<Integer> getParentCIDs() throws PSErrorException{
-		return getParentCIDs(this.guid);
+		return getParentCIDs(this.guid, false, 0);
 	}
 	
 	/**
