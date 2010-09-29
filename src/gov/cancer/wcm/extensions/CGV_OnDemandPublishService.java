@@ -56,14 +56,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	private boolean waitForStatus = true;
 	private int timeOut = 20000;
 	private int waitTime = 100;
-	private int AutoSlotConfigType = 488;
+	private int autoSlotConfigType = 488;
 	
 	public int getAutoSlotConfigType() {
-		return AutoSlotConfigType;
+		return autoSlotConfigType;
 	}
 
-	public void setAutoSlotConfigType(int autoSlotConfigType) {
-		AutoSlotConfigType = autoSlotConfigType;
+	public void setAutoSlotConfigType(int AutoSlotConfigType) {
+		autoSlotConfigType = AutoSlotConfigType;
 	}
 
 	public Map<String, Map<String, List<String>>> getEditionList() {
@@ -271,7 +271,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
 			try {
 				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
-				localPublishList = pcm.getParentCIDs(cid, true, AutoSlotConfigType);	//gets 1 layer of parents
+				localPublishList = pcm.getParentCIDs(cid, true, autoSlotConfigType);	//gets 1 layer of parents
 			} catch (PSErrorException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -320,7 +320,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		if(CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
 			try {
 				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
-				localPublishList = pcm.getParentCIDs(cid, true, AutoSlotConfigType);	//gets 1 layer of parents
+				localPublishList = pcm.getParentCIDs(cid, true, autoSlotConfigType);	//gets 1 layer of parents
 			} catch (PSErrorException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
