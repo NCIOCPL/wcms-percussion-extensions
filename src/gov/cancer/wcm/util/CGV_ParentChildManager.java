@@ -91,6 +91,23 @@ public class CGV_ParentChildManager {
 	}
 	
 	/**
+	 * Returns a list of parents for the auto slot with the specified content type id.
+	 * 
+	 * @param source - The guid to get the Parent items for.
+	 * @param type - the type for which the auto slot parent is defined as.
+	 * @return List of PSItemSummary objects for the parents of the guid passed in.
+	 * @throws PSErrorException
+	 */
+	public List<PSItemSummary> getAutoSlot(IPSGuid source, int type) throws PSErrorException {
+		PSRelationshipFilter filter = new PSRelationshipFilter();
+		filter.limitToEditOrCurrentOwnerRevision(true);
+		filter.setCategory("rs_activeassembly");
+		filter.setOwnerObjectType(type);
+		if(bDebug){System.out.println("finding the parents");}
+		return PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
+	}
+	
+	/**
 	 * Returns a List of the children for this active assembly, based on the GUID
 	 * that is passed in.  The list items will be in the type of PSItemSummary.
 	 * To call the method without a specific GUID passed in, to use the GUID
