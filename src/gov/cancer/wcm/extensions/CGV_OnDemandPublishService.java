@@ -56,7 +56,16 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	private boolean waitForStatus = true;
 	private int timeOut = 20000;
 	private int waitTime = 100;
+	private int AutoSlotConfigType = 488;
 	
+	public int getAutoSlotConfigType() {
+		return AutoSlotConfigType;
+	}
+
+	public void setAutoSlotConfigType(int autoSlotConfigType) {
+		AutoSlotConfigType = autoSlotConfigType;
+	}
+
 	public Map<String, Map<String, List<String>>> getEditionList() {
 		return editionList;
 	}
@@ -264,7 +273,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			try {
 				if (bDebug) System.out.println("getParents before get parents cids");
 				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
-				localPublishList = pcm.getParentCIDs(cid);	//gets 1 layer of parents
+				localPublishList = pcm.getParentCIDs(cid, false, 0);	//gets 1 layer of parents
 				if (bDebug) System.out.println("got localPublishList");
 			} catch (PSErrorException e) {
 				// TODO Auto-generated catch block
@@ -288,6 +297,17 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 					//add the items to the list to be returned
 					localPublishList.add(tItem);
 				}
+			}
+		}
+		else if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) || 
+				CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
+			try {
+				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
+				localPublishList = pcm.getParentCIDs(cid, true, AutoSlotConfigType);	//gets 1 layer of parents
+			} catch (PSErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
 			}
 		}
 		if (localPublishList == null) {
