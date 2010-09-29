@@ -56,14 +56,15 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	private boolean waitForStatus = true;
 	private int timeOut = 20000;
 	private int waitTime = 100;
-	private int autoSlotConfigType = 488;
+	private Map<String,List<String>> autoSlot;
 	
-	public int getAutoSlotConfigType() {
-		return autoSlotConfigType;
+
+	public Map<String, List<String>> getAutoSlot() {
+		return autoSlot;
 	}
 
-	public void setAutoSlotConfigType(int AutoSlotConfigType) {
-		autoSlotConfigType = AutoSlotConfigType;
+	public void setAutoSlot(Map<String, List<String>> autoSlot) {
+		this.autoSlot = autoSlot;
 	}
 
 	public Map<String, Map<String, List<String>>> getEditionList() {
@@ -267,18 +268,18 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		if (bDebug) System.out.println("before checking the top type");
 
 		Long typeId = item.getContentTypeId();
-		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
-			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
-			try {
-				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
-				localPublishList = pcm.getParentCIDs(cid, true, autoSlotConfigType);	//gets 1 layer of parents
-			} catch (PSErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
-			}
-		}
-		else if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)) {
+//		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
+//			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
+//			try {
+//				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
+//				localPublishList = pcm.getParentCIDs(cid, true, autoSlotConfigType);	//gets 1 layer of parents
+//			} catch (PSErrorException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//				return null;
+//			}
+//		}
+		if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)) {
 			//if this is a topmost content type, don't get the parents
 			if (bDebug) System.out.println("!top type statement");
 			try {
@@ -316,17 +317,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			localPublishList = new ArrayList<Integer>();
 			localPublishList.add(currItemId);
 		}
-		//if Topic Search category, add the auto slot parents to the queue.
-		if(CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
-			try {
-				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
-				localPublishList = pcm.getParentCIDs(cid, true, autoSlotConfigType);	//gets 1 layer of parents
-			} catch (PSErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
+		//Check auto slot list in the config file.
+		List<Integer> addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
+		if( !addToList.isEmpty() ){
+			for( Integer addInteger : addToList ){
+				localPublishList.add(addInteger);
 			}
 		}
+		
 		return localPublishList;
 	}
 
