@@ -33,5 +33,6 @@
 		<property name="waitForStatus" value="true"/>
 		<property name="timeOut" value="20000"/>
 		<property name="waitTime" value="100"/>
+		<property name="AutoSlotConfigType" value="488"/>
 	</bean>
 </beans>
