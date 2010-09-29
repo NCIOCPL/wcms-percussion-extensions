@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+//import com.percussion.search.objectstore.PSWSSearchParams;
+//import com.percussion.search.objectstore.PSWSSearchRequest;
 import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSItemSummary;
+//import com.percussion.services.content.data.PSSearchSummary;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
@@ -99,6 +102,10 @@ public class CGV_ParentChildManager {
 	 * @throws PSErrorException
 	 */
 	public List<PSItemSummary> getAutoSlot(IPSGuid source, int type) throws PSErrorException {
+//		PSWSSearchParams filter = new PSWSSearchParams();
+//		filter.setContentTypeId(type);
+//		PSWSSearchRequest request = new PSWSSearchRequest(filter);
+//		return PSContentWsLocator.getContentWebservice().findItems(request,false);
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		filter.limitToEditOrCurrentOwnerRevision(true);
 		filter.setCategory("rs_activeassembly");
