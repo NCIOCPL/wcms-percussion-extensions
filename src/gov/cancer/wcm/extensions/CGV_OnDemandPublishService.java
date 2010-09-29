@@ -299,8 +299,8 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				}
 			}
 		}
-		else if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) || 
-				CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
+		else if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
+				//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
 			try {
 				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
 				localPublishList = pcm.getParentCIDs(cid, true, AutoSlotConfigType);	//gets 1 layer of parents
