@@ -36,13 +36,16 @@ public class CGV_URLEncoding implements IPSFieldValidator
 	public Object processUdf(Object[] params, IPSRequestContext request) throws PSConversionException
 	{
   
+		
 		LOGGER.debug("******INVOKING friendlyURLencoding validation");
 		  
 		String friendlyURL = request.getParameter(CGVConstants.FRIENDLY_URL_FLD);
-		if(!friendlyURL.equalsIgnoreCase("")){
-			return validatePrettyUrl(friendlyURL);
-		}
-		return null;
+		System.out.println("URL DEBUG: the passed in URL = " + friendlyURL);
+		if(validatePrettyUrl(friendlyURL))
+			System.out.println("URL DEBUG: the URL validated TRUE");
+		else
+			System.out.println("URL DEBUG: the URL validated FALSE");
+		return validatePrettyUrl(friendlyURL);
 	}
  
 	public void init(IPSExtensionDef def, File codeRoot) throws PSExtensionException
