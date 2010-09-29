@@ -30,6 +30,20 @@
 				</entry>
 			</map>
 		</property>
+		<property name="autoSlot">
+			<map>
+				<entry key="cgvPromoUrl">
+					<list>
+						<value>891</value>
+					</list>
+				</entry>
+				<entry key="cgvTopicSearchCategory">
+					<list>
+						<value>717</value>
+					</list>
+				</entry>
+			</map>
+		</property>
 		<property name="waitForStatus" value="true"/>
 		<property name="timeOut" value="20000"/>
 		<property name="waitTime" value="100"/>
