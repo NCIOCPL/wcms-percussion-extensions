@@ -267,7 +267,18 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		if (bDebug) System.out.println("before checking the top type");
 
 		Long typeId = item.getContentTypeId();
-		if (!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)) {
+		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
+			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
+			try {
+				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
+				localPublishList = pcm.getParentCIDs(cid, true, AutoSlotConfigType);	//gets 1 layer of parents
+			} catch (PSErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}
+		else if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)) {
 			//if this is a topmost content type, don't get the parents
 			if (bDebug) System.out.println("!top type statement");
 			try {
@@ -299,8 +310,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				}
 			}
 		}
-		else if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
-				//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
+		if (localPublishList == null) {
+			//if didn't get any parents, create list and add current item to it
+			if (bDebug) System.out.println("got into the null list");
+			localPublishList = new ArrayList<Integer>();
+			localPublishList.add(currItemId);
+		}
+		//if Topic Search category, add the auto slot parents to the queue.
+		if(CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
 			try {
 				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
 				localPublishList = pcm.getParentCIDs(cid, true, AutoSlotConfigType);	//gets 1 layer of parents
@@ -309,12 +326,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				e.printStackTrace();
 				return null;
 			}
-		}
-		if (localPublishList == null) {
-			//if didn't get any parents, create list and add current item to it
-			if (bDebug) System.out.println("got into the null list");
-			localPublishList = new ArrayList<Integer>();
-			localPublishList.add(currItemId);
 		}
 		return localPublishList;
 	}
