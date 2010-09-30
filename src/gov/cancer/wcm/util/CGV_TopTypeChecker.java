@@ -6,8 +6,10 @@ package gov.cancer.wcm.util;
 import gov.cancer.wcm.util.CGV_StateHelper.StateName;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.percussion.services.content.data.PSContentTypeSummary;
 import com.percussion.webservices.content.IPSContentWs;
@@ -47,23 +49,39 @@ public class CGV_TopTypeChecker {
 
 	/**
 	 * Returns true if this contentTypeId is in the provided checkList of autoSlot types.
-	 * @param	intValue - the value of the content type id.
+	 * @param	contentTypeId - the value of the content type id.
 	 * @param	cmgr - the content Web service
 	 * @param	checList - the list of auto Slot needed content types, generated from the onDemand xml config file.
 	 * @return a list of content id's that need to be published.  Never null, possibly empty (if no content itds are to be published).
 	 */
-	public static List<Integer> autoSlotChecker(int intValue, IPSContentWs cmgr, Map<String,List<String>> checkList) {
+	public static List<Integer> autoSlotChecker(int contentTypeId, IPSContentWs cmgr, Map<String,List<String>> checkList) {
 		
 		List<Integer> returnThis = new ArrayList<Integer>();
-		if( checkList.containsKey(Integer.toString(intValue)) )
-		{
-			List<String> m = checkList.get(Integer.toString(intValue));
-			for( String s: m ){
-				returnThis.add(Integer.parseInt(s));
+		Set<String> keySet = checkList.keySet();
+		Iterator<String> it = keySet.iterator();
+		String curr;
+		while( it.hasNext() ){
+			curr = it.next();
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(curr);
+			//get the first item
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+				if (contentTypeId == summaryItem.getGuid().getUUID()) {
+					List<String> m = checkList.get(curr);
+					for( String s:m ){
+						returnThis.add(Integer.parseInt(s));
+					}
+				}
 			}
 		}
 		return returnThis;
-		
+//		if( checkList.containsKey(Integer.toString(contentTypeId)) )
+//		{
+//			List<String> m = checkList.get(Integer.toString(contentTypeId));
+//			for( String s: m ){
+//				returnThis.add(Integer.parseInt(s));
+//			}
+//		}
 	}
 	
 
