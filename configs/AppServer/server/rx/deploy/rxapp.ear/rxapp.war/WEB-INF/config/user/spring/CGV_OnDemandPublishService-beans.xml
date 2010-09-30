@@ -32,12 +32,12 @@
 		</property>
 		<property name="autoSlot">
 			<map>
-				<entry key="484">
+				<entry key="cgvPromoUrl">
 					<list>
 						<value>891</value>
 					</list>
 				</entry>
-				<entry key="429">
+				<entry key="cgvTopicSearchCategory">
 					<list>
 						<value>717</value>
 					</list>
