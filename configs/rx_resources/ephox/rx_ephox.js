@@ -1061,6 +1061,7 @@ var cGovLFConst = "&#x000a;";	//line feed substitute
 */
 var cGovWebServiceURL = 'http://verdi.nci.nih.gov/u/glossify/';	//url of glossifier web service
 //var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
+var cGovPreviewURL = "www.cancer.gov";	//dictionary preview URL
 
 /**
  * Method to fetch Ephox content, glossify it, and reset it into the editor.
@@ -1130,7 +1131,9 @@ function cGovEphoxDoGlossify(data) {
 	if (cGovReq) {
 		//Display status window
 		cGovStatusWindow = window.open("","","height=480,width=640");
-		cGovStatusWindow.document.write('<html><head><title>GlossifyDocumentPrep</title><script language="javascript" type="text/javascript">');
+		cGovStatusWindow.document.write('<html><head><title>GlossifyDocumentPrep</title>');
+		cGovStatusWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
+		cGovStatusWindow.document.write('<script language="javascript" type="text/javascript">');
 		cGovStatusWindow.document.write("var prg_width = 200;");
 		cGovStatusWindow.document.write("function progress() {");
         cGovStatusWindow.document.write("var node = document.getElementById('progress');");
@@ -1180,6 +1183,7 @@ function termObject() {
 */
 function cGovProcessReqChange() {
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
+//alert("got response");
 		cGovStatusWindow.close();
 		//Web service transaction has completed, parse the response
 		var env = cGovReq.responseXML.getElementsByTagName("soap:Envelope");
@@ -1193,23 +1197,27 @@ function cGovProcessReqChange() {
 		
 		// Set up HTML window with javascript and checkboxed text
 		var cGovCheckboxWindow=window.open("","","height=480,width=640");
-		cGovCheckboxWindow.document.write('<html>');
+		cGovCheckboxWindow.document.write('<html><head>');
+		cGovCheckboxWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
+		cGovCheckboxWindow.document.write('</head>');
 		cGovCheckboxWindow.document.write('<script language="Javascript">');
 		cGovCheckboxWindow.document.write('function returnChecks() {');
-		cGovCheckboxWindow.document.write('boxes = document.Glossify.terms.length;');
-		cGovCheckboxWindow.document.write('var checkArray = [];');
-		cGovCheckboxWindow.document.write('if (boxes == null) {');
-		cGovCheckboxWindow.document.write('	if (document.Glossify.terms.checked) {');
-		cGovCheckboxWindow.document.write('		checkArray.push(document.Glossify.terms.value);');
+		cGovCheckboxWindow.document.write('	var checkArray = [];');
+		cGovCheckboxWindow.document.write('	if (document.Glossify.terms != null) {');
+		cGovCheckboxWindow.document.write('		boxes = document.Glossify.terms.length;');
+		cGovCheckboxWindow.document.write('		if (boxes == null) {');
+		cGovCheckboxWindow.document.write('			if (document.Glossify.terms.checked) {');
+		cGovCheckboxWindow.document.write('				checkArray.push(document.Glossify.terms.value);');
+		cGovCheckboxWindow.document.write('			}');
+		cGovCheckboxWindow.document.write('		}');
+		cGovCheckboxWindow.document.write('		else {');
+		cGovCheckboxWindow.document.write('			for (i=0;i<boxes;i++) {');
+		cGovCheckboxWindow.document.write('				if (document.Glossify.terms[i].checked) {');
+		cGovCheckboxWindow.document.write('					checkArray.push(document.Glossify.terms[i].value);');
+		cGovCheckboxWindow.document.write('				}');
+		cGovCheckboxWindow.document.write('			}');
+		cGovCheckboxWindow.document.write('		}');
 		cGovCheckboxWindow.document.write('	}');
-		cGovCheckboxWindow.document.write('}');
-		cGovCheckboxWindow.document.write('else {');
-		cGovCheckboxWindow.document.write('for (i=0;i<boxes;i++) {');
-		cGovCheckboxWindow.document.write('	if (document.Glossify.terms[i].checked) {');
-		cGovCheckboxWindow.document.write('		checkArray.push(document.Glossify.terms[i].value);');
-		cGovCheckboxWindow.document.write('	}');
-		cGovCheckboxWindow.document.write('}');
-		cGovCheckboxWindow.document.write('}');
 		cGovCheckboxWindow.document.write('window.opener.submitter(checkArray);');
 		cGovCheckboxWindow.document.write('window.close();');
 		cGovCheckboxWindow.document.write('}\n</script>');
@@ -1229,6 +1237,8 @@ function cGovProcessReqChange() {
 */
 function submitter(checkArray) {
 //TODO: delete dictionary preview URL once we add it
+//	if (!cGovCheckboxWindow.closed)
+//		cGovCheckboxWindow.close();
 	var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
 	var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
 	var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
@@ -1403,7 +1413,6 @@ function cGovBuildTermsArray(terms) {
 *
 */
 function cGovBuildCBDisplayString(data, termsArray) {
-	var existingTermsArray = [];
 	// Go through the terms array in reverse order, insert terms links into massaged data with unique ids
 	for (i=termsArray.length - 1;i>=0;i--) {
 		var tobj = termsArray[i];
@@ -1412,24 +1421,11 @@ function cGovBuildCBDisplayString(data, termsArray) {
 		var text = data.substr(parseInt(tobj.start), parseInt(tobj.length));
 		var lastPart = data.substr(parseInt(tobj.start) + parseInt(tobj.length));
 		// Determine if we need to highlight the term
-		var found = false;
-		var formatting = "";
-		var formattingEnd = "";
-		for (j=0;j<existingTermsArray.length;j++) {
-			if (existingTermsArray[j] == text.toLowerCase()) {
-				found = true;
-			}
-		}
-		if (!found) {
-			existingTermsArray.push(text.toLowerCase());
-			formatting = "<font __type=\"glossifyTemp\" style=\"background-color: #ffff00;\">";
-			formattingEnd = "</font>"
-		}
 		//Build the newterm string
-		data = firstPart + "<input type=checkbox name=terms value=" + cGovUniqueId + "><a __newterm=\"" + cGovUniqueId + "\" class=\"definition\" href=\"/Common/PopUps/popDefinition.aspx?id=" + tobj.docId + "&version=Patient&language=English\" onclick=\"javascript:popWindow('defbyid','" + tobj.docId + "&version=Patient&language=English'); return false;\">" + formatting + text + formattingEnd + "</a>" + lastPart;
+		data = firstPart + "<input type=checkbox name=terms value=" + cGovUniqueId + "><a __newterm=\"" + cGovUniqueId + "\" class=\"definition\" href=\"/Common/PopUps/popDefinition.aspx?id=" + tobj.docId + "&version=Patient&language=English\" onclick=\"javascript:popWindow('defbyid','" + tobj.docId + "&version=Patient&language=English'); return false;\">" + text + "</a>" + lastPart;
 	}
-	var rxOldterm = new RegExp("<a __oldterm=\".+?>(.+?)</a>");
-	data = cGovDoRegExpOldtermFonts(rxOldterm, data);
+	var rxNewOldterm = new RegExp("<a __(?:new|old)term=\".+?>(.+?)</a>");
+	data = cGovDoRegExpFonts(rxNewOldterm, data);
 	// add checkbox (checked) to __oldterms
 	rxOldterm = new RegExp("<a __oldterm=\"(.+?)\"");
 	data = cGovDoRegExpAddChecks(rxOldterm, data);
@@ -1483,7 +1479,6 @@ function cGovPrepareStr(data) {
 *
 */
 function cGovDoRegExp1(theRegExp, result) {
-//alert("start of cGovDoRegExp1, result= " + result);
 	var done = false;
 	var offset = 0;
 	while (!done) {
@@ -1535,9 +1530,14 @@ function cGovDoRegExpAddChecks(theRegExp, data) {
 	return data;
 }
 
-function cGovDoRegExpOldtermFonts(theRegExp, data) {
+/**
+* Add highlighting font to first occurence of each term
+*
+*/
+function cGovDoRegExpFonts(theRegExp, data) {
 	var done = false;
 	var offset = 0;
+	var existingTermsArray = [];
 	while (!done) {
 		var temp = data.substr(offset);
 		if (temp == null) {
@@ -1549,15 +1549,24 @@ function cGovDoRegExpOldtermFonts(theRegExp, data) {
 				done = true;
 			}
 			else {
-				offset += target.index;
-				data = data.replace(target[1], '<font __type=\"glossifyTemp\" style=\"background-color: #ffff00;\">' + target[1] + '</font>');
-				offset += target[0].length;
+				var found = false;
+				for (j=0;j<existingTermsArray.length;j++) {
+					if (existingTermsArray[j] == target[1].toLowerCase()) {
+						found = true;
+						break;
+					}
 				}
+				offset += target.index;
+				if (!found) {
+					existingTermsArray.push(target[1].toLowerCase());
+					data = data.replace(target[1], '<font __type=\"glossifyTemp\" style=\"background-color: #ffff00;\">' + target[1] + '</font>');
+				}
+				offset += target[0].length;
+			}
 		}
 	}
 	return data;
 }
-
 /**
 * Add the __oldterm= to the old links
 *
@@ -1571,6 +1580,6 @@ function cGovAddUniqueID(data) {
 /*
 TODO: add preview URL to dictionary for the checkbox window, remove it afterwards (see line 131 of GlossifyDocument.aspx.cs) (ask Bryan about this - can't find it in configs)
 TODO: configure css, fonts, javascripts, etc. (mostly on CDE site)
-TODO: on perc sites, need ../nciadmin.css stylesheet for status window, may need glossifyTemp font (ask Bryan)
+TODO: on perc sites, need ../nciadmin.css stylesheet for status window (currently required styles are on the page because it's not finding the css file)
 TODO: add configuration of URLs, etc. in external file
 */
