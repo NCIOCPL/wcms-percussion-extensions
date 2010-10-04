@@ -44,14 +44,16 @@ public class CGV_NavonUrlPopulate extends PSDefaultExtension implements
 		//LOGGER.debug("******INVOKING titlePopulate");
 
 		Pattern q = Pattern.compile("[A-Za-z0-9\\-\\_\\.]*");
-		if(request.getParameter("pretty_url_folder_name") == null){
-			Matcher m = q.matcher(displaytitle);
-			if( !m.matches() ){
+		if(request.getParameter("sys_title") != null){
+			if(request.getParameter("pretty_url_folder_name") == null){
+				Matcher m = q.matcher(displaytitle);
+				if( !m.matches() ){
 
-				request.setParameter("pretty_url_folder_name", modifyTitle(displaytitle));
-			}
-			else{
-				request.setParameter("pretty_url_folder_name", displaytitle);
+					request.setParameter("pretty_url_folder_name", modifyTitle(displaytitle));
+				}
+				else{
+					request.setParameter("pretty_url_folder_name", displaytitle);
+				}
 			}
 		}
 	}
@@ -67,10 +69,15 @@ public class CGV_NavonUrlPopulate extends PSDefaultExtension implements
 				title = title.substring(0, 247);
 			}
 		}
-		String regex = "[^A-Za-z0-9\\-\\_\\.]";
+		String regex = " ";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(title);
-        String output = matcher.replaceAll("_");
+        String output = matcher.replaceAll("");
+        
+		regex = "[^A-Za-z0-9\\-\\_\\.]";
+		pattern = Pattern.compile(regex);
+		matcher = pattern.matcher(output);
+        output = matcher.replaceAll("_");
 		return output;
 	}
 	
