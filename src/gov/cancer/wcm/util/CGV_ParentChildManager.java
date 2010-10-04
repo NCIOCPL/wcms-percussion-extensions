@@ -94,6 +94,24 @@ public class CGV_ParentChildManager {
 	}
 	
 	/**
+	 * Returns a List of the parents for the folder structure, based on the GUID
+	 * that is passed in.  The list items will be in the type of PSItemSummary.
+	 * To call the method without a specific GUID passed in, to use the GUID
+	 * that the class holds in the guid field, just call the method with no parameter.
+	 * 
+	 * @param source - The guid to get the Parent items for.
+	 * @return List of PSItemSummary objects for the parents of the guid passed in.
+	 * @throws PSErrorException
+	 */
+	public List<PSItemSummary> getFolderParent(IPSGuid source) throws PSErrorException {
+		PSRelationshipFilter filter = new PSRelationshipFilter();
+		filter.limitToEditOrCurrentOwnerRevision(true);
+		filter.setCategory("FILTER_CATEGORY_FOLDER");
+		if(bDebug){System.out.println("finding the parents");}
+		return PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
+	}
+	
+	/**
 	 * Returns a list of parents for the auto slot with the specified content type id.
 	 * 
 	 * @param source - The guid to get the Parent items for.
@@ -196,18 +214,30 @@ public class CGV_ParentChildManager {
 	 */
 	public List<Integer> getParentCIDs(IPSGuid src, boolean autoSlot, int type) throws PSErrorException{
 		List<PSItemSummary> parents = null;
+		List<Integer> returnThis = new ArrayList<Integer>();
 		if(autoSlot){
 			parents = getAutoSlot(src, type);
+			if(!parents.isEmpty()){
+				for( PSItemSummary item : parents ){
+					returnThis.add(loadItem(item.getGUID()).getContentId());
+				}
+			}
 		}
 		else{
 			parents = getParents(src);
-		}
-		List<Integer> returnThis = new ArrayList<Integer>();
-		if(!parents.isEmpty()){
-			for( PSItemSummary item : parents ){
-				returnThis.add(loadItem(item.getGUID()).getContentId());
+			if(!parents.isEmpty()){
+				for( PSItemSummary item : parents ){
+					returnThis.add(loadItem(item.getGUID()).getContentId());
+				}
 			}
+//			parents = getFolderParent(src);
+//			if(!parents.isEmpty()){
+//				for( PSItemSummary item : parents ){
+//					returnThis.add(loadItem(item.getGUID()).getContentId());
+//				}
+//			}
 		}
+
 		return returnThis;
 	}
 	
