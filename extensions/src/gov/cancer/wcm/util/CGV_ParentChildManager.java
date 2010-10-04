@@ -4,19 +4,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.search.objectstore.PSWSSearchParams;
 import com.percussion.search.objectstore.PSWSSearchRequest;
 import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.content.data.PSSearchSummary;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
+import com.percussion.services.workflow.data.PSState;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
+import com.percussion.webservices.PSErrorsException;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
+import com.percussion.error.PSException;
 import com.percussion.webservices.content.PSContentWsLocator;
+import com.percussion.webservices.system.IPSSystemWs;
+import com.percussion.webservices.system.PSSystemWsLocator;
 
 /**
  * CGV_ParentChildManager allows the user to access methods that deal with 
@@ -106,9 +112,10 @@ public class CGV_ParentChildManager {
 	public List<PSItemSummary> getFolderParent(IPSGuid source) throws PSErrorException {
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		filter.limitToEditOrCurrentOwnerRevision(true);
-		filter.setCategory("FILTER_CATEGORY_FOLDER");
-		if(bDebug){System.out.println("finding the parents");}
-		return PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
+		//filter.setCategory("FILTER_CATEGORY_FOLDER");
+		System.out.println("finding the folder parents");
+		return PSContentWsLocator.getContentWebservice().findFolderChildren(source, false);
+		//return PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);
 	}
 	
 	/**
@@ -230,12 +237,51 @@ public class CGV_ParentChildManager {
 					returnThis.add(loadItem(item.getGUID()).getContentId());
 				}
 			}
+
+//			//Navon stuff----------------------
 //			parents = getFolderParent(src);
 //			if(!parents.isEmpty()){
+//
 //				for( PSItemSummary item : parents ){
-//					returnThis.add(loadItem(item.getGUID()).getContentId());
+//					System.out.println("The number of items in the folder is: " + parents.size() );
+//					if( item.getContentTypeName().equalsIgnoreCase("rffNavon") )
+//					{
+//						PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
+//						PSState navonState = null;
+//						System.out.println("TEST folder DEBUG: " + getCID(item.getGUID()).get(0));
+//						try {
+//							navonState = workInfo.findWorkflowState(Integer.toString(getCID(item.getGUID()).get(0)));
+//						} catch (PSException e) {
+//							e.printStackTrace();
+//						}
+//						if(navonState.getName().equalsIgnoreCase("Draft"))
+//						{
+//							List<IPSGuid> temp = Collections.<IPSGuid>singletonList(item.getGUID());
+//							IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+//							try {
+//								sysws.transitionItems(temp, "DirecttoPublic");
+//							} catch (PSErrorsException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+//						}
+//						else if(navonState.getName().equalsIgnoreCase("Pending"))
+//						{
+//							List<IPSGuid> temp = Collections.<IPSGuid>singletonList(item.getGUID());
+//							IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+//							try {
+//								sysws.transitionItems(temp, "ForcetoPublic");
+//							} catch (PSErrorsException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+//						}
+//						returnThis.add(loadItem(item.getGUID()).getContentId());
+//					}
 //				}
+//
 //			}
+//			//------------------------------
 		}
 
 		return returnThis;
