@@ -105,7 +105,7 @@ public class CGV_ParentChildManager {
 	 * To call the method without a specific GUID passed in, to use the GUID
 	 * that the class holds in the guid field, just call the method with no parameter.
 	 * 
-	 * @param source - The guid to get the Parent items for.
+	 * @param source - The guid to get the Parent items for (a folder guid).
 	 * @return List of PSItemSummary objects for the parents of the guid passed in.
 	 * @throws PSErrorException
 	 */
@@ -224,68 +224,75 @@ public class CGV_ParentChildManager {
 		List<Integer> returnThis = new ArrayList<Integer>();
 		if(autoSlot){
 			parents = getAutoSlot(src, type);
-			if(!parents.isEmpty()){
-				for( PSItemSummary item : parents ){
-					returnThis.add(loadItem(item.getGUID()).getContentId());
-				}
-			}
 		}
 		else{
 			parents = getParents(src);
-			if(!parents.isEmpty()){
-				for( PSItemSummary item : parents ){
-					returnThis.add(loadItem(item.getGUID()).getContentId());
-				}
+		}
+		if(!parents.isEmpty()){
+			for( PSItemSummary item : parents ){
+				returnThis.add(loadItem(item.getGUID()).getContentId());
 			}
-
-//			//Navon stuff----------------------
-//			parents = getFolderParent(src);
-//			if(!parents.isEmpty()){
-//
-//				for( PSItemSummary item : parents ){
-//					System.out.println("The number of items in the folder is: " + parents.size() );
-//					if( item.getContentTypeName().equalsIgnoreCase("rffNavon") )
-//					{
-//						PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
-//						PSState navonState = null;
-//						System.out.println("TEST folder DEBUG: " + getCID(item.getGUID()).get(0));
-//						try {
-//							navonState = workInfo.findWorkflowState(Integer.toString(getCID(item.getGUID()).get(0)));
-//						} catch (PSException e) {
-//							e.printStackTrace();
-//						}
-//						if(navonState.getName().equalsIgnoreCase("Draft"))
-//						{
-//							List<IPSGuid> temp = Collections.<IPSGuid>singletonList(item.getGUID());
-//							IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
-//							try {
-//								sysws.transitionItems(temp, "DirecttoPublic");
-//							} catch (PSErrorsException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-//						}
-//						else if(navonState.getName().equalsIgnoreCase("Pending"))
-//						{
-//							List<IPSGuid> temp = Collections.<IPSGuid>singletonList(item.getGUID());
-//							IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
-//							try {
-//								sysws.transitionItems(temp, "ForcetoPublic");
-//							} catch (PSErrorsException e) {
-//								// TODO Auto-generated catch block
-//								e.printStackTrace();
-//							}
-//						}
-//						returnThis.add(loadItem(item.getGUID()).getContentId());
-//					}
-//				}
-//
-//			}
-//			//------------------------------
 		}
 
 		return returnThis;
 	}
+
+	/**
+	 * Return a list with the CID (content id) for any Navon items that share a folder
+	 * with the IPSGuid src.
+	 * 
+	 * @param src - the content item GUID to find the Navons within the folder level.
+	 * @return a list of Navon content items that are in the same folder as SRC.  Could be
+	 * 	null or empty.
+	 * @throws PSErrorException
+	 */
+	public List<Integer> getNavonCIDs(IPSGuid src) throws PSErrorException{
+		List<PSItemSummary> parents = null;
+		List<Integer> returnThis = new ArrayList<Integer>();
+		parents = getFolderParent(src);
+		if(!parents.isEmpty()){
+			for( PSItemSummary item : parents ){
+				System.out.println("The number of items in the folder is: " + parents.size() );
+				if( item.getContentTypeName().equalsIgnoreCase("rffNavon") )
+				{
+					PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
+					PSState navonState = null;
+					System.out.println("TEST folder DEBUG: " + getCID(item.getGUID()).get(0));
+					try {
+						navonState = workInfo.findWorkflowState(Integer.toString(getCID(item.getGUID()).get(0)));
+					} catch (PSException e) {
+						e.printStackTrace();
+					}
+					if(navonState.getName().equalsIgnoreCase("Draft"))
+					{
+						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(item.getGUID());
+						IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+						try {
+							sysws.transitionItems(temp, "DirecttoPublic");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else if(navonState.getName().equalsIgnoreCase("Pending"))
+					{
+						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(item.getGUID());
+						IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+						try {
+							sysws.transitionItems(temp, "ForcetoPublic");
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					returnThis.add(loadItem(item.getGUID()).getContentId());
+				}
+			}
+		}
+		return returnThis;
+	}
+
+
 	
 	/**
 	 * Convenience call to List<Integer> getParentCIDs(IPSGuid src),
