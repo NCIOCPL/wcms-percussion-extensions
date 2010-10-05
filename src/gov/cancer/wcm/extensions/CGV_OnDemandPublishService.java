@@ -317,11 +317,51 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			localPublishList = new ArrayList<Integer>();
 			localPublishList.add(currItemId);
 		}
+		
+		List<Integer> addToList = new ArrayList<Integer>();
 		//Check auto slot list in the config file.
-		List<Integer> addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
+		addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
 		if( !addToList.isEmpty() ){
 			for( Integer addInteger : addToList ){
 				localPublishList.add(addInteger);
+			}
+		}
+		
+
+		//Check for publishing Navons.
+		IPSGuid folderGuid = null;
+		if(!localPublishList.isEmpty()){
+			for (int i : localPublishList) {
+				IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
+				if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
+				String path = null;
+				try {
+					path = cmgr.findFolderPaths(itemGuid)[0];
+				} catch (PSErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					if( path != null ){
+						folderGuid = cmgr.getIdByPath(path);
+					}
+				} catch (PSErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			try {
+				if( folderGuid != null ){
+					addToList = pcm.getNavonCIDs(folderGuid);
+				}
+			} catch (PSErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if( !addToList.isEmpty() ){
+				for( Integer addInteger : addToList ){
+					localPublishList.add(addInteger);
+				}
 			}
 		}
 		
