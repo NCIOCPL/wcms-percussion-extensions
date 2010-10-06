@@ -46,6 +46,56 @@ public class CGV_TopTypeChecker {
 		}
 		return false;
 	}
+	
+	/**
+	 * Returns true if this contentTypeId is in the list of content types for multi page containers
+	 * @param contentTypeId - id to check
+	 * @return true if in list
+	 */
+	public static boolean multiPageContainer(int contentTypeId, IPSContentWs cmgr) {
+		//get array of type names
+		String[] doNotPublishParentTypes = CGVConstants.MULTI_PAGE_CONTAINER;
+		for (String s : doNotPublishParentTypes) {
+			if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
+			//get all summaries matching the current type
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
+			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
+			//get the first item
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+
+				if (contentTypeId == summaryItem.getGuid().getUUID()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Returns true if this contentTypeId is in the list of page types in a multi page.
+	 * @param contentTypeId - id to check
+	 * @return true if in list
+	 */
+	public static boolean multiPagePages(int contentTypeId, IPSContentWs cmgr) {
+		//get array of type names
+		String[] doNotPublishParentTypes = CGVConstants.MULTI_PAGE_PAGES;
+		for (String s : doNotPublishParentTypes) {
+			if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
+			//get all summaries matching the current type
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
+			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
+			//get the first item
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+
+				if (contentTypeId == summaryItem.getGuid().getUUID()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Returns true if this contentTypeId is in the provided checkList of autoSlot types.
