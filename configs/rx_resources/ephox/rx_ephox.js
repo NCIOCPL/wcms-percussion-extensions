@@ -1059,8 +1059,8 @@ var cGovLFConst = "&#x000a;";	//line feed substitute
 /**
 * The following variables should be set from a config file
 */
-var cGovWebServiceURL = 'http://verdi.nci.nih.gov/u/glossify/';	//url of glossifier web service
-//var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
+//var cGovWebServiceURL = 'http://verdi.nci.nih.gov/u/glossify/';	//url of glossifier web service
+var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
 var cGovPreviewURL = "www.cancer.gov";	//dictionary preview URL
 
 /**
