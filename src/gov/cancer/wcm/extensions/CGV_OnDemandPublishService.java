@@ -327,46 +327,45 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			}
 		}
 		
-
-		//Check for publishing Navons.
-		IPSGuid folderGuid = null;
-		if(!localPublishList.isEmpty()){
-			System.out.println("In the Navon statement, localPublishList.size = " + localPublishList.size());
-			for (int i : localPublishList) {
-				System.out.println("The current int = " + i);
-				IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
-				//if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
-				String path = null;
-				try {
-					path = cmgr.findFolderPaths(itemGuid)[0];
-				} catch (PSErrorException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					if( path != null ){
-						folderGuid = cmgr.getIdByPath(path);
-					}
-				} catch (PSErrorException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				try {
-					if( folderGuid != null ){
-						addToList = pcm.getNavonCIDs(folderGuid);
-					}
-				} catch (PSErrorException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				if( !addToList.isEmpty() ){
-					for( Integer addInteger : addToList ){
-						localPublishList.add(addInteger);
-					}
-				}
-
-			}
-		}
+//		//Check for publishing Navons.
+//		IPSGuid folderGuid = null;
+//		if(!localPublishList.isEmpty()){
+//			System.out.println("In the Navon statement, localPublishList.size = " + localPublishList.size());
+//			for (int i : localPublishList) {
+//				System.out.println("The current int = " + i);
+//				IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
+//				//if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
+//				String path = null;
+//				try {
+//					path = cmgr.findFolderPaths(itemGuid)[0];
+//				} catch (PSErrorException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				try {
+//					if( path != null ){
+//						folderGuid = cmgr.getIdByPath(path);
+//					}
+//				} catch (PSErrorException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				try {
+//					if( folderGuid != null ){
+//						addToList = pcm.getNavonCIDs(folderGuid);
+//					}
+//				} catch (PSErrorException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				if( !addToList.isEmpty() ){
+//					for( Integer addInteger : addToList ){
+//						localPublishList.add(addInteger);
+//					}
+//				}
+//
+//			}
+//		}
 		
 		return localPublishList;
 	}
