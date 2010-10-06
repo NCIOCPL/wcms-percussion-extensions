@@ -216,12 +216,12 @@ public class CGV_ParentChildManager {
 	 * @param src - the source item, gets the parents content ids.
 	 * @param autoSlot - if true, then call the auto slot parent generator.
 	 * @param type - the needed type variable passed in for the autp slot generator.
-	 * @return A list of the parent content ids for IPSGuid src.
+	 * @return A list of the parent content ids for IPSGuid src.  May be empty or null.
 	 * @throws PSErrorException 
 	 */
 	public List<Integer> getParentCIDs(IPSGuid src, boolean autoSlot, int type) throws PSErrorException{
 		List<PSItemSummary> parents = null;
-		List<Integer> returnThis = new ArrayList<Integer>();
+		List<Integer> returnThis = null;
 		if(autoSlot){
 			parents = getAutoSlot(src, type);
 		}
@@ -230,6 +230,7 @@ public class CGV_ParentChildManager {
 		}
 		if(!parents.isEmpty()){
 			for( PSItemSummary item : parents ){
+				returnThis = new ArrayList<Integer>();
 				returnThis.add(loadItem(item.getGUID()).getContentId());
 			}
 		}
