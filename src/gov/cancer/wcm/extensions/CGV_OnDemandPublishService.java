@@ -279,7 +279,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 //				return null;
 //			}
 //		}
-		if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)) {
+		if(CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)){
+			//if didn't get any parents, create list and add current item to it
+			if (bDebug) System.out.println("got into the null list");
+			localPublishList = new ArrayList<Integer>();
+			localPublishList.add(currItemId);
+		}
+		if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr) || CGV_TopTypeChecker.multiPagePages(typeId.intValue(),cmgr)) 
+		{
 			//if this is a topmost content type, don't get the parents
 			if (bDebug) System.out.println("!top type statement");
 			try {
