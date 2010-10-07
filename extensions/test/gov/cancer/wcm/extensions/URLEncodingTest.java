@@ -16,6 +16,7 @@ public class URLEncodingTest {
 		String testUrl2 = "09876";
 		String testUrl3 = "My_098-good.url";
 		String testUrl4 = "my.bad*url";
+		String testUrl5 = "";
 		boolean b = (Boolean)p.invoke(null, testUrl1);
 		assertTrue(b);
 		b = (Boolean)p.invoke(null, testUrl2);
@@ -24,5 +25,7 @@ public class URLEncodingTest {
 		assertTrue(b);
 		b = (Boolean)p.invoke(null, testUrl4);
 		assertTrue(!b);
+		b = (Boolean)p.invoke(null, testUrl5);
+		assertTrue(b);
 	}
 }
