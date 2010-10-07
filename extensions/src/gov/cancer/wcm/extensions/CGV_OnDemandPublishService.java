@@ -318,6 +318,16 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				}
 			}
 		}
+		List<Integer> addToList = new ArrayList<Integer>();
+		//Check auto slot list in the config file.
+		addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
+		if( !addToList.isEmpty() ){
+			if(localPublishList == null)
+				localPublishList = new ArrayList<Integer>();
+			for( Integer addInteger : addToList ){
+				localPublishList.add(addInteger);
+			}
+		}
 		if (localPublishList == null) {
 			//if didn't get any parents, create list and add current item to it
 			if (bDebug) System.out.println("got into the null list");
@@ -325,14 +335,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			localPublishList.add(currItemId);
 		}
 		
-		List<Integer> addToList = new ArrayList<Integer>();
-		//Check auto slot list in the config file.
-		addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
-		if( !addToList.isEmpty() ){
-			for( Integer addInteger : addToList ){
-				localPublishList.add(addInteger);
-			}
-		}
+
 		
 //		//Check for publishing Navons.
 //		IPSGuid folderGuid = null;
