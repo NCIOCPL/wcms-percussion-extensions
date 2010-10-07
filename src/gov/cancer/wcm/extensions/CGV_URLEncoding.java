@@ -40,12 +40,11 @@ public class CGV_URLEncoding implements IPSFieldValidator
 		LOGGER.debug("******INVOKING friendlyURLencoding validation");
 		  
 		String friendlyURL = request.getParameter(CGVConstants.FRIENDLY_URL_FLD);
-		System.out.println("URL DEBUG: the passed in URL = " + friendlyURL);
-		if(validatePrettyUrl(friendlyURL))
-			System.out.println("URL DEBUG: the URL validated TRUE");
+		if( friendlyURL != null ){
+			return validatePrettyUrl(friendlyURL);
+		}
 		else
-			System.out.println("URL DEBUG: the URL validated FALSE");
-		return validatePrettyUrl(friendlyURL);
+			return true;
 	}
  
 	public void init(IPSExtensionDef def, File codeRoot) throws PSExtensionException
@@ -59,6 +58,8 @@ public class CGV_URLEncoding implements IPSFieldValidator
 	 * @return boolean true if valid
 	 */
 	private static boolean validatePrettyUrl(String url) {
+		if( url.isEmpty() )
+			return true;
 		String regex = "[A-Za-z0-9\\-\\_\\.]*";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(url);
