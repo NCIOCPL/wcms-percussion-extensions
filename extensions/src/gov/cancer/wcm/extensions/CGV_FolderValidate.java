@@ -8,8 +8,13 @@ import com.percussion.extension.IPSFieldValidator;
 import com.percussion.extension.PSExtensionException;
 import com.percussion.extension.PSExtensionParams;
 import com.percussion.server.IPSRequestContext;
+import com.percussion.services.content.data.PSContentTypeSummary;
+import com.percussion.services.guidmgr.IPSGuidManager;
+import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorResultsException;
+import com.percussion.webservices.content.IPSContentWs;
+import com.percussion.webservices.content.PSContentWsLocator;
 
 import gov.cancer.wcm.util.CGVConstants;
 import gov.cancer.wcm.util.CGV_ParentChildManager;
@@ -42,24 +47,41 @@ public class CGV_FolderValidate implements IPSFieldValidator
 	public Object processUdf(Object[] params, IPSRequestContext request) throws PSConversionException
 	{
 	
-	    PSExtensionParams ep = new PSExtensionParams(params);
+		String currCID = request.getParameter("sys_contentid");
+		if( currCID != null ){
+			IPSContentWs cmgr = PSContentWsLocator.getContentWebservice();
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes("Folder");
+			IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
+			List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currCID)));
+			List<PSCoreItem> items = null;
 
-	    String value = ep.getStringParam(0, null, false);
-		LOGGER.debug("******INVOKING Folder sys_title validation");
-		
-		if( Integer.parseInt(value) == 101 ){
-			String systitle = request.getParameter("sys_title");
-			if( systitle != null ){
-				return validateFolder(systitle);
+			PSCoreItem item = null;
+			try {
+				items = cmgr.loadItems(glist, true, false, false, false);
+			} catch (PSErrorResultsException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			else
-				return true;
+			item = items.get(0);
+			Long typeId = item.getContentTypeId();
+
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+
+				if (typeId.intValue() == summaryItem.getGuid().getUUID()) {
+					System.out.println("Folder!");
+					String systitle = request.getParameter("sys_title");
+					if( systitle != null ){
+						System.out.println("sys title = " + systitle);
+						return validateFolder(systitle);
+					}
+					else{
+						return true;
+					}
+				}
+			}
 		}
-		else
-		{
-			return true;
-		}
-		
+		return true;
 
 	}
  
