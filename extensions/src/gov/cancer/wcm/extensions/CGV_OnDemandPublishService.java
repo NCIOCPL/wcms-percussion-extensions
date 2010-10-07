@@ -266,7 +266,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			e.printStackTrace();
 		}
 		if (bDebug) System.out.println("before checking the top type");
-
+		
 		Long typeId = item.getContentTypeId();
 //		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
 //			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
