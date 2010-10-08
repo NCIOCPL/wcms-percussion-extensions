@@ -1196,7 +1196,7 @@ function cGovProcessReqChange() {
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
 		
 		// Set up HTML window with javascript and checkboxed text
-		var cGovCheckboxWindow=window.open("","","height=480,width=640");
+		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
 		cGovCheckboxWindow.document.write('<html><head>');
 		cGovCheckboxWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
 		cGovCheckboxWindow.document.write('</head>');
