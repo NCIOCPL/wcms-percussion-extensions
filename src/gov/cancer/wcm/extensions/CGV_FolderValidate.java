@@ -52,14 +52,16 @@ public class CGV_FolderValidate implements IPSFieldValidator
 	{
 		
 		//PSExtensionParams ep = new PSExtensionParams(params);
-		Iterator<Object> i = request.getParametersIterator();
-		while(i.hasNext()){
-			Set o = (Set)i.next();
-			String[] aList = (String[]) o.toArray();
-			for( String s : aList){
-				System.out.println("String = " + s);
-			}
-		}
+//		Iterator<Object> i = request.getParametersIterator();
+//		while(i.hasNext()){
+//			Set o = (Set)i.next();
+//			String[] aList = (String[]) o.toArray();
+//			for( String s : aList){
+//				System.out.println("String = " + s);
+//			}
+//		}
+//		
+		String folderCheck = request.getRequestPage(false);
 		
 		//String currCID = request.getParameter("sys_contentid");
 		//String sys = request.getParameter("sys_title");
@@ -86,23 +88,22 @@ public class CGV_FolderValidate implements IPSFieldValidator
 //			if(summaries.size() != 0 ){
 //				PSContentTypeSummary summaryItem = summaries.get(0);
 
-//	    		if(value.equalsIgnoreCase("101")){
-//				//if (typeId.intValue() == summaryItem.getGuid().getUUID()) {
-//					System.out.println("Folder!");
-//					String systitle = request.getParameter("sys_title");
-//					if( systitle != null ){
-//						System.out.println("sys title = " + systitle);
-//						return validateFolder(systitle);
-//					}
-//					else{
-//						return true;
-//					}
-//				}
-//				else{
-//					System.out.println("Not a folder");
-//				}
-////			}
-////		}
+		if(folderCheck.equalsIgnoreCase("folder")){
+			//	    		if(value.equalsIgnoreCase("101")){
+			//if (typeId.intValue() == summaryItem.getGuid().getUUID()) {
+			System.out.println("Folder!");
+			String systitle = request.getParameter("sys_title");
+			if( systitle != null ){
+				System.out.println("sys title = " + systitle);
+				return validateFolder(systitle);
+			}
+			else{
+				return true;
+			}
+		}
+		else{
+			System.out.println("Not a folder");
+		}
 		return true;
 
 	}
