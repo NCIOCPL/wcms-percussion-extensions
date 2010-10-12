@@ -20,7 +20,11 @@ import gov.cancer.wcm.util.CGVConstants;
 import gov.cancer.wcm.util.CGV_ParentChildManager;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.File;
@@ -46,41 +50,59 @@ public class CGV_FolderValidate implements IPSFieldValidator
 	 */
 	public Object processUdf(Object[] params, IPSRequestContext request) throws PSConversionException
 	{
-	
-		String currCID = request.getParameter("sys_contentid");
-		if( currCID != null ){
-			IPSContentWs cmgr = PSContentWsLocator.getContentWebservice();
-			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes("Folder");
-			IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
-			List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currCID)));
-			List<PSCoreItem> items = null;
-
-			PSCoreItem item = null;
-			try {
-				items = cmgr.loadItems(glist, true, false, false, false);
-			} catch (PSErrorResultsException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			item = items.get(0);
-			Long typeId = item.getContentTypeId();
-
-			if(summaries.size() != 0 ){
-				PSContentTypeSummary summaryItem = summaries.get(0);
-
-				if (typeId.intValue() == summaryItem.getGuid().getUUID()) {
-					System.out.println("Folder!");
-					String systitle = request.getParameter("sys_title");
-					if( systitle != null ){
-						System.out.println("sys title = " + systitle);
-						return validateFolder(systitle);
-					}
-					else{
-						return true;
-					}
-				}
+		
+		//PSExtensionParams ep = new PSExtensionParams(params);
+		Iterator<Object> i = request.getParametersIterator();
+		while(i.hasNext()){
+			Set o = (Set)i.next();
+			String[] aList = (String[]) o.toArray();
+			for( String s : aList){
+				System.out.println("String = " + s);
 			}
 		}
+		
+		//String currCID = request.getParameter("sys_contentid");
+		//String sys = request.getParameter("sys_title");
+		//System.out.println("current CID is " + currCID);
+		//System.out.println("sys title is " + sys);
+//		if( currCID != null ){
+//			IPSContentWs cmgr = PSContentWsLocator.getContentWebservice();
+//			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes("Folder");
+//			IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
+//			List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currCID)));
+//			List<PSCoreItem> items = null;
+//
+//			PSCoreItem item = null;
+//			try {
+//				items = cmgr.loadItems(glist, true, false, false, false);
+//			} catch (PSErrorResultsException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//			item = items.get(0);
+//			Long typeId = item.getContentTypeId();
+//			System.out.println("The content type id is " + typeId);
+//
+//			if(summaries.size() != 0 ){
+//				PSContentTypeSummary summaryItem = summaries.get(0);
+
+//	    		if(value.equalsIgnoreCase("101")){
+//				//if (typeId.intValue() == summaryItem.getGuid().getUUID()) {
+//					System.out.println("Folder!");
+//					String systitle = request.getParameter("sys_title");
+//					if( systitle != null ){
+//						System.out.println("sys title = " + systitle);
+//						return validateFolder(systitle);
+//					}
+//					else{
+//						return true;
+//					}
+//				}
+//				else{
+//					System.out.println("Not a folder");
+//				}
+////			}
+////		}
 		return true;
 
 	}
