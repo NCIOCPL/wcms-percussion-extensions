@@ -93,9 +93,9 @@ public class CGV_StateHelper {
 		trigger = svc.getTrigger(tranID);
 		currState = toStateName(svc.getCurrState(tranID));		//Set the current state for the object.
 		destState = toStateName(svc.getDestState(tranID));		//Set the destination state for the object.
-		System.out.println("JOHN TEST: currentState = " + currState.toString());
-		System.out.println("JOHN TEST: destinationState = " +destState.toString());
-		System.out.println("JOHN TEST: trigger = " + trigger);
+		//System.out.println("JOHN TEST: currentState = " + currState.toString());
+		//System.out.println("JOHN TEST: destinationState = " +destState.toString());
+		//System.out.println("JOHN TEST: trigger = " + trigger);
 	}
 
 	/**
