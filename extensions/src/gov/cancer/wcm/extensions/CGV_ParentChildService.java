@@ -99,46 +99,46 @@ public class CGV_ParentChildService implements InitializingBean {
 
 	public String getCurrState(int tranID, Boolean navon) {
 		String returnThis = null;
-		Map<String,Map<String,String>> m = transition.get("CancerGov Workflow");
-		Map<String,String> mm = m.get(Integer.toString(tranID));
-		if(mm != null){
-			returnThis = mm.get("fromState");
+		Map<String,Map<String,String>> m;
+		Map<String,String> mm;
+		if(!navon){
+			m = transition.get("CancerGov Workflow");
 		}
-		if(navon){
+		else{	//if navon
 			m = transition.get("CGV_Navon_Workflow");
-			mm = m.get(Integer.toString(tranID));
-			returnThis = mm.get("fromState");
 		}
+		mm = m.get(Integer.toString(tranID));
+		returnThis = mm.get("fromState");
 		return returnThis;
 	}
 
 	public String getDestState(int tranID, Boolean navon) {
 		String returnThis = null;
-		Map<String,Map<String,String>> m = transition.get("CancerGov Workflow");
-		Map<String,String> mm = m.get(Integer.toString(tranID));
-		if(mm != null){
-			returnThis = mm.get("toState");
+		Map<String,Map<String,String>> m;
+		Map<String,String> mm;
+		if(!navon){
+			m = transition.get("CancerGov Workflow");
 		}
-		if(navon){
+		else{	//if navon
 			m = transition.get("CGV_Navon_Workflow");
-			mm = m.get(Integer.toString(tranID));
-			returnThis = mm.get("toState");
 		}
+		mm = m.get(Integer.toString(tranID));
+		returnThis = mm.get("toState");
 		return returnThis;
 	}
 	
 	public String getTrigger(int tranID, Boolean navon) {
 		String returnThis = null;
-		Map<String,Map<String,String>> m = transition.get("CancerGov Workflow");
-		Map<String,String> mm = m.get(Integer.toString(tranID));
-		if(mm != null){
-			returnThis = mm.get("trigger");
+		Map<String,Map<String,String>> m;
+		Map<String,String> mm;
+		if(!navon){
+			m = transition.get("CancerGov Workflow");
 		}
-		if(navon){
+		else{	//if navon
 			m = transition.get("CGV_Navon_Workflow");
-			mm = m.get(Integer.toString(tranID));
-			returnThis = mm.get("trigger");
 		}
+		mm = m.get(Integer.toString(tranID));
+		returnThis = mm.get("trigger");
 		return returnThis;
 	}
 
