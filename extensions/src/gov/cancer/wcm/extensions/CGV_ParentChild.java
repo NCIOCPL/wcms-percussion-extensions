@@ -72,7 +72,7 @@ IPSWorkflowAction {
 		System.out.println("Parent/child: Calling extension...");
 
 
-		CGV_StateHelper stateHelp = new CGV_StateHelper(request);
+		CGV_StateHelper stateHelp = new CGV_StateHelper(request, false);
 		StateName currState = stateHelp.getCurrState();
 		StateName destState = stateHelp.getDestState();
 		String currStateString = stateHelp.currStateToString();
