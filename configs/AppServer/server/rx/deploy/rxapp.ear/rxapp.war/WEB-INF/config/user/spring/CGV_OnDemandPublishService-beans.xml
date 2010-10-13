@@ -30,6 +30,16 @@
 						</entry>
 					</map>
 				</entry>
+				<entry key="CGV_Navon_Workflow">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>315</value>
+								<value>355</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
 			</map>
 		</property>
 		<property name="autoSlot">
