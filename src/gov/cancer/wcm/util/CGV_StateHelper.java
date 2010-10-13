@@ -51,9 +51,9 @@ public class CGV_StateHelper {
 	 * and that sets up the current, destination, and the transition id.
 	 * @param req
 	 */
-	public CGV_StateHelper(IPSRequestContext req){
+	public CGV_StateHelper(IPSRequestContext req, Boolean navon){
 		initServices();
-		setup(req);
+		setup(req, navon);
 	}
 	
 	/**
@@ -86,13 +86,13 @@ public class CGV_StateHelper {
 	 */
 	private static CGV_ParentChildService svc = null;
 	
-	private void setup(IPSRequestContext request){
+	private void setup(IPSRequestContext request, Boolean navon){
 				
 		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
 		transitionID = tranID;
-		trigger = svc.getTrigger(tranID);
-		currState = toStateName(svc.getCurrState(tranID));		//Set the current state for the object.
-		destState = toStateName(svc.getDestState(tranID));		//Set the destination state for the object.
+		trigger = svc.getTrigger(tranID, navon);
+		currState = toStateName(svc.getCurrState(tranID, navon));		//Set the current state for the object.
+		destState = toStateName(svc.getDestState(tranID, navon));		//Set the destination state for the object.
 		//System.out.println("JOHN TEST: currentState = " + currState.toString());
 		//System.out.println("JOHN TEST: destinationState = " +destState.toString());
 		//System.out.println("JOHN TEST: trigger = " + trigger);
