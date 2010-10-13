@@ -19,6 +19,7 @@ import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.PSMissingBeanConfigurationException;
+import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.content.data.PSContentTypeSummary;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.contentmgr.IPSNode;
@@ -127,12 +128,47 @@ IPSWorkflowAction {
 			 * 4. The navon is not in Public (or past Public).
 			 * 
 			 */
-			if (!isNavonPublic(request.getParameter("sys_folderid"))){
-				System.out.println("Pending code 4");
-				if(pendingCode < 4 ){pendingCode = 4;}
-				pending = true;
-			}
+			
+			//If going into the Preview or Live server, if the Navon is not in
+			//Public, then pending.
+			if (destState == StateName.PENDING || destState == StateName.STAGING){
+				PSLocator loc1 = new PSLocator(Integer.parseInt(currCID));
+				IPSGuid itemGuid = gmgr.makeGuid(loc1);
+				if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
+				String path = "";
+				try {
+					path = cmgr.findFolderPaths(itemGuid)[0];
+				} catch (PSErrorException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
+				List<IPSGuid> folderGuidList = null;
+				if(path.length() != 0 ){
+					try {
+						folderGuidList = cmgr.findPathIds(path);
+					} catch (PSErrorException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+				}
+				//Drop 1st in List of paths (site folder)
+				if(folderGuidList != null){
+					folderGuidList.remove(0);
+				}
 
+				for( IPSGuid currFolder : folderGuidList ){
+					if (!isNavonPublic(currFolder)){
+						System.out.println("Pending code 4");
+						if(pendingCode < 4 ){pendingCode = 4;}
+						pending = true;
+						if( childHoldState == null ){
+							childHoldState = stateHelp.toStateName(currStateString);
+						}
+					}
+				}
+			}
+			//////////////////End of Navon code /////////////////////////////////////
+			
 			for( PSItemSummary currChild : children ){
 				if(!pending){
 					//TODO: Add, if currChild is a member of the list 2. I can stop my parents from moving.
@@ -545,21 +581,26 @@ IPSWorkflowAction {
 		}
 	}
 
-	private static Boolean isNavonPublic(String folderID){
+	private static Boolean isNavonPublic(IPSGuid folderID){
+		//System.out.println("Folder id = " + folderID);
+		IPSGuidManager gmngr = PSGuidManagerLocator.getGuidMgr();
 		PSONavTools nav = new PSONavTools();
 		IPSNode node = null;
-		try {
-			node = nav.findNavNodeForFolder(folderID);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		PSLocator locator = gmngr.makeLocator(folderID);
+		if(folderID != null)
+		{
+			try {
+				node = nav.findNavNodeForFolder(Integer.toString(locator.getId()));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		if(node != null){
 			IPSGuid guid = node.getGuid();
 
 			PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
 			String navonState = null;
-			IPSGuidManager gmngr = PSGuidManagerLocator.getGuidMgr();
 			PSLocator loc = gmngr.makeLocator(guid);
 			try {
 				navonState = workInfo.findWorkflowStateName(Integer.toString(loc.getId()));
