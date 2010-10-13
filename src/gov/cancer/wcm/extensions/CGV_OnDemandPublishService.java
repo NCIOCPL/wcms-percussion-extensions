@@ -297,7 +297,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currItemId)));
 			List<PSCoreItem> items = null;
 			PSCoreItem item = null;
-			Long typeId = item.getContentTypeId();
 			try {
 				items = cmgr.loadItems(glist, true, false, false, false);
 				item = items.get(0);
@@ -306,6 +305,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				e.printStackTrace();
 			}
 			if (bDebug) System.out.println("before checking the top type");
+			Long typeId = item.getContentTypeId();
 			//		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
 			//			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
 			//			try {
