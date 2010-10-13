@@ -97,22 +97,49 @@ public class CGV_ParentChildService implements InitializingBean {
 	}
 
 
-	public String getCurrState(int tranID) {
+	public String getCurrState(int tranID, Boolean navon) {
+		String returnThis = null;
 		Map<String,Map<String,String>> m = transition.get("CancerGov Workflow");
 		Map<String,String> mm = m.get(Integer.toString(tranID));
-		return mm.get("fromState");
+		if(mm != null){
+			returnThis = mm.get("fromState");
+		}
+		if(navon){
+			m = transition.get("CGV_Navon_Workflow");
+			mm = m.get(Integer.toString(tranID));
+			returnThis = mm.get("fromState");
+		}
+		return returnThis;
 	}
 
-	public String getDestState(int tranID) {
+	public String getDestState(int tranID, Boolean navon) {
+		String returnThis = null;
 		Map<String,Map<String,String>> m = transition.get("CancerGov Workflow");
 		Map<String,String> mm = m.get(Integer.toString(tranID));
-		return mm.get("toState");
+		if(mm != null){
+			returnThis = mm.get("toState");
+		}
+		if(navon){
+			m = transition.get("CGV_Navon_Workflow");
+			mm = m.get(Integer.toString(tranID));
+			returnThis = mm.get("toState");
+		}
+		return returnThis;
 	}
 	
-	public String getTrigger(int tranID) {
+	public String getTrigger(int tranID, Boolean navon) {
+		String returnThis = null;
 		Map<String,Map<String,String>> m = transition.get("CancerGov Workflow");
 		Map<String,String> mm = m.get(Integer.toString(tranID));
-		return mm.get("trigger");
+		if(mm != null){
+			returnThis = mm.get("trigger");
+		}
+		if(navon){
+			m = transition.get("CGV_Navon_Workflow");
+			mm = m.get(Integer.toString(tranID));
+			returnThis = mm.get("trigger");
+		}
+		return returnThis;
 	}
 
 
