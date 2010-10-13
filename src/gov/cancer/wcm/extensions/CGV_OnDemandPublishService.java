@@ -125,19 +125,51 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	public void queueItemSet(int contentId, IPSRequestContext request) {
 
 		List<String> editions = new ArrayList<String>();
-		CGV_StateHelper stateHelp = new CGV_StateHelper(request);
+		
+		Boolean navon = false;
+		
+		List<IPSGuid> loadList = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid"))));
+		List<PSCoreItem> items = null;
+		PSCoreItem item = null;
+		try {
+			items = cmgr.loadItems(loadList, true, false, false, false);
+			item = items.get(0);
+		} catch (PSErrorResultsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Long contentTypeId = item.getContentTypeId();
+		
+		if(CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr)){
+			navon = true;
+		}
+		
+		CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
 		StateName destState = stateHelp.getDestState();
-		Map<String,List<String>> m = editionList.get("CancerGov Workflow");
-		if (destState == StateName.PUBLIC) {
-			List<String> mm = m.get("publish_onDemandEditionId");
-			for( String i : mm ){
-				editions.add(i);
+		
+		if(navon){
+			Map<String,List<String>> m = editionList.get("CGV_Navon_Workflow");
+			if (destState == StateName.PUBLIC) {
+				List<String> mm = m.get("publish_onDemandEditionId");
+				for( String i : mm ){
+					editions.add(i);
+				}
 			}
 		}
-		else {
-			List<String> mm = m.get("preview_onDemandEditionId");
-			for( String i : mm ){
-				editions.add(i);
+		else{
+			Map<String,List<String>> m = editionList.get("CancerGov Workflow");
+			if (destState == StateName.PUBLIC) {
+				List<String> mm = m.get("publish_onDemandEditionId");
+				for( String i : mm ){
+					editions.add(i);
+				}
+			}
+			else {
+				List<String> mm = m.get("preview_onDemandEditionId");
+				for( String i : mm ){
+					editions.add(i);
+				}
 			}
 		}
 		
@@ -150,7 +182,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		List<Integer> idsToPublish = null;	//the list to publish
 		if (bDebug) System.out.println("before checking of the top type");
 		//if this is not the ultimate parent, get parents
-		idsToPublish = getParents(contentId);
+		idsToPublish = getParents(contentId, navon);
 		if (bDebug) System.out.println("\n\tItem CID: " + contentId);
 		log.debug("Need to publish " + idsToPublish.size() + " items");
 		try {
@@ -238,6 +270,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			log.error("GSAOnDemandPublishServce::queueItemSet", nfx);
 		}
 		log.debug("GSAOnDemandPublishServce::queueItemSet done");
+		
 	}
 
 	/**
@@ -252,131 +285,138 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 * @param currItemId
 	 * @return List of parent items
 	 */
-	private List<Integer> getParents(int currItemId) {
+	private List<Integer> getParents(int currItemId, boolean navon) {
 		if (bDebug) System.out.println("beginning of get parent");
 		List<Integer>localPublishList = null;	//list of items to return
-		List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currItemId)));
-		List<PSCoreItem> items = null;
-		PSCoreItem item = null;
-		try {
-			items = cmgr.loadItems(glist, true, false, false, false);
-			item = items.get(0);
-		} catch (PSErrorResultsException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if (bDebug) System.out.println("before checking the top type");
 		
-		Long typeId = item.getContentTypeId();
-//		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
-//			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
-//			try {
-//				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
-//				localPublishList = pcm.getParentCIDs(cid, true, autoSlotConfigType);	//gets 1 layer of parents
-//			} catch (PSErrorException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				return null;
-//			}
-//		}
-		if(CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)){
-			//if didn't get any parents, create list and add current item to it
-			if (bDebug) System.out.println("got into the null list");
+		if(navon){
 			localPublishList = new ArrayList<Integer>();
 			localPublishList.add(currItemId);
 		}
-		if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr) || CGV_TopTypeChecker.multiPagePages(typeId.intValue(),cmgr)) 
-		{
-			//if this is a topmost content type, don't get the parents
-			if (bDebug) System.out.println("!top type statement");
+		else{
+			List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currItemId)));
+			List<PSCoreItem> items = null;
+			PSCoreItem item = null;
+			Long typeId = item.getContentTypeId();
 			try {
-				if (bDebug) System.out.println("getParents before get parents cids");
-				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
-				localPublishList = pcm.getParentCIDs(cid, false, 0);	//gets 1 layer of parents
-				if (bDebug) System.out.println("got localPublishList");
-			} catch (PSErrorException e) {
+				items = cmgr.loadItems(glist, true, false, false, false);
+				item = items.get(0);
+			} catch (PSErrorResultsException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				return null;
 			}
-			if (localPublishList != null && localPublishList.size() > 0) {
-				//create a temp list to hold new parents items so we don't screw the loop
-				List<Integer>tempList = new ArrayList<Integer>();
-				for (int sItem : localPublishList) {
-					List<Integer> parentsList = this.getParents(sItem);	//recurses! foiled again! 
-					if (parentsList != null) {
-						for (int p : parentsList) {
-							if (bDebug) System.out.println("DEBUG: parent item CID: " + p);
-							tempList.add(p);
+			if (bDebug) System.out.println("before checking the top type");
+			//		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
+			//			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
+			//			try {
+			//				IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
+			//				localPublishList = pcm.getParentCIDs(cid, true, autoSlotConfigType);	//gets 1 layer of parents
+			//			} catch (PSErrorException e) {
+			//				// TODO Auto-generated catch block
+			//				e.printStackTrace();
+			//				return null;
+			//			}
+			//		}
+			if(CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)){
+				//if didn't get any parents, create list and add current item to it
+				if (bDebug) System.out.println("got into the null list");
+				localPublishList = new ArrayList<Integer>();
+				localPublishList.add(currItemId);
+			}
+			if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr) || CGV_TopTypeChecker.multiPagePages(typeId.intValue(),cmgr)) 
+			{
+				//if this is a topmost content type, don't get the parents
+				if (bDebug) System.out.println("!top type statement");
+				try {
+					if (bDebug) System.out.println("getParents before get parents cids");
+					IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
+					localPublishList = pcm.getParentCIDs(cid, false, 0);	//gets 1 layer of parents
+					if (bDebug) System.out.println("got localPublishList");
+				} catch (PSErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return null;
+				}
+				if (localPublishList != null && localPublishList.size() > 0) {
+					//create a temp list to hold new parents items so we don't screw the loop
+					List<Integer>tempList = new ArrayList<Integer>();
+					for (int sItem : localPublishList) {
+						List<Integer> parentsList = this.getParents(sItem, navon);	//recurses! foiled again! 
+						if (parentsList != null) {
+							for (int p : parentsList) {
+								if (bDebug) System.out.println("DEBUG: parent item CID: " + p);
+								tempList.add(p);
+							}
 						}
 					}
-				}
-				if (bDebug) System.out.println("before temp list");
-				for (int tItem : tempList) {
-					//add the items to the list to be returned
-					localPublishList.add(tItem);
+					if (bDebug) System.out.println("before temp list");
+					for (int tItem : tempList) {
+						//add the items to the list to be returned
+						localPublishList.add(tItem);
+					}
 				}
 			}
-		}
-		List<Integer> addToList = new ArrayList<Integer>();
-		//Check auto slot list in the config file.
-		addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
-		if( !addToList.isEmpty() ){
-			if(localPublishList == null)
+			List<Integer> addToList = new ArrayList<Integer>();
+			//Check auto slot list in the config file.
+			addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
+			if( !addToList.isEmpty() ){
+				if(localPublishList == null)
+					localPublishList = new ArrayList<Integer>();
+				for( Integer addInteger : addToList ){
+					localPublishList.add(addInteger);
+				}
+			}
+			if (localPublishList == null) {
+				//if didn't get any parents, create list and add current item to it
+				if (bDebug) System.out.println("got into the null list");
 				localPublishList = new ArrayList<Integer>();
-			for( Integer addInteger : addToList ){
-				localPublishList.add(addInteger);
+				localPublishList.add(currItemId);
 			}
-		}
-		if (localPublishList == null) {
-			//if didn't get any parents, create list and add current item to it
-			if (bDebug) System.out.println("got into the null list");
-			localPublishList = new ArrayList<Integer>();
-			localPublishList.add(currItemId);
-		}
-		
 
-		
-//		//Check for publishing Navons.
-//		IPSGuid folderGuid = null;
-//		if(!localPublishList.isEmpty()){
-//			System.out.println("In the Navon statement, localPublishList.size = " + localPublishList.size());
-//			for (int i : localPublishList) {
-//				System.out.println("The current int = " + i);
-//				IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
-//				//if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
-//				String path = null;
-//				try {
-//					path = cmgr.findFolderPaths(itemGuid)[0];
-//				} catch (PSErrorException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				try {
-//					if( path != null ){
-//						folderGuid = cmgr.getIdByPath(path);
-//					}
-//				} catch (PSErrorException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				try {
-//					if( folderGuid != null ){
-//						addToList = pcm.getNavonCIDs(folderGuid);
-//					}
-//				} catch (PSErrorException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				if( !addToList.isEmpty() ){
-//					for( Integer addInteger : addToList ){
-//						localPublishList.add(addInteger);
-//					}
-//				}
-//
-//			}
-//		}
-		
+
+
+			//		//Check for publishing Navons.
+			//		IPSGuid folderGuid = null;
+			//		if(!localPublishList.isEmpty()){
+			//			System.out.println("In the Navon statement, localPublishList.size = " + localPublishList.size());
+			//			for (int i : localPublishList) {
+			//				System.out.println("The current int = " + i);
+			//				IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
+			//				//if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
+			//				String path = null;
+			//				try {
+			//					path = cmgr.findFolderPaths(itemGuid)[0];
+			//				} catch (PSErrorException e) {
+			//					// TODO Auto-generated catch block
+			//					e.printStackTrace();
+			//				}
+			//				try {
+			//					if( path != null ){
+			//						folderGuid = cmgr.getIdByPath(path);
+			//					}
+			//				} catch (PSErrorException e) {
+			//					// TODO Auto-generated catch block
+			//					e.printStackTrace();
+			//				}
+			//				try {
+			//					if( folderGuid != null ){
+			//						addToList = pcm.getNavonCIDs(folderGuid);
+			//					}
+			//				} catch (PSErrorException e) {
+			//					// TODO Auto-generated catch block
+			//					e.printStackTrace();
+			//				}
+			//				if( !addToList.isEmpty() ){
+			//					for( Integer addInteger : addToList ){
+			//						localPublishList.add(addInteger);
+			//					}
+			//				}
+			//
+			//			}
+			//		}
+
+	
+		}
 		return localPublishList;
 	}
 
