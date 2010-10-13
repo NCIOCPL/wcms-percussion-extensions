@@ -8,6 +8,7 @@ import java.util.Queue;
 import gov.cancer.wcm.util.*;
 import gov.cancer.wcm.util.CGV_StateHelper.StateName;
 
+import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.error.PSException;
 import com.percussion.extension.IPSWorkFlowContext;
@@ -20,16 +21,19 @@ import com.percussion.server.IPSRequestContext;
 import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.content.data.PSContentTypeSummary;
 import com.percussion.services.content.data.PSItemSummary;
+import com.percussion.services.contentmgr.IPSNode;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.workflow.data.PSState;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
+import com.percussion.webservices.PSErrorResultsException;
 import com.percussion.webservices.PSErrorsException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 import com.percussion.webservices.content.PSContentWsLocator;
+import com.percussion.pso.jexl.PSONavTools;
 import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 
 
@@ -99,147 +103,34 @@ IPSWorkflowAction {
 		PSContentTypeSummary summaryItem = summaries.get(0);
 		if (cid == summaryItem.getGuid().getUUID()){
 			list = true;}
-		
-		//If PAGE TYPE... || List
-		if(CGV_TopTypeChecker.topType(cid.intValue(),cmgr)
-				|| list){
-						
-			List<PSItemSummary> children = null;
-			try {
-				children = pcm.getChildren(currentItem);
-			} catch (PSErrorException e) {
-				if(showStackTraces){e.printStackTrace();}
-			}
-			
-			/**
-			 * For all children of the parent, check for a pending state.
-			 * A Pending state is defined as one of three codes:
-			 * 
-			 * 1. There is a child item (in any state) checked out by ANY user.
-			 * 2. A child is a shared item, and is not allowed to go past the lowest state out of all
-			 * 		the parents it is shared in.
-			 * 3. There is no path from the child item to the destination of the parent.
-			 * 		(This deals with the handling checking for if an item is mapped to states)
-			 * 
-			 */
+		if (isNavonPublic(request.getParameter("sys_folderid"))){
 
-			for( PSItemSummary currChild : children ){
-				if(!pending){
-					//TODO: Add, if currChild is a member of the list 2. I can stop my parents from moving.
-					PSState childState = null;
-					try {
-						childState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(currChild.getGUID()).get(0)));
-					} catch (PSException e) {
-						if(showStackTraces){e.printStackTrace();}
-					} catch (PSErrorException e) {
-						if(showStackTraces){e.printStackTrace();}
-					}
-					StateName childStateName = stateHelp.toStateName(childState.getName());
-					String childStateString = childState.getName();
-					System.out.println("\tComparing "+childStateString+" to "+destState.toString());
-					if(destState == StateName.ARCHIVEAPPROVAL){
-						int mostParents = pcm.getParentsLivePreview(currChild.getGUID());
-						System.out.println("The number of parents live preview is "+mostParents);
-						if(mostParents > 1){
-							pending = true;
-							if( childHoldState == null ){
-								childHoldState = stateHelp.toStateName(childStateString);
-							}
-							else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
-								childHoldState = stateHelp.toStateName(childStateString);
-							}
-						}
-					}
-					if(CGV_StateHelper.compare( childStateString , destState.toString()) == -1
-							|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){
-						//moveChildList.add(true);
-						//If at any point (current revision, last public revision), the child was a shared item.
-						//Then pending.
+			//If PAGE TYPE... || List
+			if(CGV_TopTypeChecker.topType(cid.intValue(),cmgr)
+					|| list){
 
-						if(destState != StateName.ARCHIVEAPPROVAL){
-							System.out.println("the child state was <= the dest state.");
-							List<PSItemSummary> childParents = null;
-							try {
-								childParents = cmgr.findOwners(currChild.getGUID(), null, false);
-							} catch (PSErrorException e1) {
-								if(showStackTraces){e1.printStackTrace();}
-							}
-							if(childParents.size() > 1){
-								numSharedChildren++;
-								//find the low state of all the shared parents for this shared child
-								StateName lowState = lowestParentState(childParents, workInfo, stateHelp, currentItem);
-
-								/**
-								 * Check if:    destination >= lowestSharedParentState
-								 * 			&&	child's state >= lowestSharedParentState
-								 * 			&&	child's state < destination
-								 */
-								if( (CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 1 
-										|| CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 0)
-										&& (CGV_StateHelper.compare(childStateString, lowState.toString()) == 1 
-												|| CGV_StateHelper.compare(childStateString, lowState.toString()) == 0)
-												&& CGV_StateHelper.compare(childStateString, destState.toString()) == -1 
-								/*|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0) */  )
-								{
-									System.out.println("Pending code 2");
-									if(pendingCode < 2 ){pendingCode = 2;}
-									pending = true;
-									if( childHoldState == null ){
-										childHoldState = stateHelp.toStateName(childStateString);
-									}
-									else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
-										childHoldState = stateHelp.toStateName(childStateString);
-									}
-									childHoldRevision = pcm.getRevision(currChild.getGUID());
-								}
-							}
-							else if(!stateHelp.existsMappedPath(childStateName, destState) && !stateHelp.isMapping(childStateName, destState)){	//the child cannot reach the destination state in 1 move.
-								//Check if there is a path from the current child to the destination (mapped or direct)
-								System.out.println("Pending code 3");
-								if(pendingCode < 3 ){pendingCode = 3;}
-								pending = true;
-								if( childHoldState == null ){
-									childHoldState = stateHelp.toStateName(childStateString);
-								}
-								else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
-									childHoldState = stateHelp.toStateName(childStateString);
-								}
-							}
-							if(pcm.isCheckedOut(currChild.getGUID())){	
-								//checks to see if the current child is checked out by ANY user
-								System.out.println("Pending code 1");
-								if(pendingCode < 1 ){pendingCode = 1;}
-								pending = true;
-								if( childHoldState == null ){
-									childHoldState = stateHelp.toStateName(childStateString);
-								}
-								else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
-									childHoldState = stateHelp.toStateName(childStateString);
-								}
-							}
-						}
-					}
+				List<PSItemSummary> children = null;
+				try {
+					children = pcm.getChildren(currentItem);
+				} catch (PSErrorException e) {
+					if(showStackTraces){e.printStackTrace();}
 				}
-			}
-			//end of for statement.	
-			if(!pending){
-				//If the current item is not in the correct destination, transition it.
-				if( stateHelp.getDestState() != null ){
-					transition(currentItem, currState, destState, stateHelp, pending, true);
-				}
-				if(bDebug){System.out.println("the number of children of the parent = "+children.size());}
-				//For all children, check to see if they are moving, then move them if needed.
-				//Shared children do not get moved/dealt with AFTER PUBLIC state.
+
+				/**
+				 * For all children of the parent, check for a pending state.
+				 * A Pending state is defined as one of three codes:
+				 * 
+				 * 1. There is a child item (in any state) checked out by ANY user.
+				 * 2. A child is a shared item, and is not allowed to go past the lowest state out of all
+				 * 		the parents it is shared in.
+				 * 3. There is no path from the child item to the destination of the parent.
+				 * 		(This deals with the handling checking for if an item is mapped to states)
+				 * 
+				 */
+
 				for( PSItemSummary currChild : children ){
-
-					boolean sharedChild = false;
-					try {
-						sharedChild = pcm.isSharedChild(currChild.getGUID());
-					} catch (PSErrorException e1) {
-						if(showStackTraces){e1.printStackTrace();}
-					}
-					//Check to see if the child is shared.
-					if(!sharedChild){
+					if(!pending){
+						//TODO: Add, if currChild is a member of the list 2. I can stop my parents from moving.
 						PSState childState = null;
 						try {
 							childState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(currChild.getGUID()).get(0)));
@@ -249,111 +140,226 @@ IPSWorkflowAction {
 							if(showStackTraces){e.printStackTrace();}
 						}
 						StateName childStateName = stateHelp.toStateName(childState.getName());
-						System.out.println("The state of the above item is: "+childStateName.toString());
-
-						//If the child needs to be moved, move it.
-						if(!stateHelp.isBackwardsMove(childStateName, destState) && stateHelp.existsMappedPath(childStateName, destState)){
-							if(bDebug){System.out.println("\t\t\tCalling transition because the logic on line 226 passed TRUE");}
-							transition(currChild.getGUID(), childStateName, destState, stateHelp, pending, false);
+						String childStateString = childState.getName();
+						System.out.println("\tComparing "+childStateString+" to "+destState.toString());
+						if(destState == StateName.ARCHIVEAPPROVAL){
+							int mostParents = pcm.getParentsLivePreview(currChild.getGUID());
+							System.out.println("The number of parents live preview is "+mostParents);
+							if(mostParents > 1){
+								pending = true;
+								if( childHoldState == null ){
+									childHoldState = stateHelp.toStateName(childStateString);
+								}
+								else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
+									childHoldState = stateHelp.toStateName(childStateString);
+								}
+							}
 						}
-						else{
-							if(bDebug){System.out.println("\t\t\tNot calling transition because of logic on line 226 passed FALSE");}
-						}
+						if(CGV_StateHelper.compare( childStateString , destState.toString()) == -1
+								|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0){
+							//moveChildList.add(true);
+							//If at any point (current revision, last public revision), the child was a shared item.
+							//Then pending.
 
+							if(destState != StateName.ARCHIVEAPPROVAL){
+								System.out.println("the child state was <= the dest state.");
+								List<PSItemSummary> childParents = null;
+								try {
+									childParents = cmgr.findOwners(currChild.getGUID(), null, false);
+								} catch (PSErrorException e1) {
+									if(showStackTraces){e1.printStackTrace();}
+								}
+								if(childParents.size() > 1){
+									numSharedChildren++;
+									//find the low state of all the shared parents for this shared child
+									StateName lowState = lowestParentState(childParents, workInfo, stateHelp, currentItem);
+
+									/**
+									 * Check if:    destination >= lowestSharedParentState
+									 * 			&&	child's state >= lowestSharedParentState
+									 * 			&&	child's state < destination
+									 */
+									if( (CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 1 
+											|| CGV_StateHelper.compare(destState.toString(), lowState.toString()) == 0)
+											&& (CGV_StateHelper.compare(childStateString, lowState.toString()) == 1 
+													|| CGV_StateHelper.compare(childStateString, lowState.toString()) == 0)
+													&& CGV_StateHelper.compare(childStateString, destState.toString()) == -1 
+									/*|| CGV_StateHelper.compare(childStateString, destState.toString()) == 0) */  )
+									{
+										System.out.println("Pending code 2");
+										if(pendingCode < 2 ){pendingCode = 2;}
+										pending = true;
+										if( childHoldState == null ){
+											childHoldState = stateHelp.toStateName(childStateString);
+										}
+										else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
+											childHoldState = stateHelp.toStateName(childStateString);
+										}
+										childHoldRevision = pcm.getRevision(currChild.getGUID());
+									}
+								}
+								else if(!stateHelp.existsMappedPath(childStateName, destState) && !stateHelp.isMapping(childStateName, destState)){	//the child cannot reach the destination state in 1 move.
+									//Check if there is a path from the current child to the destination (mapped or direct)
+									System.out.println("Pending code 3");
+									if(pendingCode < 3 ){pendingCode = 3;}
+									pending = true;
+									if( childHoldState == null ){
+										childHoldState = stateHelp.toStateName(childStateString);
+									}
+									else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
+										childHoldState = stateHelp.toStateName(childStateString);
+									}
+								}
+								if(pcm.isCheckedOut(currChild.getGUID())){	
+									//checks to see if the current child is checked out by ANY user
+									System.out.println("Pending code 1");
+									if(pendingCode < 1 ){pendingCode = 1;}
+									pending = true;
+									if( childHoldState == null ){
+										childHoldState = stateHelp.toStateName(childStateString);
+									}
+									else if( CGV_StateHelper.compare(childHoldState.toString(), childStateString) == 1 ){
+										childHoldState = stateHelp.toStateName(childStateString);
+									}
+								}
+							}
+						}
 					}
 				}
-			}
-			else{	//if pending
-				//if(destState != childHoldState && childHoldRevision != 0 ){
-				//revert back to a different state (pending, makes the action fail, parent needs to revert back)
-				if(!stateHelp.isMapping(childHoldState,destState)){
-					List<String> transitionFind = stateHelp.backwardsPath(currState, destState);
-					List<IPSGuid> temp = Collections.<IPSGuid>singletonList(currentItem);
-					IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
-					
-					//Logic to deal with an item having to do 1 (or more) transition(s) to get
-					//	back to its previous state.				
-					for(String transitionString : transitionFind){
+				//end of for statement.	
+				if(!pending){
+					//If the current item is not in the correct destination, transition it.
+					if( stateHelp.getDestState() != null ){
+						transition(currentItem, currState, destState, stateHelp, pending, true);
+					}
+					if(bDebug){System.out.println("the number of children of the parent = "+children.size());}
+					//For all children, check to see if they are moving, then move them if needed.
+					//Shared children do not get moved/dealt with AFTER PUBLIC state.
+					for( PSItemSummary currChild : children ){
+
+						boolean sharedChild = false;
 						try {
-							sysws.transitionItems(temp, transitionString);
-						} catch (PSErrorsException e1) {
-							if(showStackTraces){e1.printStackTrace();}
+							sharedChild = pcm.isSharedChild(currChild.getGUID());
 						} catch (PSErrorException e1) {
 							if(showStackTraces){e1.printStackTrace();}
 						}
-					}
-				}				
-			}
+						//Check to see if the child is shared.
+						if(!sharedChild){
+							PSState childState = null;
+							try {
+								childState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(currChild.getGUID()).get(0)));
+							} catch (PSException e) {
+								if(showStackTraces){e.printStackTrace();}
+							} catch (PSErrorException e) {
+								if(showStackTraces){e.printStackTrace();}
+							}
+							StateName childStateName = stateHelp.toStateName(childState.getName());
+							System.out.println("The state of the above item is: "+childStateName.toString());
 
-		}	//end of if statement (if top type)
-		else if(destState == StateName.PENDING){
-			/**
-			 * If the item is not a top type, and is going to the pending state (between Review and Public),
-			 * the item needs to be pushed into the next transition automatically so the user never sees the 
-			 * pending state.
-			*/
-			transition(currentItem, currState, destState, stateHelp, pending, false);
-		}
-		else if(destState == StateName.ARCHIVEAPPROVAL){	//For the archiving, check to see if an item can be archived.
-			/**
-			 * An item can be archived if it has no parents, or if it has only 1 parent and the parent is
-			 * moving it.  If the child item is moving itself, there needs to be no links to any other items.
-			 */
-			int mostParents = pcm.getParentsLivePreview(currentItem);
-			List<PSItemSummary> archiveCheck = null;
-			try {
-				archiveCheck = pcm.getParents(currentItem);
-			} catch (PSErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+							//If the child needs to be moved, move it.
+							if(!stateHelp.isBackwardsMove(childStateName, destState) && stateHelp.existsMappedPath(childStateName, destState)){
+								if(bDebug){System.out.println("\t\t\tCalling transition because the logic on line 226 passed TRUE");}
+								transition(currChild.getGUID(), childStateName, destState, stateHelp, pending, false);
+							}
+							else{
+								if(bDebug){System.out.println("\t\t\tNot calling transition because of logic on line 226 passed FALSE");}
+							}
+
+						}
+					}
+				}
+				else{	//if pending
+					//if(destState != childHoldState && childHoldRevision != 0 ){
+					//revert back to a different state (pending, makes the action fail, parent needs to revert back)
+					if(!stateHelp.isMapping(childHoldState,destState)){
+						List<String> transitionFind = stateHelp.backwardsPath(currState, destState);
+						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(currentItem);
+						IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+
+						//Logic to deal with an item having to do 1 (or more) transition(s) to get
+						//	back to its previous state.				
+						for(String transitionString : transitionFind){
+							try {
+								sysws.transitionItems(temp, transitionString);
+							} catch (PSErrorsException e1) {
+								if(showStackTraces){e1.printStackTrace();}
+							} catch (PSErrorException e1) {
+								if(showStackTraces){e1.printStackTrace();}
+							}
+						}
+					}				
+				}
+
+			}	//end of if statement (if top type)
+			else if(destState == StateName.PENDING){
+				/**
+				 * If the item is not a top type, and is going to the pending state (between Review and Public),
+				 * the item needs to be pushed into the next transition automatically so the user never sees the 
+				 * pending state.
+				 */
+				transition(currentItem, currState, destState, stateHelp, pending, false);
 			}
-			PSState archiveParentsState = null;
-			try {
-				archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
-			} catch (PSException e) {
-				if(showStackTraces){e.printStackTrace();}
-			} catch (PSErrorException e) {
-				if(showStackTraces){e.printStackTrace();}
+			else if(destState == StateName.ARCHIVEAPPROVAL){	//For the archiving, check to see if an item can be archived.
+				/**
+				 * An item can be archived if it has no parents, or if it has only 1 parent and the parent is
+				 * moving it.  If the child item is moving itself, there needs to be no links to any other items.
+				 */
+				int mostParents = pcm.getParentsLivePreview(currentItem);
+				List<PSItemSummary> archiveCheck = null;
+				try {
+					archiveCheck = pcm.getParents(currentItem);
+				} catch (PSErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				PSState archiveParentsState = null;
+				try {
+					archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
+				} catch (PSException e) {
+					if(showStackTraces){e.printStackTrace();}
+				} catch (PSErrorException e) {
+					if(showStackTraces){e.printStackTrace();}
+				}
+				StateName parState = stateHelp.toStateName(archiveParentsState.getName());
+
+				if(mostParents == 1 && stateHelp.toString(parState).equalsIgnoreCase("ArchiveApproval")){
+					//do nothing (continue the transition)
+				}
+				else if(mostParents >= 1){
+					pending = true;
+					transition(currentItem, StateName.ARCHIVEAPPROVAL, StateName.PUBLIC, stateHelp, pending, false);
+				}
 			}
-			StateName parState = stateHelp.toStateName(archiveParentsState.getName());
-			
-			if(mostParents == 1 && stateHelp.toString(parState).equalsIgnoreCase("ArchiveApproval")){
-				//do nothing (continue the transition)
-			}
-			else if(mostParents >= 1){
-				pending = true;
-				transition(currentItem, StateName.ARCHIVEAPPROVAL, StateName.PUBLIC, stateHelp, pending, false);
-			}
-		}
-		else if(destState == StateName.ARCHIVED){	//For the archiving, check to see if an item can be archived.
-			/**
-			 * An item can be archived if it has no parents, or if it has only 1 parent and the parent is
-			 * moving it.  If the child item is moving itself, there needs to be no links to any other items.
-			 */
-			int mostParents = pcm.getParentsLivePreview(currentItem);
-			List<PSItemSummary> archiveCheck = null;
-			try {
-				archiveCheck = pcm.getParents(currentItem);
-			} catch (PSErrorException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			PSState archiveParentsState = null;
-			try {
-				archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
-			} catch (PSException e) {
-				if(showStackTraces){e.printStackTrace();}
-			} catch (PSErrorException e) {
-				if(showStackTraces){e.printStackTrace();}
-			}
-			StateName parState = stateHelp.toStateName(archiveParentsState.getName());
-			
-			if(mostParents == 1 && stateHelp.toString(parState).equalsIgnoreCase("Archived")){
-				//do nothing (continue the transition)
-			}
-			else if(mostParents >= 1){
-				pending = true;
-				transition(currentItem, StateName.ARCHIVED, StateName.PUBLIC, stateHelp, pending, false);
+			else if(destState == StateName.ARCHIVED){	//For the archiving, check to see if an item can be archived.
+				/**
+				 * An item can be archived if it has no parents, or if it has only 1 parent and the parent is
+				 * moving it.  If the child item is moving itself, there needs to be no links to any other items.
+				 */
+				int mostParents = pcm.getParentsLivePreview(currentItem);
+				List<PSItemSummary> archiveCheck = null;
+				try {
+					archiveCheck = pcm.getParents(currentItem);
+				} catch (PSErrorException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				PSState archiveParentsState = null;
+				try {
+					archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
+				} catch (PSException e) {
+					if(showStackTraces){e.printStackTrace();}
+				} catch (PSErrorException e) {
+					if(showStackTraces){e.printStackTrace();}
+				}
+				StateName parState = stateHelp.toStateName(archiveParentsState.getName());
+
+				if(mostParents == 1 && stateHelp.toString(parState).equalsIgnoreCase("Archived")){
+					//do nothing (continue the transition)
+				}
+				else if(mostParents >= 1){
+					pending = true;
+					transition(currentItem, StateName.ARCHIVED, StateName.PUBLIC, stateHelp, pending, false);
+				}
 			}
 		}
 		
@@ -532,6 +538,46 @@ IPSWorkflowAction {
 			}
 			pcm = new CGV_ParentChildManager();
 		}
+	}
+	
+	private static Boolean isNavonPublic(String folderID){
+		PSONavTools nav = new PSONavTools();
+		IPSNode node = null;
+		try {
+			node = nav.findNavNodeForFolder(folderID);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(node != null){
+			IPSGuid guid = node.getGuid();
+			
+//			PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
+//			PSState navonState = null;
+//			try {
+//				navonState = workInfo.findWorkflowState(folderID);
+//			} catch (PSException e) {
+//				e.printStackTrace();
+//			}
+////			if(navonState.getName().equalsIgnoreCase("Draft"))
+			
+
+
+			List<IPSGuid> glist = Collections.<IPSGuid> singletonList(guid);
+			List<PSCoreItem> items = null;
+
+			PSCoreItem item = null;
+			try {
+				items = cmgr.loadItems(glist, true, false, false, false);
+			} catch (PSErrorResultsException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			item = items.get(0);
+		}
+		
+		
+		return true;
 	}
 	
 
