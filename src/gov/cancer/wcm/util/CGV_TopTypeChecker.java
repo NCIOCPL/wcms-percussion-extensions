@@ -48,6 +48,33 @@ public class CGV_TopTypeChecker {
 	}
 	
 	/**
+	 * Returns true if this contentTypeId is a navon or nav tree.
+	 * @param contentTypeId - id to check
+	 * @return true if in list
+	 */
+	public static boolean navon(int contentTypeId, IPSContentWs cmgr) {
+		//get array of type names
+		List<String> navonTypes = new ArrayList<String>();
+		navonTypes.add("rffNavon");
+		navonTypes.add("rffNavTree");
+		for (String s : navonTypes) {
+			if (bDebug) System.out.print("DEBUG: navon types " + s);
+			//get all summaries matching the current type
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
+			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
+			//get the first item
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+
+				if (contentTypeId == summaryItem.getGuid().getUUID()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Returns true if this contentTypeId is in the list of content types for multi page containers
 	 * @param contentTypeId - id to check
 	 * @return true if in list
