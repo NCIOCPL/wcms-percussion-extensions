@@ -1060,8 +1060,16 @@ var cGovLFConst = "&#x000a;";	//line feed substitute
 * The following variables should be set from a config file
 */
 //var cGovWebServiceURL = 'http://verdi.nci.nih.gov/u/glossify/';	//url of glossifier web service
-var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
+//var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
+var cGovWebServiceURL = 'http://156.40.134.66:9921/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service
+//var cGovWebServiceURL = 'http://156.40.134.66:9921/Glossifier/services/Glossifier.GlossifierSoap/';	//url of glossifier web service
 var cGovPreviewURL = "www.cancer.gov";	//dictionary preview URL
+var cGovElementPrefix = "ns1:";
+var cGovSoapPrefix = "soapenv";
+var cGovWSNameSpace = "cancer.gov/glossproxy";
+//var cGovWSNameSpace = "cips.nci.nih.gov/cdr";
+//var cGovSoapMethod = "cips.nci.nih.gov/cdr/glossify";
+var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 
 /**
  * Method to fetch Ephox content, glossify it, and reset it into the editor.
@@ -1089,12 +1097,14 @@ function cGovEphoxDoGlossify(data) {
 	var safeData = "<![CDATA[" + cGovMassagedData + "]]>";
 	// XML SOAP command for web service
 	var soapCommand = "<?xml version=\"1.0\"?>" +
-		"<soap:Envelope " +
-		"xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' " +
-		"xmlns:xsd='http://www.w3.org/2001/XMLSchema' " +
-		"xmlns:soap='http://schemas.xmlsoap.org/soap/envelope' " +
-		"soap:encodingStyle='http://schemas.xmlsoap.org/soap/encoding'>" +
-		"<soap:Body xmlns:m='cips.nci.nih.gov/cdr'>" +
+		"<soapenv:Envelope " +
+//		"xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' " +
+//		"xmlns:xsd='http://www.w3.org/2001/XMLSchema' " +
+		"xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' " +
+		"xmlns:m='" + cGovWSNameSpace + "'> " +
+//		"soapenv:encodingStyle='http://schemas.xmlsoap.org/soap/encoding'>" +
+		"<soapenv:Header/>" +
+		"<soapenv:Body>" +
 			"<m:glossify>" +
 				"<m:fragment>" + safeData + "</m:fragment>" +
 				"<m:dictionaries>" +
@@ -1104,8 +1114,9 @@ function cGovEphoxDoGlossify(data) {
 					"<m:string>en</m:string>" +
 				"</m:languages>" +
 			"</m:glossify>" +
-		"</soap:Body>" +
-		"</soap:Envelope>";
+		"</soapenv:Body>" +
+		"</soapenv:Envelope>";
+//alert("command:\n" + soapCommand);
 	// Get request object depending on browser
 	if (window.XMLHttpRequest) {
 		try {
@@ -1152,8 +1163,11 @@ function cGovEphoxDoGlossify(data) {
 
 		// Open request and set its headers
 		cGovReq.open("POST", cGovWebServiceURL, true);
-		cGovReq.setRequestHeader("Content-Type", "application/soap+xml");
-		cGovReq.setRequestHeader("SOAPAction", "cips.nci.nih.gov/cdr/glossify");
+//		cGovReq.setRequestHeader("AcceptEncoding", "gzip,deflate");	//if this is added, actual ws doesn't work
+//		cGovReq.setRequestHeader("Content-Type", "text/xml;charset=UTF-8");
+		cGovReq.setRequestHeader("Content-Type", "text/xml");
+		cGovReq.setRequestHeader("SOAPAction", cGovSoapMethod);
+//		cGovReq.setRequestHeader("User-Agent", "Jakarta Commons-HttpClient/3.1");	//if this is added, actual ws doesn't work
 		// Send the request
 		cGovReq.send(soapCommand);
 		return true;
@@ -1183,17 +1197,23 @@ function termObject() {
 */
 function cGovProcessReqChange() {
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
-//alert("got response");
+//alert("got response, text:\n" + cGovReq.responseText);
 		cGovStatusWindow.close();
 		//Web service transaction has completed, parse the response
-		var env = cGovReq.responseXML.getElementsByTagName("soap:Envelope");
-		var body = env[0].getElementsByTagName("soap:Body");
-		var resp = body[0].getElementsByTagName("glossifyResponse");
-		var glossifyResult = resp[0].getElementsByTagName("glossifyResult");
-		var terms = glossifyResult[0].getElementsByTagName("Term");
+		var env = cGovReq.responseXML.getElementsByTagName(cGovSoapPrefix + ":Envelope");
+//alert("got env");
+		var body = env[0].getElementsByTagName(cGovSoapPrefix + ":Body");
+//alert("got body");
+		var resp = body[0].getElementsByTagName(cGovElementPrefix + "glossifyResponse");
+//alert("got glossifyResponse");
+		var glossifyResult = resp[0].getElementsByTagName(cGovElementPrefix + "glossifyResult");
+//alert("got glossifyResult");
+		var terms = glossifyResult[0].getElementsByTagName(cGovElementPrefix + "Term");
+//alert("got term");
 		// Put the terms values into an array
 		var termsArray = cGovBuildTermsArray(terms);
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
+//alert("cGovMassagedData:\n" + cGovMassagedData);
 		
 		// Set up HTML window with javascript and checkboxed text
 		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
@@ -1228,6 +1248,7 @@ function cGovProcessReqChange() {
 		cGovCheckboxWindow.document.write('<input type="submit" value="Submit Changes">');
 		cGovCheckboxWindow.document.write('</form>\n</body>\n</html>');
 	}
+//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
 }
 
 /**
@@ -1388,20 +1409,21 @@ function cGovFixCRLF(theRegExp, theText, replacement) {
 */
 function cGovBuildTermsArray(terms) {
 	var termsArray = [];	//array of term values
+//alert("terms count = " + terms.length);
 	for (i=0;i<terms.length;i++) {
 	// fetch the values for each Term returned by the service
 		var term = new termObject();
-		var start = terms[i].getElementsByTagName("start");
+		var start = terms[i].getElementsByTagName(cGovElementPrefix + "start");
 		term.start = start[0].childNodes[0].nodeValue;
-		var len = terms[i].getElementsByTagName("length");
+		var len = terms[i].getElementsByTagName(cGovElementPrefix + "length");
 		term.length = len[0].childNodes[0].nodeValue;
-		var docId = terms[i].getElementsByTagName("docId");
+		var docId = terms[i].getElementsByTagName(cGovElementPrefix + "docId");
 		term.docId = docId[0].childNodes[0].nodeValue;
-		var dictionary = terms[i].getElementsByTagName("dictionary");
+		var dictionary = terms[i].getElementsByTagName(cGovElementPrefix + "dictionary");
 		term.dictionary = dictionary[0].childNodes[0].nodeValue;
-		var language = terms[i].getElementsByTagName("language");
+		var language = terms[i].getElementsByTagName(cGovElementPrefix + "language");
 		term.language = language[0].childNodes[0].nodeValue;
-		var first = terms[i].getElementsByTagName("firstOccurrence");
+		var first = terms[i].getElementsByTagName(cGovElementPrefix + "firstOccurrence");
 		term.first = first[0].childNodes[0].nodeValue;
 		termsArray[i] = term;
 	}
