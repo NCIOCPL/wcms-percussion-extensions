@@ -376,12 +376,15 @@ public class CGV_RelationshipHandlerService {
 					log.debug("Available transitions for item "+item.getId()+" are "+availableTransitionNames);
 					availableTransitionNames.retainAll(autoTransitions);
 					if (availableTransitionNames.size()>1) {
-						log.debug("Multiple available transitions will pick first"+availableTransitionNames);
-					} else if (tDest.getValidChildStates().contains(item.getWfStateName())){
-						log.debug("Already in the state, or further");
-					} else if (availableTransitionNames.size()==0) {
-						PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Cannot transition dependent item {0}.  Item is in state {1} and cannot transition with any of {2}", new Object[]{item.getId(),item.getWfStateName(),autoTransitions});	
-						success=false;
+						log.debug("Multiple available transitions will pick first "+availableTransitionNames);
+					}
+					if (availableTransitionNames.size()==0) {
+						if (tDest.getValidChildStates().contains(item.getWfStateName())){
+								log.debug("Already in the state, or further");
+						} else{ 
+							PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Cannot transition dependent item {0}.  Item is in state {1} and cannot transition with any of {2}", new Object[]{item.getId(),item.getWfStateName(),autoTransitions});	
+							success=false;
+						}
 					} else {
 						String tName = availableTransitionNames.get(0);
 						log.debug("Will transition with "+tName);
