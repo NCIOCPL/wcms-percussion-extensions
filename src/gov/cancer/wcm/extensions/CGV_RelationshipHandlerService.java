@@ -6,6 +6,7 @@ import gov.cancer.wcm.util.CGV_TransitionDestination;
 import gov.cancer.wcm.util.CGV_TypeNames;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -17,15 +18,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
+import com.percussion.cms.PSCmsException;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.cms.objectstore.PSInvalidContentTypeException;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
+import com.percussion.pso.jexl.PSONavTools;
+import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
+import com.percussion.server.PSRequest;
+import com.percussion.server.webservices.PSServerFolderProcessor;
+import com.percussion.services.catalog.PSTypeEnum;
+import com.percussion.services.contentmgr.IPSNode;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
+import com.percussion.services.guidmgr.data.PSGuid;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
+import com.percussion.services.workflow.IPSWorkflowService;
+import com.percussion.services.workflow.PSWorkflowServiceLocator;
 import com.percussion.services.workflow.data.PSState;
 import com.percussion.util.PSItemErrorDoc;
 import com.percussion.utils.guid.IPSGuid;
@@ -47,17 +58,19 @@ public class CGV_RelationshipHandlerService {
 	private static Log log = LogFactory.getLog(CGV_RelationshipHandlerService.class);
 	private static IPSCmsContentSummaries summ;
 	private static IPSContentWs cmgr;
+	private static IPSWorkflowService wfService;
 
 	Map<String,CGV_TransitionDestination> transitionMappings;
 
 	private static IPSGuidManager gmgr;
+	private static PSOWorkflowInfoFinder workInfo;
 	protected static void initServices() {
 		if (sws == null) {
 			gmgr = PSGuidManagerLocator.getGuidMgr();
 			sws = PSSystemWsLocator.getSystemWebservice();
 			cmgr = PSContentWsLocator.getContentWebservice();
 			summ = PSCmsContentSummariesLocator.getObjectManager();
-
+			wfService = PSWorkflowServiceLocator.getWorkflowService();
 		}
 	}
 
@@ -225,7 +238,7 @@ public class CGV_RelationshipHandlerService {
 						} else {
 							item = retItems.get(retItems.indexOf(item));
 						}
-						
+
 						if (!itemToProcess.isShared() && itemToProcess.isWfFollow() && config.isWfFollow()) {
 							// Parents will not follow
 							//	item.setWfFollow(true);
@@ -286,7 +299,7 @@ public class CGV_RelationshipHandlerService {
 						log.debug("Item " + item.getId() + " is in valid child state "+item.getWfStateName() );
 					} else {
 						log.debug("Item " + item.getId() + " is in an invalid child state "+item.getWfStateName() +" it needs to be in one of "+tDest.getValidChildStates());
-						
+
 						PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Dependent item {0} is in an invalid state {1} for the transition, it needs to be in one of the following {2} to continue", new Object[]{item.getId(),item.getWfStateName(),tDest.getValidChildStates()});
 
 						success=false;
@@ -346,7 +359,7 @@ public class CGV_RelationshipHandlerService {
 
 			Stack<CGV_RelItem> processItems = new Stack<CGV_RelItem>();
 			processItems.addAll(items);
-			
+
 			List<String> autoTransitions = tDest.getAutoTransitionNames();
 			log.debug("Configured auto Transition names = "+autoTransitions);
 			while(!processItems.isEmpty()) {
@@ -387,7 +400,7 @@ public class CGV_RelationshipHandlerService {
 							success=false;
 						}
 
-						
+
 					}
 				}
 
@@ -402,13 +415,79 @@ public class CGV_RelationshipHandlerService {
 		return success;
 	}
 
-	
-	public boolean checkNavonState(
-			Set<CGV_RelItem> items, Document errorDoc) {
-		// TODO Auto-generated method stub
+	public boolean preventAncestorPull(CGV_RelItem item,PSState destState) {
+		CGV_TransitionDestination tDest = transitionMappings.get(destState.getName());
+		return (tDest.isPreventAncestorPull() && item.getParents().size()>0);
+	}
+	/**
+	 * Method isNavonPublic.
+	 * @param folderID IPSGuid
+	 * @return Boolean
+	 */
+	private static Boolean isNavonPublic(IPSGuid folderID){
+
+		PSONavTools nav = new PSONavTools();
+		IPSNode node = null;
+
+		if(folderID != null)
+		{
+			try {
+				node = nav.findNavNodeForFolder(String.valueOf(folderID.getUUID()));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if(node != null){
+
+			PSComponentSummary summary = summ.loadComponentSummary(node.getGuid().getUUID());
+			int stateid = summary.getContentStateId();
+			int wfid = summary.getWorkflowAppId();		   
+
+			PSState state = wfService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE,stateid),
+					new PSGuid(PSTypeEnum.WORKFLOW,wfid));
+			String validFlag = state.getContentValidValue();
+
+			return (validFlag.equals("y") || validFlag.equals("i"));	
+		}
 		return false;
 	}
-	
+
+	public boolean checkNavonState(	
+			Set<CGV_RelItem> items, Document errorDoc) throws PSCmsException {
+		boolean success=true;
+
+		Set<String> paths = new HashSet<String>();
+		for(CGV_RelItem item :items) {
+			paths.addAll(getFolderPaths(item.getId()));
+		}
+
+		for (String path : paths) {
+			for (IPSGuid folderGuid : getFolderGuid(path)) {
+				if (!isNavonPublic(folderGuid)) {
+					PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Navon item with id {0} and path {1} is not in a public state ", new Object[]{folderGuid.getUUID(),path});	
+					success=false;
+				}
+			}
+		}
+		return success;
+	}
+
+	public List<IPSGuid> getFolderGuid(String path) throws PSCmsException {
+		PSRequest req = (PSRequest) PSRequestInfo
+		.getRequestInfo(PSRequestInfo.KEY_PSREQUEST);
+		PSServerFolderProcessor folderproc = new PSServerFolderProcessor(req,null);
+		List<IPSGuid>ret = folderproc.findMatchingFolders(path);
+		return ret;
+	}
+
+	public List<String> getFolderPaths(int id) throws PSCmsException {
+		PSRequest req = (PSRequest) PSRequestInfo
+		.getRequestInfo(PSRequestInfo.KEY_PSREQUEST);
+		PSServerFolderProcessor folderproc = new PSServerFolderProcessor(req,null);
+		String[] ret = folderproc.getFolderPaths(new PSLocator(id,-1));
+		return Arrays.asList(ret);
+	}
 	/**
 	 * Method setConfigs.
 	 * @param configs List<CGV_RelationshipConfig>
@@ -443,10 +522,10 @@ public class CGV_RelationshipHandlerService {
 			Map<String, CGV_TransitionDestination> transitionMappings) {
 		this.transitionMappings = transitionMappings;
 	}
-	
+
 	private static final String ERR_FIELD = "TransitionValidation";
 	private static final String ERR_FIELD_DISP = "TransitionValidation";
-	
+
 
 
 }
