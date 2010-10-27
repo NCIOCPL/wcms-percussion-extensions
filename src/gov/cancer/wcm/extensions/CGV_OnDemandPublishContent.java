@@ -13,6 +13,7 @@ import com.percussion.server.IPSRequestContext;
  * Workflow action to manage publication through a queue
  * @author whole based on RM
  *
+ * @version $Revision: 1.0 $
  */
 public class CGV_OnDemandPublishContent extends PSDefaultExtension
       implements IPSWorkflowAction
@@ -37,6 +38,7 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
    
    /**
     * Initializing the Service class. 
+    * @param request IPSRequestContext
     */
    private static void initServices(IPSRequestContext request)
    {
