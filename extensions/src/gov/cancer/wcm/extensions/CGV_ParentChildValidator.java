@@ -14,20 +14,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
-import com.percussion.design.objectstore.PSLocator;
 import com.percussion.error.PSException;
-import com.percussion.pso.jexl.PSONavTools;
 import com.percussion.pso.validation.PSOAbstractItemValidationExit;
 import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.server.IPSRequestContext;
-import com.percussion.services.contentmgr.IPSNode;
 import com.percussion.services.guidmgr.IPSGuidManager;
-import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.workflow.data.PSState;
 import com.percussion.util.IPSHtmlParameters;
 import com.percussion.util.PSItemErrorDoc;
-import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
 
@@ -42,9 +37,7 @@ public class CGV_ParentChildValidator extends PSOAbstractItemValidationExit {
 	protected static IPSContentWs cmgr = null;
 	protected static CGV_ParentChildManager pcm = null;
 
-//	Map<Integer,CGV_TransitionStatus> statuses = new HashMap<Integer,CGV_TransitionStatus>();
-	
-	  private static Log log = LogFactory.getLog(CGV_ParentChildValidator.class);
+	private static Log log = LogFactory.getLog(CGV_ParentChildValidator.class);
 	private static CGV_RelationshipHandlerService rhs;
 	private static PSOWorkflowInfoFinder winfo;
 	   /**
@@ -119,13 +112,19 @@ public class CGV_ParentChildValidator extends PSOAbstractItemValidationExit {
 						noTransitionItems.add(item);
 					}	
 					
+				
 					item.initStatus();
 					log.debug("Found item "+item);
 		       }
 				
+			
 				
 			    PSState destState = winfo.findDestinationState(currCID, transition);
-			    
+				if (rhs.preventAncestorPull(currItem, destState))  {
+					//Preventing child item from pulling parent,  just check if children are in correct state for move.
+					noTransitionItems.addAll(transitionItems);
+					transitionItems.clear();
+				}
 			    String wfName = winfo.findWorkflow(currItem.getWfId()).getName();
 			    
 				boolean transitionOk = true;
@@ -168,59 +167,7 @@ public class CGV_ParentChildValidator extends PSOAbstractItemValidationExit {
 			}
 		}
 
-		/**
-		 * Method isNavonPublic.
-		 * @param folderID IPSGuid
-		 * @return Boolean
-		 */
-		private static Boolean isNavonPublic(IPSGuid folderID){
-			//System.out.println("Folder id = " + folderID);
-			IPSGuidManager gmngr = PSGuidManagerLocator.getGuidMgr();
-			PSONavTools nav = new PSONavTools();
-			IPSNode node = null;
-			PSLocator locator = gmngr.makeLocator(folderID);
-			if(folderID != null)
-			{
-				try {
-					node = nav.findNavNodeForFolder(Integer.toString(locator.getId()));
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			if(node != null){
-				IPSGuid guid = node.getGuid();
-
-				PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
-				String navonState = null;
-				PSLocator loc = gmngr.makeLocator(guid);
-				try {
-					navonState = workInfo.findWorkflowStateName(Integer.toString(loc.getId()));
-				} catch (PSException e) {
-					e.printStackTrace();
-				}
-				if(navonState.equalsIgnoreCase("Draft") || navonState.equalsIgnoreCase("Pending")){
-					return false;
-				}
-				else
-				{
-					return true;
-				}
-
-//				List<IPSGuid> glist = Collections.<IPSGuid> singletonList(guid);
-//				List<PSCoreItem> items = null;
-	//
-//				PSCoreItem item = null;
-//				try {
-//					items = cmgr.loadItems(glist, true, false, false, false);
-//				} catch (PSErrorResultsException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				item = items.get(0);
-			}
-			return false;
-		}
+		
 		
 		/**
 		 * Method getRelatedItemIds.
@@ -260,12 +207,6 @@ public class CGV_ParentChildValidator extends PSOAbstractItemValidationExit {
 		      return b.booleanValue();
 		   }
 		private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.ParentChildValidator.PSExclusionFlag";
-		private static final String ARCHIVE_SHARED = "Cannot Archive item {0} because it has more than one parent in live preview";
-		private static final String NO_PATH_TO_DEST = "Error transitioning {0} because child {1} has no path from current state {2} to destination state {3} in the workflow";
-		private static final String SHARED_ITEM_PAST_LOWEST = "Error transitioning {0} because {1} is a shared item, and is not allowed to go past the lowest state {1} out of all the parents {2}";
-		private static final String NAVON_NOT_PUBLIC = "Cannot transition content id {0} Navon id {0} is not Public";
-		private static final String ARCHIVE_PARENT_NOT_MOVING = "Cannot Archive item {0} because its parent {1} is not in state {2} it is in state {3}";
-		private static final String CHILD_IS_CHECKED_OUT = "Error transitioning {0} because child {1} is checked out";
 		private static final String ERR_FIELD = "TransitionValidation";
 		private static final String ERR_FIELD_DISP = "TransitionValidation";
 		 
