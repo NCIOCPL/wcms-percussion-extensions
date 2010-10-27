@@ -8,6 +8,7 @@ import com.percussion.services.PSBaseServiceLocator;
  *
  * 	@author DavidBenua
  *
+ * @version $Revision: 1.0 $
  */
 public class CGV_OnDemandPublishServiceLocator extends PSBaseServiceLocator
 {
@@ -22,8 +23,8 @@ public class CGV_OnDemandPublishServiceLocator extends PSBaseServiceLocator
    /**
     * Returns an instance of Service class for publishing.
     * 
-    * @return instance of CGV_OnDemandPublishService
-    */
+   
+    * @return instance of CGV_OnDemandPublishService */
    public static CGV_OnDemandPublishService getCGV_OnDemandPublishService(){ 
 	   
 	   System.out.println("DEBUG: Getting the bean...");
