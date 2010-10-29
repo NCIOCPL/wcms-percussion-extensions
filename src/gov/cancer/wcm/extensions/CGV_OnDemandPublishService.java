@@ -156,6 +156,9 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		PSOWorkflowInfoFinder winfo = new PSOWorkflowInfoFinder();
 	    PSState destState = null;
 		try {
+			System.out.println("transition id = " + transition);
+			System.out.println("current id = " + currCID);
+			System.out.println("destination state = " + winfo.findDestinationState(currCID, transition) );
 			destState = winfo.findDestinationState(currCID, transition);
 		} catch (PSException e) {
 			// TODO Auto-generated catch block
