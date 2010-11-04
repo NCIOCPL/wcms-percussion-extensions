@@ -11,15 +11,16 @@ IF "%1" == "" GOTO NO-DIRECTORY
 ECHO.
 
 SET RHYTHMYX_HOME=%1
-::SET JAVA_HOME=%RHYTHMYX_HOME%\JRE
-::SET ANT_HOME=%RHYTHMYX_HOME%\Patch\InstallToolkit
+SET JAVA_HOME=%RHYTHMYX_HOME%\JRE
+SET ANT_HOME=%RHYTHMYX_HOME%\Patch\InstallToolkit
 %ANT_HOME%\bin\ant -f deploy.xml
 
 GOTO END
 
 :NO-DIRECTORY
 ECHO.
-ECHO Please Specify Rhythmyx Root Directory
+ECHO Usage:
+ECHO install.bat rhytymyx_home_directory
 ECHO.
 
 :END
