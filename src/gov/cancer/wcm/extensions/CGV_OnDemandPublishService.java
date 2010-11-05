@@ -18,10 +18,8 @@ import org.springframework.beans.factory.InitializingBean;
 
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.design.objectstore.PSLocator;
-import com.percussion.error.PSException;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
-import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.rx.publisher.IPSPublisherJobStatus;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
@@ -30,7 +28,6 @@ import com.percussion.server.IPSRequestContext;
 import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
-import com.percussion.services.workflow.data.PSState;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
@@ -148,45 +145,30 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			navon = true;
 		}
 		
-		//CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
-		//StateName destState = stateHelp.getDestState();
+		CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
+		StateName destState = stateHelp.getDestState();
 		
-		String transition = request.getParameter("sys_transitionid");
-		String currCID = request.getParameter("sys_contentid");
-		PSOWorkflowInfoFinder winfo = new PSOWorkflowInfoFinder();
-	    PSState destState = null;
-		try {
-			System.out.println("transition id = " + transition);
-			System.out.println("current id = " + currCID);
-			System.out.println("destination state = " + winfo.findDestinationState(currCID, transition) );
-			destState = winfo.findDestinationState(currCID, transition);
-		} catch (PSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if( destState != null ){
-			if(navon){
-				Map<String,List<String>> m = editionList.get("CGV_Navon_Workflow");
-				if (destState.getName().equalsIgnoreCase("PUBLIC")) {
-					List<String> mm = m.get("publish_onDemandEditionId");
-					for( String i : mm ){
-						editions.add(i);
-					}
+		if(navon){
+			Map<String,List<String>> m = editionList.get("CGV_Navon_Workflow");
+			if (destState == StateName.PUBLIC) {
+				List<String> mm = m.get("publish_onDemandEditionId");
+				for( String i : mm ){
+					editions.add(i);
 				}
 			}
-			else{
-				Map<String,List<String>> m = editionList.get("CancerGov Workflow");
-				if (destState.getName().equalsIgnoreCase("PUBLIC")) {
-					List<String> mm = m.get("publish_onDemandEditionId");
-					for( String i : mm ){
-						editions.add(i);
-					}
+		}
+		else{
+			Map<String,List<String>> m = editionList.get("CancerGov Workflow");
+			if (destState == StateName.PUBLIC) {
+				List<String> mm = m.get("publish_onDemandEditionId");
+				for( String i : mm ){
+					editions.add(i);
 				}
-				else {
-					List<String> mm = m.get("preview_onDemandEditionId");
-					for( String i : mm ){
-						editions.add(i);
-					}
+			}
+			else {
+				List<String> mm = m.get("preview_onDemandEditionId");
+				for( String i : mm ){
+					editions.add(i);
 				}
 			}
 		}
