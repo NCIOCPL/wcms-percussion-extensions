@@ -389,6 +389,45 @@
 						</entry>
 					</map>
 				</entry>
+				<entry key="CGV_Navon_Workflow">
+					<map>
+						<entry key="4">
+							<map>
+								<entry key="fromState" value="Draft" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="DirecttoPublic" />
+							</map>
+						</entry>
+						<entry key="5">
+							<map>
+								<entry key="fromState" value="Pending" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="AgetoPublic" />
+							</map>
+						</entry>
+						<entry key="6">
+							<map>
+								<entry key="fromState" value="Pending" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="ForcetoPublic" />
+							</map>
+						</entry>
+						<entry key="11">
+							<map>
+								<entry key="fromState" value="QuickEdit" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="ReturntoPublic" />
+							</map>
+						</entry>
+						<entry key="1">
+							<map>
+								<entry key="fromState" value="Archive" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="Republish" />
+							</map>
+						</entry>
+					</map>
+				</entry>
 			</map>          
        </property> 
     </bean> 
