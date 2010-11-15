@@ -184,7 +184,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		//if this is not the ultimate parent, get parents
 		idsToPublish = getParents(contentId, navon);
 		if (bDebug) System.out.println("\n\tItem CID: " + contentId);
-		log.debug("Need to publish " + idsToPublish.size() + " items");
+		System.out.println("Need to publish " + idsToPublish.size() + " items");
 		try {
 			IPSRxPublisherService rxsvc = PSRxPublisherServiceLocator
 			.getRxPublisherService();
@@ -369,12 +369,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			
 			//Always add the current item to the list
 			if (localPublishList == null) {
+				System.out.println("null list, creating and adding individual item " + currItemId);
 				//if didn't get any parents, create list and add current item to it
 				//if (bDebug) System.out.println("got into the null list");
 				localPublishList = new ArrayList<Integer>();
 				localPublishList.add(currItemId);
 			}
 			else{
+				System.out.println("we had a non null list, addint the individual item " + currItemId);
 				localPublishList.add(currItemId);
 			}
 
@@ -421,6 +423,13 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			//		}
 
 	
+		}
+		
+		System.out.println("DEBUG: Printing out the list to publish....");
+		if(localPublishList != null){
+			for( Integer printInt : localPublishList ){
+				System.out.println(printInt);
+			}
 		}
 		return localPublishList;
 	}
