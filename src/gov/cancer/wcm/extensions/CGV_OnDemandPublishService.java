@@ -366,10 +366,15 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 					localPublishList.add(addInteger);
 				}
 			}
+			
+			//Always add the current item to the list
 			if (localPublishList == null) {
 				//if didn't get any parents, create list and add current item to it
-				if (bDebug) System.out.println("got into the null list");
+				//if (bDebug) System.out.println("got into the null list");
 				localPublishList = new ArrayList<Integer>();
+				localPublishList.add(currItemId);
+			}
+			else{
 				localPublishList.add(currItemId);
 			}
 
