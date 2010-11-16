@@ -1041,6 +1041,7 @@ function setEphoxInitialContent(divElemName, ephoxContent)
       $("#" + divElemName).html(ephoxContent);
    }
 }
+
 /********************************************************************
 *
 * The code from here on is Cancer.gov customization
@@ -1061,7 +1062,7 @@ var cGovLFConst = "&#x000a;";	//line feed substitute
 */
 //var cGovWebServiceURL = 'http://verdi.nci.nih.gov/u/glossify/';	//url of glossifier web service
 //var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
-var cGovWebServiceURL = 'http://156.40.134.66:9921/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service
+var cGovWebServiceURL = 'http://156.40.134.66:9922/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service
 //var cGovWebServiceURL = 'http://156.40.134.66:9921/Glossifier/services/Glossifier.GlossifierSoap/';	//url of glossifier web service
 var cGovPreviewURL = "www.cancer.gov";	//dictionary preview URL
 var cGovElementPrefix = "ns1:";
