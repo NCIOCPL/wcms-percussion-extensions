@@ -15,6 +15,7 @@ import com.percussion.server.IPSRequestContext;
 import com.percussion.server.PSRequestValidationException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This Preprocessor extension populates the sys_title field by appending a 4 digit number
@@ -44,12 +45,21 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 	public void preProcessRequest(Object[] params, IPSRequestContext request)
 			throws PSAuthorizationException, PSRequestValidationException,
 			PSParameterMismatchException, PSExtensionProcessingException {
-		String displaytitle = request.getParameter(CGVConstants.DISPLAY_TITLE_FLD);
+		
+		
+		String fieldName = CGVConstants.DISPLAY_TITLE_FLD;
+		
+		if (params.length > 0 && StringUtils.isNotBlank(params[0].toString())) {
+			fieldName = params[0].toString();
+		}
+		
+		String displaytitle = request.getParameter(fieldName);
+		
 		LOGGER.debug("******INVOKING titlePopulate");
 		String newTitle = modifyTitle(displaytitle);
 
 		Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
-		if(request.getParameter(CGVConstants.DISPLAY_TITLE_FLD) != null){
+		if(request.getParameter(fieldName) != null){
 			Matcher m = q.matcher(displaytitle);
 			if( !m.matches() ){	
 				request.setParameter("sys_title", newTitle);
