@@ -31,7 +31,8 @@ public class CGVConstants {
 		 "nciHome",
 		 "nciLandingPage",
 		 "cgvManualRSS",
-		 "cgvAutoRSS"
+		 "cgvAutoRSS",
+		 "cgvBestBetsCategory"
 		 };
 //TODO: move TOP_CONTENT_TYPE_NAMES to the bean xml file for CGV_OnDemandPublishService
 }
