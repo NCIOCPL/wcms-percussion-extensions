@@ -356,7 +356,9 @@ IPSWorkflowAction {
 			PSState archiveParentsState = null;
 			try {
 				if(archiveCheck != null){
-					archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
+					if(archiveCheck.size() != 0){
+						archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
+					}
 				}
 			} catch (PSException e) {
 				if(showStackTraces){e.printStackTrace();}
@@ -390,20 +392,26 @@ IPSWorkflowAction {
 			}
 			PSState archiveParentsState = null;
 			try {
-				archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
+				if(archiveCheck != null){
+					if(archiveCheck.size() != 0){
+						archiveParentsState = workInfo.findWorkflowState(Integer.toString(pcm.getCID(archiveCheck.get(0).getGUID()).get(0)));
+					}
+				}
 			} catch (PSException e) {
 				if(showStackTraces){e.printStackTrace();}
 			} catch (PSErrorException e) {
 				if(showStackTraces){e.printStackTrace();}
 			}
-			StateName parState = stateHelp.toStateName(archiveParentsState.getName());
+			if(archiveParentsState != null){
+				StateName parState = stateHelp.toStateName(archiveParentsState.getName());
 
-			if(mostParents == 1 && stateHelp.toString(parState).equalsIgnoreCase("Archived")){
-				//do nothing (continue the transition)
-			}
-			else if(mostParents >= 1){
-				pending = true;
-				transition(currentItem, StateName.ARCHIVED, StateName.PUBLIC, stateHelp, pending, false);
+				if(mostParents == 1 && stateHelp.toString(parState).equalsIgnoreCase("Archived")){
+					//do nothing (continue the transition)
+				}
+				else if(mostParents >= 1){
+					pending = true;
+					transition(currentItem, StateName.ARCHIVED, StateName.PUBLIC, stateHelp, pending, false);
+				}
 			}
 		}
 
