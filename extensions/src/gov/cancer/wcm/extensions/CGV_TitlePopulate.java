@@ -16,6 +16,7 @@ import com.percussion.server.PSRequestValidationException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
 import org.apache.commons.lang.StringUtils;
+import gov.cancer.wcm.util.CGV_Logger;
 
 /**
  * This Preprocessor extension populates the sys_title field by appending a 4 digit number
