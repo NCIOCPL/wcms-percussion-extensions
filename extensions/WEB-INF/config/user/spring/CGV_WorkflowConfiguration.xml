@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+   "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<!-- This bean defines extra configuration information about content types in the system -->
+	<!-- If a content type is not defined in the map, then the Default config will be used -->
+	<bean id="ContentTypesConfig" class="gov.cancer.wcm.workflow.ContentTypesConfigCollection">
+		<constructor-arg>
+			<list>
+				<value>
+					<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+						<constructor-arg>nciGeneral</constructor-arg>
+						<constructor-arg>true</constructor-arg>
+					</bean>
+				</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+				<constructor-arg>default</constructor-arg>
+				<constructor-arg>false</constructor-arg>
+			</bean>
+		</constructor-arg>
+	</bean>
+	
+	<!-- Defines configuration for relationships -->
+	<!-- Bean class types define how we should handle child items:
+	   RelationshipWFTransitionFollowConfig => 
+		          The dependents of the relationship should be transitioned with the owner
+			       if the business rules allow. If the dependent meets a stop condition 
+					 then it will follow the rules of the CGV_RelationshipWFTransitionStopConfig.
+					 The rules are defined using the stopConditions property and the values are:
+						TopType =>	The dependent is a top type
+						Shared =>	The dependent is participating in more than one Follow relationship
+										type.  E.G. The item is a dependent in 2 different CDE relationships.
+						OtherUserCheckedOut => the dependent is currently checked out to a user other than
+										the one who is performing the workflow transition. ??
+						OtherCommunity => the depended is owned by a different community than the 
+										relationship owner.
+										Note, this is really the same as if the user is logged into a different
+										community since the workflow transitions would not be available if the
+										relationship owner is in another community that the current one.
+						OtherWorkflow => the dependent is associated with a different workflow, (i.e. has
+										different transitions) that the owner of the relationship.
+		RelationshipWFTransitionStopConfig => 
+		        The dependents of the relationship will not be transitioned with the owner,
+		        furthermore, the transition of the owner will stop if any dependents do not
+			     have a public revision.
+	    RelationshipWFTransitionIgnoreConfig => 
+					 The dependents of the relationship will not be transition with the
+		          owner, and the transition will not stop if the dependent does not have a
+			       public revision.  This is the out of the box behavior of Percussion.
+	-->
+	<bean id="RelationshipConfigs" class="gov.cancer.wcm.workflow.RelationshipConfigsCollection">
+		<constructor-arg>
+			<list>
+				<value>
+					<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
+						<constructor-arg>CDE</constructor-arg>
+						<constructor-arg>
+							<list>
+								<value>TopType</value>
+								<value>Shared</value>
+								<value>OtherUserCheckedOut</value>
+								<value>OtherCommunity</value>
+								<value>OtherWorkflow</value>
+							</list>
+						</constructor-arg>
+					</bean>
+				</value>
+				<value>
+					<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
+						<constructor-arg>Pages</constructor-arg>
+						<constructor-arg>
+							<list>
+								<value>TopType</value>
+								<value>Shared</value>
+								<value>OtherUserCheckedOut</value>
+								<value>OtherCommunity</value>
+								<value>OtherWorkflow</value>
+							</list>
+						</constructor-arg>
+					</bean>				
+				</value>				
+			</list>
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionStopConfig">
+				<constructor-arg>default</constructor-arg>
+			</bean>
+		</constructor-arg>
+	</bean>
+	
+	<!-- MAIN BEAN -->
+	<!-- This bean defines workflow configuration information -->		
+	<bean id="CGV_WorkflowConfiguration" class="gov.cancer.wcm.workflow.WorkflowConfiguration">
+		<constructor-arg><ref bean="ContentTypesConfig"/></constructor-arg>
+		<constructor-arg><ref bean="RelationshipConfigs"/></constructor-arg>
+	</bean>
+</beans>
