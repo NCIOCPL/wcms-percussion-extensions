@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
-   "http://www.springframework.org/dtd/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.1.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
 	<!-- This bean defines extra configuration information about content types in the system -->
 	<!-- If a content type is not defined in the map, then the Default config will be used -->
+	<!-- Constructor Arguments: 
+			1. The name of the content type
+			2. Is the content type a top type
+			3. Does the content type require that the parent navons have a public revision
+			
+	-->
 	<bean id="ContentTypesConfig" class="gov.cancer.wcm.workflow.ContentTypesConfigCollection">
 		<constructor-arg>
 			<list>
-				<value>
-					<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
-						<constructor-arg>nciGeneral</constructor-arg>
-						<constructor-arg>true</constructor-arg>
-					</bean>
-				</value>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciGeneral</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+				</bean>
 			</list>
 		</constructor-arg>
 		<constructor-arg>
 			<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
-				<constructor-arg>default</constructor-arg>
-				<constructor-arg>false</constructor-arg>
+				<constructor-arg><value>default</value></constructor-arg>
+				<constructor-arg><value>false</value></constructor-arg>
+				<constructor-arg><value>false</value></constructor-arg>
 			</bean>
 		</constructor-arg>
 	</bean>
@@ -54,39 +67,35 @@
 	<bean id="RelationshipConfigs" class="gov.cancer.wcm.workflow.RelationshipConfigsCollection">
 		<constructor-arg>
 			<list>
-				<value>
-					<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
-						<constructor-arg>CDE</constructor-arg>
-						<constructor-arg>
-							<list>
-								<value>TopType</value>
-								<value>Shared</value>
-								<value>OtherUserCheckedOut</value>
-								<value>OtherCommunity</value>
-								<value>OtherWorkflow</value>
-							</list>
-						</constructor-arg>
-					</bean>
-				</value>
-				<value>
-					<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
-						<constructor-arg>Pages</constructor-arg>
-						<constructor-arg>
-							<list>
-								<value>TopType</value>
-								<value>Shared</value>
-								<value>OtherUserCheckedOut</value>
-								<value>OtherCommunity</value>
-								<value>OtherWorkflow</value>
-							</list>
-						</constructor-arg>
-					</bean>				
-				</value>				
+				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
+					<constructor-arg><value>CDE</value></constructor-arg>
+					<constructor-arg>
+						<list>
+							<value>TopType</value>
+							<value>Shared</value>
+							<value>OtherUserCheckedOut</value>
+							<value>OtherCommunity</value>
+							<value>OtherWorkflow</value>
+						</list>
+					</constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
+					<constructor-arg><value>Pages</value></constructor-arg>
+					<constructor-arg>
+						<list>
+							<value>TopType</value>
+							<value>Shared</value>
+							<value>OtherUserCheckedOut</value>
+							<value>OtherCommunity</value>
+							<value>OtherWorkflow</value>
+						</list>
+					</constructor-arg>
+				</bean>				
 			</list>
 		</constructor-arg>
 		<constructor-arg>
 			<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionStopConfig">
-				<constructor-arg>default</constructor-arg>
+				<constructor-arg><value>default</value></constructor-arg>
 			</bean>
 		</constructor-arg>
 	</bean>

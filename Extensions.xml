@@ -30,6 +30,20 @@
       </PSXExtensionParamDef>
       <suppliedResources/>
    </Extension>
+   <Extension categorystring="" context="global/percussion/user/" deprecated="no" handler="Java" name="CGV_WorkflowItemValidator" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description"/>
+      <initParam name="com.percussion.extension.version">6</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_WorkflowItemValidator</initParam>
+      <interface name="com.percussion.extension.IPSItemValidator"/>
+      <interface name="com.percussion.extension.IPSResultDocumentProcessor"/>
+      <PSXExtensionParamDef id="0">
+         <name>DestinationStates</name>
+         <dataType>java.lang.String</dataType>
+         <description>test</description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>   
    <Extension categorystring="" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_systitlePopulate" restoreRequestParamsOnError="no">
       <initParam name="com.percussion.user.description">Populates the sys_title field with the long_title and appends 4 random numbers on the end to help ensure uniqueness.</initParam>
       <initParam name="com.percussion.extension.version">1</initParam>

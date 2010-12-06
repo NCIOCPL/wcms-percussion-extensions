@@ -2,6 +2,8 @@ package gov.cancer.wcm.workflow;
 
 public class ContentTypeConfig {
 	private boolean isTopType;
+	private boolean requiresParentNavonsPublic;
+	
 	private String name;
 	
 	public String getName(){
@@ -15,8 +17,14 @@ public class ContentTypeConfig {
 		return this.isTopType;
 	}
 	
-	private ContentTypeConfig(String name, boolean isTopType) {
+	public boolean getRequiresParentNavonsPublic(){
+		return this.requiresParentNavonsPublic;
+	}
+	
+	
+	private ContentTypeConfig(String name, boolean isTopType, boolean requiresParentNavonsPublic) {
 		this.name = name;
 		this.isTopType = isTopType;
+		this.requiresParentNavonsPublic = requiresParentNavonsPublic;
 	}
 }
