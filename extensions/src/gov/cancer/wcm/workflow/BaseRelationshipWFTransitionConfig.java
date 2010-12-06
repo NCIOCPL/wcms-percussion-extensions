@@ -13,6 +13,12 @@ public abstract class BaseRelationshipWFTransitionConfig {
 	}
 	
 	/**
+	 * Gets the WF transition type for this relationship 
+	 * @return
+	 */
+	public abstract RelationshipWFTransitionTypes getTransitionType();
+	
+	/**
 	 * 
 	 * @param relationshipName
 	 */
