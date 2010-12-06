@@ -5,6 +5,8 @@ import java.util.List;
 public class RelationshipWFTransitionFollowConfig extends
 		BaseRelationshipWFTransitionConfig {
 
+	List<RelationshipWFTransitionStopConditions> stopConditions;
+	
 	/**
 	 * Gets the Transition Type for this Relationship
 	 */
@@ -17,5 +19,6 @@ public class RelationshipWFTransitionFollowConfig extends
 			List<RelationshipWFTransitionStopConditions> stopConditions
 	) {
 		super(relationshipName);
+		this.stopConditions = stopConditions;
 	}
 }

@@ -5,11 +5,28 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class RelationshipConfigsCollection {
-
 	
-	public RelationshipConfigsCollection(List<BaseRelationshipWFTransitionConfig> configs) {
+	private List<BaseRelationshipWFTransitionConfig> relationshipConfigs;
+	private BaseRelationshipWFTransitionConfig defaultConfig;
+	
+	public BaseRelationshipWFTransitionConfig GetRelationshipWFTransitionConfigOrDefault(String relationshipName) {
+		BaseRelationshipWFTransitionConfig rtnConfig = defaultConfig;
 		
+		for(BaseRelationshipWFTransitionConfig config : relationshipConfigs) {
+			if (relationshipName.equals(config.relationshipName)) {
+				rtnConfig = config;
+				continue;
+			}
+		}
+		
+		return defaultConfig;
 	}
 	
-	
+	public RelationshipConfigsCollection(
+			List<BaseRelationshipWFTransitionConfig> relationshipConfigs,
+			BaseRelationshipWFTransitionConfig defaultConfig
+	) {
+		this.relationshipConfigs = relationshipConfigs;
+		this.defaultConfig = defaultConfig;
+	}
 }
