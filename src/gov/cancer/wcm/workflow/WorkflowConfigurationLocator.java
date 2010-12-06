@@ -27,5 +27,5 @@ public class WorkflowConfigurationLocator extends PSBaseServiceLocator
 	   /**
 	    * String representing name of the Service class
 	    */
-	   private static final String WORKFLOW_CONFIGURATION_BEAN_NAME = "WorkflowConfiguration"; 
+	   private static final String WORKFLOW_CONFIGURATION_BEAN_NAME = "CGV_WorkflowConfiguration"; 
 }
