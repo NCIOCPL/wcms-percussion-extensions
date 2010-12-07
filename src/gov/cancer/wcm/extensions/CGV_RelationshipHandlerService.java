@@ -148,9 +148,10 @@ public class CGV_RelationshipHandlerService {
 						// Have we reached the max level for this config.
 						&&  (itemToProcess.getDownLevel() <= config.getMaxDown())
 				) {
-					log.debug("Processing config"+config.getName());
-					filter.setOwner(new PSLocator(itemToProcess.getId()));
-					if (config.getChildTypeIds()!= null) {
+					log.debug("Processing config" + config.getName()); 
+                    PSComponentSummary itemsSumm = summ.loadComponentSummary(itemToProcess.getId()); 
+                    filter.setOwner(itemsSumm.getHeadLocator()); 
+                    if (config.getChildTypeIds() != null) {
 						log.debug("Setting type filter "+config.getChildTypes());
 						filter.setDependentContentTypeIds(config.getChildTypeIds());
 					}
@@ -193,7 +194,7 @@ public class CGV_RelationshipHandlerService {
 
 				}
 			} else {
-				log.debug("isUp");
+				log.debug("Finding Relations Up for " + itemToProcess.getId());
 				itemToProcess.setUpComplete(true);
 				filter.setDependent(new PSLocator(itemToProcess.getId()));
 				filter.limitToEditOrCurrentOwnerRevision(true);
@@ -204,7 +205,7 @@ public class CGV_RelationshipHandlerService {
 						&&  (itemToProcess.getUpLevel() <= config.getMaxUp())
 				) {
 					log.debug("Processing config"+config.getName());
-					filter.setDependent(new PSLocator(itemToProcess.getId()));
+					filter.setDependent(new PSLocator(itemToProcess.getId())); //why do it a second time??
 					if (config.getParentTypeIds()!= null && config.getParentTypeIds().size()==1) {
 						//Can only filter parent by single id. will post process otherwise.
 						log.debug("Setting type filter "+config.getParentTypes());
@@ -454,7 +455,7 @@ public class CGV_RelationshipHandlerService {
 
 			return (validFlag.equals("y") || validFlag.equals("i"));	
 		}
-		return false;
+		return true; //There is no navon, so no need to check.
 	}
 
 	public boolean checkNavonState(	
