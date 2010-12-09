@@ -9,6 +9,7 @@ import static java.util.Arrays.asList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.jcr.RepositoryException;
@@ -21,14 +22,18 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSFolder;
+import com.percussion.cms.objectstore.PSItemField;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
 import com.percussion.pso.utils.PSONodeCataloger;
+import com.percussion.relationship.PSEffectResult;
 import com.percussion.server.IPSRequestContext;
+import com.percussion.services.content.data.PSItemStatus;
 import com.percussion.services.contentmgr.IPSContentMgr;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.IPSGuidManager;
@@ -55,6 +60,51 @@ public class CGV_FolderValidateUtils {
     private IPSContentMgr contentManager = null;
     private PSONodeCataloger nodeCataloger = null;
     private IPSSystemWs systemWs = null; 
+    
+    /**
+     * Do the actual effect attempt processing
+     * @param contentId the contentId of the item
+     * @param fieldName name of field to check
+     * @param folderId 
+     * @param checkPaths
+     * @param item
+     * @param result
+     * @throws Exception
+     */
+    public void doAttempt(int contentId, String fieldName, int folderId, String checkPaths, PSCoreItem item, PSEffectResult result)
+    	throws Exception {
+    	PSItemField field = item.getFieldByName(fieldName);
+    	if (field == null) {
+    		//this field doesn't exist in this type so success
+    		result.setSuccess();
+    	}
+    	else {
+			String fieldValue = field.getValue().getValueAsString();
+	        System.out.println("[doAttempt]fieldValue = " + fieldValue);        
+	        if (fieldValue == null) {
+	            log.debug("Field value was null for field: " + fieldName);
+	            result.setSuccess();
+	        }
+	        else {
+				String typeList = makeTypeList(fieldName);
+				boolean rvalue = true;
+				if (folderId != 0) {
+					rvalue = isFieldValueUniqueInFolder(folderId, fieldName, fieldValue, typeList, checkPaths, contentId);
+				}
+				else {
+					rvalue = true;	//was false, but we want to OK items not in folders
+				}
+				if (rvalue) {
+					System.out.println("CGV_UniqueInFolderEffect: attempt() - setting success");
+					result.setSuccess();
+				}
+				else {
+					System.out.println("CGV_UniqueInFolderEffect: attempt() - setting error");
+					result.setError("Pretty_URL_Name must be unique within folder");
+				}
+	        }
+    	}
+    }
     
     /**
      * See if a field value is unique in all the folders that the given existing item resides. 
@@ -84,7 +134,6 @@ public class CGV_FolderValidateUtils {
      */
     public boolean isFieldValueUniqueInFolderForExistingItem(int contentId, String fieldName, String fieldValue, String typeList, String path) 
         throws PSErrorException, InvalidQueryException, RepositoryException {
-System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExistingItem()");
     	List<String> paths = new ArrayList<String>();
         boolean unique = true;
         IPSGuid guid = guidManager.makeGuid(new PSLocator(contentId, -1));
@@ -128,15 +177,16 @@ System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExisti
      * @param folderId id of the folder
      * @param fieldName name of the field
      * @param fieldValue the desired value of the field for the new item.
+     * @param contentId the content ID of the item
      * @return true if its unique.
      * @throws PSErrorException
      * @throws InvalidQueryException
      * @throws RepositoryException
      * @throws PSErrorResultsException
      */
-    public boolean isFieldValueUniqueInFolder(int folderId, String fieldName, String fieldValue, String typeList)
+    public boolean isFieldValueUniqueInFolder(int folderId, String fieldName, String fieldValue, String typeList, int contentId)
     throws PSErrorException, InvalidQueryException, RepositoryException, PSErrorResultsException {
-    	return this.isFieldValueUniqueInFolder(folderId, fieldName, fieldValue, typeList, null);
+    	return this.isFieldValueUniqueInFolder(folderId, fieldName, fieldValue, typeList, null, contentId);
 	}
     /**
      *  See if a field value is unique in the given folder for a new item.
@@ -144,24 +194,29 @@ System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExisti
      * @param fieldName name of the field
      * @param fieldValue the desired value of the field for the new item.
      * @param  path If set will check this path for uniqueness,  can use % to check subfolders
+     * @param contentId the content ID of the item
      * @return true if its unique.
      * @throws PSErrorException
      * @throws InvalidQueryException
      * @throws RepositoryException
      * @throws PSErrorResultsException
      */
-    public boolean isFieldValueUniqueInFolder(int folderId, String fieldName, String fieldValue, String typeList, String path)
+    public boolean isFieldValueUniqueInFolder(int folderId, String fieldName, String fieldValue, String typeList, String path, int contentId)
     throws PSErrorException, InvalidQueryException, RepositoryException, PSErrorResultsException {
+		log.debug("isFieldValueUniqueInFolder(): folderId = "+ folderId + " fieldName = " + fieldName + " fieldValue = " + fieldValue + " contentId = " + contentId);
     	boolean unique = true;
     	List<String> paths = new ArrayList<String>();
     	if (folderId != 0) {
+    		log.debug("isFieldValueUniqueInFolder(): folderId != 0");
     		//if item isn't in folder we don't check for uniqueness
 	    	IPSGuid guid = guidManager.makeGuid(new PSLocator(folderId, -1));
 			List<PSFolder> folders = contentWs.loadFolders(asList(guid));
 	    	if (path == null) {
+	    		log.debug("isFieldValueUniqueInFolder(): path = null");
 	    		path = ! folders.isEmpty() ? folders.get(0).getFolderPath() : null;
 	    		paths.add(path);
 	    	} else {
+	    		log.debug("isFieldValueUniqueInFolder(): path != null");
 	    		String[] pathSplit = path.split(",");
 	    		for(String paramPath : pathSplit) {
 	    			for(PSFolder folder : folders) {
@@ -172,9 +227,15 @@ System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExisti
 	    		}
 	    	}
 	    	if (paths != null  && paths.size() != 0) {
+	    		log.debug("isFieldValueUniqueInFolder(): got path list");
 	    		for (String pathItem : paths ) {
 	    			if (unique ) {
-	    				String jcrQuery = getQueryForValueInFolder(fieldName, fieldValue, pathItem, typeList);
+	    				String jcrQuery = "";
+	    				if (contentId == 0)
+	    					jcrQuery = getQueryForValueInFolder(fieldName, fieldValue, pathItem, typeList);
+	    				else
+	    					jcrQuery = getQueryForValueInFolderWithCid(fieldName, fieldValue, pathItem, typeList, contentId);
+	    				log.debug("isFieldValueUniqueInFolder(): jcrQuery = " + jcrQuery);
 	    				log.trace(jcrQuery);
 	    				Query q = contentManager.createQuery(jcrQuery, Query.SQL);
 	    				QueryResult results = contentManager.executeQuery(q, -1, null, null);
@@ -182,6 +243,7 @@ System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExisti
 	    				long size = rows.getSize();
 	    				
 	    				unique = size > 0 ? false : true;
+	    				log.debug("isFieldValueUniqueInFolder(): unique = " + unique);
 	    			}
 	    		}
 	    	}
@@ -192,6 +254,15 @@ System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExisti
     	return unique;
     }
 
+    /**
+     * Build JCR query for search across folders
+     * @param contentId
+     * @param fieldName
+     * @param fieldValue
+     * @param path
+     * @param typeList
+     * @return
+     */
     public String getQueryForValueInFolders(
             int contentId, 
             String fieldName, 
@@ -212,6 +283,14 @@ System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExisti
         return jcrQuery;
     }
     
+    /**
+     * Build JCR query for search in one folder
+     * @param fieldName
+     * @param fieldValue
+     * @param path
+     * @param typeList
+     * @return
+     */
     public String getQueryForValueInFolder(String fieldName, String fieldValue, String path, String typeList) {
         return format(
                 "select rx:sys_contentid, rx:{0} " +
@@ -223,19 +302,43 @@ System.out.println("CGV_FolderValidateUtils: isFieldValueUniqueInFolderForExisti
                 fieldName, fieldValue, path, typeList);
     }
     
+    /**
+     * Build JCS query for search in one folder, ignoring this content id
+     * @param fieldName
+     * @param fieldValue
+     * @param path
+     * @param typeList
+     * @param contentId
+     * @return
+     */
+    public String getQueryForValueInFolderWithCid(String fieldName, String fieldValue, String path, String typeList, int contentId) {
+        return format(
+                "select rx:sys_contentid, rx:{0} " +
+                "from {3} " +
+                "where " +
+                "rx:{0} = ''{1}'' " +
+                "and " +
+                "rx:sys_contentid != {4} " +
+                "and " +
+                "jcr:path like ''{2}''", 
+                fieldName, fieldValue, path, typeList, String.valueOf(contentId));
+    }
+    
+    /**
+     * get the target parent folder id from the redirect url
+     * @param request
+     * @return
+     */
     public Integer getFolderId(IPSRequestContext request) {
-        // get the target parent folder id from the redirect url
         String folderId = null;
         Integer rvalue = null;
         String psredirect = request.getParameter(
            IPSHtmlParameters.DYNAMIC_REDIRECT_URL);
         if (psredirect != null && psredirect.trim().length() > 0)
         {
-System.out.println("CGV_FolderValidateUtils: getFolderId() - got psredirect");
            int index = psredirect.indexOf(IPSHtmlParameters.SYS_FOLDERID);
            if(index >= 0)
            {
-System.out.println("CGV_FolderValidateUtils: getFolderId() - index > 0");
               folderId = psredirect.substring(index +
                  IPSHtmlParameters.SYS_FOLDERID.length() + 1);
               index = folderId.indexOf('&');
@@ -244,11 +347,9 @@ System.out.println("CGV_FolderValidateUtils: getFolderId() - index > 0");
            }
         }
         else {	//else block is new for testing only
-System.out.println("CGV_FolderValidateUtils: getFolderId() - getting folderId from request");
         	folderId = request.getParameter(IPSHtmlParameters.SYS_FOLDERID);
         }
         if (StringUtils.isNumeric(folderId) && StringUtils.isNotBlank(folderId)) {
-System.out.println("CGV_FolderValidateUtils: getFolderId() - got folderId");
             rvalue = Integer.parseInt(folderId);
         
         }
@@ -308,6 +409,26 @@ System.out.println("CGV_FolderValidateUtils: getFolderId() - got folderId");
 		if (systemWs == null) setSystemWs(PSSystemWsLocator.getSystemWebservice()); 
 	}
     
+    /**
+     * Load a content item from the content ID
+     * @param contentId
+     * @param session
+     * @param user
+     * @return the item object
+     * @throws PSErrorResultsException
+     */
+    public PSCoreItem loadItem(String contentId, String session,
+    		String user)
+    		throws PSErrorResultsException
+	{
+		IPSGuid cid = getGuidManager().makeGuid(new PSLocator(contentId));
+		List<IPSGuid> glist = Collections.<IPSGuid>singletonList(cid);
+		List<PSItemStatus> statusList = contentWs.prepareForEdit(glist, user);
+		List<PSCoreItem> items = contentWs.loadItems(glist, true, false, false,
+		false, session, user);
+		return items.get(0);
+	}
+
     public IPSExtensionDef getExtensionDef() {
         return extensionDef;
     }
