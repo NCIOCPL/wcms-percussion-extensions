@@ -94,4 +94,69 @@
       <interface name="com.percussion.extension.IPSFieldValidator"/>
       <suppliedResources/>
    </Extension>
+   <Extension categorystring="contenteditor" context="user/" deprecated="no" handler="Java" name="CGV_UniqueFieldInFolderValidate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Validate that a field is unique within the folder.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_UniqueFieldWithInFoldersValidator</initParam>
+      <interface name="com.percussion.extension.IPSFieldValidator"/>
+      <PSXExtensionParamDef id="0">
+         <name>value</name>
+         <dataType>java.lang.String</dataType>
+         <description>Value</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="1">
+         <name>fieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional, default = fieldname) The name of the field providing the value.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="2">
+         <name>excludePromotableVersions</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional, default = false) If True, suppress this validation for items that are promotable
+	        versions of another item.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="3">
+         <name>checkPaths</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional) If set will check uniqueness in each comma separated path/Site e.g. //Sites/SiteA/%,//Sites/SiteB/% </description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="relationship" context="user/" deprecated="no" handler="Java" name="CGV_UniqueInFolderEffect" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Ensures that specified field in content items is unique within folder, but ignores translation items.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_UniqueInFolderEffect</initParam>
+      <interface name="com.percussion.relationship.IPSEffect"/>
+      <PSXExtensionParamDef id="0">
+         <name>fieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>The name of the field providing the value.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="1">
+         <name>checkPaths</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional) If set will check uniqueness in each comma separated path/Site e.g. //Sites/SiteA/%,//Sites/SiteB/% </description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="relationship" context="user/" deprecated="no" handler="Java" name="CGV_UniqueInFolderAllEffect" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Ensures that specified field in content items is unique within folder.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_UniqueInFolderAllEffect</initParam>
+      <interface name="com.percussion.relationship.IPSEffect"/>
+      <PSXExtensionParamDef id="0">
+         <name>fieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>The name of the field providing the value.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="1">
+         <name>checkPaths</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional) If set will check uniqueness in each comma separated path/Site e.g. //Sites/SiteA/%,//Sites/SiteB/% </description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
 </PSXExtensionHandlerConfiguration>
