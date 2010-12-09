@@ -60,7 +60,7 @@ public class CGV_UniqueFieldWithInFoldersValidator implements IPSFieldValidator 
      */
     public Boolean processUdf(Object[] params, IPSRequestContext request)
             throws PSConversionException {
-System.out.println("CGV_UniqueFieldWithInFoldersValidator: processUdf()");
+    	log.debug("CGV_UniqueFieldWithInFoldersValidator: processUdf()");
         String cmd = request.getParameter(IPSHtmlParameters.SYS_COMMAND);
         String actionType = request.getParameter("DBActionType");
         if(actionType == null || 
@@ -110,7 +110,7 @@ System.out.println("CGV_UniqueFieldWithInFoldersValidator: processUdf()");
            else {
               Number folderId = valUtil.getFolderId(request);
               if (folderId != null)
-                 rvalue = valUtil.isFieldValueUniqueInFolder(folderId.intValue(), fieldName, fieldValue, typeList, checkPaths);
+                 rvalue = valUtil.isFieldValueUniqueInFolder(folderId.intValue(), fieldName, fieldValue, typeList, checkPaths, 0);
               else
                  rvalue = true;	//was false, but we want to OK items not in folders
            }
@@ -130,7 +130,7 @@ System.out.println("CGV_UniqueFieldWithInFoldersValidator: processUdf()");
      */
     public void init(IPSExtensionDef extensionDef, File arg1)
             throws PSExtensionException {
-System.out.println("CGV_UniqueFieldWithInFoldersValidator: init()");
+    	log.debug("CGV_UniqueFieldWithInFoldersValidator: init()");
     	if (valUtil == null) {
 	    	valUtil = new CGV_FolderValidateUtils();
 	    	valUtil.setExtensionDef(extensionDef);
