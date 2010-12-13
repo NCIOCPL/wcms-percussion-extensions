@@ -40,6 +40,12 @@ import com.percussion.webservices.system.PSSystemWsLocator;
  * </ul> 
  * 
  * See the <code>Extensions.xml</code> for more information.
+ * 
+ * TODO: when time, this and CGV_UniqueInFolderEffect can be refactored. This
+ * class can be removed, and change CGV_UniqueInFolderEffect to:
+ * 	1. run on either isPreWorkflow or isPreConstruction
+ * 	2. check for translations only if isPreConstruction
+ * 
  * @author holewr
  *
  */
@@ -87,30 +93,37 @@ public class CGV_UniqueInFolderAllEffect implements IPSEffect {
 		//only do this check on preWorkFlow execution context
 			PSOExtensionParamsHelper h = new PSOExtensionParamsHelper(valUtil.getExtensionDef(), params, request, log);
 	        String fieldName = h.getRequiredParameter("fieldName");
-	        log.debug("[CGV_UniqueInFolderAllEffect.attempt]fieldName = " + fieldName);        
+	        log.debug("[attempt]fieldName = " + fieldName);        
 			PSRelationship current = context.getCurrentRelationship();
 			int contentId = current.getDependent().getId();
-			log.debug("[CGV_UniqueInFolderAllEffect.attempt]contentId = " + contentId);
+			log.debug("[attempt]contentId = " + contentId);
 			int folderId = current.getOwner().getId();
-			log.debug("[CGV_UniqueInFolderAllEffect.attempt]folderId = " + folderId);
-			String userName = request.getUserName();
-			String sessionId = request.getUserSessionId();
+			log.debug("[attempt]folderId = " + folderId);
 			String fieldValue = "";
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
-				PSCoreItem item = valUtil.loadItem(String.valueOf(contentId),sessionId,userName);
+				log.debug("[attempt]getting item");
+				PSCoreItem item = valUtil.loadItem(String.valueOf(contentId));
+				log.debug("[attempt]got item, calling doAttempt");
 				valUtil.doAttempt(contentId, fieldName, folderId, checkPaths, item, result);
+			} catch (IllegalArgumentException e) {
+				//this happens when you create a folder
+		        log.debug("[attempt]setting success - probably a folder");        
+				result.setSuccess();
 	        } catch (Exception e) {
 	           log.error(format("An error happened while checking if " +
 	                 "fieldName: {0} was unique for " +
 	                 "contentId: {1} with " +
 	                 "fieldValue: {2}",
 	                 fieldName, request.getParameter("sys_contentid"), fieldValue), e);
+		       log.debug("[attempt]setting error - got exception");        
 	           result.setError("Pretty_URL_Name must be unique within folder");
 	        }
 		}
-		else
+		else {
+	        log.debug("[attempt]setting success - not preConstruction");        
 			result.setSuccess();
+		}
 	}
 	
     /**
