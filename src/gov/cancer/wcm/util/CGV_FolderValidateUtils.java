@@ -73,16 +73,19 @@ public class CGV_FolderValidateUtils {
      */
     public void doAttempt(int contentId, String fieldName, int folderId, String checkPaths, PSCoreItem item, PSEffectResult result)
     	throws Exception {
+    	log.debug("[doAttempt]getting field");        
     	PSItemField field = item.getFieldByName(fieldName);
     	if (field == null) {
     		//this field doesn't exist in this type so success
+    		log.debug("[doAttempt]setting success - field is null");        
     		result.setSuccess();
     	}
     	else {
+    		System.out.println("[doAttempt]got field");        
 			String fieldValue = field.getValue().getValueAsString();
-	        System.out.println("[doAttempt]fieldValue = " + fieldValue);        
+			System.out.println("[doAttempt]fieldValue = " + fieldValue);        
 	        if (fieldValue == null) {
-	            log.debug("Field value was null for field: " + fieldName);
+	        	log.debug("[doAttempt]setting success - Field value was null for field: " + fieldName);
 	            result.setSuccess();
 	        }
 	        else {
@@ -95,11 +98,11 @@ public class CGV_FolderValidateUtils {
 					rvalue = true;	//was false, but we want to OK items not in folders
 				}
 				if (rvalue) {
-					System.out.println("CGV_UniqueInFolderEffect: attempt() - setting success");
+					log.debug("doAttempt() - setting success");
 					result.setSuccess();
 				}
 				else {
-					System.out.println("CGV_UniqueInFolderEffect: attempt() - setting error");
+					log.debug("doAttempt() - setting error");
 					result.setError("Pretty_URL_Name must be unique within folder");
 				}
 	        }
@@ -417,16 +420,14 @@ public class CGV_FolderValidateUtils {
      * @return the item object
      * @throws PSErrorResultsException
      */
-    public PSCoreItem loadItem(String contentId, String session,
-    		String user)
+    public PSCoreItem loadItem(String contentId)
     		throws PSErrorResultsException
 	{
 		IPSGuid cid = getGuidManager().makeGuid(new PSLocator(contentId));
 		List<IPSGuid> glist = Collections.<IPSGuid>singletonList(cid);
-		List<PSItemStatus> statusList = contentWs.prepareForEdit(glist, user);
-		List<PSCoreItem> items = contentWs.loadItems(glist, true, false, false,
-		false, session, user);
-		return items.get(0);
+		List<PSCoreItem> items = contentWs.loadItems(glist, true, false, false, false);
+    	PSCoreItem item = items.get(0);
+		return item;
 	}
 
     public IPSExtensionDef getExtensionDef() {
