@@ -9,17 +9,22 @@ public class RelationshipConfigsCollection {
 	private List<BaseRelationshipWFTransitionConfig> relationshipConfigs;
 	private BaseRelationshipWFTransitionConfig defaultConfig;
 	
+	/**
+	 * Gets a WFTransitionConfig based on the name of the relationship.
+	 * @param relationshipName
+	 * @return
+	 */
 	public BaseRelationshipWFTransitionConfig GetRelationshipWFTransitionConfigOrDefault(String relationshipName) {
 		BaseRelationshipWFTransitionConfig rtnConfig = defaultConfig;
 		
 		for(BaseRelationshipWFTransitionConfig config : relationshipConfigs) {
 			if (relationshipName.equals(config.relationshipName)) {
 				rtnConfig = config;
-				continue;
+				break;
 			}
 		}
 		
-		return defaultConfig;
+		return rtnConfig;
 	}
 	
 	public RelationshipConfigsCollection(
