@@ -12,16 +12,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.jcr.ItemNotFoundException;
 import javax.jcr.RepositoryException;
+import javax.jcr.Value;
 import javax.jcr.query.InvalidQueryException;
 import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
+import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.percussion.cms.objectstore.IPSFieldValue;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSFolder;
 import com.percussion.cms.objectstore.PSItemField;
@@ -33,7 +37,6 @@ import com.percussion.extension.PSExtensionException;
 import com.percussion.pso.utils.PSONodeCataloger;
 import com.percussion.relationship.PSEffectResult;
 import com.percussion.server.IPSRequestContext;
-import com.percussion.services.content.data.PSItemStatus;
 import com.percussion.services.contentmgr.IPSContentMgr;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.IPSGuidManager;
@@ -81,31 +84,29 @@ public class CGV_FolderValidateUtils {
     		result.setSuccess();
     	}
     	else {
-    		System.out.println("[doAttempt]got field");        
-			String fieldValue = field.getValue().getValueAsString();
+    		System.out.println("[doAttempt]got field");
+    		String fieldValue = null;
+    		//we need to handle null field values
+    		IPSFieldValue val = field.getValue();
+    		if (val != null)
+				fieldValue = val.getValueAsString();
 			System.out.println("[doAttempt]fieldValue = " + fieldValue);        
-	        if (fieldValue == null) {
-	        	log.debug("[doAttempt]setting success - Field value was null for field: " + fieldName);
-	            result.setSuccess();
-	        }
-	        else {
-				String typeList = makeTypeList(fieldName);
-				boolean rvalue = true;
-				if (folderId != 0) {
-					rvalue = isFieldValueUniqueInFolder(folderId, fieldName, fieldValue, typeList, checkPaths, contentId);
-				}
-				else {
-					rvalue = true;	//was false, but we want to OK items not in folders
-				}
-				if (rvalue) {
-					log.debug("doAttempt() - setting success");
-					result.setSuccess();
-				}
-				else {
-					log.debug("doAttempt() - setting error");
-					result.setError("Pretty_URL_Name must be unique within folder");
-				}
-	        }
+			String typeList = makeTypeList(fieldName);
+			boolean rvalue = true;
+			if (folderId != 0) {
+				rvalue = isFieldValueUniqueInFolder(folderId, fieldName, fieldValue, typeList, checkPaths, contentId);
+			}
+			else {
+				rvalue = true;	//was false, but we want to OK items not in folders
+			}
+			if (rvalue) {
+				log.debug("doAttempt() - setting success");
+				result.setSuccess();
+			}
+			else {
+				log.debug("doAttempt() - setting error");
+				result.setError("Pretty_URL_Name must be unique within folder");
+			}
     	}
     }
     
@@ -233,20 +234,25 @@ public class CGV_FolderValidateUtils {
 	    		log.debug("isFieldValueUniqueInFolder(): got path list");
 	    		for (String pathItem : paths ) {
 	    			if (unique ) {
-	    				String jcrQuery = "";
-	    				if (contentId == 0)
-	    					jcrQuery = getQueryForValueInFolder(fieldName, fieldValue, pathItem, typeList);
-	    				else
-	    					jcrQuery = getQueryForValueInFolderWithCid(fieldName, fieldValue, pathItem, typeList, contentId);
-	    				log.debug("isFieldValueUniqueInFolder(): jcrQuery = " + jcrQuery);
-	    				log.trace(jcrQuery);
-	    				Query q = contentManager.createQuery(jcrQuery, Query.SQL);
-	    				QueryResult results = contentManager.executeQuery(q, -1, null, null);
-	    				RowIterator rows = results.getRows();
-	    				long size = rows.getSize();
-	    				
-	    				unique = size > 0 ? false : true;
-	    				log.debug("isFieldValueUniqueInFolder(): unique = " + unique);
+	    				if (fieldValue != null) {
+		    				String jcrQuery = "";
+		    				if (contentId == 0)
+		    					jcrQuery = getQueryForValueInFolder(fieldName, fieldValue, pathItem, typeList);
+		    				else
+		    					jcrQuery = getQueryForValueInFolderWithCid(fieldName, fieldValue, pathItem, typeList, contentId);
+		    				log.debug("isFieldValueUniqueInFolder(): jcrQuery = " + jcrQuery);
+		    				log.trace(jcrQuery);
+		    				Query q = contentManager.createQuery(jcrQuery, Query.SQL);
+		    				QueryResult results = contentManager.executeQuery(q, -1, null, null);
+		    				RowIterator rows = results.getRows();
+		    				long size = rows.getSize();
+		    				
+		    				unique = size > 0 ? false : true;
+		    				log.debug("isFieldValueUniqueInFolder(): unique = " + unique);
+	    				}
+	    				else {
+	    					unique = isNullUnique(fieldName, pathItem, typeList, contentId);
+	    				}
 	    			}
 	    		}
 	    	}
@@ -254,6 +260,38 @@ public class CGV_FolderValidateUtils {
 	    		log.error("The folder id: " + folderId + " did not have a path (BAD)");
 	    	}
     	}
+    	return unique;
+    }
+    
+    private boolean isNullUnique(String fieldName, String pathItem, String typeList, int contentId)
+        throws PSErrorException, InvalidQueryException, RepositoryException, PSErrorResultsException {
+    	boolean unique = true;
+		String jcrQuery = "";
+		if (contentId == 0) {
+			jcrQuery = getQueryForValueListInFolder(fieldName, pathItem, typeList);
+		}
+		else {
+			jcrQuery = getQueryForValueListInFolderWithCid(fieldName, pathItem, typeList, contentId);
+		}
+		log.debug("isNullUnique(): jcrQuery = " + jcrQuery);
+		log.trace(jcrQuery);
+		Query q = contentManager.createQuery(jcrQuery, Query.SQL);
+		QueryResult results = contentManager.executeQuery(q, -1, null, null);
+		RowIterator rows = results.getRows();
+		try {
+			while (rows.hasNext() && unique) {
+				Row row = (Row)rows.next();
+				Value value = row.getValue(fieldName);
+				if (value == null) {
+					//should never get here
+					unique = false;
+				}
+			}
+		}
+		catch (ItemNotFoundException e) {
+			//must have found a null value
+			unique = false;
+		}
     	return unique;
     }
 
@@ -307,6 +345,7 @@ public class CGV_FolderValidateUtils {
     
     /**
      * Build JCS query for search in one folder, ignoring this content id
+     * in order to not find the new item
      * @param fieldName
      * @param fieldValue
      * @param path
@@ -325,6 +364,44 @@ public class CGV_FolderValidateUtils {
                 "and " +
                 "jcr:path like ''{2}''", 
                 fieldName, fieldValue, path, typeList, String.valueOf(contentId));
+    }
+    
+    /**
+     * Build JCR query for search in one folder
+     * @param fieldName
+     * @param fieldValue
+     * @param path
+     * @param typeList
+     * @return
+     */
+    public String getQueryForValueListInFolder(String fieldName, String path, String typeList) {
+        return format(
+                "select rx:sys_contentid, rx:{0} " +
+                "from {2} " +
+                "where " +
+                "jcr:path like ''{1}''", 
+                fieldName, path, typeList);
+    }
+    
+    /**
+     * Build JCS query for search in one folder, ignoring this content id
+     * in order to not find the new item
+     * @param fieldName
+     * @param fieldValue
+     * @param path
+     * @param typeList
+     * @param contentId
+     * @return
+     */
+    public String getQueryForValueListInFolderWithCid(String fieldName, String path, String typeList, int contentId) {
+        return format(
+                "select rx:sys_contentid, rx:{0} " +
+                "from {2} " +
+                "where " +
+                "rx:sys_contentid != {3} " +
+                "and " +
+                "jcr:path like ''{1}''", 
+                fieldName, path, typeList, String.valueOf(contentId));
     }
     
     /**
