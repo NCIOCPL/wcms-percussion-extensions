@@ -95,32 +95,38 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 			log.debug("[attempt]contentId = " + contentId);
 			int folderId = originating.getOwner().getId();
 			log.debug("[attempt]folderId = " + folderId);
-			String userName = request.getUserName();
-			String sessionId = request.getUserSessionId();
 			String fieldValue = "";
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
-				PSCoreItem item = valUtil.loadItem(String.valueOf(contentId),sessionId,userName);
+				PSCoreItem item = valUtil.loadItem(String.valueOf(contentId));
 				String sysTitle = item.getFieldByName("sys_title").getValue().getValueAsString();
 				if (sysTitle.startsWith("[es-us]")) {
 					//don't check field if this is a translation
 					//this is a gross kluge and I'd like to find a better way to know
+			        log.debug("[attempt]setting success - probably a translation");        
 		            result.setSuccess();
 				}
 				else {
 					valUtil.doAttempt(contentId, fieldName, folderId, checkPaths, item, result);
 				}
+			} catch (IllegalArgumentException e) {
+			//this happens when you create a folder
+		        log.debug("[attempt]setting success - probably a folder");        
+				result.setSuccess();
 	        } catch (Exception e) {
-	           log.error(format("An error happend while checking if " +
+	           log.error(format("An error happened while checking if " +
 	                 "fieldName: {0} was unique for " +
 	                 "contentId: {1} with " +
 	                 "fieldValue: {2}",
 	                 fieldName, request.getParameter("sys_contentid"), fieldValue), e);
+		       log.debug("[attempt]setting error - got exception");        
 	           result.setError("Pretty_URL_Name must be unique within folder");
 	        }
 		}
-		else
+		else {
+	        log.debug("[attempt]setting success - not preConstruction");        
 			result.setSuccess();
+		}
 	}
 	
     /**
