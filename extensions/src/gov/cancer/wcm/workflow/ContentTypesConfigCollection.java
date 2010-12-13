@@ -17,7 +17,7 @@ public class ContentTypesConfigCollection {
 		for (ContentTypeConfig config : contentTypeConfigs) {
 			if (contentTypeName.equals(config.getName())) {
 				rtnConfig = config;
-				continue;
+				break;
 			}
 		}
 		

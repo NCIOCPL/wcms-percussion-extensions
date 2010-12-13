@@ -1,5 +1,8 @@
 package gov.cancer.wcm.workflow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import gov.cancer.wcm.util.CGV_TypeNames;
 
 import org.apache.commons.lang.Validate;
@@ -8,11 +11,17 @@ import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
+import com.percussion.cms.objectstore.PSRelationshipFilter;
+import com.percussion.design.objectstore.PSLocator;
+import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.error.PSException;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
 import com.percussion.util.PSItemErrorDoc;
+import com.percussion.webservices.PSErrorException;
+import com.percussion.webservices.system.IPSSystemWs;
+import com.percussion.webservices.system.PSSystemWsLocator;
 
 public class ContentItemWFValidatorAndTransitioner {
 
@@ -20,10 +29,12 @@ public class ContentItemWFValidatorAndTransitioner {
 
 	private static IPSCmsContentSummaries contentSummariesService;
 	private static WorkflowConfiguration workflowConfig;
-		
+	private static IPSSystemWs systemWebService;
+	
 	static {
 		contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 		workflowConfig = WorkflowConfigurationLocator.getWorkflowConfiguration();
+		systemWebService = PSSystemWsLocator.getSystemWebservice();
 	}
 	
 	public ContentItemWFValidatorAndTransitioner(Log log) {
@@ -39,7 +50,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @throws PSException
 	 */
 	public void performTest(IPSRequestContext request,Document errorDoc)
-		throws PSException {
+		throws PSException, PSErrorException {
 
 		log.debug("Workflow Item Validator: Performing Test...");
 
@@ -79,7 +90,7 @@ public class ContentItemWFValidatorAndTransitioner {
 			if (config.getIsTopType()) {
 				//This is a top type.
 				log.debug("Content Item : " + id + ", of type: " + config.getName() +  ", is a top type.");
-				pushTopType(request, errorDoc, contentItemSummary);
+				pushTopType(request, errorDoc, contentItemSummary, config);
 			} else {
 				//This is not a top type				
 				
@@ -89,7 +100,7 @@ public class ContentItemWFValidatorAndTransitioner {
 		// Step 2. 
 		
 		PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Error getting related ids for item with id {0}", new Object[]{id});
-		throw new PSException("Stopping");
+		
 	}
 	
 	/**
@@ -98,9 +109,144 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @param errorDoc
 	 * @param contentItemSummary
 	 */
-	private void pushTopType(IPSRequestContext request,Document errorDoc, PSComponentSummary contentItemSummary) {
+	private void pushTopType(IPSRequestContext request,Document errorDoc, PSComponentSummary contentItemSummary, ContentTypeConfig config) 
+		throws PSErrorException
+	{
+
+		//Check Navon
+		if (config.getRequiresParentNavonsPublic() && areParentNavonsPublic(contentItemSummary) == false) {
+			//Error Out Because public navons are required but they are not public.
+			log.debug("Parent Navons are not Public for content item: " + contentItemSummary.getContentId());
+		}
 		
+		//Validate Dependents
+		validateChildRelationships(contentItemSummary);
+				
 	}
+	
+	/**
+	 * Validates dependents participating in Active Assembly (category) relationships based 
+	 * on rules defined in the RelationshipWFTransitionConfig items.
+	 * (This may be called recursively)
+	 * (Should return items which need to be transitioned??)
+	 * @param contentItemSummary
+	 */
+	private void validateChildRelationships(PSComponentSummary contentItemSummary)
+		throws PSErrorException
+	{
+		List<PSRelationship> rels = new ArrayList<PSRelationship>();
+		
+		log.debug("Finding relationships for Content ID: " + contentItemSummary.getContentId());
+		
+		PSRelationshipFilter filter = new PSRelationshipFilter();
+		//This is going to be the current/edit revision for this content item.
+		filter.setOwner(contentItemSummary.getHeadLocator());
+		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+		rels = systemWebService.loadRelationships(filter);
+		
+		log.debug("Found " + rels.size() + " relationships for Content ID: " + contentItemSummary.getContentId());
+		
+		for (PSRelationship rel:rels) {
+			String relName = rel.getConfig().getName();
+			log.debug("Found " + relName + " relationship for Content ID: " + contentItemSummary.getContentId());
+			
+			//Check config for relationship with that name. (Or get default)
+			BaseRelationshipWFTransitionConfig config = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
+
+			//So yeah, this should get moved into the bean? at some point in time since it is silly to have this 
+			//conditional here.  However it is ok for initial development while we figure out what info we are 
+			//going to need.  
+			//For example: is there a follow stop condition for, RelationshipCheckOk, then does that
+			//need to return a list of dependents that need to be transitioned, and a list of errors??  Does everyone
+			//need to return these?
+			
+			//Furthermore, is it the config that does all of the checking?  Anyway, that is just an idea for now, lets
+			//get this thing working first.
+			
+			//TODO: Refactor this code into RelationshipWFTransitionConfigs
+			if (config instanceof RelationshipWFTransitionFollowConfig) {
+				//If follow, then check all stop conditions.				
+				for(RelationshipWFTransitionStopConditions condition : ((RelationshipWFTransitionFollowConfig)config).getStopConditions()) {
+					log.debug("Handling follow Config for dependent: " + rel.getDependent().getId());					
+					switch(condition) {
+						case Shared : {
+							log.debug("Checking Shared Stop Condition for dependent: " + rel.getDependent().getId());
+							if (isShared(rel.getDependent()))
+								log.debug("Dependent ID: " + rel.getDependent().getId() + " is Shared.");
+							else
+								log.debug("Dependent ID: " + rel.getDependent().getId() + " is NOT Shared.");
+							break;
+						}
+						case OtherCommunity: {
+							log.debug("Checking OtherCommunity Stop Condition for dependent: " + rel.getDependent().getId());
+							if (contentItemSummary.getCommunityId() == rel.getDependentCommunityId())
+								log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
+							else
+								log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Other Community.");
+							break;
+						}
+						case OtherWorkflow: {
+							log.debug("Checking OtherWorkflow Stop Condition for dependent: " + rel.getDependent().getId());
+							break;							
+						}
+						case OtherUserCheckedOut: {
+							log.debug("Checking OtherUserCheckedOut Stop Condition for dependent: " + rel.getDependent().getId());
+							break;
+						}
+						case TopType: {
+							log.debug("Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
+							break;
+						}
+					}
+				}
+			} else if (config instanceof RelationshipWFTransitionStopConfig) {
+				//If stop, then check if there is a public revision
+				log.debug("Handling Stop Config for dependent: " + rel.getDependent().getId());
+			} else if (config instanceof RelationshipWFTransitionIgnoreConfig) {
+				//If ignore, then ignore,
+				
+			} else {
+				//Should never happen, only when a new type has been added and this is not updated. Default to stop.
+				log.error("validateChildRelationships: Unknown BaseRelationshipWFTransitionConfig: " + config.getClass().getName());
+				log.debug("Handling Stop Config for dependent: " + rel.getDependent().getId());
+			}
+			
+		}
+	}
+	
+	/**
+	 * Determines if an item is participating in more than one Active Assembly relationship
+	 * as a dependent.
+	 * @param contentItemLocator
+	 * @return
+	 * @throws PSErrorException
+	 */
+	private boolean isShared(PSLocator contentItemLocator)
+		throws PSErrorException
+	{
+		List<PSRelationship> rels = new ArrayList<PSRelationship>();
+		
+		PSRelationshipFilter filter = new PSRelationshipFilter();		
+		//This is going to be the current/edit revision for this content item.
+		filter.setDependent(contentItemLocator);		
+		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+		rels = systemWebService.loadRelationships(filter);
+		
+		return (rels.size() > 1);
+	}
+		
+	
+	
+	/**
+	 * Checks to see if all Parent/Ancestor navons have a public revision.
+	 * @return
+	 */
+	private boolean areParentNavonsPublic(PSComponentSummary contentItemSummary) {
+		//TODO:Implement areParentNavonsPublic
+		//getParentFolderRelationships()
+		return false;
+	}
+	
 	
 	/**
 	 * Checks to see if a content item is shared.  Share being defined
