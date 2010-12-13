@@ -99,7 +99,6 @@ public class CGV_UniqueInFolderAllEffect implements IPSEffect {
 			log.debug("[attempt]contentId = " + contentId);
 			int folderId = current.getOwner().getId();
 			log.debug("[attempt]folderId = " + folderId);
-			String fieldValue = "";
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
 				log.debug("[attempt]getting item");
@@ -113,9 +112,8 @@ public class CGV_UniqueInFolderAllEffect implements IPSEffect {
 	        } catch (Exception e) {
 	           log.error(format("An error happened while checking if " +
 	                 "fieldName: {0} was unique for " +
-	                 "contentId: {1} with " +
-	                 "fieldValue: {2}",
-	                 fieldName, request.getParameter("sys_contentid"), fieldValue), e);
+	                 "contentId: {1} with ",
+	                 fieldName, request.getParameter("sys_contentid")), e);
 		       log.debug("[attempt]setting error - got exception");        
 	           result.setError("Pretty_URL_Name must be unique within folder");
 	        }
