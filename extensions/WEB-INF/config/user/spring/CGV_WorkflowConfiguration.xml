@@ -36,65 +36,87 @@
 		</constructor-arg>
 	</bean>
 	
+	<!-- This section defines the RelationshipWFTransitionStopCondition classes so they
+		may be referenced in the RelationshipWFTransitionChecks below.	
+	-->
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not a Top Type or
+		is a Top Type with a public revision.
+	 -->
+	<bean id="TopTypeRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.TopTypeRelationshipWFTransitionStopCondition" />
+
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not shared or
+		is shared with a public revision.
+	 -->
+	<bean id="SharedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.SharedRelationshipWFTransitionStopCondition" />
+
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not in another community or
+		is in another community with a public revision.
+	 -->
+	<bean id="OtherCommunityRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherCommunityRelationshipWFTransitionStopCondition" />
+
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent uses another workflow or
+		uses another workflow with a public revision.
+	 -->
+	<bean id="OtherWorkflowRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherWorkflowRelationshipWFTransitionStopCondition" />
+
+	<!-- RelationshipWFTransitionStopCondition to check if a dependent is checked out by another user. 
+		this is not a condition which is ok to continue.
+	-->
+	<bean id="OtherUserLockedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherUserLockedRelationshipWFTransitionStopCondition" />
+
+	<!-- RelationshipWFTransitionStopCondition to check the dependent's relationships.
+	 -->
+	<bean id="DependentsCheckRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.DependentsCheckRelationshipWFTransitionStopCondition" />
+
+		
 	<!-- Defines configuration for relationships -->
 	<!-- Bean class types define how we should handle child items:
-	   RelationshipWFTransitionFollowConfig => 
+	   RelationshipWFTransitionFollowCheck => 
 		          The dependents of the relationship should be transitioned with the owner
 			       if the business rules allow. If the dependent meets a stop condition 
 					 then it will follow the rules of the CGV_RelationshipWFTransitionStopConfig.
-					 The rules are defined using the stopConditions property and the values are:
-						TopType =>	The dependent is a top type
-						Shared =>	The dependent is participating in more than one Follow relationship
-										type.  E.G. The item is a dependent in 2 different CDE relationships.
-						OtherUserCheckedOut => the dependent is currently checked out to a user other than
-										the one who is performing the workflow transition. ??
-						OtherCommunity => the depended is owned by a different community than the 
-										relationship owner.
-										Note, this is really the same as if the user is logged into a different
-										community since the workflow transitions would not be available if the
-										relationship owner is in another community that the current one.
-						OtherWorkflow => the dependent is associated with a different workflow, (i.e. has
-										different transitions) that the owner of the relationship.
-		RelationshipWFTransitionStopConfig => 
+		RelationshipWFTransitionStopCheck => 
 		        The dependents of the relationship will not be transitioned with the owner,
 		        furthermore, the transition of the owner will stop if any dependents do not
 			     have a public revision.
-	    RelationshipWFTransitionIgnoreConfig => 
+	    RelationshipWFTransitionIgnoreCheck => 
 					 The dependents of the relationship will not be transition with the
 		          owner, and the transition will not stop if the dependent does not have a
 			       public revision.  This is the out of the box behavior of Percussion.
 	-->
-	<bean id="RelationshipConfigs" class="gov.cancer.wcm.workflow.RelationshipConfigsCollection">
+	<bean id="RelationshipChecks" class="gov.cancer.wcm.workflow.RelationshipWFTransitionChecksCollection">
 		<constructor-arg>
 			<list>
-				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
+				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowCheck">
 					<constructor-arg><value>CDE</value></constructor-arg>
 					<constructor-arg>
 						<list>
-							<value>TopType</value>
-							<value>Shared</value>
-							<value>OtherUserCheckedOut</value>
-							<value>OtherCommunity</value>
-							<value>OtherWorkflow</value>
+							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />							
+							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
 					</constructor-arg>
 				</bean>
-				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowConfig">
+				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowCheck">
 					<constructor-arg><value>Pages</value></constructor-arg>
 					<constructor-arg>
 						<list>
-							<value>TopType</value>
-							<value>Shared</value>
-							<value>OtherUserCheckedOut</value>
-							<value>OtherCommunity</value>
-							<value>OtherWorkflow</value>
+							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />							
+							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
 					</constructor-arg>
 				</bean>				
 			</list>
 		</constructor-arg>
 		<constructor-arg>
-			<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionStopConfig">
+			<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionStopCheck">
 				<constructor-arg><value>default</value></constructor-arg>
 			</bean>
 		</constructor-arg>
@@ -104,6 +126,6 @@
 	<!-- This bean defines workflow configuration information -->		
 	<bean id="CGV_WorkflowConfiguration" class="gov.cancer.wcm.workflow.WorkflowConfiguration">
 		<constructor-arg><ref bean="ContentTypesConfig"/></constructor-arg>
-		<constructor-arg><ref bean="RelationshipConfigs"/></constructor-arg>
+		<constructor-arg><ref bean="RelationshipChecks"/></constructor-arg>
 	</bean>
 </beans>
