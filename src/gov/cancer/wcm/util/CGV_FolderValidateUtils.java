@@ -281,7 +281,7 @@ public class CGV_FolderValidateUtils {
 		try {
 			while (rows.hasNext() && unique) {
 				Row row = (Row)rows.next();
-				Value value = row.getValue(fieldName);
+				Value value = row.getValue("rx:" + fieldName);
 				if (value == null) {
 					//should never get here
 					unique = false;
