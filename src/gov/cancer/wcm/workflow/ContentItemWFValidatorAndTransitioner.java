@@ -146,13 +146,17 @@ public class ContentItemWFValidatorAndTransitioner {
 		
 		log.debug("Found " + rels.size() + " relationships for Content ID: " + contentItemSummary.getContentId());
 		
+		
+		
 		for (PSRelationship rel:rels) {
 			String relName = rel.getConfig().getName();
 			log.debug("Found " + relName + " relationship for Content ID: " + contentItemSummary.getContentId());
 			
 			//Check config for relationship with that name. (Or get default)
-			BaseRelationshipWFTransitionConfig config = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
+			//////BaseRelationshipWFTransitionCheck config = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
 
+			
+			
 			//So yeah, this should get moved into the bean? at some point in time since it is silly to have this 
 			//conditional here.  However it is ok for initial development while we figure out what info we are 
 			//going to need.  
@@ -164,52 +168,53 @@ public class ContentItemWFValidatorAndTransitioner {
 			//get this thing working first.
 			
 			//TODO: Refactor this code into RelationshipWFTransitionConfigs
-			if (config instanceof RelationshipWFTransitionFollowConfig) {
-				//If follow, then check all stop conditions.				
-				for(RelationshipWFTransitionStopConditions condition : ((RelationshipWFTransitionFollowConfig)config).getStopConditions()) {
-					log.debug("Handling follow Config for dependent: " + rel.getDependent().getId());					
-					switch(condition) {
-						case Shared : {
-							log.debug("Checking Shared Stop Condition for dependent: " + rel.getDependent().getId());
-							if (isShared(rel.getDependent()))
-								log.debug("Dependent ID: " + rel.getDependent().getId() + " is Shared.");
-							else
-								log.debug("Dependent ID: " + rel.getDependent().getId() + " is NOT Shared.");
-							break;
-						}
-						case OtherCommunity: {
-							log.debug("Checking OtherCommunity Stop Condition for dependent: " + rel.getDependent().getId());
-							if (contentItemSummary.getCommunityId() == rel.getDependentCommunityId())
-								log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
-							else
-								log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Other Community.");
-							break;
-						}
-						case OtherWorkflow: {
-							log.debug("Checking OtherWorkflow Stop Condition for dependent: " + rel.getDependent().getId());
-							break;							
-						}
-						case OtherUserCheckedOut: {
-							log.debug("Checking OtherUserCheckedOut Stop Condition for dependent: " + rel.getDependent().getId());
-							break;
-						}
-						case TopType: {
-							log.debug("Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
-							break;
-						}
-					}
-				}
-			} else if (config instanceof RelationshipWFTransitionStopConfig) {
+			
+		//////if (config instanceof RelationshipWFTransitionFollowCheck) {
+		//////				//If follow, then check all stop conditions.				
+		//////				for(RelationshipWFTransitionStopConditions condition : ((RelationshipWFTransitionFollowCheck)config).getStopConditions()) {
+		//////log.debug("Handling follow Config for dependent: " + rel.getDependent().getId());					
+		//////	switch(condition) {
+		//////		case Shared : {
+		//////			log.debug("Checking Shared Stop Condition for dependent: " + rel.getDependent().getId());
+		//////			if (isShared(rel.getDependent()))
+		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is Shared.");
+		//////			else
+		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is NOT Shared.");
+		//////			break;
+		//////		}
+		//////		case OtherCommunity: {
+		//////			log.debug("Checking OtherCommunity Stop Condition for dependent: " + rel.getDependent().getId());
+		//////			if (contentItemSummary.getCommunityId() == rel.getDependentCommunityId())
+		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
+		//////			else
+		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Other Community.");
+		//////			break;
+		//////		}
+		//////		case OtherWorkflow: {
+		//////			log.debug("Checking OtherWorkflow Stop Condition for dependent: " + rel.getDependent().getId());
+		//////			break;							
+		//////		}
+		//////		case OtherUserCheckedOut: {
+		//////			log.debug("Checking OtherUserCheckedOut Stop Condition for dependent: " + rel.getDependent().getId());
+		//////			break;
+		//////		}
+		//////		case TopType: {
+		//////			log.debug("Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
+		//////			break;
+		//////		}
+		//////	}
+		//////}
+		//////} else if (config instanceof RelationshipWFTransitionPublicRevisionCheck) {
 				//If stop, then check if there is a public revision
-				log.debug("Handling Stop Config for dependent: " + rel.getDependent().getId());
-			} else if (config instanceof RelationshipWFTransitionIgnoreConfig) {
+		//////log.debug("Handling Stop Config for dependent: " + rel.getDependent().getId());
+		//////} else if (config instanceof RelationshipWFTransitionIgnoreCheck) {
 				//If ignore, then ignore,
 				
-			} else {
+		//////} else {
 				//Should never happen, only when a new type has been added and this is not updated. Default to stop.
-				log.error("validateChildRelationships: Unknown BaseRelationshipWFTransitionConfig: " + config.getClass().getName());
-				log.debug("Handling Stop Config for dependent: " + rel.getDependent().getId());
-			}
+		//////log.error("validateChildRelationships: Unknown BaseRelationshipWFTransitionConfig: " + config.getClass().getName());
+		//////log.debug("Handling Stop Config for dependent: " + rel.getDependent().getId());
+		//////}
 			
 		}
 	}
