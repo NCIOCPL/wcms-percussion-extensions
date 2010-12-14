@@ -14,8 +14,16 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 
 	@Override
 	public RelationshipWFTransitionStopConditionResult validate(
-			PSComponentSummary contentItemSummary, PSRelationship rel) {
-		
+			PSComponentSummary contentItemSummary, 
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Checking OtherCommunity Stop Condition for dependent: " + rel.getDependent().getId());
+		if (contentItemSummary.getCommunityId() == rel.getDependentCommunityId())
+			wvc.getLog().debug("Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
+		else
+			wvc.getLog().debug("Dependent ID: " + rel.getDependent().getId() + " is in Other Community.");
+
 		return RelationshipWFTransitionStopConditionResult.StopTransition;
 	}
 

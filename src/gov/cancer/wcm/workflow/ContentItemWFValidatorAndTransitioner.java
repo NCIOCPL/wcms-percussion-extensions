@@ -146,17 +146,26 @@ public class ContentItemWFValidatorAndTransitioner {
 		
 		log.debug("Found " + rels.size() + " relationships for Content ID: " + contentItemSummary.getContentId());
 		
-		
+		//Setup the context for validation.  This should probably be done higher up.
+		WorkflowValidationContext wvc = new WorkflowValidationContext(log);
 		
 		for (PSRelationship rel:rels) {
 			String relName = rel.getConfig().getName();
 			log.debug("Found " + relName + " relationship for Content ID: " + contentItemSummary.getContentId());
 			
+			
 			//Check config for relationship with that name. (Or get default)
-			//////BaseRelationshipWFTransitionCheck config = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
+			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
 
+			RelationshipWFTransitionCheckResult result = transitionCheck.validate(contentItemSummary, rel, wvc);
+			if (result == RelationshipWFTransitionCheckResult.StopTransition) {
+				//Stop Processing. Maybe do something else.  The original code that PSO gave us
+				//attempted to find all of the issues and show a list all at once.  That would
+				//exclude us from breaking here.
+				break;
+			}
 			
-			
+			//THIS CODE HAS NOW BEEN REFACTORED.  REMOVE THE COMMENT AND CLEAN UP
 			//So yeah, this should get moved into the bean? at some point in time since it is silly to have this 
 			//conditional here.  However it is ok for initial development while we figure out what info we are 
 			//going to need.  
@@ -175,31 +184,18 @@ public class ContentItemWFValidatorAndTransitioner {
 		//////log.debug("Handling follow Config for dependent: " + rel.getDependent().getId());					
 		//////	switch(condition) {
 		//////		case Shared : {
-		//////			log.debug("Checking Shared Stop Condition for dependent: " + rel.getDependent().getId());
-		//////			if (isShared(rel.getDependent()))
-		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is Shared.");
-		//////			else
-		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is NOT Shared.");
 		//////			break;
 		//////		}
 		//////		case OtherCommunity: {
-		//////			log.debug("Checking OtherCommunity Stop Condition for dependent: " + rel.getDependent().getId());
-		//////			if (contentItemSummary.getCommunityId() == rel.getDependentCommunityId())
-		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
-		//////			else
-		//////				log.debug("Dependent ID: " + rel.getDependent().getId() + " is in Other Community.");
 		//////			break;
 		//////		}
 		//////		case OtherWorkflow: {
-		//////			log.debug("Checking OtherWorkflow Stop Condition for dependent: " + rel.getDependent().getId());
 		//////			break;							
 		//////		}
 		//////		case OtherUserCheckedOut: {
-		//////			log.debug("Checking OtherUserCheckedOut Stop Condition for dependent: " + rel.getDependent().getId());
 		//////			break;
 		//////		}
 		//////		case TopType: {
-		//////			log.debug("Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
 		//////			break;
 		//////		}
 		//////	}

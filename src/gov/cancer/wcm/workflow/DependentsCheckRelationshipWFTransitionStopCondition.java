@@ -15,7 +15,10 @@ public class DependentsCheckRelationshipWFTransitionStopCondition extends
 
 	@Override
 	public RelationshipWFTransitionStopConditionResult validate(
-			PSComponentSummary contentItemSummary, PSRelationship rel) {
+			PSComponentSummary contentItemSummary, 
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
 		// TODO Auto-generated method stub
 		return RelationshipWFTransitionStopConditionResult.StopTransition;
 	}

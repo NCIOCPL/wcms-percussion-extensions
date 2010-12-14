@@ -15,8 +15,12 @@ public class OtherWorkflowRelationshipWFTransitionStopCondition extends
 
 	@Override
 	public RelationshipWFTransitionStopConditionResult validate(
-			PSComponentSummary contentItemSummary, PSRelationship rel) {
-		// TODO Auto-generated method stub
+			PSComponentSummary contentItemSummary, 
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Checking OtherWorkflow Stop Condition for dependent: " + rel.getDependent().getId());
+
 		return RelationshipWFTransitionStopConditionResult.StopTransition;
 	}
 
