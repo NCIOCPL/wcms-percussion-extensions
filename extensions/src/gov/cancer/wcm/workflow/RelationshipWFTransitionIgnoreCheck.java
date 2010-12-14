@@ -22,8 +22,9 @@ public class RelationshipWFTransitionIgnoreCheck extends
 	@Override
 	public RelationshipWFTransitionCheckResult validate(
 			PSComponentSummary contentItemSummary,
-			PSRelationship rel
-			) {
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
 
 		
 		return RelationshipWFTransitionCheckResult.ContinueTransition;

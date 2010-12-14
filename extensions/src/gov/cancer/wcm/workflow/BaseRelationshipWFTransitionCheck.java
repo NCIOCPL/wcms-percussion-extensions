@@ -36,7 +36,9 @@ public abstract class BaseRelationshipWFTransitionCheck {
 	 */
 	public abstract RelationshipWFTransitionCheckResult validate(
 			PSComponentSummary contentItemSummary,
-			PSRelationship rel);
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+			);
 	
 	/**
 	 * 

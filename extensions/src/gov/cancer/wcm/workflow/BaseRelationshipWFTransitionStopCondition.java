@@ -18,5 +18,7 @@ public abstract class BaseRelationshipWFTransitionStopCondition {
 	 */
 	public abstract RelationshipWFTransitionStopConditionResult validate(
 			PSComponentSummary contentItemSummary, 
-			PSRelationship rel);
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+			);
 }

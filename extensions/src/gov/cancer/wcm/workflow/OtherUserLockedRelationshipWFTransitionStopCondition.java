@@ -13,9 +13,13 @@ public class OtherUserLockedRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
 	@Override
-	public RelationshipWFTransitionStopConditionResult validate(PSComponentSummary contentItemSummary,
-			PSRelationship rel) {
-		// TODO Auto-generated method stub
+	public RelationshipWFTransitionStopConditionResult validate(
+			PSComponentSummary contentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Checking OtherUserCheckedOut Stop Condition for dependent: " + rel.getDependent().getId());
+
 		return RelationshipWFTransitionStopConditionResult.StopTransition;
 	}
 

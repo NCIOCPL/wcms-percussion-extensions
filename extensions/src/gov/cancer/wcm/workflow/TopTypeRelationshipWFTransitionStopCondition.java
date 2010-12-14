@@ -13,9 +13,13 @@ public class TopTypeRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
 	@Override
-	public RelationshipWFTransitionStopConditionResult validate(PSComponentSummary contentItemSummary,
-			PSRelationship rel) {
+	public RelationshipWFTransitionStopConditionResult validate(
+			PSComponentSummary contentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
 		
+		wvc.getLog().debug("Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
 		
 		return RelationshipWFTransitionStopConditionResult.StopTransition;
 	}
