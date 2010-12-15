@@ -1,6 +1,7 @@
 package gov.cancer.wcm.extensions.jexl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import com.percussion.extension.IPSJexlMethod;
 import com.percussion.extension.IPSJexlParam;
 import com.percussion.extension.PSJexlUtilBase;
 import com.percussion.pso.jexl.PSOQueryTools;
+import com.percussion.pso.jexl.PSOSlotTools;
 import com.percussion.services.assembly.IPSAssemblyItem;
 import com.percussion.services.contentmgr.IPSContentMgr;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
@@ -65,17 +67,34 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 		{
 			cmgr = PSContentMgrLocator.getContentMgr();
 		}
-	
-		
 		
 		//Query q = cmgr.createQuery(path, Query.SQL);
 		PSOQueryTools pso = new PSOQueryTools();
 		//QueryResult r =  cmgr.executeQuery(q, -1, null, null);
 		//List<Map<String, Value>> eq = new ArrayList<Map<String, Value>>();
 		return pso.executeQuery(path, -1, null, null).size();
-		
-		
-
+	}
+	
+	@IPSJexlMethod(description = "Returns the content id that cooresponds to a piece of content's translated copy.", params = {
+			@IPSJexlParam(name = "item", description = "The IPSAssemblyItem to find the translation for.") })
+	public int translationCID(IPSAssemblyItem item)
+				throws RepositoryException 
+	{
+		PSOSlotTools pso = new PSOSlotTools();
+		Map<String,Object> map = new HashMap<String,Object>();
+		List<IPSAssemblyItem> li = null;
+		try {
+			li = pso.getSlotContents(item, "cgvTranslationFinder", map);
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(li != null){
+			if(!li.isEmpty()){
+				return li.get(0).getId().getUUID();
+			}
+		}
+		return (Integer)null;
 	}
 
 }
