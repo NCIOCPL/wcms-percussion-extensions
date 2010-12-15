@@ -94,7 +94,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				return li.get(0).getId().getUUID();
 			}
 		}
-		return (Integer)null;
+		return 0;
 	}
 
 }
