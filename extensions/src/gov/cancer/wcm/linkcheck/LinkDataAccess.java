@@ -117,7 +117,8 @@ public class LinkDataAccess {
 			for (LinkItem item : itemArray) {
 				String query = "insert into CGVLINKCHECK(contentid, url, message, response, lastupdate) values(?, ?, ?, ?, ?)";
 				pstmt = conn.prepareStatement(query);
-				pstmt.setString(1, item.getContentId());
+				int id = Integer.parseInt(item.getContentId());
+				pstmt.setInt(1, id);
 				pstmt.setString(2, item.getUrl());
 				pstmt.setString(3, item.getMessage());
 				pstmt.setInt(4, item.getResponse());
@@ -168,7 +169,7 @@ public class LinkDataAccess {
 		try {
 			Connection conn = PSConnectionHelper.getDbConnection();
 			String query = "create table CGVLINKCHECK " +
-			"(contentid varchar(10) not null, " +
+			"(contentid integer not null, " +
 			"url varchar(256), " +
 			"message varchar(100), " +
 			"response integer, " +
