@@ -159,4 +159,12 @@
       </PSXExtensionParamDef>
       <suppliedResources/>
    </Extension>
+   <Extension categorystring="scheduledTask" context="user/" deprecated="no" handler="Java" name="CGV_LinkCheckTask" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Fetches all nciLink content items, tests their URLs, and stores a problem report in the database</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_LinkCheckTask</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <interface name="com.percussion.services.schedule.IPSTask"/>
+      <suppliedResources/>
+   </Extension>
 </PSXExtensionHandlerConfiguration>
