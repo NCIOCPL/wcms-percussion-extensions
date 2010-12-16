@@ -91,6 +91,12 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        String fieldName = h.getRequiredParameter("fieldName");
 	        log.debug("[attempt]fieldName = " + fieldName);        
 			PSRelationship originating = context.getOriginatingRelationship(); 
+			int revision = originating.getDependent().getRevision();
+			if (revision <= -1) {
+				result.setSuccess();
+				log.debug("revision is undefined, report success");
+				return;
+			}
 			int contentId = originating.getDependent().getId();
 			log.debug("[attempt]contentId = " + contentId);
 			int folderId = originating.getOwner().getId();
