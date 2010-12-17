@@ -79,28 +79,19 @@ public class CGV_WorkflowItemValidator extends PSOAbstractItemValidationExit {
 	    Validate.notEmpty(transitionid);
 	    String states = params[0].toString();
 	    if(!isExclusive(req)) {
-	  	  setExclusive(req, true);
-	    if(super.matchDestinationState(contentid, transitionid, states))
-	    {
-	    	log.debug("Testing if transition of item is allowed, valid state for test");
-	    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);
-	    	validator.performTest(req,errorDoc);
-	    		    	
-	    } 
-	    setExclusive(req, false);
+	    	setExclusive(req, true);
+	    	if(super.matchDestinationState(contentid, transitionid, states))
+	    	{
+		    	log.debug("Testing if transition of item is allowed, valid state for test");
+		    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);	    	
+		    	validator.performTest(req, errorDoc);
+	    	} 
+	    	setExclusive(req, false);
 	    }else {
 	    	log.debug("Exclusion flag detected");
 	    }	
 	    
-	    throw new PSException("Stopping");
 	} 
-
-	//I think this is an internal test.
-//	public void performTest(IPSRequestContext request,Document errorDoc)
-//	throws PSException {
-//    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);
-//    	validator.performTest(request,errorDoc);
-//	}
 	
 	 /**
 	    * set the exclusion flag.

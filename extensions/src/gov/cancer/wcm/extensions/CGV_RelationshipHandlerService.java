@@ -48,7 +48,9 @@ import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 
 /**
+ * PSO Code that is not to be used.
  */
+@Deprecated
 public class CGV_RelationshipHandlerService {
 
 	private static IPSSystemWs sws;
