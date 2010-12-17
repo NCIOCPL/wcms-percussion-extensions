@@ -18,13 +18,25 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Checking OtherCommunity Stop Condition for dependent: " + rel.getDependent().getId());
-		if (contentItemSummary.getCommunityId() == rel.getDependentCommunityId())
-			wvc.getLog().debug("Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
-		else
-			wvc.getLog().debug("Dependent ID: " + rel.getDependent().getId() + " is in Other Community.");
-
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("Other Community Stop Condition: Checking dependent: " + rel.getDependent().getId());
+		if (contentItemSummary.getCommunityId() == rel.getDependentCommunityId()) {
+			wvc.getLog().debug("Other Community Stop Condition: Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		}
+		else {
+			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(rel.getDependent(), wvc)) {
+				wvc.getLog().debug("Other Community Stop Condition: Dependent ID: " + rel.getDependent().getId() + " is in Other Community and has public revision.");
+				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
+			} else {
+				wvc.getLog().debug("Other Community Stop Condition: Dependent ID: " + rel.getDependent().getId() + " is in Other Community and does not have public revision.");
+				wvc.addError(
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+						ContentItemWFValidatorAndTransitioner.NON_PUBLIC_CHILD_IS_OTHER_COMMUNITY,
+						new Object[]{contentItemSummary.getContentId(), rel.getDependent().getId()});
+				return RelationshipWFTransitionStopConditionResult.StopTransition;
+			}	
+		}		
 	}
 
 }

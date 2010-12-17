@@ -38,9 +38,23 @@ public class RelationshipWFTransitionFollowCheck extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-
+		wvc.getLog().debug("Handling Follow Check for dependent: " + rel.getDependent().getId() + " in slot " + rel.getConfig().getLabel());
 		
-		return RelationshipWFTransitionCheckResult.StopTransition;
+		RelationshipWFTransitionStopConditionResult lastResult = RelationshipWFTransitionStopConditionResult.Ok;
+		for(BaseRelationshipWFTransitionStopCondition stopCond : stopConditions) {
+			lastResult = stopCond.validate(contentItemSummary, rel, wvc);
+			if (lastResult != RelationshipWFTransitionStopConditionResult.Ok)
+				break;
+		}
+		
+		if (lastResult != RelationshipWFTransitionStopConditionResult.Ok) {
+			//Add rel.getDependent() to list of items to transition.
+			return RelationshipWFTransitionCheckResult.ContinueTransition;
+		}else if (lastResult != RelationshipWFTransitionStopConditionResult.OkStopChecking) {
+			return RelationshipWFTransitionCheckResult.ContinueTransition;
+		} else {
+			return RelationshipWFTransitionCheckResult.StopTransition;
+		}
 	}
 
 	/**

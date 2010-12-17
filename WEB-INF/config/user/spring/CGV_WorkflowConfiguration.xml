@@ -92,9 +92,9 @@
 					<constructor-arg>
 						<list>
 							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
-							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
-							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />							
+							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />												
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<!-- ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" /-->
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
@@ -106,8 +106,8 @@
 						<list>
 							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
-							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />							
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<!-- ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" /-->
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
@@ -116,7 +116,7 @@
 			</list>
 		</constructor-arg>
 		<constructor-arg>
-			<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionStopCheck">
+			<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionPublicRevisionCheck">
 				<constructor-arg><value>default</value></constructor-arg>
 			</bean>
 		</constructor-arg>

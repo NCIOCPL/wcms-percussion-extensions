@@ -21,7 +21,9 @@ import com.percussion.services.workflow.data.PSWorkflow;
 
 
 /**
+ * PSO Code not to be used
  */
+@Deprecated 
 public class CGV_RelItem{
 	private static Log log = LogFactory.getLog(CGV_RelItem.class);
 	private static IPSCmsContentSummaries sum;

@@ -25,9 +25,15 @@ public class RelationshipWFTransitionPublicRevisionCheck extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-
+		wvc.getLog().debug("Handling Public Revision Check for dependent: " + rel.getDependent().getId() + " in slot " + rel.getConfig().getLabel());
 		
-		return RelationshipWFTransitionCheckResult.StopTransition;
+		//Check if the item has a public revision or not.
+		if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(rel.getDependent(), wvc)) 
+			return RelationshipWFTransitionCheckResult.ContinueTransition;
+		else 
+		{
+			return RelationshipWFTransitionCheckResult.StopTransition;
+		}
 	}
 	
 	/**

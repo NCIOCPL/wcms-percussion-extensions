@@ -2,6 +2,7 @@ package gov.cancer.wcm.workflow;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.design.objectstore.PSRelationship;
+import com.percussion.webservices.PSErrorException;
 
 /**
  * Defines a base class for all RelationshipWFTransitionStopConditions.
@@ -20,5 +21,5 @@ public abstract class BaseRelationshipWFTransitionStopCondition {
 			PSComponentSummary contentItemSummary, 
 			PSRelationship rel,
 			WorkflowValidationContext wvc
-			);
+			)  throws WFValidationException;
 }
