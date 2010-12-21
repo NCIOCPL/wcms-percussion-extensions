@@ -127,6 +127,8 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		List<String> editions = new ArrayList<String>();
 		
 		Boolean navon = false;
+		Boolean tcga = false;
+		Boolean shared_site = false;
 		
 		List<IPSGuid> loadList = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid"))));
 		List<PSCoreItem> items = null;
@@ -144,21 +146,31 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		if(CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr)){
 			navon = true;
 		}
+		if(CGV_TopTypeChecker.isTCGAContent(contentTypeId.intValue(),cmgr)){
+			tcga = true;
+		}
 		
 		CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
 		StateName destState = stateHelp.getDestState();
+		Map<String,List<String>> m = null;
 		
 		if(navon){
-			Map<String,List<String>> m = editionList.get("CGV_Navon_Workflow");
-			if (destState == StateName.PUBLIC) {
-				List<String> mm = m.get("publish_onDemandEditionId");
-				for( String i : mm ){
-					editions.add(i);
-				}
-			}
+			m = editionList.get("CGV_Navon_Workflow");
+
+		}
+		else if(tcga){
+			m = editionList.get("TCGA Workflow");
+
+		}
+		else if(shared_site){
+			m = editionList.get("Shared Workflow");
+
 		}
 		else{
-			Map<String,List<String>> m = editionList.get("CancerGov Workflow");
+			m = editionList.get("CancerGov Workflow");
+		}
+		
+		if(!navon){
 			if (destState == StateName.PUBLIC) {
 				List<String> mm = m.get("publish_onDemandEditionId");
 				for( String i : mm ){
@@ -172,6 +184,15 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				}
 			}
 		}
+		else{
+			if (destState == StateName.PUBLIC) {
+				List<String> mm = m.get("publish_onDemandEditionId");
+				for( String i : mm ){
+					editions.add(i);
+				}
+			}
+		}
+		
 		
 		if (bDebug) System.out.println("start of queue item set");
 
