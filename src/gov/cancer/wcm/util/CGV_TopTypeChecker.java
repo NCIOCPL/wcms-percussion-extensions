@@ -160,6 +160,55 @@ public class CGV_TopTypeChecker {
 //			}
 //		}
 	}
+
+	/**
+	 * Returns true if this contentTypeId is in the list of TCGA content types
+	 * @param contentTypeId - id to check
+	 * @return true if in list
+	 */
+	public static boolean isTCGAContent(int contentTypeId, IPSContentWs cmgr) {
+		//get array of type names
+		String[] doNotPublishParentTypes = CGVConstants.TCGA_TYPES;
+		for (String s : doNotPublishParentTypes) {
+			if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
+			//get all summaries matching the current type
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
+			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
+			//get the first item
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+
+				if (contentTypeId == summaryItem.getGuid().getUUID()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	
+	/**
+	 * Returns true if this contentTypeId is in the list of Shared content types
+	 * @param contentTypeId - id to check
+	 * @return true if in list
+	 */
+	public static boolean isCrossSiteContent(int contentTypeId, IPSContentWs cmgr) {
+		//get array of type names
+		String[] doNotPublishParentTypes = CGVConstants.CROSS_SITE_TYPES;
+		for (String s : doNotPublishParentTypes) {
+			if (bDebug) System.out.print("DEBUG: do not publish parent types " + s);
+			//get all summaries matching the current type
+			List<PSContentTypeSummary> summaries = cmgr.loadContentTypes(s);
+			if (bDebug) System.out.println("the size of the content type summary list is " + summaries.size());
+			//get the first item
+			if(summaries.size() != 0 ){
+				PSContentTypeSummary summaryItem = summaries.get(0);
+
+				if (contentTypeId == summaryItem.getGuid().getUUID()) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 }
