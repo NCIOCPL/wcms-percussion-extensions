@@ -20,6 +20,7 @@ import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
+import com.percussion.pso.jexl.PSOObjectFinder;
 import com.percussion.rx.publisher.IPSPublisherJobStatus;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
@@ -163,8 +164,18 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 
 		}
 		else if(shared_site){
-			m = editionList.get("Shared Workflow");
-
+			PSOObjectFinder commFinder = new PSOObjectFinder();			
+			String community = commFinder.getUserCommunity();
+			if(community.equalsIgnoreCase("TCGA")){
+				m = editionList.get("TCGA Workflow");
+			}
+			else if(community.equalsIgnoreCase("CancerGov"))
+			{
+				m = editionList.get("CancerGov Workflow");
+			}
+			else{
+				m = editionList.get("Shared Workflow");
+			}
 		}
 		else{
 			m = editionList.get("CancerGov Workflow");
