@@ -20,8 +20,8 @@ public class RelationshipWFTransitionIgnoreCheck extends
 	}
 
 	@Override
-	public RelationshipWFTransitionCheckResult validate(
-			PSComponentSummary contentItemSummary,
+	public RelationshipWFTransitionCheckResult validateDown(
+			PSComponentSummary ownerContentItemSummary,
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
@@ -30,6 +30,14 @@ public class RelationshipWFTransitionIgnoreCheck extends
 		return RelationshipWFTransitionCheckResult.ContinueTransition;
 	}
 
+	@Override
+	public RelationshipWFTransitionCheckResult validateUp(
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {		
+		return RelationshipWFTransitionCheckResult.ContinueTransition;
+	}
 	
 	/**
 	 * Initializes a new instance of the RelationshipWFTransitionIgnoreConfig class.

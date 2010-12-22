@@ -42,31 +42,52 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not a Top Type or
 		is a Top Type with a public revision.
 	 -->
-	<bean id="TopTypeRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.TopTypeRelationshipWFTransitionStopCondition" />
+	<bean id="TopTypeRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.TopTypeRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
 
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not shared or
 		is shared with a public revision.
 	 -->
-	<bean id="SharedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.SharedRelationshipWFTransitionStopCondition" />
+	<bean id="SharedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.SharedRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
 
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not in another community or
 		is in another community with a public revision.
 	 -->
-	<bean id="OtherCommunityRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherCommunityRelationshipWFTransitionStopCondition" />
+	<bean id="OtherCommunityRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherCommunityRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
 
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent uses another workflow or
 		uses another workflow with a public revision.
 	 -->
-	<bean id="OtherWorkflowRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherWorkflowRelationshipWFTransitionStopCondition" />
+	<bean id="WFTransitionAvailableRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.WFTransitionAvailableRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
+	
 
 	<!-- RelationshipWFTransitionStopCondition to check if a dependent is checked out by another user. 
 		this is not a condition which is ok to continue.
 	-->
-	<bean id="OtherUserLockedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherUserLockedRelationshipWFTransitionStopCondition" />
+	<bean id="OtherUserLockedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherUserLockedRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
+	
 
 	<!-- RelationshipWFTransitionStopCondition to check the dependent's relationships.
 	 -->
-	<bean id="DependentsCheckRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.DependentsCheckRelationshipWFTransitionStopCondition" />
+	<bean id="DependentsCheckRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.DependentsCheckRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
+	
 
 		
 	<!-- Defines configuration for relationships -->
@@ -94,7 +115,7 @@
 							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />												
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
-							<!-- ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" /-->
+							<!-- ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" /-->
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
@@ -107,7 +128,7 @@
 							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
-							<!-- ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" /-->
+							<!-- ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" /-->
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
@@ -122,10 +143,251 @@
 		</constructor-arg>
 	</bean>
 	
+	<!-- This begins the Workflow Transition Mappings -->
+	
+	<!-- Defines the transition mappings for the CancerGov Workflow. -->
+	<bean id="CGovWorkflowTransitionMap" class="gov.cancer.wcm.workflow.WFTransitionMap">
+		<!-- The first constructor-arg is for content creation transitions -->
+		<constructor-arg>
+			<map>
+				<!-- From State as Defined in Workflow-->
+				<entry key="Draft">
+					<map>
+						<!-- To State.  If there should NOT be a transition to the state, leave it out. -->
+						<entry key="Staging">
+							<!-- 
+							List of transition triggers as defined in the workflow, in the order of when they should be called  
+							to be made to get to the to state.  Note: Items should either stay publishable or stay unpublishable
+							therefore a move from Draft to Restaging should really be Draft to Staging since moving to Restaging
+							would actually make that unpublishable component publishable.
+							So for example, from Draft to Public there are a number of states which the item must be transitioned to.  
+							So the list should contain the transitions from Draft->S1,...,Sn->Public
+							-->
+							<list>								
+								<value>Staging</value>
+							</list>
+						</entry>
+						<entry key="Review">
+							<list>								
+								<value>Staging</value>
+								<value>submitForReview</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>								
+								<value>Staging</value>
+								<value>submitForReview</value>
+								<value>Approve</value>
+							</list>
+						</entry>
+						<entry key="Restaging">
+							<list>								
+								<value>Staging</value>
+							</list>
+						</entry>
+						<entry key="Reapproval">
+							<list>								
+								<value>Staging</value>
+								<value>submitForReview</value>
+							</list>
+						</entry>						
+					</map>
+				</entry>
+				<entry key="Staging">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>backToDraft</value>
+							</list>
+						</entry>					
+						<entry key="Review">
+							<list>
+								<value>submitForReview</value>								
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>
+								<value>submitForReview</value>
+								<value>Approve</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>backToDraft</value>
+							</list>
+						</entry>
+						<entry key="Reapproval">
+							<list>
+								<value>submitForReview</value>								
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="Review">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>Disapprove</value>
+							</list>
+						</entry>					
+						<entry key="Public">
+							<list>
+								<value>Approve</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>Disapprove</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="Public">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>Quick Edit</value>
+							</list>
+						</entry>					
+						<entry key="Editing">
+							<list>
+								<value>Quick Edit</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="Editing">
+					<map>
+						<entry key="Staging">
+							<list>
+								<value>Preview</value>
+							</list>
+						</entry>
+						<entry key="Review">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+								<value>Reapprove</value>
+							</list>
+						</entry>
+						<entry key="Restaging">
+							<list>
+								<value>Preview</value>
+							</list>
+						</entry>
+						<entry key="Reapproval">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="Restaging">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>backToEdit</value>
+							</list>
+						</entry>					
+						<entry key="Review">
+							<list>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>							
+								<value>Resubmit for Review</value>
+								<value>Reapprove</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>backToEdit</value>
+							</list>
+						</entry>
+						<entry key="Reapproval">
+							<list>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="Reapproval">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>noApproval</value>
+							</list>
+						</entry>					
+						<entry key="Public">
+							<list>
+								<value>Reapprove</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>noApproval</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</constructor-arg>
+		<!-- THe second constructor-arg is for archiving transitions -->
+		<constructor-arg>
+			<map>
+				<!--  From State -->
+				<entry key="Public">
+					<map>
+						<!--  To State -->
+						<entry key="ArchiveApproval">
+							<list>
+								<value>RequestArchive</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="ArchiveApproval">
+					<map>
+						<!--  To State -->
+						<entry key="Archived">
+							<list>
+								<value>ApproveArchive</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>
+								<value>DisapproveArchive</value>
+							</list>
+						</entry>						
+					</map>					
+				</entry>				
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<!-- This defines the state transition mappings for different workflows. -->
+	<bean id="WorkflowTransitionMappings" class="gov.cancer.wcm.workflow.WFTransitionMappings">
+		<constructor-arg>
+			<map>
+				<!-- This should be the name of the workflow as defined in workbench-->
+				<entry key="CancerGov Workflow"><ref bean="CGovWorkflowTransitionMap" /></entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
 	<!-- MAIN BEAN -->
 	<!-- This bean defines workflow configuration information -->		
 	<bean id="CGV_WorkflowConfiguration" class="gov.cancer.wcm.workflow.WorkflowConfiguration">
 		<constructor-arg><ref bean="ContentTypesConfig"/></constructor-arg>
 		<constructor-arg><ref bean="RelationshipChecks"/></constructor-arg>
+		<constructor-arg><ref bean="WorkflowTransitionMappings" /></constructor-arg>
 	</bean>
 </beans>

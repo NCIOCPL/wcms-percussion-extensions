@@ -19,35 +19,63 @@ public class OtherUserLockedRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
 	@Override
-	public RelationshipWFTransitionStopConditionResult validate(
-			PSComponentSummary contentItemSummary,
+	public RelationshipWFTransitionStopConditionResult validateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSComponentSummary dependentContentItemSummary,
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("OtherUserCheckedOut Stop Condition: Checking dependent: " + rel.getDependent().getId());
+		wvc.getLog().debug("OtherUserCheckedOut Stop Condition(down): Checking dependent: " + rel.getDependent().getId());
 
-		//Get the summary
-		PSComponentSummary dependentSummary = ContentItemWFValidatorAndTransitioner.getSummaryFromId(rel.getDependent().getId());
-		
-		if (dependentSummary == null) {
-			//Do not add PSError since that will be added for us when the WFValidationException is thrown
-			wvc.getLog().error("OtherUserCheckedOut Stop Condition: Could not get Component Summary for id: " + rel.getDependent().getId());
-			throw new WFValidationException("System Error Occured. Please Check the logs.", true);
-		}
-
-		String checkedOutUser = ContentItemWFValidatorAndTransitioner.isCheckedOutToOtherUser(contentItemSummary, wvc);
+		String checkedOutUser = ContentItemWFValidatorAndTransitioner.isCheckedOutToOtherUser(dependentContentItemSummary, wvc);
 		if (checkedOutUser == null) {
-			wvc.getLog().debug("OtherUserCheckedOut Stop Condition: Not checked out or checked out by this user.");
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(down): Not checked out or checked out by this user.");
 			return RelationshipWFTransitionStopConditionResult.Ok;
 		} else {
-			wvc.getLog().debug("OtherUserCheckedOut Stop Condition: checked out to user, " + checkedOutUser);
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(down): checked out to user, " + checkedOutUser);
 			wvc.addError(
 					ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
 					ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
 					ContentItemWFValidatorAndTransitioner.CHILD_IS_CHECKED_OUT,
-					new Object[]{contentItemSummary.getContentId(), rel.getDependent().getId(), checkedOutUser});
+					new Object[]{ownerContentItemSummary.getContentId(), rel.getDependent().getId(), checkedOutUser});
 			return RelationshipWFTransitionStopConditionResult.StopTransition;
 		}
 	}
 
+	@Override 
+	public RelationshipWFTransitionStopConditionResult validateUp(
+			PSComponentSummary dependentContentItemSummary, 
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("OtherUserCheckedOut Stop Condition(up): Checking dependent: " + rel.getOwner().getId());
+
+		String checkedOutUser = ContentItemWFValidatorAndTransitioner.isCheckedOutToOtherUser(ownerContentItemSummary, wvc);
+		if (checkedOutUser == null) {
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(up): Not checked out or checked out by this user.");
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		} else {
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(up): checked out to user, " + checkedOutUser);
+			
+			//Since this item is checked out to another user, then we cannot go to that item to start the transition
+			//however, we need to get information back to the initial call to say, hey stop.  I think an exception
+			//will make this behave the way that we want.
+			
+			throw new WFValidationException(
+					String.format(
+							ContentItemWFValidatorAndTransitioner.PARENT_IS_CHECKED_OUT, 
+							dependentContentItemSummary.getContentId(),
+							ownerContentItemSummary.getContentId(),
+							checkedOutUser
+					)
+			);
+		}
+	}
+
+	public OtherUserLockedRelationshipWFTransitionStopCondition(
+			RelationshipWFTransitionStopConditionDirection checkDirection
+	) {
+		super(checkDirection);
+	}
 }
