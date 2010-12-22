@@ -21,8 +21,9 @@ public class DependentsCheckRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
 	@Override 
-	public RelationshipWFTransitionStopConditionResult validate(
-			PSComponentSummary contentItemSummary, 
+	public RelationshipWFTransitionStopConditionResult validateDown(
+			PSComponentSummary ownerContentItemSummary, 
+			PSComponentSummary dependentContentItemSummary,
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
@@ -50,6 +51,27 @@ public class DependentsCheckRelationshipWFTransitionStopCondition extends
 			//child checks.
 			return RelationshipWFTransitionStopConditionResult.StopTransition;
 		}
+	}
+
+	@Override 
+	public RelationshipWFTransitionStopConditionResult validateUp(
+			PSComponentSummary dependentContentItemSummary, 
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().error("Dependents Check Stop Condition: Cannot validate upwards. Check configuration. Called on dependent with id: " + dependentContentItemSummary.getContentId());
+		throw new WFValidationException("System Error Occured. Please Check the logs.", true);
+	}
+	
+	/**
+	 * Initializes a new instance of the DependentsCheckRelationshipWFTransitionStopCondition class.
+	 * @param checkDirection the direction when this check should be validated.
+	 */
+	public DependentsCheckRelationshipWFTransitionStopCondition(
+			RelationshipWFTransitionStopConditionDirection checkDirection
+	) {
+		super(checkDirection);
 	}
 
 }

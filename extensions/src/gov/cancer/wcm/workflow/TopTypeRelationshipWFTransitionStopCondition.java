@@ -13,41 +13,51 @@ public class TopTypeRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
 	@Override
-	public RelationshipWFTransitionStopConditionResult validate(
-			PSComponentSummary contentItemSummary,
+	public RelationshipWFTransitionStopConditionResult validateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSComponentSummary dependentContentItemSummary,
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
 		
-		wvc.getLog().debug("Top Type Stop Condition: Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
-		
-		//Get the summary
-		PSComponentSummary dependentSummary = ContentItemWFValidatorAndTransitioner.getSummaryFromId(rel.getDependent().getId());
-		
-		if (dependentSummary == null) {
-			//Do not add PSError since that will be added for us when the WFValidationException is thrown
-			wvc.getLog().error("Top Type Stop Condition: Could not get Component Summary for id: " + rel.getDependent().getId());
-			throw new WFValidationException("System Error Occured. Please Check the logs.", true);
-		}
-
-		
-		if (ContentItemWFValidatorAndTransitioner.isTopType(dependentSummary.getContentTypeId(), wvc)) {
+		wvc.getLog().debug("Top Type Stop Condition(down): Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
+				
+		if (ContentItemWFValidatorAndTransitioner.isTopType(dependentContentItemSummary.getContentTypeId(), wvc)) {
 			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(rel.getDependent(), wvc)) {
-				wvc.getLog().debug("Top Type Stop Condition: Is Top Type, has public revision. dependent: " + rel.getDependent().getId());
+				wvc.getLog().debug("Top Type Stop Condition(down): Is Top Type, has public revision. dependent: " + rel.getDependent().getId());
 				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
 			} else {
-				wvc.getLog().debug("Top Type Stop Condition: Is Top Type, has NO public revision. dependent: " + rel.getDependent().getId());
+				wvc.getLog().debug("Top Type Stop Condition(down): Is Top Type, has NO public revision. dependent: " + rel.getDependent().getId());
 				wvc.addError(
 						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
 						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
 						ContentItemWFValidatorAndTransitioner.NON_PUBLIC_CHILD_IS_TOP_TYPE,
-						new Object[]{contentItemSummary.getContentId(), rel.getDependent().getId()});
+						new Object[]{ownerContentItemSummary.getContentId(), rel.getDependent().getId()});
 				return RelationshipWFTransitionStopConditionResult.StopTransition;
 			}
 		} else {		
-			wvc.getLog().debug("Top Type Stop Condition: Is NOT Top Type. dependent: " + rel.getDependent().getId());
+			wvc.getLog().debug("Top Type Stop Condition(down): Is NOT Top Type. dependent: " + rel.getDependent().getId());
 			return RelationshipWFTransitionStopConditionResult.Ok;
 		}
 	}
 
+	@Override 
+	public RelationshipWFTransitionStopConditionResult validateUp(
+			PSComponentSummary dependentContentItemSummary, 
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		//There is no reason to check the parent to see if it is a top type, if it is, then we would want
+		//to go to that item.  The earlier check would get there and say, yes, this item is a top type, stop
+		//going up.
+		wvc.getLog().error("Shared Check Stop Condition: Cannot validate upwards. Check configuration. Called on dependent with id: " + dependentContentItemSummary.getContentId());
+		throw new WFValidationException("System Error Occured. Please Check the logs.", true);
+	}
+
+	public TopTypeRelationshipWFTransitionStopCondition(
+			RelationshipWFTransitionStopConditionDirection checkDirection
+	) {
+		super(checkDirection);
+	}
 }

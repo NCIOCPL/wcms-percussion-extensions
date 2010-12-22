@@ -8,6 +8,9 @@ import org.w3c.dom.Document;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.util.PSItemErrorDoc;
+import com.percussion.services.workflow.data.PSState;
+import com.percussion.services.workflow.data.PSWorkflow;
+
 
 /**
  * Defines a class which holds information which is used for a workflow validation.  This
@@ -22,6 +25,9 @@ public class WorkflowValidationContext {
 	private Document _errorDoc;
 	private PSComponentSummary _initiatorContentItem;
 	private ArrayList<Integer> _transitionItemIds = new ArrayList<Integer>();
+	private PSState _initiatingItemWorkflowState;
+	private PSWorkflow _initiatingItemWorkflowApp;
+	private int _initiatingTransitionID = -1;
 	
 	/**
 	 * Gets the log for this validation context
@@ -67,6 +73,22 @@ public class WorkflowValidationContext {
 	}
 	
 	/**
+	 * Gets the initiating item's workflow app
+	 * @return
+	 */
+	public PSWorkflow getInitiatorWorkflowApp() {
+		return _initiatingItemWorkflowApp;
+	}
+	
+	/**
+	 * Gets the initiating item's workflow state
+	 * @return
+	 */
+	public PSState getInitiatorWorkflowState() {
+		return _initiatingItemWorkflowState;
+	}
+	
+	/**
 	 * Adds an id to the list of child items which need to be transitioned.
 	 * @param contentId
 	 */
@@ -87,9 +109,19 @@ public class WorkflowValidationContext {
 		return items;
 	}
 	
-	public WorkflowValidationContext(PSComponentSummary initiatorContentItem, Log log, Document errorDoc) {
+	public WorkflowValidationContext(
+			PSComponentSummary initiatorContentItem, 
+			Log log, 
+			Document errorDoc,
+			PSWorkflow initiatingItemWorkflowApp,
+			PSState initiatingItemWorkflowState,
+			int initiatingTransitionID
+	) {
 		_initiatorContentItem = initiatorContentItem;
 		_log = log;
 		_errorDoc = errorDoc;
+		_initiatingItemWorkflowApp = initiatingItemWorkflowApp;
+		_initiatingItemWorkflowState = initiatingItemWorkflowState;
+		_initiatingTransitionID = initiatingTransitionID;
 	}
 }

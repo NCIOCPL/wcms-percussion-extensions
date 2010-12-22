@@ -27,19 +27,33 @@ public abstract class BaseRelationshipWFTransitionCheck {
 	public abstract RelationshipWFTransitionTypes getTransitionType();
 	
 	/**
-	 * Validates whether or not this relationship should stop the transition or not.
+	 * Validates whether or not this relationship should stop the transition or not when the check is going down.
 	 * Follow types should be expected to include a list of dependents which need to be included
 	 * in transitions.
-	 * @param contentItemSummary 
+	 * @param ownerContentItemSummary 
 	 * @param rel
 	 * @return
 	 */
-	public abstract RelationshipWFTransitionCheckResult validate(
-			PSComponentSummary contentItemSummary,
+	public abstract RelationshipWFTransitionCheckResult validateDown(
+			PSComponentSummary ownerContentItemSummary,
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 			);
 	
+	/**
+	 * Validates whether or not this relationship should stop the transition or not when the check is going up.
+	 * Follow types should be expected to include a list of dependents which need to be included
+	 * in transitions.
+	 * @param dependentContentItemSummary 
+	 * @param rel
+	 * @return
+	 */
+	public abstract RelationshipWFTransitionCheckResult validateUp(
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+			);
+
 	/**
 	 * 
 	 * @param relationshipName

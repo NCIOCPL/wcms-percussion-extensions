@@ -20,15 +20,35 @@ public class RelationshipWFTransitionPublicRevisionCheck extends
 	}
 
 	@Override
-	public RelationshipWFTransitionCheckResult validate(
-			PSComponentSummary contentItemSummary,
+	public RelationshipWFTransitionCheckResult validateDown(
+			PSComponentSummary ownerContentItemSummary,
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Handling Public Revision Check for dependent: " + rel.getDependent().getId() + " in slot " + rel.getConfig().getLabel());
+		wvc.getLog().debug("Handling Public Revision Check (Down) for dependent: " + rel.getDependent().getId() + " in slot " + rel.getConfig().getLabel());
 		
 		//Check if the item has a public revision or not.
-		if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(rel.getDependent(), wvc)) 
+		if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(rel.getDependent(), wvc)) { 
+			wvc.getLog().debug("Handling Public Revision Check (Down): dependent: " + rel.getDependent().getId() + " has public revision.");
+			return RelationshipWFTransitionCheckResult.ContinueTransition;
+		}
+		else 
+		{
+			wvc.getLog().debug("Handling Public Revision Check (Down): dependent: " + rel.getDependent().getId() + " has NO public revision.");
+			return RelationshipWFTransitionCheckResult.StopTransition;
+		}
+	}
+
+	@Override
+	public RelationshipWFTransitionCheckResult validateUp(
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Handling Public Revision Check (Up) for dependent: " + rel.getOwner().getId() + " in slot " + rel.getConfig().getLabel());
+		
+		//Check if the item has a public revision or not.
+		if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(rel.getOwner(), wvc)) 
 			return RelationshipWFTransitionCheckResult.ContinueTransition;
 		else 
 		{

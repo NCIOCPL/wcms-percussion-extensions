@@ -16,8 +16,9 @@ public class SharedRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
 	@Override
-	public RelationshipWFTransitionStopConditionResult validate(
-			PSComponentSummary contentItemSummary,
+	public RelationshipWFTransitionStopConditionResult validateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSComponentSummary dependentContentItemSummary,
 			PSRelationship rel, 
 			WorkflowValidationContext wvc
 			) throws WFValidationException 
@@ -35,7 +36,7 @@ public class SharedRelationshipWFTransitionStopCondition extends
 						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
 						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
 						ContentItemWFValidatorAndTransitioner.NON_PUBLIC_CHILD_IS_SHARED,
-						new Object[]{contentItemSummary.getContentId(), rel.getDependent().getId()});
+						new Object[]{ownerContentItemSummary.getContentId(), rel.getDependent().getId()});
 				return RelationshipWFTransitionStopConditionResult.StopTransition;
 			}
 		}
@@ -43,5 +44,25 @@ public class SharedRelationshipWFTransitionStopCondition extends
 			wvc.getLog().debug("Dependent ID: " + rel.getDependent().getId() + " is NOT Shared.");
 			return RelationshipWFTransitionStopConditionResult.Ok;
 		}
+	}
+	
+	@Override 
+	public RelationshipWFTransitionStopConditionResult validateUp(
+			PSComponentSummary dependentContentItemSummary, 
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		//There is no reason to check the parent to see if it is shared, if it is, then we would want
+		//to go to that item.  The earlier check would get there and say, yes, this item is shared stop
+		//going up.
+		wvc.getLog().error("Shared Check Stop Condition: Cannot validate upwards. Check configuration. Called on dependent with id: " + dependentContentItemSummary.getContentId());
+		throw new WFValidationException("System Error Occured. Please Check the logs.", true);
+	}
+
+	public SharedRelationshipWFTransitionStopCondition(
+			RelationshipWFTransitionStopConditionDirection checkDirection
+	) {
+		super(checkDirection);
 	}
 }

@@ -8,6 +8,7 @@ package gov.cancer.wcm.workflow;
 public class WorkflowConfiguration {
 	private ContentTypesConfigCollection contentTypes;
 	private RelationshipWFTransitionChecksCollection relationshipChecks;	
+	private WFTransitionMappings transitionMappings;
 	
 	/**
 	 * Gets the configurations for content types.  These are extra metadata about
@@ -27,6 +28,14 @@ public class WorkflowConfiguration {
 	public RelationshipWFTransitionChecksCollection getRelationshipConfigs() {
 		return relationshipChecks;
 	}
+	
+	/**
+	 * Gets the transition mappings for the workflow system.
+	 * @return
+	 */
+	public WFTransitionMappings getTransitionMappings() {
+		return this.transitionMappings;
+	}
 
 	/**
 	 * Initializes a new instance of the WorkflowConfiguration class.
@@ -35,10 +44,12 @@ public class WorkflowConfiguration {
 	 */
 	public WorkflowConfiguration(
 			ContentTypesConfigCollection contentTypes,
-			RelationshipWFTransitionChecksCollection relationshipChecks
+			RelationshipWFTransitionChecksCollection relationshipChecks,
+			WFTransitionMappings transitionMappings
 	) {
 		this.contentTypes = contentTypes;
-		this.relationshipChecks = relationshipChecks;		
+		this.relationshipChecks = relationshipChecks;
+		this.transitionMappings = transitionMappings;
 	}
 
 }
