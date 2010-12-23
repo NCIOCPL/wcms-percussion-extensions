@@ -336,14 +336,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @return
 	 */
 	//TODO: Update this to hasPublicRevision or is in a workflow state greater than the one we are transitioning to.	
-	public static boolean hasPublicRevision(PSLocator contentItemLocator, WorkflowValidationContext wvc) {
-		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(contentItemLocator.getId());
-
-		if (contentItemSummary == null) {
-			wvc.getLog().error("hasPublicRevision: Could not get contentItemSummary from Locator for item: " + contentItemLocator.getId());
-			throw new WFValidationException("Could not get contentItemSummary for content item: " + contentItemLocator.getId(), true);
-		}
-		
+	public static boolean hasPublicRevision(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {		
 		return contentItemSummary.getPublicRevision() != -1;
 	}	
 	
@@ -475,6 +468,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static final String PARENT_IS_CHECKED_OUT = "Could not promote item {0} because its parent item {1} is checked out to {2}.";
 	public static final String CHILD_IS_CHECKED_OUT = "Could not promote item {0} because its child item {1} is checked out to {2}.";
 	public static final String NON_PUBLIC_CHILD_IS_OTHER_COMMUNITY = "Could not promote item {0} because its child item {1} is in another community and not public.";
+	public static final String NON_PUBLIC_CHILD_IS_OTHER_WORKFLOW = "Could not promote item {0} because its child item {1} uses another workflow and is not public.";
 	public static final String NON_PUBLIC_CHILD_IS_TOP_TYPE = "Could not promote item {0} because its child item {1} is another page and not public.";
 	public static final String NON_PUBLIC_CHILD_IS_SHARED = "Could not promote item {0} because its child item {1} is shared and not public.";
 	

@@ -25,7 +25,7 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 			return RelationshipWFTransitionStopConditionResult.Ok;
 		}
 		else {
-			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(rel.getDependent(), wvc)) {
+			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(dependentContentItemSummary, wvc)) {
 				wvc.getLog().debug("Other Community Stop Condition (down): Dependent ID: " + rel.getDependent().getId() + " is in Other Community and has public revision.");
 				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
 			} else {
@@ -48,17 +48,8 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 			WorkflowValidationContext wvc
 	) {
 		wvc.getLog().debug("Other Community Stop Condition (Up): Checking owner: " + rel.getOwner().getId());
-		
-		//Get the summary
-		PSComponentSummary ownerSummary = ContentItemWFValidatorAndTransitioner.getSummaryFromId(rel.getOwner().getId());
-		
-		if (ownerSummary == null) {
-			//Do not add PSError since that will be added for us when the WFValidationException is thrown
-			wvc.getLog().error("OtherUserCheckedOut Stop Condition (Up): Could not get Component Summary for id: " + rel.getOwner().getId());
-			throw new WFValidationException("System Error Occured. Please Check the logs.", true);
-		}
-		
-		if (dependentContentItemSummary.getCommunityId() == ownerSummary.getCommunityId()) {
+				
+		if (dependentContentItemSummary.getCommunityId() == ownerContentItemSummary.getCommunityId()) {
 			wvc.getLog().debug("Other Community Stop Condition (Up): Owner ID: " + rel.getOwner().getId() + " is in Same Community.");
 			return RelationshipWFTransitionStopConditionResult.Ok;
 		}
