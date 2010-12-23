@@ -14,7 +14,7 @@ public class CGVConstants {
 	 public static String[] MULTI_PAGE_CONTAINER = {"cgvBooklet", "cgvPowerPoint", "cgvCancerBulletin"};
 	 public static String[] MULTI_PAGE_PAGES = {"cgvBookletPage", "cgvPowerPointPage", "cgvCancerBulletinPage"};
 	 public static String[] TCGA_TYPES = { "tcgaCancerSelected", "tcgaCancerType", "tcgaEvent", "tcgaListPage", "tcgaSeries", "tcgaNewsRelease"};
-	 public static String[] CROSS_SITE_TYPES = {"nciGeneral", "nciHome", "nciLandingPage",};
+	 public static String[] CROSS_SITE_TYPES = {"nciGeneral", "nciHome", "nciLandingPage", "nciErrorPage"};
 	 public static String[] TOP_CONTENT_TYPE_NAMES = {
 		 "cgvBooklet", 
 		 "cgvBookletPage", 
@@ -32,6 +32,7 @@ public class CGVConstants {
 		 "nciGeneral",
 		 "nciHome",
 		 "nciLandingPage",
+		 "nciErrorPage",
 		 "cgvManualRSS",
 		 "cgvAutoRSS",
 		 "cgvBestBetsCategory",
