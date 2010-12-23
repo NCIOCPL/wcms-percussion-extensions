@@ -173,6 +173,10 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			{
 				m = editionList.get("CancerGov Workflow");
 			}
+			else if(community.equalsIgnoreCase("CancerGov_Configuration"))
+			{
+				m = editionList.get("CancerGov Workflow");
+			}
 			else{
 				m = editionList.get("Shared Workflow");
 			}
