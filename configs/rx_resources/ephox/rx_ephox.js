@@ -1477,11 +1477,12 @@ function cGovPrepareStr(data) {
 	// second way. If this turns out to not be the case, we'll have to run the first two expressions as well
 	// as the second.
 //	var rxDict1 = new RegExp("<a\\s+(href=.+dictionary/db_alpha.aspx.+</a>)","i");
-//	var rxDef1 = new RegExp("<a\\s+(class=\"definition\".+?>.+?</a>)");
+	var rxDef1 = new RegExp("<a\\s+(class=\"definition\".+?>.+?</a>)");
 	var rxDict2 = new RegExp("<a\\s+(onclick=\"javascript:popWindow.+?href=.+?dictionary/db_alpha.aspx.+?</a>)","i");
 	var rxDef2 = new RegExp("<a\\s+(onclick=\"javascript:popWindow.+?href=.+?popDefinition.aspx.+?</a>)");
 	tempData = cGovDoRegExp1(rxDict2, tempData);
 	tempData = cGovDoRegExp1(rxDef2, tempData);
+	tempData = cGovDoRegExp1(rxDef1, tempData);
 	for (var i=0;i<tempData.length;i++) {
 		var c = tempData.charAt(i);
 		if (c == "\n") {
