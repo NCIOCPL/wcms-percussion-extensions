@@ -66,6 +66,14 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent uses another workflow or
 		uses another workflow with a public revision.
 	 -->
+	<bean id="OtherWorkflowRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherCommunityRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
+
+	<!-- RelationshipWFTransitionStopCondition to check if the user has rights to transition
+		a dependent.
+	 -->
 	<bean id="WFTransitionAvailableRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.WFTransitionAvailableRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Both</value></constructor-arg>
@@ -113,10 +121,12 @@
 					<constructor-arg>
 						<list>
 							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />												
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
-							<!-- ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" /-->
+							<!-- At this point we know we are going to transition the dependent, but can we? -->							
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
 					</constructor-arg>
@@ -126,10 +136,12 @@
 					<constructor-arg>
 						<list>
 							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
-							<!-- ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" /-->
+							<!-- At this point we know we are going to transition the dependent, but can we? -->							
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
 						</list>
 					</constructor-arg>

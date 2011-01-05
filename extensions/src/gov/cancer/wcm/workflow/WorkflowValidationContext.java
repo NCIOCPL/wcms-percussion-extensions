@@ -1,15 +1,28 @@
 package gov.cancer.wcm.workflow;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.w3c.dom.Document;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.design.objectstore.PSRelationship;
+import com.percussion.design.objectstore.PSRole;
 import com.percussion.util.PSItemErrorDoc;
+import com.percussion.utils.types.PSPair;
+import com.percussion.webservices.security.IPSSecurityWs;
+import com.percussion.server.IPSRequestContext;
+import com.percussion.services.workflow.data.PSTransition;
 import com.percussion.services.workflow.data.PSState;
 import com.percussion.services.workflow.data.PSWorkflow;
+import com.percussion.services.workflow.data.PSWorkflowRole;
 
 
 /**
@@ -23,11 +36,18 @@ public class WorkflowValidationContext {
 	 
 	private Log _log;
 	private Document _errorDoc;
+	private IPSRequestContext _request;
 	private PSComponentSummary _initiatorContentItem;
 	private ArrayList<Integer> _transitionItemIds = new ArrayList<Integer>();
 	private PSState _initiatingItemWorkflowState;
 	private PSWorkflow _initiatingItemWorkflowApp;
-	private int _initiatingTransitionID = -1;
+	private PSTransition _initiatingTransition;
+	private List<PSWorkflowRole> _workflowRoles;
+	private Map<PSPair<String,String>, List<String>> _workflowTriggers;
+	private HashMap<String, PSTransition> _workflowTransitions = new HashMap<String, PSTransition>();
+	
+	//Hash to Cache PSStates.
+	private HashMap<Long, PSState> _wfStates = new HashMap<Long, PSState>();
 	
 	/**
 	 * Gets the log for this validation context
@@ -109,19 +129,130 @@ public class WorkflowValidationContext {
 		return items;
 	}
 	
+	/**
+	 * Gets a workflow state by its ID
+	 * @param stateId
+	 * @return
+	 */
+	public PSState getState(long stateId) {
+		Long iStateId = new Long(stateId);
+		
+		if (_wfStates.containsKey(iStateId))
+			return _wfStates.get(iStateId);
+		
+		//We *should* have the state so this is bad. 
+		return null;		
+	}
+	
+	/**
+	 * Gets the state the transition is trying to get to. 
+	 * @return
+	 */
+	public PSState getDestinationState() {
+		if (_wfStates.containsKey(_initiatingTransition.getToState()))
+			return _wfStates.get(_initiatingTransition.getToState());
+		
+		//We *should* have the state so this is bad.
+		return null;
+	}
+	
+	/**
+	 * Gets a list of transitions that must happen in order to move from
+	 * a state, fromState to the state we are transitioning to.
+	 * @param fromState the state to transition from
+	 * @return a List<PSTransitions> which contains the Transitions which must happen in order, or an empty list if the item does not need to transition
+	 */
+	public List<PSTransition> getTransitions(String fromState) {
+		ArrayList<PSTransition> transitions = new ArrayList<PSTransition>();
+
+		if (!_wfStates.containsKey(_initiatingTransition.getToState())) {
+			//TODO: Log Error
+			return transitions;
+		}
+		
+		PSPair<String,String> fromTo = new PSPair<String, String> (fromState, _wfStates.get(_initiatingTransition.getToState()).getName());
+		
+		if (_workflowTriggers.containsKey(fromTo)) {
+			for (String trigger : _workflowTriggers.get(fromTo)) {
+				if (_workflowTransitions.containsKey(trigger)) {
+					transitions.add(_workflowTransitions.get(trigger));					
+				} else {
+					//If we cannot find the transition that is bad.
+					_log.error("Workflow Validation Context: Could not get transition for trigger: " + trigger);
+					throw new WFValidationException("Error getting Transition for trigger: " + trigger, true);
+				}
+			}
+		}
+		
+		return transitions;
+	}
+	
+	/**
+	 * Gets the Request Context for the current validation.
+	 * @return
+	 */
+	public IPSRequestContext getRequest() {
+		return _request;
+	}
+	
+	/**
+	 * Gets the list of roles defined in the system.
+	 * @return
+	 */
+	public List<PSWorkflowRole> getWorkflowRoles() {
+		return _workflowRoles;
+	}
+	
 	public WorkflowValidationContext(
+			IPSRequestContext request,
 			PSComponentSummary initiatorContentItem, 
 			Log log, 
 			Document errorDoc,
 			PSWorkflow initiatingItemWorkflowApp,
 			PSState initiatingItemWorkflowState,
-			int initiatingTransitionID
+			long initiatingTransitionID
 	) {
-		_initiatorContentItem = initiatorContentItem;
+		_request = request;		
+		_initiatorContentItem = initiatorContentItem;		
 		_log = log;
 		_errorDoc = errorDoc;
 		_initiatingItemWorkflowApp = initiatingItemWorkflowApp;
 		_initiatingItemWorkflowState = initiatingItemWorkflowState;
-		_initiatingTransitionID = initiatingTransitionID;
+		
+		_workflowRoles = initiatingItemWorkflowApp.getRoles();		
+				
+		//Let's find all the workflow transitions we will be using and get them
+		//out into a structure before we look through all
+		WorkflowConfiguration config = WorkflowConfigurationLocator.getWorkflowConfiguration();
+		
+		_workflowTriggers = config.getTransitionMappings().getContentCreationTransitionTriggers(initiatingItemWorkflowApp.getName());
+		
+		HashSet<String> triggers = new HashSet<String>();
+		
+		for(List<String> triggerList : _workflowTriggers.values()) {
+			triggers.addAll(triggerList);
+		}				
+		
+				
+		//Load up the states.
+		for (PSState state : _initiatingItemWorkflowApp.getStates()) {
+			_wfStates.put(state.getStateId(), state);
+		
+			//Find the transition which is being initiated.
+			for (PSTransition transition: state.getTransitions()) {				
+				if (transition.getGUID().getUUID() == initiatingTransitionID) {
+					_initiatingTransition = transition;
+				}
+				
+				//Add the transition to the list of transitions which will be used
+				//in this workflow
+				if (triggers.contains(transition.getTrigger())) {
+					_workflowTransitions.put(transition.getTrigger(), transition);
+				}					
+			}
+			
+			//TODO: Check to see if _initiatingTransition is not null.
+		}
+				
 	}
 }
