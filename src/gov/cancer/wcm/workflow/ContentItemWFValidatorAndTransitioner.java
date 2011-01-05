@@ -28,6 +28,8 @@ import com.percussion.services.workflow.data.PSWorkflow;
 import com.percussion.util.PSItemErrorDoc;
 import com.percussion.utils.request.PSRequestInfo;
 import com.percussion.webservices.PSErrorException;
+import com.percussion.webservices.security.IPSSecurityWs;
+import com.percussion.webservices.security.PSSecurityWsLocator;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 
@@ -94,7 +96,7 @@ public class ContentItemWFValidatorAndTransitioner {
 				new PSGuid(PSTypeEnum.WORKFLOW,wfId));	   
 	   
 		//Setup the context for validation.
-		WorkflowValidationContext wvc = new WorkflowValidationContext(contentItemSummary, log, errorDoc, workflow, state, transitionID);
+		WorkflowValidationContext wvc = new WorkflowValidationContext(request, contentItemSummary, log, errorDoc, workflow, state, transitionID);
 				
 		//log.debug("Initiating Push for Content Item: " + id + "(" + contentTypeName +")");
 		
@@ -465,12 +467,14 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static final String NAVON_NOT_PUBLIC = "The navon with id {xx} must be promoted to Public before content item {System Title} can be promoted.";
 	public static final String ARCHIVE_PARENT_NOT_MOVING = "Could not archive the content item {System Title} because its parent item {System Title} has not been archived.";
 
+	public static final String PARENT_HAS_NO_AVAILABLE_TRANSITION = "Could not promote item {0} because the user does not have permission to transition its parent item {1}.";
 	public static final String PARENT_IS_CHECKED_OUT = "Could not promote item {0} because its parent item {1} is checked out to {2}.";
 	public static final String CHILD_IS_CHECKED_OUT = "Could not promote item {0} because its child item {1} is checked out to {2}.";
 	public static final String NON_PUBLIC_CHILD_IS_OTHER_COMMUNITY = "Could not promote item {0} because its child item {1} is in another community and not public.";
 	public static final String NON_PUBLIC_CHILD_IS_OTHER_WORKFLOW = "Could not promote item {0} because its child item {1} uses another workflow and is not public.";
 	public static final String NON_PUBLIC_CHILD_IS_TOP_TYPE = "Could not promote item {0} because its child item {1} is another page and not public.";
 	public static final String NON_PUBLIC_CHILD_IS_SHARED = "Could not promote item {0} because its child item {1} is shared and not public.";
+	public static final String NO_TRANSITION_AVAILABLE = "Could not promote item {0} because the user does not have permission to transition child item {1}.";
 	
 	public static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
 	public static final String ERR_FIELD = "N/A";
