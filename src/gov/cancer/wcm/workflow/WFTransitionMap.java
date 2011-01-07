@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.percussion.services.workflow.data.PSTransition;
 import com.percussion.utils.types.PSPair;
 
 /**
@@ -61,5 +62,36 @@ public class WFTransitionMap {
 	){
 		_contentCreationTransitions = contentCreationTransitions;
 		_contentArchivingTransitions = contentArchivingTransitions;
+	}
+	
+	
+	////////////////////////// TODO: FILL IN THE BELOW METHODS.
+	
+	/**
+	 * Check to see if the trigger name is in the archiving transitions map.
+	 * @param transitionMap - Map of the transitions to check against
+	 * @return
+	 */
+	public boolean isArchiving(HashMap<String, PSTransition> transitionMap ){
+		
+		HashMap<PSPair<String, String>, List<String>> triggers = new HashMap<PSPair<String, String>, List<String>>(); 
+		
+		for(String fromKey : _contentCreationTransitions.keySet()) {
+			for (String toKey : _contentCreationTransitions.get(fromKey).keySet()) {
+				PSPair<String, String> pair = new PSPair<String, String>(fromKey, toKey);
+				triggers.put(pair, _contentCreationTransitions.get(fromKey).get(toKey));
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Check to see if the trigger name is in the public transitions map.
+	 * @param fromState, name of the state the item is coming from.
+	 * @param toState, name of the state the item is transitioning to.
+	 * @return
+	 */
+	public boolean isPublic(){
+		return false;
 	}
 }

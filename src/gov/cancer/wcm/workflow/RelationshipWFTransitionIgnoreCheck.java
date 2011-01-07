@@ -47,5 +47,25 @@ public class RelationshipWFTransitionIgnoreCheck extends
 		super(relationshipName);
 	}
 	
+	@Override
+	public RelationshipWFTransitionCheckResult archiveValidateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+
+		
+		return RelationshipWFTransitionCheckResult.ContinueTransition;
+	}
+
+	@Override
+	public RelationshipWFTransitionCheckResult archiveValidateUp(
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {		
+		return RelationshipWFTransitionCheckResult.ContinueTransition;
+	}
+	
 
 }

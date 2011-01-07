@@ -9,7 +9,16 @@ public class WorkflowConfiguration {
 	private ContentTypesConfigCollection contentTypes;
 	private RelationshipWFTransitionChecksCollection relationshipChecks;	
 	private WFTransitionMappings transitionMappings;
+	private ValidatorIgnoreConfig validatorIgnore;
 	
+	public ValidatorIgnoreConfig getValidatorIgnore() {
+		return validatorIgnore;
+	}
+
+	public void setValidatorIgnore(ValidatorIgnoreConfig validatorIgnore) {
+		this.validatorIgnore = validatorIgnore;
+	}
+
 	/**
 	 * Gets the configurations for content types.  These are extra metadata about
 	 * a content type since it is not possible to add extra metadata to a content
@@ -45,11 +54,13 @@ public class WorkflowConfiguration {
 	public WorkflowConfiguration(
 			ContentTypesConfigCollection contentTypes,
 			RelationshipWFTransitionChecksCollection relationshipChecks,
-			WFTransitionMappings transitionMappings
+			WFTransitionMappings transitionMappings, 
+			ValidatorIgnoreConfig validatorIgnore
 	) {
 		this.contentTypes = contentTypes;
 		this.relationshipChecks = relationshipChecks;
 		this.transitionMappings = transitionMappings;
+		this.validatorIgnore = validatorIgnore;
 	}
 
 }

@@ -53,6 +53,36 @@ public abstract class BaseRelationshipWFTransitionCheck {
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 			);
+	
+	/**
+	 * Validates whether or not this relationship should stop the transition or not when the check is going down.
+	 * Follow types should be expected to include a list of dependents which need to be included
+	 * in transitions.
+	 * This is run when an archiving transition is called.
+	 * @param ownerContentItemSummary 
+	 * @param rel
+	 * @return
+	 */
+	public abstract RelationshipWFTransitionCheckResult archiveValidateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+			);
+	
+	/**
+	 * Validates whether or not this relationship should stop the transition or not when the check is going up.
+	 * Follow types should be expected to include a list of dependents which need to be included
+	 * in transitions.
+	 * This is run when an archiving transition is called.
+	 * @param dependentContentItemSummary 
+	 * @param rel
+	 * @return
+	 */
+	public abstract RelationshipWFTransitionCheckResult archiveValidateUp(
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+			);
 
 	/**
 	 * 
