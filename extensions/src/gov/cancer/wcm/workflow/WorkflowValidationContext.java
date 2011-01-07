@@ -253,6 +253,52 @@ public class WorkflowValidationContext {
 			
 			//TODO: Check to see if _initiatingTransition is not null.
 		}
-				
+		
+		//JOHN TODO: ADD CHECK HERE FOR IS ARCHIVING?
+		
+	}
+	
+	/**
+	 * Checks to see if the current transition (in the context) is a transition dealing with archiving.
+	 * @return
+	 */
+	public boolean isArchiveTransition(){
+		
+		return false;		
+	}
+	
+	/**
+	 * Checks to see if the current transition (in the context) is a transition dealing with publishing.
+	 * @return
+	 */
+	public boolean isPublicTransition(){
+		return false;		
+	}
+	
+	/**
+	 * Checks to see if the current transition (in the context) is one of the ignorable triggers, or if it
+	 * is in one of the ignorable workflows.
+	 * @return
+	 */
+	public boolean ignoreValidator(){
+		
+		_wfStates.get(_initiatingTransition.getToState()).getName();
+		String initWorkflowName = _initiatingItemWorkflowApp.getName();
+		
+		/**
+		 * Check if the workflow trigger is in the workflow trigger list to ignore.
+		 */
+//		if(){
+//			
+//		}
+		
+		/**
+		 * Check if the workflow is in the workflow list to ignore.
+		 */
+//		if(){
+//			
+//		}
+		
+		return false;		
 	}
 }
