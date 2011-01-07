@@ -280,25 +280,25 @@ public class WorkflowValidationContext {
 	 * is in one of the ignorable workflows.
 	 * @return
 	 */
-	public boolean ignoreValidator(){
-		
-		_wfStates.get(_initiatingTransition.getToState()).getName();
-		String initWorkflowName = _initiatingItemWorkflowApp.getName();
-		
-		/**
-		 * Check if the workflow trigger is in the workflow trigger list to ignore.
-		 */
-//		if(){
-//			
-//		}
-		
-		/**
-		 * Check if the workflow is in the workflow list to ignore.
-		 */
-//		if(){
-//			
-//		}
-		
-		return false;		
-	}
+//	public boolean ignoreValidator(){
+//		
+//		_wfStates.get(_initiatingTransition.getToState()).getName();
+//		String initWorkflowName = _initiatingItemWorkflowApp.getName();
+//		
+//		/**
+//		 * Check if the workflow trigger is in the workflow trigger list to ignore.
+//		 */
+////		if(){
+////			
+////		}
+//		
+//		/**
+//		 * Check if the workflow is in the workflow list to ignore.
+//		 */
+////		if(){
+////			
+////		}
+//		
+//		return false;		
+//	}
 }

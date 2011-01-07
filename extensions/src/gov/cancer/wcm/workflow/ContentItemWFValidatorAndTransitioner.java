@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gov.cancer.wcm.util.CGV_TypeNames;
+import gov.cancer.wcm.workflow.checks.BaseRelationshipWFTransitionCheck;
+import gov.cancer.wcm.workflow.checks.RelationshipWFTransitionCheckResult;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
@@ -94,7 +96,31 @@ public class ContentItemWFValidatorAndTransitioner {
 		PSWorkflow workflow = workflowService.loadWorkflow(new PSGuid(PSTypeEnum.WORKFLOW, wfId));
 		PSState state = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, wfState),
 				new PSGuid(PSTypeEnum.WORKFLOW,wfId));	   
-	   
+
+		//JOHN TODO: Check if the transition is going to be ignored.
+		//get bean list for workflow && compare with PSWorkflow workflow.getName()
+		WorkflowConfiguration config = WorkflowConfigurationLocator.getWorkflowConfiguration();
+		ValidatorIgnoreConfig ignoreCheck = config.getValidatorIgnore();
+		
+		for( String currWkflw : ignoreCheck.getIgnoreWorkflows() ){
+			if(workflow.getName().equalsIgnoreCase(currWkflw)){
+				return;
+			}
+		}
+		
+		//convert state + transitionid into a trigger name
+		String triggerName = null;
+		for (PSTransition tran : state.getTransitions()){
+			if (tran.getGUID().getUUID() == transitionID){
+				 triggerName = tran.getTrigger();
+			}
+		}
+		if(triggerName != null){
+			if(ignoreCheck.getIgnoreTriggers().contains(triggerName)){
+				return;
+			}
+		}
+
 		//Setup the context for validation.
 		WorkflowValidationContext wvc = new WorkflowValidationContext(request, contentItemSummary, log, errorDoc, workflow, state, transitionID);
 				

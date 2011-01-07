@@ -1,7 +1,6 @@
 package gov.cancer.wcm.workflow.checks;
 
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
-import gov.cancer.wcm.workflow.RelationshipWFTransitionCheckResult;
 import gov.cancer.wcm.workflow.RelationshipWFTransitionTypes;
 import gov.cancer.wcm.workflow.WFValidationException;
 import gov.cancer.wcm.workflow.WorkflowValidationContext;
