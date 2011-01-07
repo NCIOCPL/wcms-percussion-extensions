@@ -35,6 +35,22 @@
 			</bean>
 		</constructor-arg>
 	</bean>
+
+	<bean id="ValidatorIgnoreConfig" class="gov.cancer.wcm.workflow.ValidatorIgnoreConfig">
+		<!-- Ignore Workflow Triggers -->
+		<constructor-arg>
+			<list>
+				<value>Migrate</value>
+			</list>
+		</constructor-arg>
+		<!-- Ignore Workflows  -->
+		<constructor-arg>
+			<list>
+				<value>CGV_Navon_Workflow</value>
+			</list>
+		</constructor-arg>
+	</bean>
+	
 	
 	<!-- This section defines the RelationshipWFTransitionStopCondition classes so they
 		may be referenced in the RelationshipWFTransitionChecks below.	
@@ -401,5 +417,6 @@
 		<constructor-arg><ref bean="ContentTypesConfig"/></constructor-arg>
 		<constructor-arg><ref bean="RelationshipChecks"/></constructor-arg>
 		<constructor-arg><ref bean="WorkflowTransitionMappings" /></constructor-arg>
+		<constructor-arg><ref bean="ValidatorIgnoreConfig" /></constructor-arg>
 	</bean>
 </beans>
