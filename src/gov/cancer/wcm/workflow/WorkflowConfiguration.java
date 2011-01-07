@@ -1,5 +1,7 @@
 package gov.cancer.wcm.workflow;
 
+import gov.cancer.wcm.workflow.checks.RelationshipWFTransitionChecksCollection;
+
 /**
  * Defines the workflow configuration for the WCM Project
  * @author bpizzillo
