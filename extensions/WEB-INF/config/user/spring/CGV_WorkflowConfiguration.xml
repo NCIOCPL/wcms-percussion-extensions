@@ -135,6 +135,13 @@
 		<constructor-arg><value>Down</value></constructor-arg>
 	</bean>
 	
+	<!-- ContentTypeValidationRelationshipWFTransitionStopCondition to check the dependent's validation list.
+	 -->
+	<bean id="ContentTypeValidationRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.ContentTypeValidationRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
+	
 
 		
 	<!-- Defines configuration for relationships -->
@@ -163,7 +170,8 @@
 							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />												
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
-							<!-- At this point we know we are going to transition the dependent, but can we? -->							
+							<!-- At this point we know we are going to transition the dependent, but can we? -->	
+							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />					
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
@@ -178,7 +186,8 @@
 							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
-							<!-- At this point we know we are going to transition the dependent, but can we? -->							
+							<!-- At this point we know we are going to transition the dependent, but can we? -->
+							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />								
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />

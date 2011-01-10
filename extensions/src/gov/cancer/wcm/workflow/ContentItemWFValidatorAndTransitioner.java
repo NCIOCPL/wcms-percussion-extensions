@@ -148,9 +148,10 @@ public class ContentItemWFValidatorAndTransitioner {
 		
 		//The following holds true for non-archiving transitions.
 		try {
-			PSComponentSummary pushRoot = getTransitionRoot(contentItemSummary, wvc);			
-			pushContentItem(pushRoot, wvc);
-			
+			PSComponentSummary pushRoot = getTransitionRoot(contentItemSummary, wvc);
+			if(validate(pushRoot, wvc)){
+				pushContentItem(pushRoot, wvc);
+			}
 		} catch (WFValidationException validationEx) {
 			if (!validationEx.hasBeenLogged())
 				log.error("Error Occured while Validating", validationEx);
@@ -296,16 +297,13 @@ public class ContentItemWFValidatorAndTransitioner {
 		}
 		
 		wvc.getLog().debug("Found " + rels.size() + " relationships for Content ID: " + contentItemSummary.getContentId());
-				
+						
 		//Loop through relationships and validate.  If a relationship is a follow relationship,
 		//then the content ids which should be transition will be added to the WorkflowValidationContext
 		//for later use.
 		for (PSRelationship rel:rels) {
 			String relName = rel.getConfig().getName();
 			wvc.getLog().debug("Found " + relName + " relationship for Content ID: " + contentItemSummary.getContentId());
-					
-			//Validate the node
-			workflowConfig.getContentTypes().getContentTypeOrDefault("contentTypeName").getValidatorCollection().validate(contentItemSummary, rel, wvc);
 			
 			//JOHN TODO: Change this so it takes a list from the config, and then uses all the things in that list.
 			//Check config for relationship with that name. (Or get default)
@@ -508,6 +506,26 @@ public class ContentItemWFValidatorAndTransitioner {
 	   if (b == null)
 	      return false;
 	   return b.booleanValue();
+	}
+	
+	public static boolean validate(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc){
+		String contentTypeName = "";
+		try {
+			contentTypeName = CGV_TypeNames.getTypeName(contentItemSummary.getContentTypeGUID().getUUID());
+		} catch (Exception ex) {
+			wvc.getLog().error("isTopType: Could not get content type name for id: " + contentItemSummary.getContentTypeGUID().getUUID(), ex);
+			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
+		}
+		if(	!workflowConfig.getContentTypes().
+				getContentTypeOrDefault(contentTypeName).
+				getValidatorCollection().
+				validate(contentItemSummary, null, wvc) ){
+			//Failed the validation
+			wvc.getLog().error("Failed the validation check for item with content id: " + 
+					contentItemSummary.getContentId() + ", see log for errors.", null);
+			return false;
+		}
+		return true;
 	}
 	
 	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
