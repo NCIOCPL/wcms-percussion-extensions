@@ -97,18 +97,20 @@ public class ContentItemWFValidatorAndTransitioner {
 		PSState state = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, wfState),
 				new PSGuid(PSTypeEnum.WORKFLOW,wfId));	   
 
-		//JOHN TODO: Check if the transition is going to be ignored.
-		//get bean list for workflow && compare with PSWorkflow workflow.getName()
+		//Check to see if the workflow code is going to be ignored (configurable list of triggers/workflows to ignore)
+		
+		//Get the configuration bean.
 		WorkflowConfiguration config = WorkflowConfigurationLocator.getWorkflowConfiguration();
 		ValidatorIgnoreConfig ignoreCheck = config.getValidatorIgnore();
 		
 		for( String currWkflw : ignoreCheck.getIgnoreWorkflows() ){
+			//If the current workflow is in the list of ignored workflows, return.
 			if(workflow.getName().equalsIgnoreCase(currWkflw)){
 				return;
 			}
 		}
 		
-		//convert state + transitionid into a trigger name
+		//Find the trigger name.
 		String triggerName = null;
 		for (PSTransition tran : state.getTransitions()){
 			if (tran.getGUID().getUUID() == transitionID){
@@ -116,6 +118,7 @@ public class ContentItemWFValidatorAndTransitioner {
 			}
 		}
 		if(triggerName != null){
+			//If the trigger name is in the list of ignored triggers, return.
 			if(ignoreCheck.getIgnoreTriggers().contains(triggerName)){
 				return;
 			}
@@ -300,10 +303,16 @@ public class ContentItemWFValidatorAndTransitioner {
 		for (PSRelationship rel:rels) {
 			String relName = rel.getConfig().getName();
 			wvc.getLog().debug("Found " + relName + " relationship for Content ID: " + contentItemSummary.getContentId());
-						
+					
+			//Validate the node
+			workflowConfig.getContentTypes().getContentTypeOrDefault("contentTypeName").getValidatorCollection().validate(contentItemSummary, rel, wvc);
+			
+			//JOHN TODO: Change this so it takes a list from the config, and then uses all the things in that list.
 			//Check config for relationship with that name. (Or get default)
 			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
-
+			
+			//JOHN TODO: Change this so it uses the correct validate (archiveDown vs validateDown), based off the triggers in the
+			//transition mapping.
 			RelationshipWFTransitionCheckResult result = transitionCheck.validateDown(contentItemSummary, rel, wvc);
 			if (result == RelationshipWFTransitionCheckResult.StopTransition) {
 				
@@ -313,7 +322,7 @@ public class ContentItemWFValidatorAndTransitioner {
 				return RelationshipWFTransitionCheckResult.StopTransition;
 			}
 		}
-		
+			
 		//If we have gotten here then everything is ok.
 		return RelationshipWFTransitionCheckResult.ContinueTransition;
 	}
@@ -443,11 +452,12 @@ public class ContentItemWFValidatorAndTransitioner {
 		}
 
 		//Check Navon
-		if (config.getRequiresParentNavonsPublic() && ContentItemWFValidatorAndTransitioner.areParentNavonsPublic(contentItemSummary) == false) {
-			//Error Out Because public navons are required but they are not public.
-			wvc.getLog().debug("Parent Navons are not Public for content item: " + contentItemSummary.getContentId());			
-			return false;
-		}
+		//JOHN TODO: Change this to use the new "validator" class that is in a list, inside of a CTListConfig object.
+//		if (config.getRequiresParentNavonsPublic() && ContentItemWFValidatorAndTransitioner.areParentNavonsPublic(contentItemSummary) == false) {
+//			//Error Out Because public navons are required but they are not public.
+//			wvc.getLog().debug("Parent Navons are not Public for content item: " + contentItemSummary.getContentId());			
+//			return false;
+//		}
 		
 		return true;
 	}

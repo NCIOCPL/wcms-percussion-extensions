@@ -44,16 +44,16 @@
 	 -->
 	<bean id="PublicNavonNeeded" class="gov.cancer.wcm.workflow.validators.PublicNavonNeeded"/>
 
-	<bean id="PublishableTypeValidators" class="gov.cancer.wcm.workflow.CTValidatorCollection">
+	<bean id="PublishableTypeValidators" class="gov.cancer.wcm.workflow.validators.CTValidatorCollection">
 		<constructor-arg>
 			<list>
 				<ref bean="PublicNavonNeeded" />
-				<ref bean="NonImplementedExampleValidator" />
+				<!--  <ref bean="NonImplementedExampleValidator" />  -->
 			</list>
 		</constructor-arg>
 	</bean>
 	
-	<bean id="EmptyTypeValidators" class="gov.cancer.wcm.workflow.CTValidatorCollection">
+	<bean id="EmptyTypeValidators" class="gov.cancer.wcm.workflow.validators.CTValidatorCollection">
 		<constructor-arg>
 			<list>
 			</list>
