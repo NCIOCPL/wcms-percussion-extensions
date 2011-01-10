@@ -171,7 +171,7 @@
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />												
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
 							<!-- At this point we know we are going to transition the dependent, but can we? -->	
-							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />					
+							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />		
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
 							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
