@@ -23,7 +23,7 @@
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>nciGeneral</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
-					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="ExampleListConfig" /></constructor-arg>
 				</bean>
 			</list>
 		</constructor-arg>
@@ -31,7 +31,7 @@
 			<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 				<constructor-arg><value>default</value></constructor-arg>
 				<constructor-arg><value>false</value></constructor-arg>
-				<constructor-arg><value>false</value></constructor-arg>
+				<constructor-arg><ref bean="default" /></constructor-arg>
 			</bean>
 		</constructor-arg>
 	</bean>
@@ -50,8 +50,40 @@
 			</list>
 		</constructor-arg>
 	</bean>
+
+	<bean id="CTListConfigCollection" class="gov.cancer.wcm.workflow.CTListConfigCollection">
+		<constructor-arg>
+			<list>
+				<bean id="ExampleListConfig" class="gov.cancer.wcm.workflow.CTListConfig">
+					<!-- Validator List -->
+					<constructor-arg>
+						<list>
+							<ref bean="PublicNavonNeeded" />
+							<ref bean="NonImplementedExampleValidator" />
+						</list>
+					</constructor-arg>
+				</bean>
+				<bean id="default" class="gov.cancer.wcm.workflow.CTListConfig">
+					<!-- Validator List -->
+					<constructor-arg>
+						<list>
+						</list>
+					</constructor-arg>
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<!-- This section defines the ContentType Validator classes so they
+		may be referenced in the CTListConfig.	
+	-->
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not a Top Type or
+		is a Top Type with a public revision.
+	 -->
+	<bean id="PublicNavonNeeded" class="gov.cancer.wcm.workflow.validators.PublicNavonNeeded"/>
 	
 	
+		
 	<!-- This section defines the RelationshipWFTransitionStopCondition classes so they
 		may be referenced in the RelationshipWFTransitionChecks below.	
 	-->
