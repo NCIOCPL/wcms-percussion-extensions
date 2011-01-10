@@ -1,11 +1,17 @@
 package gov.cancer.wcm.workflow;
 
+import gov.cancer.wcm.workflow.validators.CTValidatorCollection;
+
 public class ContentTypeConfig {
 	private boolean isTopType;
-	private boolean requiresParentNavonsPublic;
-	
+	//private boolean requiresParentNavonsPublic;
 	private String name;
-	
+	private CTValidatorCollection validatorCollection;
+
+	public CTValidatorCollection getValidatorCollection() {
+		return validatorCollection;
+	}
+
 	public String getName(){
 		return this.name;
 	}
@@ -17,14 +23,10 @@ public class ContentTypeConfig {
 		return this.isTopType;
 	}
 	
-	public boolean getRequiresParentNavonsPublic(){
-		return this.requiresParentNavonsPublic;
-	}
-	
-	
-	private ContentTypeConfig(String name, boolean isTopType, boolean requiresParentNavonsPublic) {
+	private ContentTypeConfig(String name, boolean isTopType, CTValidatorCollection validatorCollection) {
 		this.name = name;
 		this.isTopType = isTopType;
-		this.requiresParentNavonsPublic = requiresParentNavonsPublic;
+		//this.requiresParentNavonsPublic = requiresParentNavonsPublic;
+		this.validatorCollection = validatorCollection;
 	}
 }
