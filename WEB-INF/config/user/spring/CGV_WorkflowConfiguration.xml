@@ -58,7 +58,7 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not a Top Type or
 		is a Top Type with a public revision.
 	 -->
-	<bean id="TopTypeRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.TopTypeRelationshipWFTransitionStopCondition">
+	<bean id="TopTypeRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.TopTypeRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Down</value></constructor-arg>
 	</bean>
@@ -66,7 +66,7 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not shared or
 		is shared with a public revision.
 	 -->
-	<bean id="SharedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.SharedRelationshipWFTransitionStopCondition">
+	<bean id="SharedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.SharedRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Down</value></constructor-arg>
 	</bean>
@@ -74,7 +74,7 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not in another community or
 		is in another community with a public revision.
 	 -->
-	<bean id="OtherCommunityRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherCommunityRelationshipWFTransitionStopCondition">
+	<bean id="OtherCommunityRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.OtherCommunityRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Both</value></constructor-arg>
 	</bean>
@@ -82,7 +82,7 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent uses another workflow or
 		uses another workflow with a public revision.
 	 -->
-	<bean id="OtherWorkflowRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherCommunityRelationshipWFTransitionStopCondition">
+	<bean id="OtherWorkflowRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.OtherCommunityRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Both</value></constructor-arg>
 	</bean>
@@ -90,7 +90,7 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the user has rights to transition
 		a dependent.
 	 -->
-	<bean id="WFTransitionAvailableRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.WFTransitionAvailableRelationshipWFTransitionStopCondition">
+	<bean id="WFTransitionAvailableRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.WFTransitionAvailableRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Both</value></constructor-arg>
 	</bean>
@@ -99,7 +99,7 @@
 	<!-- RelationshipWFTransitionStopCondition to check if a dependent is checked out by another user. 
 		this is not a condition which is ok to continue.
 	-->
-	<bean id="OtherUserLockedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.OtherUserLockedRelationshipWFTransitionStopCondition">
+	<bean id="OtherUserLockedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.OtherUserLockedRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Both</value></constructor-arg>
 	</bean>
@@ -107,7 +107,7 @@
 
 	<!-- RelationshipWFTransitionStopCondition to check the dependent's relationships.
 	 -->
-	<bean id="DependentsCheckRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.DependentsCheckRelationshipWFTransitionStopCondition">
+	<bean id="DependentsCheckRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.DependentsCheckRelationshipWFTransitionStopCondition">
 	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
 		<constructor-arg><value>Down</value></constructor-arg>
 	</bean>
@@ -129,10 +129,10 @@
 		          owner, and the transition will not stop if the dependent does not have a
 			       public revision.  This is the out of the box behavior of Percussion.
 	-->
-	<bean id="RelationshipChecks" class="gov.cancer.wcm.workflow.RelationshipWFTransitionChecksCollection">
+	<bean id="RelationshipChecks" class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionChecksCollection">
 		<constructor-arg>
 			<list>
-				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowCheck">
+				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
 					<constructor-arg><value>CDE</value></constructor-arg>
 					<constructor-arg>
 						<list>
@@ -147,7 +147,7 @@
 						</list>
 					</constructor-arg>
 				</bean>
-				<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionFollowCheck">
+				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
 					<constructor-arg><value>Pages</value></constructor-arg>
 					<constructor-arg>
 						<list>
@@ -165,7 +165,7 @@
 			</list>
 		</constructor-arg>
 		<constructor-arg>
-			<bean class="gov.cancer.wcm.workflow.RelationshipWFTransitionPublicRevisionCheck">
+			<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionPublicRevisionCheck">
 				<constructor-arg><value>default</value></constructor-arg>
 			</bean>
 		</constructor-arg>

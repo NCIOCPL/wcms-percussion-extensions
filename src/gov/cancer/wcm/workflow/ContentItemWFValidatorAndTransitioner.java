@@ -475,17 +475,33 @@ public class ContentItemWFValidatorAndTransitioner {
 	}
 	
 	/**
-	 * Checks to see if a content item is shared.  Share being defined
-	 * as "if the item were to move to the public state, then the item 
-	 * would be a dependent in more than one follow relationship"  
-	 * @param request
-	 * @param errorDoc
-	 * @param contentItemSummary
-	 */
-//	private void isShared(IPSRequestContext request, Document errorDoc, PSComponentSummary contentItemSummary) {
-//		// find how many "follow" relationships the item is a dependent in.
-//	}
+	* set the exclusion flag.
+	* 
+	* @param req the request context of the caller.
+	* @param b the new exclusion value. <code>true</code> means that
+	*           subsequent effects should not interfere with event processing.
+	*/
+	public static void setExclusive(IPSRequestContext req, boolean b)
+	{
+	   req.setPrivateObject(EXCLUSION_FLAG, b);
+	}
 
+	/**
+	* tests if the exclusion flag is on.
+	* 
+	* @param req the parent request context.
+	* @return <code>true</code> if the exclusion flag is set.
+	*/
+	public static boolean isExclusive(IPSRequestContext req)
+	{
+	   Boolean b = (Boolean) req.getPrivateObject(EXCLUSION_FLAG);
+	   if (b == null)
+	      return false;
+	   return b.booleanValue();
+	}
+	
+	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
+	
 	//Below are the formatters for messages
 	public static final String ARCHIVE_SHARED = "The content item {System Title} is shared so it cannot be archived.";	
 	public static final String NO_PATH_TO_DEST = "Could not promote content item{System Title} to {Destination State} because its child item {System Title } cannot be promoted to {Destination State}.";
@@ -502,7 +518,6 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static final String NON_PUBLIC_CHILD_IS_SHARED = "Could not promote item {0} because its child item {1} is shared and not public.";
 	public static final String NO_TRANSITION_AVAILABLE = "Could not promote item {0} because the user does not have permission to transition child item {1}.";
 	
-	public static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
 	public static final String ERR_FIELD = "N/A";
 	public static final String ERR_FIELD_DISP = "N/A";	
 }

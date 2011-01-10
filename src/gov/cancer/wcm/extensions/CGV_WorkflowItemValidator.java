@@ -78,48 +78,24 @@ public class CGV_WorkflowItemValidator extends PSOAbstractItemValidationExit {
 	    String transitionid = req.getParameter(IPSHtmlParameters.SYS_TRANSITIONID);
 	    Validate.notEmpty(transitionid);
 	    String states = params[0].toString();
-	    if(!isExclusive(req)) {
-	    	setExclusive(req, true);
+	    if(!ContentItemWFValidatorAndTransitioner.isExclusive(req)) {
+	    	ContentItemWFValidatorAndTransitioner.setExclusive(req, true);
 	    	if(super.matchDestinationState(contentid, transitionid, states))
 	    	{
 		    	log.debug("Testing if transition of item is allowed, valid state for test");
 		    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);	    	
 		    	validator.performTest(req, errorDoc);
 	    	} 
-	    	setExclusive(req, false);
+	    	ContentItemWFValidatorAndTransitioner.setExclusive(req, false);
 	    }else {
 	    	log.debug("Exclusion flag detected");
 	    }	
 	    
 	} 
 	
-	 /**
-	    * set the exclusion flag.
-	    * 
-	    * @param req the request context of the caller.
-	    * @param b the new exclusion value. <code>true</code> means that
-	    *           subsequent effects should not interfere with event processing.
-	    */
-	   protected void setExclusive(IPSRequestContext req, boolean b)
-	   {
-	      req.setPrivateObject(EXCLUSION_FLAG, b);
-	   }
 
-	   /**
-	    * tests if the exclusion flag is on.
-	    * 
-	    * @param req the parent request context.
-	    * @return <code>true</code> if the exclusion flag is set.
-	    */
-	   protected boolean isExclusive(IPSRequestContext req)
-	   {
-	      Boolean b = (Boolean) req.getPrivateObject(EXCLUSION_FLAG);
-	      if (b == null)
-	         return false;
-	      return b.booleanValue();
-	   }
 	
-	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
+	
 	private static final String ERR_FIELD = "TransitionValidation";
 	private static final String ERR_FIELD_DISP = "TransitionValidation";
 }
