@@ -87,7 +87,7 @@ public class PublicNavonNeeded extends BaseContentTypeValidator {
 				}
 			}
 		}
-		wvc.getLog().debug("All navons are in public for item with content id: " + dependentContentItemSummary.getContentTypeId());
+		wvc.getLog().debug("All navons are in public for item with content id: " + dependentContentItemSummary.getContentId());
 		return allNavonsPublic; //There is no navon, so no need to check.
 	}
 
