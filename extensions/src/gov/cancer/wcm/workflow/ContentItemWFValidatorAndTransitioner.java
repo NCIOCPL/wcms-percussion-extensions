@@ -1,6 +1,7 @@
 package gov.cancer.wcm.workflow;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import gov.cancer.wcm.util.CGV_TypeNames;
@@ -17,8 +18,11 @@ import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.error.PSException;
+import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.catalog.PSTypeEnum;
+import com.percussion.services.guidmgr.IPSGuidManager;
+import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.guidmgr.data.PSGuid;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
@@ -28,8 +32,12 @@ import com.percussion.services.workflow.data.PSState;
 import com.percussion.services.workflow.data.PSTransition;
 import com.percussion.services.workflow.data.PSWorkflow;
 import com.percussion.util.PSItemErrorDoc;
+import com.percussion.utils.guid.IPSGuid;
 import com.percussion.utils.request.PSRequestInfo;
 import com.percussion.webservices.PSErrorException;
+import com.percussion.webservices.PSErrorsException;
+import com.percussion.webservices.content.IPSContentWs;
+import com.percussion.webservices.content.PSContentWsLocator;
 import com.percussion.webservices.security.IPSSecurityWs;
 import com.percussion.webservices.security.PSSecurityWsLocator;
 import com.percussion.webservices.system.IPSSystemWs;
@@ -147,10 +155,12 @@ public class ContentItemWFValidatorAndTransitioner {
 		// Step 1. Check if this is a top type and handle appropriately
 		
 		//The following holds true for non-archiving transitions.
+		PSComponentSummary pushRoot = null;
+		RelationshipWFTransitionCheckResult result = RelationshipWFTransitionCheckResult.StopTransition;
 		try {
-			PSComponentSummary pushRoot = getTransitionRoot(contentItemSummary, wvc);
+			pushRoot = getTransitionRoot(contentItemSummary, wvc);
 			if(validate(pushRoot, wvc)){
-				pushContentItem(pushRoot, wvc);
+				result = pushContentItem(pushRoot, wvc);
 			}
 		} catch (WFValidationException validationEx) {
 			if (!validationEx.hasBeenLogged())
@@ -159,9 +169,69 @@ public class ContentItemWFValidatorAndTransitioner {
 			PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "System Error Occured.  Please consult the logs.", null);
 		}
 		
+		
 		//If there was not an error, transition?
-		int[] itemsToTransition = wvc.getItemsToTransition();
-		wvc.getLog().debug("Items to transition: " + itemsToTransition.length);
+		//else, error
+		if(result == RelationshipWFTransitionCheckResult.ContinueTransition){
+			if(pushRoot != null){
+				//If root == initial transitioned item: remove it from the list, and add the root.
+				//It is already going to transition (that is what runs the code)
+				if(!pushRoot.equals(contentItemSummary)){
+					wvc.removeItemToTransition(contentItemSummary);
+					wvc.addItemToTransition(pushRoot);
+				}
+			}
+			PSComponentSummary[] itemsToTransition = wvc.getItemsToTransition();
+			wvc.getLog().debug("Items to transition: " + itemsToTransition.length);
+
+			PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
+			IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
+			IPSContentWs cws = PSContentWsLocator.getContentWebservice();
+			IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
+			for(PSComponentSummary item : itemsToTransition){
+				/**
+				 * Transition Items
+				 * --------------------------------------------------------------------------
+				 * 1.  Find the state item is in.
+				 * 2.  From the config, get the list of transition mappings/triggers.
+				 * 3.  Compare original context destination, to current state of item.
+				 * 4.  Find that mapping (item current --> context destination). Store in a list.
+				 * 5.  For all triggers in the list from Step 4, PercussionTransition(item). 
+				 * --------------------------------------------------------------------------
+				 */
+
+				//1. Find the state item is in.
+				PSState itemStartState = null;
+				try {
+					itemStartState = workInfo.findWorkflowState(Integer.toString(item.getContentId()));
+				} catch (PSException e) {
+					e.printStackTrace();
+					//TODO: Log the error.
+				}
+				if(itemStartState != null ){
+					//2. From the config, get the list of transition mappings/triggers.
+					//3. Compare original context destination, to current state of item.
+					//4. Find that mapping (item current --> context destination). Store in a list.
+					List<String> triggerList = null;
+
+					//5. For all triggers in the list from Step 4, PercussionTransition(item).
+					IPSGuid guid = gmgr.makeGuid(item.getCurrentLocator());
+					for( String trigger : triggerList ){
+						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
+						try {
+							sysws.transitionItems(temp, trigger);
+						} catch (PSErrorsException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+		else{
+			//error
+		}
+		
 		
 		PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Stopping For Testing", null);
 		//throw new PSException("STOPPING");
@@ -253,15 +323,23 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @param errorDoc
 	 * @param contentItemSummary
 	 */
-	private void pushContentItem(
+	private RelationshipWFTransitionCheckResult pushContentItem(
 			PSComponentSummary contentItemSummary,
 			WorkflowValidationContext wvc			
 			) 
 		throws WFValidationException
 	{
+		return validateChildRelationships(contentItemSummary, wvc);
 		
 		//Validate Dependents
-		validateChildRelationships(contentItemSummary, wvc);				
+		//RelationshipWFTransitionCheckResult result = validateChildRelationships(contentItemSummary, wvc);
+		
+//		if(result == RelationshipWFTransitionCheckResult.ContinueTransition){
+//			//Find mapping that leads to the correct destination for the dependents.
+//		}
+//		else{
+//			//An error occurred and we stop transition.
+//		}
 	}
 	
 	/*

@@ -12,17 +12,9 @@ import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.design.objectstore.PSRelationship;
 
 /**
- * Defines a RelationshipWFTransitionStopCondition to check the dependent
- * of a relationship's dependents.  This will continue following relationships
- * until it has no more relationships to follow.
- * 
- * This should always be the last Stop Condition of a Check.  This is because it
- * will actually push the dependent's ID into the list of items that should be
- * transitioned.  This is because we know that by the time we get to this point
- * the item has been validated as being ok for transitioning, we just need to
- * check its relationships.
- * 
- * @author bpizzillo
+ * Checks a list of BaseContentTypeValidator based off the content type, setup in the workflow config.
+ * Runs the entire list of the validators, catching any errors.
+ * @author wallsjt
  *
  */
 public class ContentTypeValidationRelationshipWFTransitionStopCondition extends
@@ -50,7 +42,7 @@ public class ContentTypeValidationRelationshipWFTransitionStopCondition extends
 				getValidatorCollection().
 				validate(dependentContentItemSummary, null, wvc) ){
 			//Failed the validation
-			wvc.getLog().error("Failed the validation check for item with content id: " + 
+			wvc.getLog().debug("Failed the validation check for item with content id: " + 
 					dependentContentItemSummary.getContentId() + ", see log for errors.", null);
 			return RelationshipWFTransitionStopConditionResult.StopTransition;
 		}
