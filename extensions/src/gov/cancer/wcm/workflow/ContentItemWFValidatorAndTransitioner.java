@@ -59,12 +59,18 @@ public class ContentItemWFValidatorAndTransitioner {
 	private static WorkflowConfiguration workflowConfig;
 	private static IPSSystemWs systemWebService;
 	private static IPSWorkflowService workflowService;
+	private static PSOWorkflowInfoFinder workInfoFinder;
+	private static IPSContentWs contentWebService;
+	private static IPSGuidManager guidManager;	
 	
 	static {
 		contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 		workflowConfig = WorkflowConfigurationLocator.getWorkflowConfiguration();
 		systemWebService = PSSystemWsLocator.getSystemWebservice();
 		workflowService = PSWorkflowServiceLocator.getWorkflowService();
+		workInfoFinder = new PSOWorkflowInfoFinder();
+		contentWebService = PSContentWsLocator.getContentWebservice();
+		guidManager = PSGuidManagerLocator.getGuidMgr();	
 	}
 	
 	public ContentItemWFValidatorAndTransitioner(Log log) {
@@ -173,6 +179,8 @@ public class ContentItemWFValidatorAndTransitioner {
 		//If there was not an error, transition?
 		//else, error
 		if(result == RelationshipWFTransitionCheckResult.ContinueTransition){
+			
+			//---------------------------------------------
 			if(pushRoot != null){
 				//If root == initial transitioned item: remove it from the list, and add the root.
 				//It is already going to transition (that is what runs the code)
@@ -181,13 +189,11 @@ public class ContentItemWFValidatorAndTransitioner {
 					wvc.addItemToTransition(pushRoot);
 				}
 			}
+			//---------------------------------------------
+			
 			PSComponentSummary[] itemsToTransition = wvc.getItemsToTransition();
 			wvc.getLog().debug("Items to transition: " + itemsToTransition.length);
 
-			PSOWorkflowInfoFinder workInfo = new PSOWorkflowInfoFinder();
-			IPSSystemWs sysws = PSSystemWsLocator.getSystemWebservice();
-			IPSContentWs cws = PSContentWsLocator.getContentWebservice();
-			IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
 			for(PSComponentSummary item : itemsToTransition){
 				/**
 				 * Transition Items
@@ -203,7 +209,7 @@ public class ContentItemWFValidatorAndTransitioner {
 				//1. Find the state item is in.
 				PSState itemStartState = null;
 				try {
-					itemStartState = workInfo.findWorkflowState(Integer.toString(item.getContentId()));
+					itemStartState = workInfoFinder.findWorkflowState(Integer.toString(item.getContentId()));
 				} catch (PSException e) {
 					e.printStackTrace();
 					//TODO: Log the error.
@@ -215,11 +221,11 @@ public class ContentItemWFValidatorAndTransitioner {
 					List<String> triggerList = null;
 
 					//5. For all triggers in the list from Step 4, PercussionTransition(item).
-					IPSGuid guid = gmgr.makeGuid(item.getCurrentLocator());
+					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
 					for( String trigger : triggerList ){
 						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
 						try {
-							sysws.transitionItems(temp, trigger);
+							systemWebService.transitionItems(temp, trigger);
 						} catch (PSErrorsException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
