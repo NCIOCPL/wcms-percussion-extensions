@@ -2,6 +2,7 @@ package gov.cancer.wcm.workflow.validators;
 
 import java.util.List;
 
+import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 import gov.cancer.wcm.workflow.WorkflowValidationContext;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
@@ -83,7 +84,12 @@ public class PublicNavonNeeded extends BaseContentTypeValidator {
 				if(!validFlag.equals("y") && !validFlag.equals("i"))
 				{
 					allNavonsPublic = false;
-					wvc.getLog().error("The navon with content id: " + summary.getContentId() + ", is not in Public." );
+					wvc.getLog().debug("The navon with content id: " + summary.getContentId() + ", is not in Public." );
+					wvc.addError(
+							ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+							ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+							ContentItemWFValidatorAndTransitioner.NAVON_NOT_PUBLIC,
+							new Object[]{summary.getContentId(), dependentContentItemSummary.getContentId()});
 				}
 			}
 		}

@@ -215,17 +215,17 @@ public class ContentItemWFValidatorAndTransitioner {
 					//TODO: Log the error.
 				}
 				if(itemStartState != null ){
-					//2. From the config, get the list of transition mappings/triggers.
-					//3. Compare original context destination, to current state of item.
-					//4. Find that mapping (item current --> context destination). Store in a list.
-					List<String> triggerList = null;
-
+					//2, 3, and 4.
+					List<PSTransition> transitionList = wvc.getTransitions(itemStartState.getName());
+					
 					//5. For all triggers in the list from Step 4, PercussionTransition(item).
 					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
-					for( String trigger : triggerList ){
+					for( PSTransition t :transitionList ){
 						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
 						try {
-							systemWebService.transitionItems(temp, trigger);
+							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
+									", Trigger Name: "+t.getName());
+							systemWebService.transitionItems(temp, t.getName());
 						} catch (PSErrorsException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -235,11 +235,11 @@ public class ContentItemWFValidatorAndTransitioner {
 			}
 		}
 		else{
-			//error
+			wvc.getLog().debug("There was an error while trying to transition dependents.  See log for more info.");
 		}
 		
 		
-		PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Stopping For Testing", null);
+		//PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Stopping For Testing", null);
 		//throw new PSException("STOPPING");
 		
 	}
@@ -261,7 +261,9 @@ public class ContentItemWFValidatorAndTransitioner {
 		PSRelationshipFilter filter = new PSRelationshipFilter();		
 		//This is going to be the current/edit revision for this content item.
 		filter.setDependent(contentItemSummary.getHeadLocator());		
-		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+		//filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+		//filter.limitToEditOrCurrentOwnerRevision(true);
+		filter.setCategory("rs_activeassembly");
 		
 		try {
 			rels = systemWebService.loadRelationships(filter);
@@ -389,18 +391,27 @@ public class ContentItemWFValidatorAndTransitioner {
 			String relName = rel.getConfig().getName();
 			wvc.getLog().debug("Found " + relName + " relationship for Content ID: " + contentItemSummary.getContentId());
 			
-			//JOHN TODO: Change this so it takes a list from the config, and then uses all the things in that list.
 			//Check config for relationship with that name. (Or get default)
 			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
 			
 			//JOHN TODO: Change this so it uses the correct validate (archiveDown vs validateDown), based off the triggers in the
 			//transition mapping.
-			RelationshipWFTransitionCheckResult result = transitionCheck.validateDown(contentItemSummary, rel, wvc);
-			if (result == RelationshipWFTransitionCheckResult.StopTransition) {
-				
-				//We found an issue while validating children so we should stop checking.
-				//TODO: Determine if we should continue validating on error just to get all error messages
-				//
+			RelationshipWFTransitionCheckResult result = null;
+			if( wvc.isArchiveTransition() ){
+				result = transitionCheck.archiveValidateDown(contentItemSummary, rel, wvc);
+			}
+			else{
+				result = transitionCheck.validateDown(contentItemSummary, rel, wvc);
+			}
+			if(result != null){
+				if (result == RelationshipWFTransitionCheckResult.StopTransition) {
+
+					//We found an issue while validating children so we should stop checking.
+					//TODO: Determine if we should continue validating on error just to get all error messages
+					return RelationshipWFTransitionCheckResult.StopTransition;
+				}
+			}
+			else{	//result failed, stop transition
 				return RelationshipWFTransitionCheckResult.StopTransition;
 			}
 		}
@@ -618,7 +629,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static final String ARCHIVE_SHARED = "The content item {System Title} is shared so it cannot be archived.";	
 	public static final String NO_PATH_TO_DEST = "Could not promote content item{System Title} to {Destination State} because its child item {System Title } cannot be promoted to {Destination State}.";
 	public static final String SHARED_ITEM_PAST_LOWEST = "Could not promote content item{System Title} because its child item {System Title } is being edited.";
-	public static final String NAVON_NOT_PUBLIC = "The navon with id {xx} must be promoted to Public before content item {System Title} can be promoted.";
+	public static final String NAVON_NOT_PUBLIC = "The navon with id {0} must be promoted to Public before content item {1} can be promoted.";
 	public static final String ARCHIVE_PARENT_NOT_MOVING = "Could not archive the content item {System Title} because its parent item {System Title} has not been archived.";
 
 	public static final String PARENT_HAS_NO_AVAILABLE_TRANSITION = "Could not promote item {0} because the user does not have permission to transition its parent item {1}.";
