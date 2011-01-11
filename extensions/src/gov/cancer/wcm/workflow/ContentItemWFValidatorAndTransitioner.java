@@ -224,8 +224,8 @@ public class ContentItemWFValidatorAndTransitioner {
 						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
 						try {
 							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
-									", Trigger Name: "+t.getName());
-							systemWebService.transitionItems(temp, t.getName());
+									", Trigger Name: "+t.getTrigger());
+							systemWebService.transitionItems(temp, t.getTrigger());
 						} catch (PSErrorsException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
