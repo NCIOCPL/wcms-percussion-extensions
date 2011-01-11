@@ -38,7 +38,7 @@ public class WorkflowValidationContext {
 	private Document _errorDoc;
 	private IPSRequestContext _request;
 	private PSComponentSummary _initiatorContentItem;
-	private ArrayList<Integer> _transitionItemIds = new ArrayList<Integer>();
+	private ArrayList<PSComponentSummary> _transitionItemIds = new ArrayList<PSComponentSummary>();
 	private PSState _initiatingItemWorkflowState;
 	private PSWorkflow _initiatingItemWorkflowApp;
 	private PSTransition _initiatingTransition;
@@ -112,19 +112,27 @@ public class WorkflowValidationContext {
 	 * Adds an id to the list of child items which need to be transitioned.
 	 * @param contentId
 	 */
-	public void addItemToTransition(int contentId) {
-		_transitionItemIds.add(contentId);
+	public void addItemToTransition(PSComponentSummary item) {
+		_transitionItemIds.add(item);
+	}	
+	
+	/**
+	 * Removes an id to the list of child items which does not need to be transitioned.
+	 * @param contentId
+	 */
+	public void removeItemToTransition(PSComponentSummary item) {
+		_transitionItemIds.remove(item);
 	}	
 	
 	/**
 	 * Gets a list of all of the content ids that would need to be transitioned.
 	 * @return
 	 */
-	public int[] getItemsToTransition() {
-		int[] items = new int[_transitionItemIds.size()];
+	public PSComponentSummary[] getItemsToTransition() {
+		PSComponentSummary[] items = new PSComponentSummary[_transitionItemIds.size()];
 		
 		for(int i =0; i<_transitionItemIds.size(); i++)
-			items[i] = _transitionItemIds.get(i).intValue();
+			items[i] = _transitionItemIds.get(i);
 		
 		return items;
 	}
@@ -275,30 +283,5 @@ public class WorkflowValidationContext {
 		return false;		
 	}
 	
-	/**
-	 * Checks to see if the current transition (in the context) is one of the ignorable triggers, or if it
-	 * is in one of the ignorable workflows.
-	 * @return
-	 */
-//	public boolean ignoreValidator(){
-//		
-//		_wfStates.get(_initiatingTransition.getToState()).getName();
-//		String initWorkflowName = _initiatingItemWorkflowApp.getName();
-//		
-//		/**
-//		 * Check if the workflow trigger is in the workflow trigger list to ignore.
-//		 */
-////		if(){
-////			
-////		}
-//		
-//		/**
-//		 * Check if the workflow is in the workflow list to ignore.
-//		 */
-////		if(){
-////			
-////		}
-//		
-//		return false;		
-//	}
+
 }

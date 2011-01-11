@@ -7,7 +7,14 @@ import gov.cancer.wcm.workflow.WorkflowValidationContext;
 import gov.cancer.wcm.workflow.checks.RelationshipWFTransitionCheckResult;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
+import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
+import com.percussion.services.guidmgr.IPSGuidManager;
+import com.percussion.services.guidmgr.PSGuidManagerLocator;
+import com.percussion.services.legacy.IPSCmsContentSummaries;
+import com.percussion.services.legacy.PSCmsContentSummariesLocator;
+import com.percussion.webservices.content.IPSContentWs;
+import com.percussion.webservices.content.PSContentWsLocator;
 
 /**
  * Defines a RelationshipWFTransitionStopCondition to check the dependent
@@ -45,7 +52,10 @@ public class DependentsCheckRelationshipWFTransitionStopCondition extends
 		//Check the dependent's relationships
 		if (ContentItemWFValidatorAndTransitioner.validateChildRelationships(dependentSummary, wvc) == RelationshipWFTransitionCheckResult.ContinueTransition) {
 			wvc.getLog().debug("Dependents Check Stop Condition: Adding dependent id: " + rel.getDependent().getId() + " to list of items to transition");
-			wvc.addItemToTransition(rel.getDependent().getId());
+			//PSLocator loc = rel.getDependent();
+			
+			IPSCmsContentSummaries contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
+			wvc.addItemToTransition(contentSummariesService.loadComponentSummary(rel.getDependent().getId()));
 			
 			//The below return is different from the rest of the stop conditions and that is because there is
 			//no difference for this stop condition between Ok and OkStopChecking.  We either cannot transition
