@@ -125,23 +125,23 @@ public class CGV_StateHelper {
 	public StateName toStateName(String curr){
 		if(curr.equalsIgnoreCase("Draft"))
 			return StateName.DRAFT;
-		else if(curr.equalsIgnoreCase("Review"))
+		else if(curr.equalsIgnoreCase("Review (D)"))
 			return StateName.REVIEW;
 		else if(curr.equalsIgnoreCase("Public"))
 			return StateName.PUBLIC;		
-		else if(curr.equalsIgnoreCase("Archived"))
+		else if(curr.equalsIgnoreCase("Private Archive"))
 			return StateName.ARCHIVED;		
 		else if(curr.equalsIgnoreCase("Editing"))
 			return StateName.EDITING;		
-		else if(curr.equalsIgnoreCase("Reapproval"))
+		else if(curr.equalsIgnoreCase("Review (P)"))
 			return StateName.REAPPROVAL;
-		else if(curr.equalsIgnoreCase("Pending"))
-			return StateName.PENDING;
-		else if(curr.equalsIgnoreCase("ArchiveApproval"))
+		//else if(curr.equalsIgnoreCase("Pending"))
+		//	return StateName.PENDING;
+		else if(curr.equalsIgnoreCase("Pending Archive"))
 			return StateName.ARCHIVEAPPROVAL;
-		else if(curr.equalsIgnoreCase("Staging"))
+		else if(curr.equalsIgnoreCase("Staging (D)"))
 			return StateName.STAGING;
-		else if(curr.equalsIgnoreCase("Restaging"))
+		else if(curr.equalsIgnoreCase("Staging (P)"))
 			return StateName.RESTAGING;
 		else
 			return null;
@@ -151,23 +151,23 @@ public class CGV_StateHelper {
 		if( state == StateName.DRAFT )
 			return "Draft";
 		else if(state == StateName.REVIEW )
-			return "Review";
+			return "Review (D)";
 		else if(state == StateName.PUBLIC )
 			return "Public";		
 		else if(state == StateName.ARCHIVED )
-			return "Archived";		
+			return "Private Archive";		
 		else if(state == StateName.EDITING )
 			return "Editing";		
 		else if(state == StateName.REAPPROVAL )
-			return "Reapproval";
-		else if(state == StateName.PENDING)
-			return "Pending";
+			return "Review (P)";
+//		else if(state == StateName.PENDING)
+//			return "Pending";
 		else if(state == StateName.ARCHIVEAPPROVAL)
-			return "ArchiveApproval";
+			return "Pending Archive";
 		else if(state == StateName.STAGING)
-			return "Staging";	
+			return "Staging (D)";	
 		else if(state == StateName.RESTAGING)
-			return "Restaging";
+			return "Staging (P)";
 		else
 			return "Null";
 	}

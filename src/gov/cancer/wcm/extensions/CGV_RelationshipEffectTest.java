@@ -44,9 +44,7 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 			IPSExecutionContext context, 
 			PSEffectResult result
 	)
-			throws PSExtensionProcessingException, PSParameterMismatchException 
-	{
-		// TODO Auto-generated method stub
+	throws PSExtensionProcessingException, PSParameterMismatchException {
 		result.setSuccess();
 	}
 
@@ -75,75 +73,84 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 		//however, we only want to fire for isPreWorkflow
 		if (!context.isPreWorkflow()) {
 			result.setWarning(
-	           "This effect is active only during relationship workflow");
+					"This effect is active only during relationship workflow");
 			return;
 		}
 
-		
+
 		//Checks to see if we have already processed this relationship.
 
 		boolean doesExclusiveExist = true;
-//		Boolean b = null;
-		try {
-			if(request.getPrivateObject(EXCLUSION_FLAG) != null){
-				doesExclusiveExist = true;
-			}
-			else{
-				doesExclusiveExist = false;
-			}
-		} catch (PSRuntimeException e) {
-			doesExclusiveExist = false;
-			e.printStackTrace();
+		if(request.getPrivateObject(EXCLUSION_FLAG) != null){
+			doesExclusiveExist = true;
 		}
-
-//		if (b == null){
-//			doesExclusiveExist = false;
-//		}
-//		else{
-//			doesExclusiveExist = true;
-//		}
+		else{
+			doesExclusiveExist = false;
+		}
 
 		if(doesExclusiveExist){
 			result.setWarning(
-	           "The exclusive flag exists for the transition.");
+					"The exclusive flag exists for the transition.");
 			return;
 		}
-		
-	    /**
-	     * request... get initiator and transition, pass into our stuff.
-	     * 
-	     * Private object, exclusive: check workflow states, see if the exclusive is in the execution context
-	     * if exclusive is flagged, we dont need to call this.
-	     * CALL: wfvalidator and transitioner
-	     * if exclusive, dont call effect
-	     * Does PRIVATE exclusive object exist???, setexclusive, isexclusive.
-	     * 
-	     */
-		
-		//PSRelationship currRel = context.getCurrentRelationship();		
 
-	    String wfAction = request.getParameter("WFAction", "").trim();
-	    if ((wfAction == null) || (wfAction.length() == 0))
-	    {
-	      result.setWarning("No WFAction?");
-	      return;
-	    }
-	    
-	    System.out.println("The exclusive flag does not exist. Calling the transitioner and validator workflow code.");
-	    Document errorDoc = PSXmlDocumentBuilder.createXmlDocument();
-    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);
-    	ContentItemWFValidatorAndTransitioner.setExclusive(request, true);
-	    try {
-			validator.performTest(request, errorDoc);
-	    } catch (PSException e) {
-	    	e.printStackTrace();
-		} catch (PSErrorException e) {
-			e.printStackTrace();
+		/**
+		 * request... get initiator and transition, pass into our stuff.
+		 * 
+		 * Private object, exclusive: check workflow states, see if the exclusive is in the execution context
+		 * if exclusive is flagged, we dont need to call this.
+		 * CALL: wfvalidator and transitioner
+		 * if exclusive, dont call effect
+		 * Does PRIVATE exclusive object exist???, setexclusive, isexclusive.
+		 * 
+		 */
+
+//		PSRelationship currRel = context.getCurrentRelationship();		
+//		if (context.getProcessedRelationships() != null) {
+//			for(Object processedRel : context.getProcessedRelationships()) {
+//				
+//				PSLocator currOwner = currRel.getOwner();
+//				PSLocator processedOwner = ((PSRelationship)processedRel).getOwner();
+//				PSLocator currDep = currRel.getDependent();
+//				PSLocator processedDep = ((PSRelationship)processedRel).getDependent();
+//				
+//				if (
+//					(currOwner.getId() == processedOwner.getId() &&	currDep.getId() == processedDep.getId())
+//					|| (currOwner.getId() == processedDep.getId() 
+//							&& currDep.getId() == processedOwner.getId() 
+//							&& currRel.getConfig().getType() == ((PSRelationship)processedRel).getConfig().getType()
+//					)
+//				) {
+//					result.setWarning("Skip: already processed same owner/dependent.");
+//					return;
+//				}			
+//			}			
+//		}		
+
+		String wfAction = request.getParameter("WFAction", "").trim();
+		if ((wfAction == null) || (wfAction.length() == 0))
+		{
+			result.setWarning("No WFAction?");
+			return;
 		}
-		ContentItemWFValidatorAndTransitioner.setExclusive(request, false);
-	    
-	    result.setSuccess();
-		//result.setError("This is an error");
+
+		System.out.println("The exclusive flag does not exist. Calling the transitioner and validator workflow code.");
+		Document errorDoc = PSXmlDocumentBuilder.createXmlDocument();
+		ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);
+		if(!ContentItemWFValidatorAndTransitioner.isExclusive(request)){
+			ContentItemWFValidatorAndTransitioner.setExclusive(request, true);
+			try {
+				validator.performTest(request, errorDoc);
+			} catch (PSException e) {
+				e.printStackTrace();
+			} catch (PSErrorException e) {
+				e.printStackTrace();
+			}
+			ContentItemWFValidatorAndTransitioner.setExclusive(request, false);
+		}
+
+		result.setWarning("Finished running the effect");
+		return;
 	}
 	
 	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
