@@ -586,7 +586,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	*/
 	public static void setExclusive(IPSRequestContext req, boolean b)
 	{
-	   req.setPrivateObject(EXCLUSION_FLAG, b);
+	   req.setSessionPrivateObject(EXCLUSION_FLAG, b);
 	}
 
 	/**
@@ -597,7 +597,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	*/
 	public static boolean isExclusive(IPSRequestContext req)
 	{
-	   Boolean b = (Boolean) req.getPrivateObject(EXCLUSION_FLAG);
+	   Boolean b = (Boolean) req.getSessionPrivateObject(EXCLUSION_FLAG);
 	   if (b == null)
 	      return false;
 	   return b.booleanValue();

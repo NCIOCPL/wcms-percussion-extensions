@@ -33,7 +33,7 @@ import com.percussion.xml.PSXmlDocumentBuilder;
  *
  */
 public class CGV_RelationshipEffectTest extends PSEffect {
-	
+
 	private static Log log = LogFactory.getLog(CGV_WorkflowItemValidator.class);
 
 
@@ -57,7 +57,7 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 			PSEffectResult result
 	) throws PSExtensionProcessingException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 			IPSExecutionContext context, 
 			PSEffectResult result
 	)
-			throws PSExtensionProcessingException, PSParameterMismatchException 
+	throws PSExtensionProcessingException, PSParameterMismatchException 
 	{
 		//This will get called for any changes to a relationship,
 		//however, we only want to fire for isPreWorkflow
@@ -80,19 +80,19 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 
 		//Checks to see if we have already processed this relationship.
 
-		boolean doesExclusiveExist = true;
-		if(request.getPrivateObject(EXCLUSION_FLAG) != null){
-			doesExclusiveExist = true;
-		}
-		else{
-			doesExclusiveExist = false;
-		}
-
-		if(doesExclusiveExist){
-			result.setWarning(
-					"The exclusive flag exists for the transition.");
-			return;
-		}
+//		boolean doesExclusiveExist = true;
+//		if(request.getSessionPrivateObject(EXCLUSION_FLAG) != null){
+//			doesExclusiveExist = true;
+//		}
+//		else{
+//			doesExclusiveExist = false;
+//		}
+//
+//		if(doesExclusiveExist){
+//			result.setWarning(
+//					"The exclusive flag exists for the transition.");
+//			return;
+//		}
 
 		/**
 		 * request... get initiator and transition, pass into our stuff.
@@ -105,27 +105,27 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 		 * 
 		 */
 
-//		PSRelationship currRel = context.getCurrentRelationship();		
-//		if (context.getProcessedRelationships() != null) {
-//			for(Object processedRel : context.getProcessedRelationships()) {
-//				
-//				PSLocator currOwner = currRel.getOwner();
-//				PSLocator processedOwner = ((PSRelationship)processedRel).getOwner();
-//				PSLocator currDep = currRel.getDependent();
-//				PSLocator processedDep = ((PSRelationship)processedRel).getDependent();
-//				
-//				if (
-//					(currOwner.getId() == processedOwner.getId() &&	currDep.getId() == processedDep.getId())
-//					|| (currOwner.getId() == processedDep.getId() 
-//							&& currDep.getId() == processedOwner.getId() 
-//							&& currRel.getConfig().getType() == ((PSRelationship)processedRel).getConfig().getType()
-//					)
-//				) {
-//					result.setWarning("Skip: already processed same owner/dependent.");
-//					return;
-//				}			
-//			}			
-//		}		
+		//		PSRelationship currRel = context.getCurrentRelationship();		
+		//		if (context.getProcessedRelationships() != null) {
+		//			for(Object processedRel : context.getProcessedRelationships()) {
+		//				
+		//				PSLocator currOwner = currRel.getOwner();
+		//				PSLocator processedOwner = ((PSRelationship)processedRel).getOwner();
+		//				PSLocator currDep = currRel.getDependent();
+		//				PSLocator processedDep = ((PSRelationship)processedRel).getDependent();
+		//				
+		//				if (
+		//					(currOwner.getId() == processedOwner.getId() &&	currDep.getId() == processedDep.getId())
+		//					|| (currOwner.getId() == processedDep.getId() 
+		//							&& currDep.getId() == processedOwner.getId() 
+		//							&& currRel.getConfig().getType() == ((PSRelationship)processedRel).getConfig().getType()
+		//					)
+		//				) {
+		//					result.setWarning("Skip: already processed same owner/dependent.");
+		//					return;
+		//				}			
+		//			}			
+		//		}		
 
 		String wfAction = request.getParameter("WFAction", "").trim();
 		if ((wfAction == null) || (wfAction.length() == 0))
@@ -149,10 +149,11 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 			ContentItemWFValidatorAndTransitioner.setExclusive(request, false);
 		}
 
-		result.setWarning("Finished running the effect");
+		result.setSuccess();
+		//result.setWarning("Finished running the effect");
 		return;
 	}
-	
+
 	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
 
 }
