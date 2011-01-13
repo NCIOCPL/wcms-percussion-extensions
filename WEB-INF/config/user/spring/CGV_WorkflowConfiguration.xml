@@ -398,6 +398,15 @@
 						</entry>
 					</map>
 				</entry>
+				<entry key="Private Archive">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>Archive_to_Draft</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
 			</map>
 		</constructor-arg>
 		<!-- THe second constructor-arg is for archiving transitions -->
