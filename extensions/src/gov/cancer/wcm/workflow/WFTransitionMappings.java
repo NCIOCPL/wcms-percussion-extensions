@@ -29,6 +29,21 @@ public class WFTransitionMappings {
 		return new HashMap<PSPair<String, String>, List<String>>(); 
 	}
 	
+	/**
+	 * Gets a collection of transition triggers for a workflow.
+	 * @param workflowName The name of the workflow.
+	 * @return A Map which represents the transitions.  The key is a PSPair<String, String> which represents where
+	 * the first element is the from state and the second element is the to state.  The value is a collection of 
+	 * trigger names in the order in which they would be executed.
+	 */
+	public Map<PSPair<String, String>, List<String>> getContentArchivingTransitionTriggers(String workflowName) {
+		if (_workflowTransitionMaps.containsKey(workflowName))
+			return _workflowTransitionMaps.get(workflowName).getContentArchivingTransitionTriggers();
+		
+		//Is this an empty map, or is this an error that the workflow was not defined?
+		return new HashMap<PSPair<String, String>, List<String>>(); 
+	}
+	
 	public WFTransitionMappings(Map<String,WFTransitionMap> workflowTransitionMaps) {
 		_workflowTransitionMaps = workflowTransitionMaps;
 	}

@@ -43,16 +43,48 @@ public class WFTransitionMap {
 	 * trigger names in the order in which they would be executed.
 	 */
 	public Map<PSPair<String, String>, List<String>> getContentCreationTransitionTriggers() {
-
 		HashMap<PSPair<String, String>, List<String>> triggers = new HashMap<PSPair<String, String>, List<String>>(); 
-		
 		for(String fromKey : _contentCreationTransitions.keySet()) {
 			for (String toKey : _contentCreationTransitions.get(fromKey).keySet()) {
 				PSPair<String, String> pair = new PSPair<String, String>(fromKey, toKey);
 				triggers.put(pair, _contentCreationTransitions.get(fromKey).get(toKey));
 			}
 		}
+		return triggers;
+	}
+	
+	/**
+	 * Gets a list of transition triggers to be fired from a state to another
+	 * state
+	 * @param fromState
+	 * @param toState
+	 * @return
+	 */
+	public List<String> getContentArchivingTransitions(String fromState, String toState){
+		List<String> rtnList = Collections.emptyList();
+		if (!_contentArchivingTransitions.containsKey(fromState)) {
+			Map<String, List<String>> toMap = _contentArchivingTransitions.get(fromState);
+			if (toMap.containsKey(toState))
+				rtnList = toMap.get(toState);
+		}
 		
+		return rtnList;
+	}
+
+	/**
+	 * Gets a collection of transition triggers for this workflow mapping.
+	 * @return A Map which represents the transitions.  The key is a PSPair<String, String> which represents where
+	 * the first element is the from state and the second element is the to state.  The value is a collection of 
+	 * trigger names in the order in which they would be executed.
+	 */
+	public Map<PSPair<String, String>, List<String>> getContentArchivingTransitionTriggers() {
+		HashMap<PSPair<String, String>, List<String>> triggers = new HashMap<PSPair<String, String>, List<String>>(); 
+		for(String fromKey : _contentArchivingTransitions.keySet()) {
+			for (String toKey : _contentArchivingTransitions.get(fromKey).keySet()) {
+				PSPair<String, String> pair = new PSPair<String, String>(fromKey, toKey);
+				triggers.put(pair, _contentArchivingTransitions.get(fromKey).get(toKey));
+			}
+		}
 		return triggers;
 	}
 	
@@ -63,35 +95,5 @@ public class WFTransitionMap {
 		_contentCreationTransitions = contentCreationTransitions;
 		_contentArchivingTransitions = contentArchivingTransitions;
 	}
-	
-	
-	////////////////////////// TODO: FILL IN THE BELOW METHODS.
-	
-	/**
-	 * Check to see if the trigger name is in the archiving transitions map.
-	 * @param transitionMap - Map of the transitions to check against
-	 * @return
-	 */
-	public boolean isArchiving(HashMap<String, PSTransition> transitionMap ){
-		
-		HashMap<PSPair<String, String>, List<String>> triggers = new HashMap<PSPair<String, String>, List<String>>(); 
-		
-		for(String fromKey : _contentCreationTransitions.keySet()) {
-			for (String toKey : _contentCreationTransitions.get(fromKey).keySet()) {
-				PSPair<String, String> pair = new PSPair<String, String>(fromKey, toKey);
-				triggers.put(pair, _contentCreationTransitions.get(fromKey).get(toKey));
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Check to see if the trigger name is in the public transitions map.
-	 * @param fromState, name of the state the item is coming from.
-	 * @param toState, name of the state the item is transitioning to.
-	 * @return
-	 */
-	public boolean isPublic(){
-		return false;
-	}
+
 }

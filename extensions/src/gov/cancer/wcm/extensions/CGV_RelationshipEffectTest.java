@@ -80,19 +80,19 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 
 		//Checks to see if we have already processed this relationship.
 
-//		boolean doesExclusiveExist = true;
-//		if(request.getSessionPrivateObject(EXCLUSION_FLAG) != null){
-//			doesExclusiveExist = true;
-//		}
-//		else{
-//			doesExclusiveExist = false;
-//		}
-//
-//		if(doesExclusiveExist){
-//			result.setWarning(
-//					"The exclusive flag exists for the transition.");
-//			return;
-//		}
+		boolean doesExclusiveExist = true;
+		if(request.getPrivateObject(EXCLUSION_FLAG) != null){
+			doesExclusiveExist = true;
+		}
+		else{
+			doesExclusiveExist = false;
+		}
+
+		if(doesExclusiveExist){
+			result.setWarning(
+					"The exclusive flag exists for the transition.");
+			return;
+		}
 
 		/**
 		 * request... get initiator and transition, pass into our stuff.
@@ -137,7 +137,8 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 		System.out.println("The exclusive flag does not exist. Calling the transitioner and validator workflow code.");
 		Document errorDoc = PSXmlDocumentBuilder.createXmlDocument();
 		ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);
-		if(!ContentItemWFValidatorAndTransitioner.isExclusive(request)){
+//		if(!ContentItemWFValidatorAndTransitioner.isExclusive(request)){
+		if(request.getParameter(NCI_EFFECT_FLAG) != "true"){
 			ContentItemWFValidatorAndTransitioner.setExclusive(request, true);
 			try {
 				validator.performTest(request, errorDoc);
@@ -155,5 +156,6 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 	}
 
 	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
+	private static final String NCI_EFFECT_FLAG = "gov.cancer.wcm.extensions.WorkflowItemValidator.NCI_EFFECT_FLAG";
 
 }

@@ -222,14 +222,18 @@ public class ContentItemWFValidatorAndTransitioner {
 					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
 					for( PSTransition t :transitionList ){
 						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
-						try {
+						//try {
 							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
 									", Trigger Name: "+t.getTrigger());
-							systemWebService.transitionItems(temp, t.getTrigger());
-						} catch (PSErrorsException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						
+							PercussionWFTransition.transitionItem(item.getContentId(), t.getTrigger(), "", null);
+							//systemWebService.transitionItems(temp, t.getTrigger());
+						
+						
+//						} catch (PSErrorsException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
 					}
 				}
 			}
@@ -397,12 +401,12 @@ public class ContentItemWFValidatorAndTransitioner {
 			//JOHN TODO: Change this so it uses the correct validate (archiveDown vs validateDown), based off the triggers in the
 			//transition mapping.
 			RelationshipWFTransitionCheckResult result = null;
-			if( wvc.isArchiveTransition() ){
-				result = transitionCheck.archiveValidateDown(contentItemSummary, rel, wvc);
-			}
-			else{
+//			if( wvc.isArchiveTransition() ){
+//				result = transitionCheck.archiveValidateDown(contentItemSummary, rel, wvc);
+//			}
+//			else{
 				result = transitionCheck.validateDown(contentItemSummary, rel, wvc);
-			}
+//			}
 			if(result != null){
 				if (result == RelationshipWFTransitionCheckResult.StopTransition) {
 
@@ -586,7 +590,8 @@ public class ContentItemWFValidatorAndTransitioner {
 	*/
 	public static void setExclusive(IPSRequestContext req, boolean b)
 	{
-	   req.setSessionPrivateObject(EXCLUSION_FLAG, b);
+	   //req.setSessionPrivateObject(EXCLUSION_FLAG, b);
+	   req.setPrivateObject(EXCLUSION_FLAG, b);
 	}
 
 	/**
@@ -597,12 +602,13 @@ public class ContentItemWFValidatorAndTransitioner {
 	*/
 	public static boolean isExclusive(IPSRequestContext req)
 	{
-	   Boolean b = (Boolean) req.getSessionPrivateObject(EXCLUSION_FLAG);
-	   if (b == null)
-	      return false;
-	   return b.booleanValue();
+		//Boolean b = (Boolean) req.getSessionPrivateObject(EXCLUSION_FLAG);
+		Boolean b = (Boolean) req.getPrivateObject(EXCLUSION_FLAG);
+		if (b == null)
+			return false;
+		return b.booleanValue();
 	}
-	
+
 	public static boolean validate(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc){
 		String contentTypeName = "";
 		try {
