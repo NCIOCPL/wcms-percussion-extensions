@@ -142,15 +142,18 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 			ContentItemWFValidatorAndTransitioner.setExclusive(request, true);
 			try {
 				validator.performTest(request, errorDoc);
+				result.setSuccess();
 			} catch (PSException e) {
+				result.setError(e);
 				e.printStackTrace();
 			} catch (PSErrorException e) {
+				result.setError(e.getErrorMessage());
 				e.printStackTrace();
 			}
 			ContentItemWFValidatorAndTransitioner.setExclusive(request, false);
 		}
 
-		result.setSuccess();
+		//result.setSuccess();
 		//result.setWarning("Finished running the effect");
 		return;
 	}

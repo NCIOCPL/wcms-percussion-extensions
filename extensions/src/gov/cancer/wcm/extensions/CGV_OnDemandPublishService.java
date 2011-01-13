@@ -4,6 +4,7 @@ import gov.cancer.wcm.util.CGV_ParentChildManager;
 import gov.cancer.wcm.util.CGV_StateHelper;
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
 import gov.cancer.wcm.util.CGV_StateHelper.StateName;
+import gov.cancer.wcm.workflow.WorkflowValidationContext;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,13 +15,16 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.w3c.dom.Document;
 
 
+import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
 import com.percussion.pso.jexl.PSOObjectFinder;
+import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.rx.publisher.IPSPublisherJobStatus;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
@@ -29,11 +33,19 @@ import com.percussion.server.IPSRequestContext;
 import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
+import com.percussion.services.guidmgr.data.PSGuid;
+import com.percussion.services.legacy.IPSCmsContentSummaries;
+import com.percussion.services.legacy.PSCmsContentSummariesLocator;
+import com.percussion.services.workflow.IPSWorkflowService;
+import com.percussion.services.workflow.PSWorkflowServiceLocator;
+import com.percussion.services.workflow.data.PSState;
+import com.percussion.services.workflow.data.PSWorkflow;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
+import com.percussion.xml.PSXmlDocumentBuilder;
 
 
 /**
@@ -50,6 +62,9 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	protected static IPSRxPublisherService rps = null;
 	protected static IPSContentWs cmgr = null;
 	protected static CGV_ParentChildManager pcm = null;
+	private static IPSWorkflowService workflowService;
+	private static PSOWorkflowInfoFinder workInfoFinder;
+	private static IPSCmsContentSummaries contentSummariesService;
 	
 	private IPSRequestContext request = null;
 	private Map<String,Map<String,List<String>>> editionList;
@@ -98,6 +113,9 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			gmgr = PSGuidManagerLocator.getGuidMgr();
 			cmgr = PSContentWsLocator.getContentWebservice();
 			pcm = new CGV_ParentChildManager();
+			workflowService = PSWorkflowServiceLocator.getWorkflowService();
+			workInfoFinder = new PSOWorkflowInfoFinder();
+			contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 		}
 	}
 
@@ -151,8 +169,21 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			tcga = true;
 		}
 		
-		CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
-		StateName destState = stateHelp.getDestState();
+//		CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
+//		StateName destState = stateHelp.getDestState();
+		
+		int id = Integer.parseInt(request.getParameter("sys_contentid"));	
+		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(id);	
+		int wfState = contentItemSummary.getContentStateId();
+		int wfId = contentItemSummary.getWorkflowAppId();	
+//		PSWorkflow workflow = workflowService.loadWorkflow(new PSGuid(PSTypeEnum.WORKFLOW, wfId));
+		PSState startState = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, wfState),
+				new PSGuid(PSTypeEnum.WORKFLOW,wfId));	   
+//		Document errorDoc = PSXmlDocumentBuilder.createXmlDocument();
+//		WorkflowValidationContext wvc = new WorkflowValidationContext(request, contentItemSummary, log, errorDoc, workflow, startState, Integer.parseInt(request.getParameter("sys_transitionid")));
+//		String destination = wvc.getDestinationState().getName();
+		String publishingFlag = startState.getContentValidValue();
+		
 		Map<String,List<String>> m = null;
 		
 		if(navon){
@@ -186,7 +217,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		}
 		
 		if(!navon){
-			if (destState == StateName.PUBLIC) {
+			if (publishingFlag.equalsIgnoreCase("y")) {
 				List<String> mm = m.get("publish_onDemandEditionId");
 				for( String i : mm ){
 					editions.add(i);
@@ -200,7 +231,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			}
 		}
 		else{
-			if (destState == StateName.PUBLIC) {
+			if (publishingFlag.equalsIgnoreCase("y")) {
 				List<String> mm = m.get("publish_onDemandEditionId");
 				for( String i : mm ){
 					editions.add(i);
@@ -303,9 +334,9 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				}
 			}
 		} catch (Exception nfx) {
-			log.error("GSAOnDemandPublishServce::queueItemSet", nfx);
+			log.error("CGVOnDemandPublishServce::queueItemSet", nfx);
 		}
-		log.debug("GSAOnDemandPublishServce::queueItemSet done");
+		log.debug("CGVOnDemandPublishServce::queueItemSet done");
 		
 	}
 

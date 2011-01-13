@@ -47,9 +47,6 @@ public class WorkflowValidationContext {
 	private HashMap<String, PSTransition> _workflowTransitions = new HashMap<String, PSTransition>();
 	private boolean _isArchiving = false;
 	
-	//Hash to Cache PSStates.
-//	private HashMap<Long, PSState> _creationStates = new HashMap<Long, PSState>();
-//	private HashMap<Long, PSState> _archiveStates = new HashMap<Long, PSState>();
 	private HashMap<Long, PSState> _wfStates = new HashMap<Long, PSState>();
 	
 	/**
@@ -145,15 +142,7 @@ public class WorkflowValidationContext {
 	 * @param stateId
 	 * @return
 	 */
-	public PSState getState(long stateId) {
-		
-//		HashMap<Long, PSState> _wfStates;
-//		if(isArchiveTransition()){
-//			_wfStates = _archiveStates;
-//		}
-//		else{
-//			_wfStates = _creationStates;
-//		}	
+	public PSState getState(long stateId) {	
 		
 		Long iStateId = new Long(stateId);
 		
@@ -170,14 +159,6 @@ public class WorkflowValidationContext {
 	 */
 	public PSState getDestinationState() {
 		
-//		HashMap<Long, PSState> _wfStates;
-//		if(isArchiveTransition()){
-//			_wfStates = _archiveStates;
-//		}
-//		else{
-//			_wfStates = _creationStates;
-//		}	
-		
 		if (_wfStates.containsKey(_initiatingTransition.getToState()))
 			return _wfStates.get(_initiatingTransition.getToState());
 		
@@ -192,20 +173,6 @@ public class WorkflowValidationContext {
 	 * @return a List<PSTransitions> which contains the Transitions which must happen in order, or an empty list if the item does not need to transition
 	 */
 	public List<PSTransition> getTransitions(String fromState) {
-		
-//		HashMap<Long, PSState> _wfStates;
-//		Map<PSPair<String,String>, List<String>> _workflowTriggers;
-//		HashMap<String, PSTransition> _workflowTransitions;
-//		if(isArchiveTransition()){
-//			_wfStates = _archiveStates;
-//			_workflowTriggers = _archivingTriggers;
-//			_workflowTransitions = _archivingTransitions;
-//		}
-//		else{
-//			_wfStates = _creationStates;
-//			_workflowTriggers = _creationTriggers;
-//			_workflowTransitions = _creationTransitions;
-//		}		
 		
 		ArrayList<PSTransition> transitions = new ArrayList<PSTransition>();
 
@@ -287,17 +254,23 @@ public class WorkflowValidationContext {
 		//Create the to/from to determine if archiving or not.
 		//TODO: Fix the to state to make sure exceptions are not thrown out the
 		//wazoo.
+		if( _wfStates.get(_initiatingTransition.getToState()) == null){
+			_log.error("Error: Could not load the destination state of the transition.");
+			throw new WFValidationException("Error: Could not load the destination state of the transition.");
+		}
 		PSPair<String, String> initiatingToFrom = new PSPair<String, String>(
 				_initiatingItemWorkflowState.getName(),
-				_wfStates.get(_initiatingTransition.getToState()).getName()
+				 _wfStates.get(_initiatingTransition.getToState()).getName()
 				);
 		
 
 		if (config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName()).containsKey(initiatingToFrom)) {
 			_isArchiving = true;
 			_workflowTriggers = config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName());
+			_log.debug("Workflow Validation Context, Transition is: Archiving");
 		} else {
-			config.getTransitionMappings().getContentCreationTransitionTriggers(initiatingItemWorkflowApp.getName());			
+			_workflowTriggers = config.getTransitionMappings().getContentCreationTransitionTriggers(initiatingItemWorkflowApp.getName());
+			_log.debug("Workflow Validation Context, Transition is: Non Archiving");
 		}
 		
 		//if archiving( setup the below things using the archiving lists.... )
@@ -335,7 +308,7 @@ public class WorkflowValidationContext {
 	 * @return
 	 */
 	public boolean isPublicTransition(){
-		return !isArchiveTransition();		
+		return !_isArchiving;		
 	}
 	
 

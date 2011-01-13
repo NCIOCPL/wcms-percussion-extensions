@@ -29,7 +29,7 @@ public class CGV_StateHelper {
 		currState = null;
 		destState = null;
 		transitionID = 0;
-		trigger = null;
+//		trigger = null;
 	}
 		
 //	/**
@@ -78,7 +78,7 @@ public class CGV_StateHelper {
 	 */
 	private int transitionID;
 	
-	private String trigger;
+	//private String trigger;
 
 
 	/**
@@ -90,7 +90,7 @@ public class CGV_StateHelper {
 				
 		int tranID = Integer.parseInt(request.getParameter("sys_transitionid"));
 		transitionID = tranID;
-		trigger = svc.getTrigger(tranID, navon);
+		//trigger = svc.getTrigger(tranID, navon);
 		currState = toStateName(svc.getCurrState(tranID, navon));		//Set the current state for the object.
 		destState = toStateName(svc.getDestState(tranID, navon));		//Set the destination state for the object.
 		//System.out.println("JOHN TEST: currentState = " + currState.toString());
@@ -222,13 +222,13 @@ public class CGV_StateHelper {
 		this.transitionID = transitionID;
 	}
 	
-	public String getTrigger() {
-		return trigger;
-	}
-
-	public void setTrigger(String trigger) {
-		this.trigger = trigger;
-	}
+//	public String getTrigger() {
+//		return trigger;
+//	}
+//
+//	public void setTrigger(String trigger) {
+//		this.trigger = trigger;
+//	}
 	
 	/**
 	 * Returns the correct workflow transition(s) to allow the item

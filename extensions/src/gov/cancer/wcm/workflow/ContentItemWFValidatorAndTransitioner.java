@@ -240,6 +240,7 @@ public class ContentItemWFValidatorAndTransitioner {
 		}
 		else{
 			wvc.getLog().debug("There was an error while trying to transition dependents.  See log for more info.");
+			throw new PSException("There was an error while trying to transition dependents.  See log for more info.");
 		}
 		
 		
@@ -303,12 +304,12 @@ public class ContentItemWFValidatorAndTransitioner {
 		//so that we can see its parent.  However, just like the rules we use to test when going down,
 		//we need to follow those rules going up.
 		RelationshipWFTransitionCheckResult result = null;
-//		if( wvc.isArchiveTransition() ){
-//			result = followChecks.get(0).archiveValidateUp(contentItemSummary, followRels.get(0), wvc);
-//		}
-//		else{
+		if( wvc.isArchiveTransition() ){
+			result = followChecks.get(0).archiveValidateUp(contentItemSummary, followRels.get(0), wvc);
+		}
+		else{
 			result = followChecks.get(0).validateUp(contentItemSummary, followRels.get(0), wvc);
-//		}
+		}
 		if ( result == RelationshipWFTransitionCheckResult.ContinueTransition) 
 		{
 			//We would be able to be pushed by our parent, so, we need to try and see if our parent
@@ -407,12 +408,12 @@ public class ContentItemWFValidatorAndTransitioner {
 			//JOHN TODO: Change this so it uses the correct validate (archiveDown vs validateDown), based off the triggers in the
 			//transition mapping.
 			RelationshipWFTransitionCheckResult result = null;
-//			if( wvc.isArchiveTransition() ){
-//				result = transitionCheck.archiveValidateDown(contentItemSummary, rel, wvc);
-//			}
-//			else{
+			if( wvc.isArchiveTransition() ){
+				result = transitionCheck.archiveValidateDown(contentItemSummary, rel, wvc);
+			}
+			else{
 				result = transitionCheck.validateDown(contentItemSummary, rel, wvc);
-//			}
+			}
 			if(result != null){
 				if (result == RelationshipWFTransitionCheckResult.StopTransition) {
 
