@@ -33,6 +33,29 @@ import com.percussion.webservices.content.PSContentWsLocator;
 public class DependentsCheckRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
+	@Override
+	public RelationshipWFTransitionStopConditionResult archiveValidateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Archive Validate Down: DependentsCheckRelationshipWFTransitionStopCondition");
+		return RelationshipWFTransitionStopConditionResult.StopTransition;
+	}
+
+	@Override 
+	public RelationshipWFTransitionStopConditionResult archiveValidateUp(
+			PSComponentSummary dependentContentItemSummary, 
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Archive Validate Up: DependentsCheckRelationshipWFTransitionStopCondition");
+		return RelationshipWFTransitionStopConditionResult.StopTransition;
+	}	
+
+	
 	@Override 
 	public RelationshipWFTransitionStopConditionResult validateDown(
 			PSComponentSummary ownerContentItemSummary, 
