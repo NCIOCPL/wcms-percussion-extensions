@@ -50,6 +50,32 @@ public abstract class BaseRelationshipWFTransitionStopCondition {
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 			)  throws WFValidationException;
+	
+	/**
+	 * Base class for checking stop conditions when archiving down. 
+	 * @param contentItemSummary The owner PSComponentSummary
+	 * @param rel The relationship to test
+	 * @return
+	 */
+	public abstract RelationshipWFTransitionStopConditionResult archiveValidateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+			)  throws WFValidationException;
+
+	/**
+	 * Base class for checking stop conditions when archiving up. 
+	 * @param contentItemSummary The owner PSComponentSummary
+	 * @param rel The relationship to test
+	 * @return
+	 */
+	public abstract RelationshipWFTransitionStopConditionResult archiveValidateUp(
+			PSComponentSummary dependentContentItemSummary,
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+			)  throws WFValidationException;
 
 	public BaseRelationshipWFTransitionStopCondition(RelationshipWFTransitionStopConditionDirection checkDirection){
 		_checkDirection = checkDirection;

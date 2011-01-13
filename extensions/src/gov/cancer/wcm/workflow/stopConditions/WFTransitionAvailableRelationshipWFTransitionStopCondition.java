@@ -37,6 +37,29 @@ public class WFTransitionAvailableRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
 
 	@Override
+	public RelationshipWFTransitionStopConditionResult archiveValidateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Archive Validate Down: WFTransitionAvailableRelationshipWFTransitionStopCondition");
+		return RelationshipWFTransitionStopConditionResult.StopTransition;
+	}
+
+	@Override 
+	public RelationshipWFTransitionStopConditionResult archiveValidateUp(
+			PSComponentSummary dependentContentItemSummary, 
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Archive Validate Up: WFTransitionAvailableRelationshipWFTransitionStopCondition");
+		return RelationshipWFTransitionStopConditionResult.StopTransition;
+	}
+	
+	
+	@Override
 	public RelationshipWFTransitionStopConditionResult validateDown(
 			PSComponentSummary ownerContentItemSummary, 
 			PSComponentSummary dependentContentItemSummary,

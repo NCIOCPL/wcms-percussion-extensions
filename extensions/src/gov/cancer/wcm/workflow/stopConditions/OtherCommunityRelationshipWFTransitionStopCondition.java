@@ -14,6 +14,28 @@ import com.percussion.design.objectstore.PSRelationship;
  */
 public class OtherCommunityRelationshipWFTransitionStopCondition extends
 		BaseRelationshipWFTransitionStopCondition {
+	
+	@Override
+	public RelationshipWFTransitionStopConditionResult archiveValidateDown(
+			PSComponentSummary ownerContentItemSummary,
+			PSComponentSummary dependentContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Archive Validate Down: OtherCommunityRelationshipWFTransitionStopCondition");
+		return RelationshipWFTransitionStopConditionResult.StopTransition;
+	}
+
+	@Override 
+	public RelationshipWFTransitionStopConditionResult archiveValidateUp(
+			PSComponentSummary dependentContentItemSummary, 
+			PSComponentSummary ownerContentItemSummary,
+			PSRelationship rel,
+			WorkflowValidationContext wvc
+	) {
+		wvc.getLog().debug("Archive Validate Up: OtherCommunityRelationshipWFTransitionStopCondition");
+		return RelationshipWFTransitionStopConditionResult.StopTransition;
+	}	
 
 	@Override
 	public RelationshipWFTransitionStopConditionResult validateDown(

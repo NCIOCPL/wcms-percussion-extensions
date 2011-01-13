@@ -56,8 +56,7 @@ public class RelationshipWFTransitionIgnoreCheck extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-
-		
+		wvc.getLog().debug("Archive Validate Down: RelationshipWFTransitionIgnoreCheck");
 		return RelationshipWFTransitionCheckResult.ContinueTransition;
 	}
 
@@ -67,6 +66,7 @@ public class RelationshipWFTransitionIgnoreCheck extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {		
+		wvc.getLog().debug("Archive Validate Up: RelationshipWFTransitionIgnoreCheck");
 		return RelationshipWFTransitionCheckResult.ContinueTransition;
 	}
 	
