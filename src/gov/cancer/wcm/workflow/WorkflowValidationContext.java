@@ -43,12 +43,9 @@ public class WorkflowValidationContext {
 	private PSWorkflow _initiatingItemWorkflowApp;
 	private PSTransition _initiatingTransition;
 	private List<PSWorkflowRole> _workflowRoles;
-//	private Map<PSPair<String,String>, List<String>> _creationTriggers;
-//	private HashMap<String, PSTransition> _creationTransitions = new HashMap<String, PSTransition>();
-//	private Map<PSPair<String,String>, List<String>> _archivingTriggers;
-//	private HashMap<String, PSTransition> _archivingTransitions = new HashMap<String, PSTransition>();
 	private Map<PSPair<String,String>, List<String>> _workflowTriggers;
 	private HashMap<String, PSTransition> _workflowTransitions = new HashMap<String, PSTransition>();
+	private boolean _isArchiving = false;
 	
 	//Hash to Cache PSStates.
 //	private HashMap<Long, PSState> _creationStates = new HashMap<Long, PSState>();
@@ -271,17 +268,9 @@ public class WorkflowValidationContext {
 		//Let's find all the workflow transitions we will be using and get them
 		//out into a structure before we look through all
 		WorkflowConfiguration config = WorkflowConfigurationLocator.getWorkflowConfiguration();
-
-		//if archiving( setup the below things using the archiving lists.... )
-		_workflowTriggers = config.getTransitionMappings().getContentCreationTransitionTriggers(initiatingItemWorkflowApp.getName());	
-		_workflowTriggers.putAll(config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName()));
-		HashSet<String> triggers = new HashSet<String>();
 		
-		for(List<String> triggerList : _workflowTriggers.values()) {
-			triggers.addAll(triggerList);
-		}				
 		
-		//Load up the states.
+		//Load up the states and get the initiating transition
 		for (PSState state : _initiatingItemWorkflowApp.getStates()) {
 			_wfStates.put(state.getStateId(), state);
 		
@@ -289,7 +278,40 @@ public class WorkflowValidationContext {
 			for (PSTransition transition: state.getTransitions()) {				
 				if (transition.getGUID().getUUID() == initiatingTransitionID) {
 					_initiatingTransition = transition;
-				}
+				}				
+			}
+			
+			//TODO: Check to see if _initiatingTransition is not null.
+		}
+
+		//Create the to/from to determine if archiving or not.
+		//TODO: Fix the to state to make sure exceptions are not thrown out the
+		//wazoo.
+		PSPair<String, String> initiatingToFrom = new PSPair<String, String>(
+				_initiatingItemWorkflowState.getName(),
+				_wfStates.get(_initiatingTransition.getToState()).getName()
+				);
+		
+
+		if (config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName()).containsKey(initiatingToFrom)) {
+			_isArchiving = true;
+			_workflowTriggers = config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName());
+		} else {
+			config.getTransitionMappings().getContentCreationTransitionTriggers(initiatingItemWorkflowApp.getName());			
+		}
+		
+		//if archiving( setup the below things using the archiving lists.... )
+		HashSet<String> triggers = new HashSet<String>();
+		
+		for(List<String> triggerList : _workflowTriggers.values()) {
+			triggers.addAll(triggerList);
+		}				
+		
+		//Find all triggers that will be used.
+		for (long stateId : _wfStates.keySet()) {
+						
+			//Find the transition which is being initiated.
+			for (PSTransition transition: _wfStates.get(stateId).getTransitions()) {				
 				
 				//Add the transition to the list of transitions which will be used
 				//in this workflow
@@ -297,47 +319,7 @@ public class WorkflowValidationContext {
 					_workflowTransitions.put(transition.getTrigger(), transition);
 				}					
 			}
-			
-			//TODO: Check to see if _initiatingTransition is not null.
-		}
-		
-		//----------------------------------------------------------------------------------
-		
-		
-//		//The trigger was not in the workflow transitions for creation... add it to archive.
-//		if(!triggerFound){
-//			_wfStates.clear();
-//			_workflowTriggers = config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName());	
-//			triggers.clear();
-//			
-//			for(List<String> triggerList : _workflowTriggers.values()) {
-//				triggers.addAll(triggerList);
-//			}				
-//			
-//			//Load up the states.
-//			for (PSState state : _initiatingItemWorkflowApp.getStates()) {
-//				_wfStates.put(state.getStateId(), state);
-//			
-//				//Find the transition which is being initiated.
-//				for (PSTransition transition: state.getTransitions()) {				
-//					if (transition.getGUID().getUUID() == initiatingTransitionID) {
-//						_initiatingTransition = transition;
-//					}
-//					
-//					//Add the transition to the list of transitions which will be used
-//					//in this workflow
-//					if (triggers.contains(transition.getTrigger())) {
-//						_workflowTransitions.put(transition.getTrigger(), transition);
-//					}					
-//				}
-//				
-//				//TODO: Check to see if _initiatingTransition is not null.
-//			}
-//		}
-		
-		/////////////////////////////////////////////////////////
-		
-
+		}		
 	}
 	
 	/**
@@ -345,19 +327,7 @@ public class WorkflowValidationContext {
 	 * @return
 	 */
 	public boolean isArchiveTransition(){
-		WorkflowConfiguration config = WorkflowConfigurationLocator.getWorkflowConfiguration();
-		//pair, from - to.  if that pair lives in the archiving list... we are archiving
-		PSState dest = getDestinationState();
-		PSState source = _initiatingItemWorkflowState;
-		PSPair<String, String> transition = new PSPair<String, String>(dest.getName(), source.getName());
-		Map<PSPair<String,String>, List<String>> m = config.getTransitionMappings().getContentArchivingTransitionTriggers(_initiatingItemWorkflowApp.getName());
-		
-		if(m.containsKey(transition)){
-			return true;
-		}
-		else{
-			return false;
-		}		
+		return _isArchiving;
 	}
 	
 	/**
