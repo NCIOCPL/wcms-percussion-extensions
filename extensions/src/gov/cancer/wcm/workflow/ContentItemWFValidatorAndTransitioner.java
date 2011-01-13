@@ -302,8 +302,14 @@ public class ContentItemWFValidatorAndTransitioner {
 		//Now since there is only one relationship it is the parent of this follower, so we need to get it
 		//so that we can see its parent.  However, just like the rules we use to test when going down,
 		//we need to follow those rules going up.
-		if (followChecks.get(0).validateUp(contentItemSummary, followRels.get(0), wvc) 
-				== RelationshipWFTransitionCheckResult.ContinueTransition) 
+		RelationshipWFTransitionCheckResult result = null;
+//		if( wvc.isArchiveTransition() ){
+//			result = followChecks.get(0).archiveValidateUp(contentItemSummary, followRels.get(0), wvc);
+//		}
+//		else{
+			result = followChecks.get(0).validateUp(contentItemSummary, followRels.get(0), wvc);
+//		}
+		if ( result == RelationshipWFTransitionCheckResult.ContinueTransition) 
 		{
 			//We would be able to be pushed by our parent, so, we need to try and see if our parent
 			//is the root.
