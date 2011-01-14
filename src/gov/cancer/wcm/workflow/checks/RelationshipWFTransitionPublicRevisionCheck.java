@@ -50,6 +50,11 @@ public class RelationshipWFTransitionPublicRevisionCheck extends
 		else 
 		{
 			wvc.getLog().debug("Handling Public Revision Check (Down): dependent: " + rel.getDependent().getId() + " has NO public revision.");
+			wvc.addError(
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+					ContentItemWFValidatorAndTransitioner.NO_PUBLIC_REVISION,
+					new Object[]{rel.getOwner().getId(), rel.getDependent().getId()});
 			return RelationshipWFTransitionCheckResult.StopTransition;
 		}
 	}
@@ -76,6 +81,11 @@ public class RelationshipWFTransitionPublicRevisionCheck extends
 			return RelationshipWFTransitionCheckResult.ContinueTransition;
 		else 
 		{
+			wvc.addError(
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+					ContentItemWFValidatorAndTransitioner.NO_PUBLIC_REVISION,
+					new Object[]{rel.getOwner().getId(), rel.getDependent().getId()});
 			return RelationshipWFTransitionCheckResult.StopTransition;
 		}
 	}
