@@ -29,10 +29,12 @@ public class CTValidatorCollection {
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-
+ 
 		for(BaseContentTypeValidator currValidator : validatorList) {
-			if(!currValidator.validate(dependentContentItemSummary, rel, wvc)){
-				return false;
+			if (currValidator.getValidationDirections().contains(wvc.getPublishingDirection())) {
+				if(!currValidator.validate(dependentContentItemSummary, rel, wvc)){
+					return false;
+				}
 			}
 		}
 		return true;

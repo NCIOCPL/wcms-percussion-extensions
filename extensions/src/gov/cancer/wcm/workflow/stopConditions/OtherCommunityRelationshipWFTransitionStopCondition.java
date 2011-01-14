@@ -27,20 +27,8 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 			wvc.getLog().debug("Other Community Stop Condition (archive down): Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
 			return RelationshipWFTransitionStopConditionResult.Ok;
 		}
-		else {
-			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(dependentContentItemSummary, wvc)) {
-				wvc.getLog().debug("Other Community Stop Condition (archive down): Dependent ID: " + rel.getDependent().getId() + " is in Other Community and has public revision.");
-				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
-			} else {
-				wvc.getLog().debug("Other Community Stop Condition (archive down): Dependent ID: " + rel.getDependent().getId() + " is in Other Community and does not have public revision.");
-				wvc.addError(
-						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
-						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
-						ContentItemWFValidatorAndTransitioner.NON_PUBLIC_CHILD_IS_OTHER_COMMUNITY,
-						new Object[]{ownerContentItemSummary.getContentId(), rel.getDependent().getId()});
-				return RelationshipWFTransitionStopConditionResult.StopTransition;
-			}	
-		}	
+		
+		return RelationshipWFTransitionStopConditionResult.OkStopChecking;
 	}
 
 	@Override 

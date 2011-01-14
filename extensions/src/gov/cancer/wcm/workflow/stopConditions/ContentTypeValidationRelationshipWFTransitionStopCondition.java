@@ -27,8 +27,29 @@ public class ContentTypeValidationRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Down: ContentTypeValidationRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("Content Type Validation Stop Condition (down): Checking item: " + dependentContentItemSummary.getContentId());
+		String contentTypeName = "";
+		try {
+			contentTypeName = CGV_TypeNames.getTypeName(dependentContentItemSummary.getContentTypeGUID().getUUID());
+		} catch (Exception ex) {
+			wvc.getLog().error("Content Type Validation (Archive-Down): Could not get content type name for id: " + dependentContentItemSummary.getContentTypeGUID().getUUID(), ex);
+			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
+		}
+		
+		//TODO: THIS CRAP COULD THROW EXCEPTIONS IF ANYTHING IS NULL. FIX IT
+		if(	!WorkflowConfigurationLocator.
+				getWorkflowConfiguration().
+				getContentTypes().
+				getContentTypeOrDefault(contentTypeName).
+				getValidatorCollection().
+				validate(dependentContentItemSummary, null, wvc) ){
+			//Failed the validation
+			wvc.getLog().debug("Content Type Validation (Archive-Down): Failed the validation check for item with content id: " + 
+					dependentContentItemSummary.getContentId() + ", see log for errors.", null);
+			return RelationshipWFTransitionStopConditionResult.StopTransition;
+		}
+		wvc.getLog().debug("Content Type Validation Stop Condition (Archive-down): Item: " + dependentContentItemSummary.getContentId() + " is valid.");
+		return RelationshipWFTransitionStopConditionResult.Ok;
 	}
 
 	@Override 
@@ -38,8 +59,8 @@ public class ContentTypeValidationRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Up: ContentTypeValidationRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().error("Content Type Validation Stop Condition (Archive-up): Cannot validate upwards. Check configuration. Called on dependent with id: " + dependentContentItemSummary.getContentId());
+		throw new WFValidationException("System Error Occured. Please Check the logs.", true);
 	}
 	
 	@Override 

@@ -49,7 +49,7 @@ public class WFTransitionAvailableRelationshipWFTransitionStopCondition extends
 		PSState dependentState = wvc.getState(dependentContentItemSummary.getContentStateId());
 		
 		if (dependentState == null) {
-			wvc.getLog().error("Transition Available Stop Condition for dependent(archive down): " + dependentContentItemSummary.getContentId() + " could not get workflow state.");
+			wvc.getLog().error("Transition Available Stop Condition (Archive-Down) for dependent(archive down): " + dependentContentItemSummary.getContentId() + " could not get workflow state.");
 			throw new WFValidationException("Could not get workflow state for dependent: " + dependentContentItemSummary.getContentId(), true);
 		}	
 
