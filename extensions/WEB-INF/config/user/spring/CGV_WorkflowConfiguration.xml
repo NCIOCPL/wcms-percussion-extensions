@@ -21,11 +21,185 @@
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvBooklet</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerBulletin</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerTypeHome</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvClinicalTrialResult</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvContentSearch</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvDrugInfoSummary</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvFactSheet</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvFeaturedClinicalTrial</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvPowerPoint</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvPressRelease</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTopicSearchCategory</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciFile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>nciGeneral</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
 				</bean>
-				
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciHome</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciLandingPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciAppModulePage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciErrorPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaCancerSelected</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaCancerType</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaEvent</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaListPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMIndex</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMInteractive</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMVideo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaNewsRelease</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaSeries</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciErrorPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciBestBetsCategory</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvConfigurationFile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciImage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvAutoRSS</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvManualRSS</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciTile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciLink</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvMicrositeIndex</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMImage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
 			</list>
 		</constructor-arg>
 		<constructor-arg>
