@@ -46,7 +46,7 @@
 	<bean id="PublicNavonNeeded" class="gov.cancer.wcm.workflow.validators.PublicNavonNeeded">
 		<constructor-arg>
 			<list>
-				<value>ContentCreation</value>
+				<value>Creation</value>
 			</list>
 		</constructor-arg>
 	</bean>

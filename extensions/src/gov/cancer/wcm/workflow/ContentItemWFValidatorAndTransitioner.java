@@ -165,6 +165,12 @@ public class ContentItemWFValidatorAndTransitioner {
 		RelationshipWFTransitionCheckResult result = RelationshipWFTransitionCheckResult.StopTransition;
 		try {
 			pushRoot = getTransitionRoot(contentItemSummary, wvc);
+			//Perform one archive test before validating.
+			if(!archiveSharedCheck(pushRoot, wvc)){
+				//Cannot archive, error.
+				log.error("Error Occured while Validating for Archiving");
+			}
+			
 			if(validate(pushRoot, wvc)){
 				result = pushContentItem(pushRoot, wvc);
 			}
@@ -248,7 +254,7 @@ public class ContentItemWFValidatorAndTransitioner {
 		//throw new PSException("STOPPING");
 		
 	}
-	
+
 	private PSComponentSummary getTransitionRoot(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {
 
 		wvc.getLog().debug("getTransitionRoot: Checking for root for content item : " + contentItemSummary.getContentId());
@@ -636,6 +642,33 @@ public class ContentItemWFValidatorAndTransitioner {
 		return true;
 	}
 	
+	/**
+	 * Checks to see if the root that is pushing, is the dependent in more then one relationship.
+	 * @param pushRoot - the root to check
+	 * @param wvc - the workflow validation context.
+	 * @return true if the check passes, false if not.
+	 */
+	private boolean archiveSharedCheck(PSComponentSummary pushRoot,
+			WorkflowValidationContext wvc) {
+		if(wvc.isArchiveTransition()){
+			if(ContentItemWFValidatorAndTransitioner.isShared(pushRoot.getCurrentLocator(), wvc))
+			{
+				wvc.addError(
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+						ContentItemWFValidatorAndTransitioner.SHARED_ARCHIVE,
+						new Object[]{pushRoot.getContentId()}); 
+				return false;
+			}
+		}
+		else{
+			return true;
+		}
+		
+		//Should never be reached
+		return false;
+	}
+	
 	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
 	
 	//Below are the formatters for messages
@@ -654,6 +687,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static final String NON_PUBLIC_CHILD_IS_SHARED = "Could not promote item {0} because its child item {1} is shared and not public.";
 	public static final String NO_TRANSITION_AVAILABLE = "Could not promote item {0} because the user does not have permission to transition child item {1}.";
 	public static final String NO_PUBLIC_REVISION = "Could not promote item {0} because its child item {1} has no public revision.";
+	public static final String SHARED_ARCHIVE = "Could not archive item {0} because it is a shared content item.";
 	
 	public static final String ERR_FIELD = "N/A";
 	public static final String ERR_FIELD_DISP = "N/A";	
