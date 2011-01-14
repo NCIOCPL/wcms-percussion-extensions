@@ -22,8 +22,25 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Down: OtherCommunityRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("Other Community Stop Condition (archive down): Checking dependent: " + rel.getDependent().getId());
+		if (ownerContentItemSummary.getCommunityId() == rel.getDependentCommunityId()) {
+			wvc.getLog().debug("Other Community Stop Condition (archive down): Dependent ID: " + rel.getDependent().getId() + " is in Same Community.");
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		}
+		else {
+			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(dependentContentItemSummary, wvc)) {
+				wvc.getLog().debug("Other Community Stop Condition (archive down): Dependent ID: " + rel.getDependent().getId() + " is in Other Community and has public revision.");
+				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
+			} else {
+				wvc.getLog().debug("Other Community Stop Condition (archive down): Dependent ID: " + rel.getDependent().getId() + " is in Other Community and does not have public revision.");
+				wvc.addError(
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+						ContentItemWFValidatorAndTransitioner.NON_PUBLIC_CHILD_IS_OTHER_COMMUNITY,
+						new Object[]{ownerContentItemSummary.getContentId(), rel.getDependent().getId()});
+				return RelationshipWFTransitionStopConditionResult.StopTransition;
+			}	
+		}	
 	}
 
 	@Override 
@@ -33,8 +50,18 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Up: OtherCommunityRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("Other Community Stop Condition (archive Up): Checking owner: " + rel.getOwner().getId());
+		
+		if (dependentContentItemSummary.getCommunityId() == ownerContentItemSummary.getCommunityId()) {
+			wvc.getLog().debug("Other Community Stop Condition (archive Up): Owner ID: " + rel.getOwner().getId() + " is in Same Community.");
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		}
+		else {
+			//Up validation does not check if the item has a public revision since we know that the push must
+			//start with the dependentContentItemSummary passed in.
+			wvc.getLog().debug("Other Community Stop Condition (archive Up): Owner ID: " + rel.getOwner().getId() + " is in Other Community.");
+			return RelationshipWFTransitionStopConditionResult.OkStopChecking;
+		}		
 	}	
 
 	@Override

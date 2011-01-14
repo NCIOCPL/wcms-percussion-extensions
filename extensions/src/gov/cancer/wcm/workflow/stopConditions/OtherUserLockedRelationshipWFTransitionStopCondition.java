@@ -29,8 +29,21 @@ public class OtherUserLockedRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Down: OtherUserLockedRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("OtherUserCheckedOut Stop Condition(archive down): Checking dependent: " + rel.getDependent().getId());
+
+		String checkedOutUser = ContentItemWFValidatorAndTransitioner.isCheckedOutToOtherUser(dependentContentItemSummary, wvc);
+		if (checkedOutUser == null) {
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(archive down): Not checked out or checked out by this user.");
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		} else {
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(archive down): checked out to user, " + checkedOutUser);
+			wvc.addError(
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+					ContentItemWFValidatorAndTransitioner.CHILD_IS_CHECKED_OUT,
+					new Object[]{ownerContentItemSummary.getContentId(), rel.getDependent().getId(), checkedOutUser});
+			return RelationshipWFTransitionStopConditionResult.StopTransition;
+		}
 	}
 
 	@Override 
@@ -40,8 +53,28 @@ public class OtherUserLockedRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Up: OtherUserLockedRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("OtherUserCheckedOut Stop Condition(archive up): Checking dependent: " + rel.getOwner().getId());
+
+		String checkedOutUser = ContentItemWFValidatorAndTransitioner.isCheckedOutToOtherUser(ownerContentItemSummary, wvc);
+		if (checkedOutUser == null) {
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(archive up): Not checked out or checked out by this user.");
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		} else {
+			wvc.getLog().debug("OtherUserCheckedOut Stop Condition(archive up): checked out to user, " + checkedOutUser);
+			
+			//Since this item is checked out to another user, then we cannot go to that item to start the transition
+			//however, we need to get information back to the initial call to say, hey stop.  I think an exception
+			//will make this behave the way that we want.
+			
+			throw new WFValidationException(
+					String.format(
+							ContentItemWFValidatorAndTransitioner.PARENT_IS_CHECKED_OUT, 
+							dependentContentItemSummary.getContentId(),
+							ownerContentItemSummary.getContentId(),
+							checkedOutUser
+					)
+			);
+		}
 	}
 	
 	@Override
