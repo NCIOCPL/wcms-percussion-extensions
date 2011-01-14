@@ -245,12 +245,14 @@
 		<constructor-arg>
 			<list>
 				<value>Migrate</value>
+				<value>MigrateFromEditing</value>
 			</list>
 		</constructor-arg>
 		<!-- Ignore Workflows  -->
 		<constructor-arg>
 			<list>
 				<value>CGV_Navon_Workflow</value>
+				<value>CancerGov_PDQ_Workflow</value>
 			</list>
 		</constructor-arg>
 	</bean>
