@@ -42,7 +42,7 @@ public class CGV_WorkflowItemValidator extends PSOAbstractItemValidationExit {
 
 	private static Log log = LogFactory.getLog(CGV_WorkflowItemValidator.class);
 	
-	private static CGV_RelationshipHandlerService relationshipHandlerService;
+	//private static CGV_RelationshipHandlerService relationshipHandlerService;
 	private static IPSContentMgr contentManagerService;
 	private static IPSGuidManager guidManagerService; 
 	private static PSOWorkflowInfoFinder workflowInfoFinder;	
@@ -54,7 +54,7 @@ public class CGV_WorkflowItemValidator extends PSOAbstractItemValidationExit {
 	static {
 		contentManagerService = PSContentMgrLocator.getContentMgr();
 		guidManagerService = PSGuidManagerLocator.getGuidMgr();
-		relationshipHandlerService = CGV_RelationshipHandlerServiceLocator.getCGV_RelatoinshipHandlerService();
+		//relationshipHandlerService = CGV_RelationshipHandlerServiceLocator.getCGV_RelatoinshipHandlerService();
 	    workflowInfoFinder = new PSOWorkflowInfoFinder();	    
 	}
 	
