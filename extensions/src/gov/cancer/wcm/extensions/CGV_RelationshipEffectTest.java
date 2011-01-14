@@ -7,6 +7,7 @@ import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
@@ -17,15 +18,18 @@ import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
 import com.percussion.extension.PSExtensionProcessingException;
 import com.percussion.extension.PSParameterMismatchException;
+import com.percussion.pso.validation.PSOAbstractItemValidationExit;
 import com.percussion.relationship.IPSEffect;
 import com.percussion.relationship.IPSExecutionContext;
 import com.percussion.relationship.PSEffect;
 import com.percussion.relationship.PSEffectResult;
 import com.percussion.relationship.effect.PSEffectUtils;
 import com.percussion.server.IPSRequestContext;
+import com.percussion.util.PSItemErrorDoc;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.workflow.PSWorkFlowUtils;
 import com.percussion.xml.PSXmlDocumentBuilder;
+import com.percussion.xml.PSXmlTreeWalker;
 
 /**
  * This a test of relationship effects and can go away at some point.
@@ -142,7 +146,12 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 			ContentItemWFValidatorAndTransitioner.setExclusive(request, true);
 			try {
 				validator.performTest(request, errorDoc);
-				result.setSuccess();
+				if(docHasErrors(errorDoc)){
+					result.setError("Could not transition.  See log for more info.");
+				}
+				else{
+					result.setSuccess();
+				}
 			} catch (PSException e) {
 				result.setError(e);
 				e.printStackTrace();
@@ -160,5 +169,25 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 
 	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
 	private static final String NCI_EFFECT_FLAG = "gov.cancer.wcm.extensions.WorkflowItemValidator.NCI_EFFECT_FLAG";
+	
+	private boolean docHasErrors(Document errorDoc){
+	     Element root = errorDoc.getDocumentElement();
+	      if(root == null)
+	      {
+	         return false;
+	      }
+	      PSXmlTreeWalker w = new PSXmlTreeWalker(root);
+	      Element e = w.getNextElement(PSItemErrorDoc.ERROR_FIELD_SET_ELEM, PSXmlTreeWalker.GET_NEXT_ALLOW_CHILDREN);
+	      if(e == null)
+	      {
+	         return false;
+	      }
+	      e = w.getNextElement(PSItemErrorDoc.ERROR_FIELD_ELEM, PSXmlTreeWalker.GET_NEXT_ALLOW_CHILDREN);
+	      if(e == null)
+	      {
+	         return false;
+	      }
+	      return true; 
+	}
 
 }

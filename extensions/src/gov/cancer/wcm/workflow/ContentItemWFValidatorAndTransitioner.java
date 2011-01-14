@@ -62,7 +62,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	private static PSOWorkflowInfoFinder workInfoFinder;
 	private static IPSContentWs contentWebService;
 	private static IPSGuidManager guidManager;	
-	
+
 	static {
 		contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 		workflowConfig = WorkflowConfigurationLocator.getWorkflowConfiguration();
@@ -72,11 +72,11 @@ public class ContentItemWFValidatorAndTransitioner {
 		contentWebService = PSContentWsLocator.getContentWebservice();
 		guidManager = PSGuidManagerLocator.getGuidMgr();	
 	}
-	
+
 	public ContentItemWFValidatorAndTransitioner(Log log) {
 		this.log = log;
 	}
-	
+
 	/**
 	 * Tests an item to see if the item should be allowed through the workflow.
 	 * If it is, and dependents which should transition with the item should
@@ -86,49 +86,49 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @throws PSException
 	 */
 	public void performTest(IPSRequestContext request,Document errorDoc)
-		throws PSException, PSErrorException {
+	throws PSException, PSErrorException {
 
 		log.debug("performTest: Workflow Item Validator: Performing Test...");
 
 		String transition = request.getParameter("sys_transitionid");
 		int transitionID = Integer.parseInt(transition);
-			
+
 		String currCID = request.getParameter("sys_contentid");
 		int id = Integer.parseInt(currCID);		
 
 		//Get information about the content item this lets us get the GUID
 		//and allows us to get the content Type Name
 		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(id);					
-		
+
 		//TODO: Error if summary is null.
-		
+
 		//TODO: Get transition information.
 		log.debug("performTest: Getting Workflow Info");
 		int wfState = contentItemSummary.getContentStateId();
 		int wfId = contentItemSummary.getWorkflowAppId();		   
-	  
+
 		PSWorkflow workflow = workflowService.loadWorkflow(new PSGuid(PSTypeEnum.WORKFLOW, wfId));
 		PSState state = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, wfState),
 				new PSGuid(PSTypeEnum.WORKFLOW,wfId));	   
 
 		//Check to see if the workflow code is going to be ignored (configurable list of triggers/workflows to ignore)
-		
+
 		//Get the configuration bean.
 		WorkflowConfiguration config = WorkflowConfigurationLocator.getWorkflowConfiguration();
 		ValidatorIgnoreConfig ignoreCheck = config.getValidatorIgnore();
-		
+
 		for( String currWkflw : ignoreCheck.getIgnoreWorkflows() ){
 			//If the current workflow is in the list of ignored workflows, return.
 			if(workflow.getName().equalsIgnoreCase(currWkflw)){
 				return;
 			}
 		}
-		
+
 		//Find the trigger name.
 		String triggerName = null;
 		for (PSTransition tran : state.getTransitions()){
 			if (tran.getGUID().getUUID() == transitionID){
-				 triggerName = tran.getTrigger();
+				triggerName = tran.getTrigger();
 			}
 		}
 		if(triggerName != null){
@@ -140,9 +140,9 @@ public class ContentItemWFValidatorAndTransitioner {
 
 		//Setup the context for validation.
 		WorkflowValidationContext wvc = new WorkflowValidationContext(request, contentItemSummary, log, errorDoc, workflow, state, transitionID);
-				
+
 		//log.debug("Initiating Push for Content Item: " + id + "(" + contentTypeName +")");
-		
+
 		/*
 		 * We need to check if:
 		 *  A) we are either
@@ -157,9 +157,9 @@ public class ContentItemWFValidatorAndTransitioner {
 		 */
 
 		//We should really check if we are updating, first publish, or unpublishing content.
-		
+
 		// Step 1. Check if this is a top type and handle appropriately
-		
+
 		//The following holds true for non-archiving transitions.
 		PSComponentSummary pushRoot = null;
 		RelationshipWFTransitionCheckResult result = RelationshipWFTransitionCheckResult.StopTransition;
@@ -169,10 +169,16 @@ public class ContentItemWFValidatorAndTransitioner {
 			if(!archiveSharedCheck(pushRoot, wvc)){
 				//Cannot archive, error.
 				log.error("Error Occured while Validating for Archiving");
+				wvc.addError(
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+						ContentItemWFValidatorAndTransitioner.SHARED_ARCHIVE,
+						new Object[]{pushRoot.getContentId()});
 			}
-			
-			if(validate(pushRoot, wvc)){
-				result = pushContentItem(pushRoot, wvc);
+			else{
+				if(validate(pushRoot, wvc)){
+					result = pushContentItem(pushRoot, wvc);
+				}
 			}
 		} catch (WFValidationException validationEx) {
 			if (!validationEx.hasBeenLogged())
@@ -180,12 +186,12 @@ public class ContentItemWFValidatorAndTransitioner {
 			//Add Generic error, since the user cannot do anything to fix this.
 			PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "System Error Occured.  Please consult the logs.", null);
 		}
-		
-		
+
+
 		//If there was not an error, transition?
 		//else, error
 		if(result == RelationshipWFTransitionCheckResult.ContinueTransition){
-			
+
 			//---------------------------------------------
 			if(pushRoot != null){
 				//If root == initial transitioned item: remove it from the list, and add the root.
@@ -196,7 +202,7 @@ public class ContentItemWFValidatorAndTransitioner {
 				}
 			}
 			//---------------------------------------------
-			
+
 			PSComponentSummary[] itemsToTransition = wvc.getItemsToTransition();
 			wvc.getLog().debug("Items to transition: " + itemsToTransition.length);
 
@@ -223,23 +229,23 @@ public class ContentItemWFValidatorAndTransitioner {
 				if(itemStartState != null ){
 					//2, 3, and 4.
 					List<PSTransition> transitionList = wvc.getTransitions(itemStartState.getName());
-					
+
 					//5. For all triggers in the list from Step 4, PercussionTransition(item).
 					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
 					for( PSTransition t :transitionList ){
 						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
 						//try {
-							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
-									", Trigger Name: "+t.getTrigger());
-						
-							PercussionWFTransition.transitionItem(item.getContentId(), t.getTrigger(), "", null);
-							//systemWebService.transitionItems(temp, t.getTrigger());
-						
-						
-//						} catch (PSErrorsException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
+						wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
+								", Trigger Name: "+t.getTrigger());
+
+						PercussionWFTransition.transitionItem(item.getContentId(), t.getTrigger(), "", null);
+						//systemWebService.transitionItems(temp, t.getTrigger());
+
+
+						//						} catch (PSErrorsException e) {
+						//							// TODO Auto-generated catch block
+						//							e.printStackTrace();
+						//						}
 					}
 				}
 			}
@@ -248,44 +254,44 @@ public class ContentItemWFValidatorAndTransitioner {
 			wvc.getLog().debug("There was an error while trying to transition dependents.  See log for more info.");
 			//throw new PSException("There was an error while trying to transition dependents.  See log for more info.");
 		}
-		
-		
+
+
 		//PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Stopping For Testing", null);
 		//throw new PSException("STOPPING");
-		
+
 	}
 
 	private PSComponentSummary getTransitionRoot(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {
 
 		wvc.getLog().debug("getTransitionRoot: Checking for root for content item : " + contentItemSummary.getContentId());
-		
+
 		//Check if it is a top type
 		if (ContentItemWFValidatorAndTransitioner.isTopType(contentItemSummary.getContentTypeId(), wvc)) {
 			wvc.getLog().debug("getTransitionRoot: Content Item : " + contentItemSummary.getContentId() + ", is a top type.");
 			return contentItemSummary;
 		}
-		
+
 		//Find Follow Relationships
-		
+
 		List<PSRelationship> rels = new ArrayList<PSRelationship>();
-		
+
 		PSRelationshipFilter filter = new PSRelationshipFilter();		
 		//This is going to be the current/edit revision for this content item.
 		filter.setDependent(contentItemSummary.getHeadLocator());		
 		//filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
 		//filter.limitToEditOrCurrentOwnerRevision(true);
 		filter.setCategory("rs_activeassembly");
-		
+
 		try {
 			rels = systemWebService.loadRelationships(filter);
 		} catch (Exception ex) {
 			wvc.getLog().error("getTransitionRoot: Could not get relationships for id: " + contentItemSummary.getContentId(), ex);
 			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
 		}
-		
+
 		//Count the number of follow relationships to see if it is shared.  More than one follow
 		//means the item is shared.
-		
+
 		ArrayList<PSRelationship> followRels = new ArrayList<PSRelationship>();
 		ArrayList<BaseRelationshipWFTransitionCheck> followChecks = new ArrayList<BaseRelationshipWFTransitionCheck>();
 		for(PSRelationship rel: rels) {
@@ -293,9 +299,9 @@ public class ContentItemWFValidatorAndTransitioner {
 			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
 			if (transitionCheck.getTransitionType() == RelationshipWFTransitionTypes.Follow)
 				followRels.add(rel);
-				followChecks.add(transitionCheck);
+			followChecks.add(transitionCheck);
 		}
-		
+
 		//If the number of rels is not 1 it is either 0, which means that this component is not shared but is transitioned
 		//on its own, or it is > 1 which means it is shared.
 		if (followRels.size() > 1) {
@@ -305,7 +311,7 @@ public class ContentItemWFValidatorAndTransitioner {
 			wvc.getLog().debug("getTransitionRoot: Content Item : " + contentItemSummary.getContentId() + ", has no relationships.");
 			return contentItemSummary;			
 		}
-		
+
 		//Now since there is only one relationship it is the parent of this follower, so we need to get it
 		//so that we can see its parent.  However, just like the rules we use to test when going down,
 		//we need to follow those rules going up.
@@ -321,10 +327,10 @@ public class ContentItemWFValidatorAndTransitioner {
 			//We would be able to be pushed by our parent, so, we need to try and see if our parent
 			//is the root.
 			//Get the PSComponentSummary for our parent and call this method again.
-			
+
 			//Get the summary
 			PSComponentSummary ownerSummary = ContentItemWFValidatorAndTransitioner.getSummaryFromId(followRels.get(0).getOwner().getId());
-			
+
 			if (ownerSummary == null) {
 				//Do not add PSError since that will be added for us when the WFValidationException is thrown
 				wvc.getLog().error("getTransitionRoot: Could not get Component Summary for id: " + followRels.get(0).getOwner().getId());
@@ -333,7 +339,7 @@ public class ContentItemWFValidatorAndTransitioner {
 
 			wvc.getLog().debug("getTransitionRoot: Content Item : " + contentItemSummary.getContentId() + ", is not a root, continuing up.");
 			return getTransitionRoot(ownerSummary, wvc);
-			
+
 		} else {
 			//Basically, we hit an item where if we pushed the parent then the WFStopCondition would
 			//be met and we could never be pushed.  This means we are the root of the transition.
@@ -341,7 +347,7 @@ public class ContentItemWFValidatorAndTransitioner {
 			return contentItemSummary;
 		}
 	}
-		
+
 	/**
 	 * Validates a content item and transitions its children through the workflow 
 	 * @param request
@@ -351,28 +357,28 @@ public class ContentItemWFValidatorAndTransitioner {
 	private RelationshipWFTransitionCheckResult pushContentItem(
 			PSComponentSummary contentItemSummary,
 			WorkflowValidationContext wvc			
-			) 
-		throws WFValidationException
+	) 
+	throws WFValidationException
 	{
 		return validateChildRelationships(contentItemSummary, wvc);
-		
+
 		//Validate Dependents
 		//RelationshipWFTransitionCheckResult result = validateChildRelationships(contentItemSummary, wvc);
-		
-//		if(result == RelationshipWFTransitionCheckResult.ContinueTransition){
-//			//Find mapping that leads to the correct destination for the dependents.
-//		}
-//		else{
-//			//An error occurred and we stop transition.
-//		}
+
+		//		if(result == RelationshipWFTransitionCheckResult.ContinueTransition){
+		//			//Find mapping that leads to the correct destination for the dependents.
+		//		}
+		//		else{
+		//			//An error occurred and we stop transition.
+		//		}
 	}
-	
+
 	/*
 	 * Below are class methods for use by the various checks and stop conditions so that
 	 * the code is in one place.
 	 */
 
-	
+
 	/**
 	 * Validates dependents participating in Active Assembly (category) relationships based 
 	 * on rules defined in the RelationshipWFTransitionConfig items.
@@ -381,36 +387,36 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @param contentItemSummary
 	 */
 	public static RelationshipWFTransitionCheckResult validateChildRelationships(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc)
-		throws WFValidationException
+	throws WFValidationException
 	{
 		List<PSRelationship> rels = new ArrayList<PSRelationship>();
-		
+
 		wvc.getLog().debug("Finding relationships for Content ID: " + contentItemSummary.getContentId());
-		
+
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		//This is going to be the current/edit revision for this content item.
 		filter.setOwner(contentItemSummary.getHeadLocator());
 		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
-		
+
 		try {
 			rels = systemWebService.loadRelationships(filter);
 		} catch (Exception ex) {
 			wvc.getLog().error("Could not get relationships for Content ID:" + contentItemSummary.getContentId(), ex);
 			throw new WFValidationException("Could not get relationships for Content ID:" + contentItemSummary.getContentId(), ex, true);
 		}
-		
+
 		wvc.getLog().debug("Found " + rels.size() + " relationships for Content ID: " + contentItemSummary.getContentId());
-						
+
 		//Loop through relationships and validate.  If a relationship is a follow relationship,
 		//then the content ids which should be transition will be added to the WorkflowValidationContext
 		//for later use.
 		for (PSRelationship rel:rels) {
 			String relName = rel.getConfig().getName();
 			wvc.getLog().debug("Found " + relName + " relationship for Content ID: " + contentItemSummary.getContentId());
-			
+
 			//Check config for relationship with that name. (Or get default)
 			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
-			
+
 			//JOHN TODO: Change this so it uses the correct validate (archiveDown vs validateDown), based off the triggers in the
 			//transition mapping.
 			RelationshipWFTransitionCheckResult result = null;
@@ -432,11 +438,11 @@ public class ContentItemWFValidatorAndTransitioner {
 				return RelationshipWFTransitionCheckResult.StopTransition;
 			}
 		}
-			
+
 		//If we have gotten here then everything is ok.
 		return RelationshipWFTransitionCheckResult.ContinueTransition;
 	}
-		
+
 	/**
 	 * Determines if an item is participating in more than one Active Assembly relationship
 	 * as a dependent.
@@ -446,22 +452,22 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @throws PSErrorException
 	 */
 	public static boolean isShared(PSLocator contentItemLocator, WorkflowValidationContext wvc)
-		throws WFValidationException
+	throws WFValidationException
 	{
 		List<PSRelationship> rels = new ArrayList<PSRelationship>();
-				
+
 		PSRelationshipFilter filter = new PSRelationshipFilter();		
 		//This is going to be the current/edit revision for this content item.
 		filter.setDependent(contentItemLocator);		
 		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
-		
+
 		try {
 			rels = systemWebService.loadRelationships(filter);
 		} catch (Exception ex) {
 			wvc.getLog().error("isShared: Could not get content type name for id: " + contentItemLocator.getId(), ex);
 			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
 		}
-		
+
 		//Count the number of follow relationships to see if it is shared.  More than one follow
 		//means the item is shared.
 		int followRelCount = 0;		
@@ -471,10 +477,10 @@ public class ContentItemWFValidatorAndTransitioner {
 			if (transitionCheck.getTransitionType() == RelationshipWFTransitionTypes.Follow)
 				followRelCount++;
 		}
-		
+
 		return (followRelCount > 1);
 	}
-	
+
 	/**
 	 * Checks if an item has a public revision.  (I.E. Check that there is a version on
 	 * the live site)
@@ -486,7 +492,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static boolean hasPublicRevision(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {		
 		return contentItemSummary.getPublicRevision() != -1;
 	}	
-	
+
 	/**
 	 * Checks to see if the contentTypeID that is passed in is a top type.
 	 * @param contentTypeID
@@ -494,28 +500,28 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @return
 	 */
 	public static boolean isTopType(long contentTypeID, WorkflowValidationContext wvc) 
-		throws WFValidationException
+	throws WFValidationException
 	{
-		
+
 		String contentTypeName = null;
-		
+
 		try {
 			contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
 		} catch (Exception ex) {
 			wvc.getLog().error("isTopType: Could not get content type name for id: " + contentTypeID, ex);
 			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
 		}
-		
+
 		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
-		
+
 		if (config == null) {
 			wvc.getLog().error("isTopType: Recieved a null content type config when validating an item.");
 			throw new WFValidationException("System Error Occured. Please Check the logs.", true);			
 		}
-		
+
 		return config.getIsTopType();		
 	}
-	
+
 	/**
 	 * Checks to see if a content item is checked out to a user other than the one that is initiating the
 	 * workflow transition.
@@ -526,14 +532,14 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static String isCheckedOutToOtherUser(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {
 		String userName = (String) PSRequestInfo.getRequestInfo(PSRequestInfo.KEY_USER);
 		String checkedOutUser = contentItemSummary.getCheckoutUserName();
-		
+
 		if (checkedOutUser!=null && checkedOutUser.length()>0 && !checkedOutUser.equals(userName)) {
 			return checkedOutUser;
 		} else {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Checks to see if parent navons are required to be public and if so checks to make sure.
 	 * @param contentItemSummary
@@ -544,7 +550,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static boolean isNavonRequiredOrPublic(
 			PSComponentSummary contentItemSummary, 
 			WorkflowValidationContext wvc)
-		throws WFValidationException
+	throws WFValidationException
 	{
 		String contentTypeName = null; 
 		try {
@@ -553,9 +559,9 @@ public class ContentItemWFValidatorAndTransitioner {
 			wvc.getLog().error("isNavonRequiredOrPublic: Could not get content type name for id: " + contentItemSummary.getContentTypeId(), ex);
 			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
 		}
-		
+
 		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
-		
+
 		if (config == null) {
 			wvc.getLog().error("isNavonRequiredOrPublic: Recieved a null content type config when validating an item.");
 			throw new WFValidationException("System Error Occured. Please Check the logs.", true);			
@@ -563,12 +569,12 @@ public class ContentItemWFValidatorAndTransitioner {
 
 		//Check Navon
 		//JOHN TODO: Change this to use the new "validator" class that is in a list, inside of a CTListConfig object.
-//		if (config.getRequiresParentNavonsPublic() && ContentItemWFValidatorAndTransitioner.areParentNavonsPublic(contentItemSummary) == false) {
-//			//Error Out Because public navons are required but they are not public.
-//			wvc.getLog().debug("Parent Navons are not Public for content item: " + contentItemSummary.getContentId());			
-//			return false;
-//		}
-		
+		//		if (config.getRequiresParentNavonsPublic() && ContentItemWFValidatorAndTransitioner.areParentNavonsPublic(contentItemSummary) == false) {
+		//			//Error Out Because public navons are required but they are not public.
+		//			wvc.getLog().debug("Parent Navons are not Public for content item: " + contentItemSummary.getContentId());			
+		//			return false;
+		//		}
+
 		return true;
 	}
 
@@ -580,7 +586,7 @@ public class ContentItemWFValidatorAndTransitioner {
 		//TODO:Implement areParentNavonsPublic
 		//getParentFolderRelationships()
 		//wvc.addError(ERR_FIELD, ERR_FIELD_DISP, NAVON_NOT_PUBLIC, args)
-		
+
 		return false;
 	}
 
@@ -593,26 +599,26 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static PSComponentSummary getSummaryFromId(int contentId) {
 		return contentSummariesService.loadComponentSummary(contentId);
 	}
-	
+
 	/**
-	* set the exclusion flag.
-	* 
-	* @param req the request context of the caller.
-	* @param b the new exclusion value. <code>true</code> means that
-	*           subsequent effects should not interfere with event processing.
-	*/
+	 * set the exclusion flag.
+	 * 
+	 * @param req the request context of the caller.
+	 * @param b the new exclusion value. <code>true</code> means that
+	 *           subsequent effects should not interfere with event processing.
+	 */
 	public static void setExclusive(IPSRequestContext req, boolean b)
 	{
-	   //req.setSessionPrivateObject(EXCLUSION_FLAG, b);
-	   req.setPrivateObject(EXCLUSION_FLAG, b);
+		//req.setSessionPrivateObject(EXCLUSION_FLAG, b);
+		req.setPrivateObject(EXCLUSION_FLAG, b);
 	}
 
 	/**
-	* tests if the exclusion flag is on.
-	* 
-	* @param req the parent request context.
-	* @return <code>true</code> if the exclusion flag is set.
-	*/
+	 * tests if the exclusion flag is on.
+	 * 
+	 * @param req the parent request context.
+	 * @return <code>true</code> if the exclusion flag is set.
+	 */
 	public static boolean isExclusive(IPSRequestContext req)
 	{
 		//Boolean b = (Boolean) req.getSessionPrivateObject(EXCLUSION_FLAG);
@@ -641,7 +647,7 @@ public class ContentItemWFValidatorAndTransitioner {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Checks to see if the root that is pushing, is the dependent in more then one relationship.
 	 * @param pushRoot - the root to check
@@ -650,27 +656,17 @@ public class ContentItemWFValidatorAndTransitioner {
 	 */
 	private boolean archiveSharedCheck(PSComponentSummary pushRoot,
 			WorkflowValidationContext wvc) {
-		if(wvc.isArchiveTransition()){
-			if(ContentItemWFValidatorAndTransitioner.isShared(pushRoot.getCurrentLocator(), wvc))
-			{
-				wvc.addError(
-						ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
-						ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
-						ContentItemWFValidatorAndTransitioner.SHARED_ARCHIVE,
-						new Object[]{pushRoot.getContentId()}); 
-				return false;
-			}
+		if(wvc.isArchiveTransition() && 
+				ContentItemWFValidatorAndTransitioner.isShared(pushRoot.getCurrentLocator(), wvc)){
+			return false;
 		}
 		else{
 			return true;
 		}
-		
-		//Should never be reached
-		return false;
 	}
-	
+
 	private static final String EXCLUSION_FLAG =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
-	
+
 	//Below are the formatters for messages
 	public static final String ARCHIVE_SHARED = "The content item {System Title} is shared so it cannot be archived.";	
 	public static final String NO_PATH_TO_DEST = "Could not promote content item{System Title} to {Destination State} because its child item {System Title } cannot be promoted to {Destination State}.";
@@ -687,8 +683,8 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static final String NON_PUBLIC_CHILD_IS_SHARED = "Could not promote item {0} because its child item {1} is shared and not public.";
 	public static final String NO_TRANSITION_AVAILABLE = "Could not promote item {0} because the user does not have permission to transition child item {1}.";
 	public static final String NO_PUBLIC_REVISION = "Could not promote item {0} because its child item {1} has no public revision.";
-	public static final String SHARED_ARCHIVE = "Could not archive item {0} because it is a shared content item.";
-	
+	public static final String SHARED_ARCHIVE = "Could not archive item {0} because it is a dependent of more than 1 content item.";
+
 	public static final String ERR_FIELD = "N/A";
 	public static final String ERR_FIELD_DISP = "N/A";	
 }
