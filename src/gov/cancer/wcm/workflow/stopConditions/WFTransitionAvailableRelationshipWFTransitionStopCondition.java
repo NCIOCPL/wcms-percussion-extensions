@@ -43,8 +43,29 @@ public class WFTransitionAvailableRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Down: WFTransitionAvailableRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("Checking Transition Available Stop Condition for dependent(archive down): " + rel.getDependent().getId());
+		
+		//Get the state of the Dependent.
+		PSState dependentState = wvc.getState(dependentContentItemSummary.getContentStateId());
+		
+		if (dependentState == null) {
+			wvc.getLog().error("Transition Available Stop Condition for dependent(archive down): " + dependentContentItemSummary.getContentId() + " could not get workflow state.");
+			throw new WFValidationException("Could not get workflow state for dependent: " + dependentContentItemSummary.getContentId(), true);
+		}	
+
+		if (!canTransition(dependentState, wvc)) {
+			//This is a hard error because we must be able to transition a child in order
+			//to transition the parent.
+			wvc.getLog().debug("Workflow Transition Available Stop Condition (archive down): Dependent ID: " + rel.getDependent().getId() + " cannot be transitioned because user does not have rights to transition.");
+			wvc.addError(
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD, 
+					ContentItemWFValidatorAndTransitioner.ERR_FIELD_DISP, 
+					ContentItemWFValidatorAndTransitioner.NO_TRANSITION_AVAILABLE,
+					new Object[]{ownerContentItemSummary.getContentId(), rel.getDependent().getId()});
+			return RelationshipWFTransitionStopConditionResult.StopTransition;
+		}
+		
+		return RelationshipWFTransitionStopConditionResult.Ok;
 	}
 
 	@Override 
@@ -54,8 +75,29 @@ public class WFTransitionAvailableRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Up: WFTransitionAvailableRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().debug("Checking Transition Available Stop Condition for owner(archive up): " + rel.getOwner().getId());
+		
+		//Get the state of the Dependent.
+		PSState ownerState = wvc.getState(ownerContentItemSummary.getContentStateId());
+		
+		if (ownerState == null) {
+			wvc.getLog().error("Transition Available Stop Condition for dependent(archive up): " + ownerContentItemSummary.getContentId() + " could not get workflow state.");
+			throw new WFValidationException("Could not get workflow state for dependent: " + ownerContentItemSummary.getContentId(), true);
+		}	
+
+		if (!canTransition(ownerState, wvc)) {
+			//This is a hard error because we must be able to transition a child in order
+			//to transition the parent.
+			throw new WFValidationException(
+					String.format(
+							ContentItemWFValidatorAndTransitioner.PARENT_HAS_NO_AVAILABLE_TRANSITION, 
+							dependentContentItemSummary.getContentId(),
+							ownerContentItemSummary.getContentId()
+					)
+			);
+		}
+		
+		return RelationshipWFTransitionStopConditionResult.Ok;
 	}
 	
 	

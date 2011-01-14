@@ -240,7 +240,7 @@ public class ContentItemWFValidatorAndTransitioner {
 		}
 		else{
 			wvc.getLog().debug("There was an error while trying to transition dependents.  See log for more info.");
-			throw new PSException("There was an error while trying to transition dependents.  See log for more info.");
+			//throw new PSException("There was an error while trying to transition dependents.  See log for more info.");
 		}
 		
 		
@@ -653,6 +653,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static final String NON_PUBLIC_CHILD_IS_TOP_TYPE = "Could not promote item {0} because its child item {1} is another page and not public.";
 	public static final String NON_PUBLIC_CHILD_IS_SHARED = "Could not promote item {0} because its child item {1} is shared and not public.";
 	public static final String NO_TRANSITION_AVAILABLE = "Could not promote item {0} because the user does not have permission to transition child item {1}.";
+	public static final String NO_PUBLIC_REVISION = "Could not promote item {0} because its child item {1} has no public revision.";
 	
 	public static final String ERR_FIELD = "N/A";
 	public static final String ERR_FIELD_DISP = "N/A";	

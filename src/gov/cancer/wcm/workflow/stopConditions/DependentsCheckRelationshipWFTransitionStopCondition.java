@@ -40,8 +40,32 @@ public class DependentsCheckRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Down: DependentsCheckRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		PSComponentSummary dependentSummary = ContentItemWFValidatorAndTransitioner.getSummaryFromId(rel.getDependent().getId());
+		
+		if (dependentSummary == null) {
+			//Do not add PSError since that will be added for us when the WFValidationException is thrown
+			wvc.getLog().error("Dependents Check Stop Condition: Could not get Component Summary for id: " + rel.getDependent().getId());
+			throw new WFValidationException("System Error Occured. Please Check the logs.", true);
+		}
+		
+		//Check the dependent's relationships
+		if (ContentItemWFValidatorAndTransitioner.validateChildRelationships(dependentSummary, wvc) == RelationshipWFTransitionCheckResult.ContinueTransition) {
+			wvc.getLog().debug("Dependents Check Stop Condition: Adding dependent id: " + rel.getDependent().getId() + " to list of items to transition");
+			//PSLocator loc = rel.getDependent();
+			
+			IPSCmsContentSummaries contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
+			//        wvc.addItemToTransition(contentSummariesService.loadComponentSummary(rel.getDependent().getId()));
+			
+			//The below return is different from the rest of the stop conditions and that is because there is
+			//no difference for this stop condition between Ok and OkStopChecking.  We either cannot transition
+			//this child because of a child relationship stops or it can transition.
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		} else {
+			wvc.getLog().debug("Dependents Check Stop Condition: Cannot transition dependent id: " + rel.getDependent().getId());
+			//There is no reason to add a PSError message since it would have already been added in the one of the
+			//child checks.
+			return RelationshipWFTransitionStopConditionResult.StopTransition;
+		}
 	}
 
 	@Override 
@@ -51,8 +75,8 @@ public class DependentsCheckRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Up: DependentsCheckRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		wvc.getLog().error("Dependents Check Stop Condition: Cannot archive validate upwards. Check configuration. Called on dependent with id: " + dependentContentItemSummary.getContentId());
+		throw new WFValidationException("System Error Occured. Please Check the logs.", true);
 	}	
 
 	
