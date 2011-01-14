@@ -1,5 +1,8 @@
 package gov.cancer.wcm.workflow.validators;
 
+import java.util.List;
+
+import gov.cancer.wcm.workflow.PublishingDirection;
 import gov.cancer.wcm.workflow.WorkflowValidationContext;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
@@ -12,6 +15,17 @@ import com.percussion.design.objectstore.PSRelationship;
  */
 public abstract class BaseContentTypeValidator {
 
+	private List<PublishingDirection> _validationDirections;
+	
+
+	/**
+	 * Gets the publishing directions for which this validator should fire.
+	 * @return
+	 */
+	public List<PublishingDirection> getValidationDirections() {
+		return _validationDirections;		
+	}
+	
 	/**
 	 * Validates whether or not the item can be allowed to transition or not.
 	 * @param dependentContentItemSummary 
@@ -28,6 +42,7 @@ public abstract class BaseContentTypeValidator {
 	 * 
 	 * @param relationshipName
 	 */
-	public BaseContentTypeValidator() {
+	public BaseContentTypeValidator(List<PublishingDirection> validationDirections) {
+		_validationDirections = validationDirections;
 	}
 }

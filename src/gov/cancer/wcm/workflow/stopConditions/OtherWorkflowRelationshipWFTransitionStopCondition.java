@@ -23,7 +23,10 @@ public class OtherWorkflowRelationshipWFTransitionStopCondition extends
 			WorkflowValidationContext wvc
 	) {
 		wvc.getLog().debug("Archive Validate Down: OtherWorkflowRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		if (ownerContentItemSummary.getWorkflowAppId() == dependentContentItemSummary.getWorkflowAppId()) {
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		}
+		return RelationshipWFTransitionStopConditionResult.OkStopChecking;
 	}
 
 	@Override 
@@ -34,7 +37,16 @@ public class OtherWorkflowRelationshipWFTransitionStopCondition extends
 			WorkflowValidationContext wvc
 	) {
 		wvc.getLog().debug("Archive Validate Up: OtherWorkflowRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		if (dependentContentItemSummary.getWorkflowAppId() == ownerContentItemSummary.getWorkflowAppId()) {
+			wvc.getLog().debug("Other Workflow Stop Condition (Archive-Up): Owner ID: " + rel.getOwner().getId() + " uses Same Workflow.");
+			return RelationshipWFTransitionStopConditionResult.Ok;
+		}
+		else {
+			//Up validation does not check if the item has a public revision since we know that the push must
+			//start with the dependentContentItemSummary passed in.
+			wvc.getLog().debug("Other Workflow Stop Condition (Archive-Up): Owner ID: " + rel.getOwner().getId() + " uses Other Workflow.");
+			return RelationshipWFTransitionStopConditionResult.OkStopChecking;
+		}		
 	}	
 	
 	@Override

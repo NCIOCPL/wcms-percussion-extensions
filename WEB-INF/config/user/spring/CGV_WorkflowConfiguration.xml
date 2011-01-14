@@ -25,6 +25,7 @@
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
 				</bean>
+				
 			</list>
 		</constructor-arg>
 		<constructor-arg>
@@ -42,7 +43,13 @@
 	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not a Top Type or
 		is a Top Type with a public revision.
 	 -->
-	<bean id="PublicNavonNeeded" class="gov.cancer.wcm.workflow.validators.PublicNavonNeeded"/>
+	<bean id="PublicNavonNeeded" class="gov.cancer.wcm.workflow.validators.PublicNavonNeeded">
+		<constructor-arg>
+			<list>
+				<value>ContentCreation</value>
+			</list>
+		</constructor-arg>
+	</bean>
 
 	<bean id="PublishableTypeValidators" class="gov.cancer.wcm.workflow.validators.CTValidatorCollection">
 		<constructor-arg>

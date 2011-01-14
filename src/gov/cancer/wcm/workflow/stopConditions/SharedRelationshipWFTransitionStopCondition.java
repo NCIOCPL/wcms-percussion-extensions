@@ -27,7 +27,10 @@ public class SharedRelationshipWFTransitionStopCondition extends
 			WorkflowValidationContext wvc
 	) {
 		wvc.getLog().debug("Archive Validate Down: SharedRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		if (ContentItemWFValidatorAndTransitioner.isShared(rel.getDependent(), wvc)) {
+			return RelationshipWFTransitionStopConditionResult.OkStopChecking;
+		}
+		return RelationshipWFTransitionStopConditionResult.Ok;
 	}
 
 	@Override 
@@ -37,8 +40,11 @@ public class SharedRelationshipWFTransitionStopCondition extends
 			PSRelationship rel,
 			WorkflowValidationContext wvc
 	) {
-		wvc.getLog().debug("Archive Validate Up: SharedRelationshipWFTransitionStopCondition");
-		return RelationshipWFTransitionStopConditionResult.StopTransition;
+		//There is no reason to check the parent to see if it is shared, if it is, then we would want
+		//to go to that item.  The earlier check would get there and say, yes, this item is shared stop
+		//going up.
+		wvc.getLog().error("Shared Check Stop Condition (archive): Cannot validate upwards. Check configuration. Called on dependent with id: " + dependentContentItemSummary.getContentId());
+		throw new WFValidationException("System Error Occured. Please Check the logs.", true);
 	}	
 	
 	@Override

@@ -311,5 +311,16 @@ public class WorkflowValidationContext {
 		return !_isArchiving;		
 	}
 	
+	/**
+	 * Gets the publishing direction of the current transition
+	 * @return
+	 */
+	public PublishingDirection getPublishingDirection() {
+		if (isArchiveTransition())
+			return PublishingDirection.Archiving;
+		else
+			return PublishingDirection.Creation;			
+	}
+	
 
 }

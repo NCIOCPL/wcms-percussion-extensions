@@ -3,6 +3,7 @@ package gov.cancer.wcm.workflow.validators;
 import java.util.List;
 
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
+import gov.cancer.wcm.workflow.PublishingDirection;
 import gov.cancer.wcm.workflow.WorkflowValidationContext;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
@@ -95,6 +96,10 @@ public class PublicNavonNeeded extends BaseContentTypeValidator {
 		}
 		wvc.getLog().debug("All navons are in public for item with content id: " + dependentContentItemSummary.getContentId());
 		return allNavonsPublic; //There is no navon, so no need to check.
+	}
+	
+	public PublicNavonNeeded(List<PublishingDirection> validationDirections) {
+		super(validationDirections);
 	}
 
 }
