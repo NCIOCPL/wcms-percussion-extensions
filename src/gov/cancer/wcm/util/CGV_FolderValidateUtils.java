@@ -492,8 +492,6 @@ public class CGV_FolderValidateUtils {
     /**
      * Load a content item from the content ID
      * @param contentId
-     * @param session
-     * @param user
      * @return the item object
      * @throws PSErrorResultsException
      */
