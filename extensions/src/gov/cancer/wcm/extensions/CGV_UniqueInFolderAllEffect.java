@@ -91,6 +91,12 @@ public class CGV_UniqueInFolderAllEffect implements IPSEffect {
 	public void attempt(Object[] params, IPSRequestContext request, IPSExecutionContext context, PSEffectResult result) {
 		if (context.isPreWorkflow()) {
 		//only do this check on preWorkFlow execution context
+			String userName = request.getUserName();
+			if (userName == null || userName.isEmpty()) {
+				//don't do this if no user (probably migrating)
+				result.setSuccess();
+				return;
+			}
 			PSOExtensionParamsHelper h = new PSOExtensionParamsHelper(valUtil.getExtensionDef(), params, request, log);
 	        String fieldName = h.getRequiredParameter("fieldName");
 	        log.debug("[attempt]fieldName = " + fieldName);        
