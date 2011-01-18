@@ -168,6 +168,9 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		if(CGV_TopTypeChecker.isTCGAContent(contentTypeId.intValue(),cmgr)){
 			tcga = true;
 		}
+		if(CGV_TopTypeChecker.isCrossSiteContent(contentTypeId.intValue(),cmgr)){
+			shared_site = true;
+		}
 		
 //		CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
 //		StateName destState = stateHelp.getDestState();
@@ -190,27 +193,28 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			m = editionList.get("CGV_Navon_Workflow");
 
 		}
+		if(shared_site){
+			m = editionList.get("Shared Workflow");
+//			PSOObjectFinder commFinder = new PSOObjectFinder();			
+//			String community = commFinder.getUserCommunity();
+//			if(community.equalsIgnoreCase("TCGA")){
+//				m = editionList.get("TCGA Workflow");
+//			}
+//			else if(community.equalsIgnoreCase("CancerGov"))
+//			{
+//				m = editionList.get("CancerGov Workflow");
+//			}
+//			else if(community.equalsIgnoreCase("CancerGov_Configuration"))
+//			{
+//				m = editionList.get("CancerGov Workflow");
+//			}
+//			else{
+//				m = editionList.get("Shared Workflow");
+//			}
+		}
 		else if(tcga){
 			m = editionList.get("TCGA Workflow");
 
-		}
-		else if(shared_site){
-			PSOObjectFinder commFinder = new PSOObjectFinder();			
-			String community = commFinder.getUserCommunity();
-			if(community.equalsIgnoreCase("TCGA")){
-				m = editionList.get("TCGA Workflow");
-			}
-			else if(community.equalsIgnoreCase("CancerGov"))
-			{
-				m = editionList.get("CancerGov Workflow");
-			}
-			else if(community.equalsIgnoreCase("CancerGov_Configuration"))
-			{
-				m = editionList.get("CancerGov Workflow");
-			}
-			else{
-				m = editionList.get("Shared Workflow");
-			}
 		}
 		else{
 			m = editionList.get("CancerGov Workflow");
