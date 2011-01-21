@@ -487,10 +487,14 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * @param contentItemLocator
 	 * @param wvc
 	 * @return
+	 * @throws Exception 
 	 */
 	//TODO: Update this to hasPublicRevision or is in a workflow state greater than the one we are transitioning to.	
-	public static boolean hasPublicRevision(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {		
-		return contentItemSummary.getPublicRevision() != -1;
+	public static boolean hasPublicRevisionOrGreater(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) throws WFValidationException {		
+		boolean greaterOrEqual = false;
+		greaterOrEqual = workflowConfig.getWorkflowStates().greaterThanOrEqual(wvc.getInitiatorWorkflowState().getName(), wvc.getDestinationState().getName());
+		return (contentItemSummary.getPublicRevision() != -1) || greaterOrEqual;
+		
 	}	
 
 	/**

@@ -624,6 +624,40 @@
 		</constructor-arg>
 	</bean>
 	
+	<bean id="CGovWorkflowStates" class="gov.cancer.wcm.workflow.WFStates">
+	<constructor-arg>
+		<map>
+			<entry key="Draft">
+				<value>1</value>
+			</entry>
+			<entry key="Editing">
+				<value>1</value>
+			</entry>
+			<entry key="Staging (D)">
+				<value>3</value>
+			</entry>
+			<entry key="Staging (P)">
+				<value>3</value>
+			</entry>
+			<entry key="Review (D)">
+				<value>5</value>
+			</entry>
+			<entry key="Review (P)">
+				<value>5</value>
+			</entry>
+			<entry key="Pending Archive">
+				<value>7</value>
+			</entry>
+			<entry key="Private Archive">
+				<value>10</value>
+			</entry>
+			<entry key="Public">
+				<value>10</value>
+			</entry>
+		</map>
+	</constructor-arg>
+</bean>
+	
 	<!-- This defines the state transition mappings for different workflows. -->
 	<bean id="WorkflowTransitionMappings" class="gov.cancer.wcm.workflow.WFTransitionMappings">
 		<constructor-arg>
@@ -641,5 +675,6 @@
 		<constructor-arg><ref bean="RelationshipChecks"/></constructor-arg>
 		<constructor-arg><ref bean="WorkflowTransitionMappings" /></constructor-arg>
 		<constructor-arg><ref bean="ValidatorIgnoreConfig" /></constructor-arg>
+		<constructor-arg><ref bean="CGovWorkflowStates" /></constructor-arg>
 	</bean>
 </beans>

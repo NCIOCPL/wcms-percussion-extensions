@@ -65,7 +65,7 @@ public class OtherCommunityRelationshipWFTransitionStopCondition extends
 			return RelationshipWFTransitionStopConditionResult.Ok;
 		}
 		else {
-			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(dependentContentItemSummary, wvc)) {
+			if (ContentItemWFValidatorAndTransitioner.hasPublicRevisionOrGreater(dependentContentItemSummary, wvc)) {
 				wvc.getLog().debug("Other Community Stop Condition (down): Dependent ID: " + rel.getDependent().getId() + " is in Other Community and has public revision.");
 				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
 			} else {

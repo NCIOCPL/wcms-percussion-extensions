@@ -43,7 +43,7 @@ public class RelationshipWFTransitionPublicRevisionCheck extends
 		
 		
 		//Check if the item has a public revision or not.
-		if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(dependentContentItemSummary, wvc)) { 
+		if (ContentItemWFValidatorAndTransitioner.hasPublicRevisionOrGreater(dependentContentItemSummary, wvc)) { 
 			wvc.getLog().debug("Handling Public Revision Check (Down): dependent: " + rel.getDependent().getId() + " has public revision.");
 			return RelationshipWFTransitionCheckResult.ContinueTransition;
 		}
@@ -77,7 +77,7 @@ public class RelationshipWFTransitionPublicRevisionCheck extends
 		}
 		
 		//Check if the item has a public revision or not.
-		if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(ownerContentItemSummary, wvc)) 
+		if (ContentItemWFValidatorAndTransitioner.hasPublicRevisionOrGreater(ownerContentItemSummary, wvc)) 
 			return RelationshipWFTransitionCheckResult.ContinueTransition;
 		else 
 		{

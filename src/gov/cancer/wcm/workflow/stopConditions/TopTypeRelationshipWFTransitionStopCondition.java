@@ -51,12 +51,12 @@ public class TopTypeRelationshipWFTransitionStopCondition extends
 			PSComponentSummary dependentContentItemSummary,
 			PSRelationship rel,
 			WorkflowValidationContext wvc
-	) {
+	){
 		
 		wvc.getLog().debug("Top Type Stop Condition(down): Checking Top Type Stop Condition for dependent: " + rel.getDependent().getId());
 				
 		if (ContentItemWFValidatorAndTransitioner.isTopType(dependentContentItemSummary.getContentTypeId(), wvc)) {
-			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(dependentContentItemSummary, wvc)) {
+			if (ContentItemWFValidatorAndTransitioner.hasPublicRevisionOrGreater(dependentContentItemSummary, wvc)) {
 				wvc.getLog().debug("Top Type Stop Condition(down): Is Top Type, has public revision. dependent: " + rel.getDependent().getId());
 				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
 			} else {

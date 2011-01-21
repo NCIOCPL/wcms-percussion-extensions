@@ -12,6 +12,15 @@ public class WorkflowConfiguration {
 	private RelationshipWFTransitionChecksCollection relationshipChecks;	
 	private WFTransitionMappings transitionMappings;
 	private ValidatorIgnoreConfig validatorIgnore;
+	private WFStates workflowStates;
+	
+	public WFStates getWorkflowStates() {
+		return workflowStates;
+	}
+
+	public void setWorkflowStates(WFStates workflowStates) {
+		this.workflowStates = workflowStates;
+	}
 	
 	public ValidatorIgnoreConfig getValidatorIgnore() {
 		return validatorIgnore;
@@ -57,12 +66,15 @@ public class WorkflowConfiguration {
 			ContentTypesConfigCollection contentTypes,
 			RelationshipWFTransitionChecksCollection relationshipChecks,
 			WFTransitionMappings transitionMappings, 
-			ValidatorIgnoreConfig validatorIgnore
+			ValidatorIgnoreConfig validatorIgnore,
+			WFStates workflowStates
 	) {
 		this.contentTypes = contentTypes;
 		this.relationshipChecks = relationshipChecks;
 		this.transitionMappings = transitionMappings;
 		this.validatorIgnore = validatorIgnore;
+		this.workflowStates = workflowStates;
 	}
+
 
 }

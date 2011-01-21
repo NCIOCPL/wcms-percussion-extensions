@@ -59,7 +59,7 @@ public class SharedRelationshipWFTransitionStopCondition extends
 		if (ContentItemWFValidatorAndTransitioner.isShared(rel.getDependent(), wvc)) {
 			wvc.getLog().debug("Shared Stop Condition: Dependent ID: " + rel.getDependent().getId() + " is Shared.");
 			//Since this item is shared, we need to check if it has a public revision or not.
-			if (ContentItemWFValidatorAndTransitioner.hasPublicRevision(dependentContentItemSummary, wvc)) {
+			if (ContentItemWFValidatorAndTransitioner.hasPublicRevisionOrGreater(dependentContentItemSummary, wvc)) {
 				wvc.getLog().debug("Shared Stop Condition: Dependent ID: " + rel.getDependent().getId() + " has public revision.");
 				return RelationshipWFTransitionStopConditionResult.OkStopChecking;
 			} else {				
