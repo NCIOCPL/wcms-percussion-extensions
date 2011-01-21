@@ -470,15 +470,18 @@ public class ContentItemWFValidatorAndTransitioner {
 
 		//Count the number of follow relationships to see if it is shared.  More than one follow
 		//means the item is shared.
-		int followRelCount = 0;		
+		int owner = -1;
 		for(PSRelationship rel: rels) {
-			String relName = rel.getConfig().getName();
-			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
-			if (transitionCheck.getTransitionType() == RelationshipWFTransitionTypes.Follow)
-				followRelCount++;
-		}
 
-		return (followRelCount > 1);
+			if(owner == -1){
+				owner = rel.getOwner().getId();
+			}
+			else if(owner != rel.getOwner().getId())
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -492,7 +495,14 @@ public class ContentItemWFValidatorAndTransitioner {
 	//TODO: Update this to hasPublicRevision or is in a workflow state greater than the one we are transitioning to.	
 	public static boolean hasPublicRevisionOrGreater(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) throws WFValidationException {		
 		boolean greaterOrEqual = false;
-		greaterOrEqual = workflowConfig.getWorkflowStates().greaterThanOrEqual(wvc.getInitiatorWorkflowState().getName(), wvc.getDestinationState().getName());
+
+		int wfState = contentItemSummary.getContentStateId();
+		int wfId = contentItemSummary.getWorkflowAppId();		   
+
+		PSState state = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, wfState),
+				new PSGuid(PSTypeEnum.WORKFLOW,wfId));	
+ 
+		greaterOrEqual = workflowConfig.getWorkflowStates().greaterThanOrEqual(state.getName(), wvc.getDestinationState().getName());
 		return (contentItemSummary.getPublicRevision() != -1) || greaterOrEqual;
 		
 	}	
