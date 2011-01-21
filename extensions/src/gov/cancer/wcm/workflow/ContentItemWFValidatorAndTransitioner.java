@@ -293,12 +293,17 @@ public class ContentItemWFValidatorAndTransitioner {
 		//means the item is shared.
 
 		ArrayList<PSRelationship> followRels = new ArrayList<PSRelationship>();
+		ArrayList<Integer> follows = new ArrayList<Integer>();
 		ArrayList<BaseRelationshipWFTransitionCheck> followChecks = new ArrayList<BaseRelationshipWFTransitionCheck>();
 		for(PSRelationship rel: rels) {
 			String relName = rel.getConfig().getName();
 			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
-			if (transitionCheck.getTransitionType() == RelationshipWFTransitionTypes.Follow)
-				followRels.add(rel);
+			if (transitionCheck.getTransitionType() == RelationshipWFTransitionTypes.Follow){
+				if(!follows.contains(rel.getOwner().getId())){
+					follows.add(rel.getOwner().getId());
+					followRels.add(rel);
+				}
+			}
 			followChecks.add(transitionCheck);
 		}
 
@@ -444,8 +449,54 @@ public class ContentItemWFValidatorAndTransitioner {
 	}
 
 	/**
-	 * Determines if an item is participating in more than one Active Assembly relationship
+	 * Finds how many follow Active Assembly relationship the item is a part of
 	 * as a dependent.
+	 * @param contentItemLocator
+	 * @param wvc
+	 * @return the number of follow relationships the contentItemLocator is a part of.
+	 * @throws PSErrorException
+	 */
+	public static int numberOfUniqueFollowRels(PSLocator contentItemLocator, WorkflowValidationContext wvc)
+	throws WFValidationException
+	{
+		List<PSRelationship> rels = new ArrayList<PSRelationship>();
+		
+		PSRelationshipFilter filter = new PSRelationshipFilter();		
+		//This is going to be the current/edit revision for this content item.
+		filter.setDependent(contentItemLocator);		
+		//filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+		//filter.limitToEditOrCurrentOwnerRevision(true);
+		filter.setCategory("rs_activeassembly");
+
+		try {
+			rels = systemWebService.loadRelationships(filter);
+		} catch (Exception ex) {
+			wvc.getLog().error("getTransitionRoot: Could not get relationships for id: " + contentItemLocator.getId(), ex);
+			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
+		}
+
+		//Count the number of follow relationships to see if it is shared.  More than one follow
+		//means the item is shared.
+		//ArrayList<PSRelationship> followRels = new ArrayList<PSRelationship>();
+		ArrayList<Integer> uniqueOwners = new ArrayList<Integer>();
+		
+		for(PSRelationship rel: rels) {
+			String relName = rel.getConfig().getName();
+			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
+			if (transitionCheck.getTransitionType() == RelationshipWFTransitionTypes.Follow){
+				if(!uniqueOwners.contains(rel.getOwner().getId())){
+					uniqueOwners.add(rel.getOwner().getId());
+				}
+			}
+		}
+		
+		return uniqueOwners.size();
+	}
+	
+	
+	/**
+	 * Determines if an item is participating in more than one Active Assembly relationship
+	 * as a dependent. (checks the follow relationships)
 	 * @param contentItemLocator
 	 * @param wvc
 	 * @return
@@ -454,34 +505,38 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static boolean isShared(PSLocator contentItemLocator, WorkflowValidationContext wvc)
 	throws WFValidationException
 	{
-		List<PSRelationship> rels = new ArrayList<PSRelationship>();
-
-		PSRelationshipFilter filter = new PSRelationshipFilter();		
-		//This is going to be the current/edit revision for this content item.
-		filter.setDependent(contentItemLocator);		
-		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
-
-		try {
-			rels = systemWebService.loadRelationships(filter);
-		} catch (Exception ex) {
-			wvc.getLog().error("isShared: Could not get content type name for id: " + contentItemLocator.getId(), ex);
-			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
-		}
-
-		//Count the number of follow relationships to see if it is shared.  More than one follow
-		//means the item is shared.
-		int owner = -1;
-		for(PSRelationship rel: rels) {
-
-			if(owner == -1){
-				owner = rel.getOwner().getId();
-			}
-			else if(owner != rel.getOwner().getId())
-			{
-				return true;
-			}
-		}
-		return false;
+		
+		return (numberOfUniqueFollowRels(contentItemLocator, wvc) > 1);
+		
+		
+//		List<PSRelationship> rels = new ArrayList<PSRelationship>();
+//
+//		PSRelationshipFilter filter = new PSRelationshipFilter();		
+//		//This is going to be the current/edit revision for this content item.
+//		filter.setDependent(contentItemLocator);		
+//		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+//
+//		try {
+//			rels = systemWebService.loadRelationships(filter);
+//		} catch (Exception ex) {
+//			wvc.getLog().error("isShared: Could not get content type name for id: " + contentItemLocator.getId(), ex);
+//			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
+//		}
+//
+//		//Count the number of follow relationships to see if it is shared.  More than one follow
+//		//means the item is shared.
+//		int owner = -1;
+//		for(PSRelationship rel: rels) {
+//
+//			if(owner == -1){
+//				owner = rel.getOwner().getId();
+//			}
+//			else if(owner != rel.getOwner().getId())
+//			{
+//				return true;
+//			}
+//		}
+//		return false;
 	}
 
 	/**

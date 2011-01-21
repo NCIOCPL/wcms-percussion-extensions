@@ -151,11 +151,6 @@
 					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
 				</bean>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
-					<constructor-arg><value>nciErrorPage</value></constructor-arg>
-					<constructor-arg><value>true</value></constructor-arg>
-					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
-				</bean>
-				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>nciBestBetsCategory</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
@@ -166,22 +161,12 @@
 					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
 				</bean>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
-					<constructor-arg><value>nciImage</value></constructor-arg>
-					<constructor-arg><value>true</value></constructor-arg>
-					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
-				</bean>
-				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>cgvAutoRSS</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
 				</bean>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>cgvManualRSS</value></constructor-arg>
-					<constructor-arg><value>true</value></constructor-arg>
-					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
-				</bean>
-				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
-					<constructor-arg><value>nciTile</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
 				</bean>
