@@ -302,9 +302,9 @@ public class ContentItemWFValidatorAndTransitioner {
 				if(!follows.contains(rel.getOwner().getId())){
 					follows.add(rel.getOwner().getId());
 					followRels.add(rel);
+					followChecks.add(transitionCheck);
 				}
 			}
-			followChecks.add(transitionCheck);
 		}
 
 		//If the number of rels is not 1 it is either 0, which means that this component is not shared but is transitioned
