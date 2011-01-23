@@ -493,6 +493,47 @@ public class ContentItemWFValidatorAndTransitioner {
 		return uniqueOwners.size();
 	}
 	
+	/**
+	 * Checks how many relationships exist coming into the item.  This will check
+	 * ALL relationships, not just ones that are marked as follow relationships.
+	 * @param contentItemLocator
+	 * @param wvc
+	 * @return the number of relationships the contentItemLocator is a part of.
+	 * @throws PSErrorException
+	 */
+	public static int numberOfRelationships(PSLocator contentItemLocator, WorkflowValidationContext wvc)
+	throws WFValidationException
+	{
+		List<PSRelationship> rels = new ArrayList<PSRelationship>();
+		
+		PSRelationshipFilter filter = new PSRelationshipFilter();		
+		//This is going to be the current/edit revision for this content item.
+		filter.setDependent(contentItemLocator);		
+		//filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+		filter.limitToEditOrCurrentOwnerRevision(true);
+		filter.setCategory("rs_activeassembly");
+
+		try {
+			rels = systemWebService.loadRelationships(filter);
+		} catch (Exception ex) {
+			wvc.getLog().error("getTransitionRoot: Could not get relationships for id: " + contentItemLocator.getId(), ex);
+			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
+		}
+
+		//Count the number of follow relationships to see if it is shared.  More than one follow
+		//means the item is shared.
+		//ArrayList<PSRelationship> followRels = new ArrayList<PSRelationship>();
+		ArrayList<Integer> uniqueOwners = new ArrayList<Integer>();
+		
+		for(PSRelationship rel: rels) {
+			if(!uniqueOwners.contains(rel.getOwner().getId())){
+				uniqueOwners.add(rel.getOwner().getId());
+			}
+		}
+		
+		return uniqueOwners.size();
+	}
+	
 	
 	/**
 	 * Determines if an item is participating in more than one Active Assembly relationship
@@ -726,7 +767,8 @@ public class ContentItemWFValidatorAndTransitioner {
 	private boolean archiveSharedCheck(PSComponentSummary pushRoot,
 			WorkflowValidationContext wvc) {
 		if(wvc.isArchiveTransition() && 
-				ContentItemWFValidatorAndTransitioner.isShared(pushRoot.getCurrentLocator(), wvc)){
+				(ContentItemWFValidatorAndTransitioner.numberOfRelationships(pushRoot.getCurrentLocator(), wvc) > 0 ))
+		{
 			return false;
 		}
 		else{
