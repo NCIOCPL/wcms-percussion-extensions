@@ -597,6 +597,20 @@ public class ContentItemWFValidatorAndTransitioner {
 
 		PSState state = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, wfState),
 				new PSGuid(PSTypeEnum.WORKFLOW,wfId));	
+		PSWorkflow workflow = workflowService.loadWorkflow(new PSGuid(PSTypeEnum.WORKFLOW, wfId)); 
+
+		//Check to see if the workflow is going to be ignored (configurable list of triggers/workflows to ignore)
+		//Get the configuration bean.
+		WorkflowConfiguration config = WorkflowConfigurationLocator.getWorkflowConfiguration();
+		ValidatorIgnoreConfig ignoreCheck = config.getValidatorIgnore();
+
+		for( String currWkflw : ignoreCheck.getIgnoreWorkflows() ){
+			//If the current workflow is in the list of ignored workflows, return.
+			if(workflow.getName().equalsIgnoreCase(currWkflw)){
+				//Just check for a public revision since the workflow state is not in the config.
+				return (contentItemSummary.getPublicRevision() != -1);
+			}
+		}
  
 		greaterOrEqual = workflowConfig.getWorkflowStates().greaterThanOrEqual(state.getName(), wvc.getDestinationState().getName());
 		return (contentItemSummary.getPublicRevision() != -1) || greaterOrEqual;
