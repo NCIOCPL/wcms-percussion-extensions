@@ -231,7 +231,7 @@
 			<list>
 				<value>Migrate</value>
 				<value>MigrateFromEditing</value>
-				<value>MigrateToArchive</value>
+				<value>MigratePrivateArchive</value>
 			</list>
 		</constructor-arg>
 		<!-- Ignore Workflows  -->
