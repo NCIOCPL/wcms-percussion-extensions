@@ -458,6 +458,39 @@ function cGovPrepareStr(data) {
 		else if (c == "\r") {
 			result += cGovCRConst;
 		}
+		else if (c == "’") {	//apostrophe
+			result += "&#146;";
+		}
+		else if (c == "‘") {	//left single quote
+			result += "&#145;";
+		}
+		else if (c == "“") {	//left double quote
+			result += "&#147;";
+		}
+		else if (c == "”") {	//right doulbe quote
+			result += "&#148;";
+		}
+		else if (c == "—") {	//em dash
+			result += "&#151;";
+		}
+		else if (c == "–") {	//en dash
+			result += "&#150;";
+		}
+		else if (c == "©") {
+			result += "&#169;";
+		}
+		else if (c == "™") {
+			result += "&#153;";
+		}
+		else if (c == "®") {
+			result += "&#174;";
+		}
+		else if (c == "…") {	//ellipsis
+			result += "&#133;";
+		}
+		else if (c == "•") {	//bullet
+			result += "&#149;";
+		}
 		else {
 			result += c;
 		}
