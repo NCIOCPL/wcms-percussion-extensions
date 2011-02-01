@@ -32,6 +32,8 @@ import com.percussion.utils.jdbc.PSConnectionHelper;
  */
 public class LinkDataAccess {
     private IPSContentMgr contentManager = null;
+	private Connection conn = null;
+    
 	
 	/**
 	 * Constructor with IPSContentMgr
@@ -39,6 +41,12 @@ public class LinkDataAccess {
 	 */
 	public LinkDataAccess(IPSContentMgr contentMgr) {
 		contentManager = contentMgr;
+		try {
+			conn = PSConnectionHelper.getDbConnection();
+		}
+		catch (Exception e) {
+			log.error("Couldn't get database connection: " + e.getLocalizedMessage());
+		}
 	}
 	
 	/**
@@ -87,14 +95,6 @@ public class LinkDataAccess {
 	public boolean saveBadLinkItems(ArrayList<LinkItem> itemArray) {
 		boolean res = true;
 		Statement stmt = null;
-		Connection conn = null;
-		try {
-			conn = PSConnectionHelper.getDbConnection();
-		}
-		catch (Exception e) {
-			log.error("Couldn't get database connection: " + e.getLocalizedMessage());
-			return false;
-		}
 		try {
 			String query = "delete from CGVLINKCHECK";
 			stmt = conn.createStatement();
@@ -142,13 +142,44 @@ public class LinkDataAccess {
 	}
 	
 	/**
+	 * Check to see if this link is orphaned (no other content items reference it)
+	 * @param contentId
+	 * @return true if orphaned
+	 */
+	public boolean checkForOrphanedLink(int contentId) {
+		boolean orphaned = true;
+		PreparedStatement stmt = null;
+		try {
+			String query = "select RID from psx_objectrelationship where dependent_id = ? and slot_id is not null";
+			stmt = conn.prepareStatement(query);
+			stmt.setInt(1, contentId);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				orphaned = false;	// if any results it's not an orphan
+			}
+		}
+		catch (Exception e) {
+			log.error("Error checking orphaned link: " + e.getLocalizedMessage());
+			//we don't set res = false, we'll keep going
+		}
+		finally {
+			if (stmt != null) {
+				try {
+					stmt.close();
+				}
+				catch (Exception e) {}
+			}
+		}
+		return orphaned;
+	}
+	
+	/**
 	 * Returns true if the CGVLINKCHECK table already exists
 	 * @return
 	 */
 	public boolean reportTableExists() {
 		boolean exists = true;
 		try {
-			Connection conn = PSConnectionHelper.getDbConnection();
 			DatabaseMetaData dmd = conn.getMetaData();
 			ResultSet rs = dmd.getTables(null, null, "CGVLINKCHECK", null);
 			exists = rs.next();
@@ -167,7 +198,6 @@ public class LinkDataAccess {
 		boolean result = true;
 		Statement stmt = null;
 		try {
-			Connection conn = PSConnectionHelper.getDbConnection();
 			String query = "create table CGVLINKCHECK " +
 			"(contentid integer not null, " +
 			"url varchar(256), " +

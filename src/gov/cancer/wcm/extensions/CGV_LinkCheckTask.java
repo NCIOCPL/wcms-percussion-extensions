@@ -43,7 +43,7 @@ public class CGV_LinkCheckTask implements IPSTask {
 		lda = new LinkDataAccess(contentManager);
 		boolean haveTable = lda.reportTableExists();
 		if (!haveTable) {
-			boolean ok = lda.createTable();
+			lda.createTable();
 		}
 	}
 	
@@ -69,6 +69,15 @@ public class CGV_LinkCheckTask implements IPSTask {
 					badItem.setUrl(item.getUrl());
 					badItem.setResponse(linkResult.getCode());
 					badItem.setMessage(linkResult.getMessage());
+					itemErrorList.add(badItem);
+				}
+				if (lda.checkForOrphanedLink(Integer.parseInt(item.getContentId()))) {
+					LinkItem badItem = new LinkItem();
+					badItem.setContentId(item.getContentId());
+					badItem.setSysTitle(item.getSysTitle());
+					badItem.setUrl(item.getUrl());
+					badItem.setResponse(1000);
+					badItem.setMessage("Orphaned link");
 					itemErrorList.add(badItem);
 				}
 			}
