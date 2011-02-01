@@ -59,9 +59,14 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 		LOGGER.debug("******INVOKING titlePopulate");
 		String newTitle = modifyTitle(displaytitle);
 
-		Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
-		if(request.getParameter(fieldName) != null){
-			Matcher m = q.matcher(displaytitle);
+		//Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
+		//Pattern q = Pattern.compile(".*\\[#[0-9]{4}\\]");
+		Pattern q = Pattern.compile(displaytitle + "\\[#[0-9]{4}\\]");
+		
+		if(request.getParameter(fieldName) != null && request.getParameter("sys_title") != null){
+			//Matcher m = q.matcher(displaytitle);
+			Matcher m = q.matcher(request.getParameter("sys_title"));
+			//Check to see if the sys_title already has [#XXXX] appended.
 			if( !m.matches() ){	
 				request.setParameter("sys_title", newTitle);
 			}
