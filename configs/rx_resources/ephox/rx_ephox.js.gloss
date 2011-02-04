@@ -560,7 +560,7 @@ function cGovPrepareStr(data) {
 			result += c;
 		}
 	}
-alert("result = " + result);
+//alert("result = " + result);
 	return result;
 }
 
