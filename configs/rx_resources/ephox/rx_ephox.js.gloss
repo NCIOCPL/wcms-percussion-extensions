@@ -1,7 +1,6 @@
 /********************************************************************
 *
 * The code from here on is Cancer.gov customization
-* This code should be added to the end of the rx_ephox.js file
 * @author holewr
 *
 ***********************************************************************/
@@ -21,11 +20,11 @@ var cGovLFConst = "&#x000a;";	//line feed substitute
 //var cGovWebServiceURL = 'http://verdi.nci.nih.gov/u/glossify/';	//url of glossifier web service
 //var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
 // These are used if going to the glossifier proxy running on the same box as Percussion
-var cGovWebServiceURL = 'http://156.40.134.66:9922/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Blue)
+//var cGovWebServiceURL = 'http://156.40.134.66:9922/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Blue)
 //var cGovWebServiceURL = 'http://156.40.134.66:9921/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Brown)
 //var cGovWebServiceURL = 'http://156.40.134.66:9925/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Pink)
 //var cGovWebServiceURL = 'http://percussionpre.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (PreProd)
-//var cGovWebServiceURL = 'http://percussion.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Prod)
+var cGovWebServiceURL = 'http://percussion.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Prod)
 //var cGovWebServiceURL = 'http://percussionqa.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (QA)
 //var cGovWebServiceURL = 'http://percussionint.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Int)
 //var cGovWebServiceURL = 'http://percussionca.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (CA)
@@ -485,16 +484,83 @@ function cGovPrepareStr(data) {
 		else if (c == "®") {
 			result += "&#174;";
 		}
-		else if (c == "…") {	//ellipsis
+		else if (c == "…") {	//ellipses
 			result += "&#133;";
 		}
 		else if (c == "•") {	//bullet
 			result += "&#149;";
 		}
+		else if (c == "ä") {	//a umlaut
+			result += "&#228;";
+		}
+		else if (c == "á") {	//a accent
+			result += "&#225;";
+		}
+		else if (c == "Ä") {	//A umlaut
+			result += "&#196;";
+		}
+		else if (c == "Á") {	//A accent
+			result += "&#193;";
+		}
+		else if (c == "é") {	//e accent
+			result += "&#233;";
+		}
+		else if (c == "ë") {	//e umlaut
+			result += "&#235;";
+		}
+		else if (c == "É") {	//E accent
+			result += "&#201;";
+		}
+		else if (c == "Ë") {	//E umlaut
+			result += "&#203;";
+		}
+		else if (c == "í") {	//i accent
+			result += "&#237;";
+		}
+		else if (c == "ï") {	//i umlaut
+			result += "&#239;";
+		}
+		else if (c == "Í") {	//I accent
+			result += "&#205;";
+		}
+		else if (c == "Ï") {	//I umlaut
+			result += "&#207;";
+		}
+		else if (c == "ó") {	//o accent
+			result += "&#243;";
+		}
+		else if (c == "ö") {	//o umlaut
+			result += "&#246;";
+		}
+		else if (c == "Ó") {	//O accent
+			result += "&#211;";
+		}
+		else if (c == "Ö") {	//O umlaut
+			result += "&#214;";
+		}
+		else if (c == "ú") {	//u accent
+			result += "&#250;";
+		}
+		else if (c == "ü") {	//u umlaut
+			result += "&#252;";
+		}
+		else if (c == "Ú") {	//U accent
+			result += "&#218;";
+		}
+		else if (c == "Ü") {	//U umlaut
+			result += "&#220;";
+		}
+		else if (c == "ñ") {	//n tilde
+			result += "&#241;";
+		}
+		else if (c == "Ñ") {	//N tilde
+			result += "&#209;";
+		}
 		else {
 			result += c;
 		}
 	}
+alert("result = " + result);
 	return result;
 }
 
@@ -609,5 +675,6 @@ TODO: configure css, fonts, javascripts, etc. (mostly on CDE site)
 TODO: on perc sites, need ../nciadmin.css stylesheet for status window (currently required styles are on the page because it's not finding the css file)
 TODO: add configuration of URLs, etc. in external file
 */
+
 
 
