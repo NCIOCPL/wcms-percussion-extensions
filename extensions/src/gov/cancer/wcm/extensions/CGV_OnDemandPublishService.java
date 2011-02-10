@@ -1,9 +1,8 @@
 package gov.cancer.wcm.extensions;
 
 import gov.cancer.wcm.util.CGV_ParentChildManager;
-import gov.cancer.wcm.util.CGV_StateHelper;
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
-import gov.cancer.wcm.util.CGV_StateHelper.StateName;
+import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 import gov.cancer.wcm.workflow.WorkflowValidationContext;
 
 import java.io.File;
@@ -23,8 +22,6 @@ import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
-import com.percussion.pso.jexl.PSOObjectFinder;
-import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.rx.publisher.IPSPublisherJobStatus;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
@@ -55,26 +52,21 @@ import com.percussion.xml.PSXmlDocumentBuilder;
  */
 public class CGV_OnDemandPublishService implements InitializingBean {
 	private static final Log log = LogFactory.getLog(CGV_OnDemandPublishService.class);
-	private boolean bDebug = true;	//if true print statements to console
-//TODO: set bDebug to false when done debugging
 	
 	protected static IPSGuidManager gmgr = null;
 	protected static IPSRxPublisherService rps = null;
 	protected static IPSContentWs cmgr = null;
 	protected static CGV_ParentChildManager pcm = null;
 	private static IPSWorkflowService workflowService;
-	private static PSOWorkflowInfoFinder workInfoFinder;
 	private static IPSCmsContentSummaries contentSummariesService;
 	
 	private IPSRequestContext request = null;
 	private Map<String,Map<String,List<String>>> editionList;
-	//private int onDemandEditionId = 315;
 	private boolean waitForStatus = true;
 	private int timeOut = 20000;
 	private int waitTime = 100;
 	private Map<String,List<String>> autoSlot;
 	
-
 	public Map<String, List<String>> getAutoSlot() {
 		return autoSlot;
 	}
@@ -114,7 +106,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			cmgr = PSContentWsLocator.getContentWebservice();
 			pcm = new CGV_ParentChildManager();
 			workflowService = PSWorkflowServiceLocator.getWorkflowService();
-			workInfoFinder = new PSOWorkflowInfoFinder();
 			contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 		}
 	}
@@ -132,8 +123,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 */
 	public void init(IPSExtensionDef extensionDef, File codeRoot)
 	throws PSExtensionException {
-//		log.debug("Initializing CGV_OnDemandPublishService...");
-		if (bDebug) System.out.println("Initializing CGV_OnDemandPublishService...");
+		log.debug("Initializing CGV_OnDemandPublishService...");
 	}
 
 	/**
@@ -195,22 +185,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		}
 		if(shared_site){
 			m = editionList.get("Shared Workflow");
-//			PSOObjectFinder commFinder = new PSOObjectFinder();			
-//			String community = commFinder.getUserCommunity();
-//			if(community.equalsIgnoreCase("TCGA")){
-//				m = editionList.get("TCGA Workflow");
-//			}
-//			else if(community.equalsIgnoreCase("CancerGov"))
-//			{
-//				m = editionList.get("CancerGov Workflow");
-//			}
-//			else if(community.equalsIgnoreCase("CancerGov_Configuration"))
-//			{
-//				m = editionList.get("CancerGov Workflow");
-//			}
-//			else{
-//				m = editionList.get("Shared Workflow");
-//			}
 		}
 		else if(tcga){
 			m = editionList.get("TCGA Workflow");
@@ -244,97 +218,95 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		}
 		
 		
-		if (bDebug) System.out.println("start of queue item set");
+		log.debug("start of queue item set");
 
 		//log.debug("CGV_OnDemandPublishService::queueItemSet executing...");
 		initServices();
-		if (bDebug) System.out.println("after init services has run!");		
+		log.debug("after init services has run!");		
 
 		List<Integer> idsToPublish = null;	//the list to publish
-		if (bDebug) System.out.println("before checking of the top type");
+		log.debug("before checking of the top type");
 		//if this is not the ultimate parent, get parents
 		idsToPublish = getParents(contentId, navon);
-		if (bDebug) System.out.println("\n\tItem CID: " + contentId);
-		System.out.println("Need to publish " + idsToPublish.size() + " items");
+		log.debug("Item CID: " + contentId);
+		log.debug("Need to publish " + idsToPublish.size() + " items");
 		try {
 			IPSRxPublisherService rxsvc = PSRxPublisherServiceLocator
 			.getRxPublisherService();
 			PSDemandWork work = new PSDemandWork();
 			if (idsToPublish == null || idsToPublish.size() == 0) {
 				log.debug("queueItemSet: no items");
-				if (bDebug) System.out.println("DEBUG: queueItemSet: no items");
 			}
 			else {
-				if (bDebug) System.out.println("DEBUG: Processing parents");
+				log.debug("Processing parents");
 				//add the parents and children to the queue
 				for (int i : idsToPublish) {
 					IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
-					if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
+					log.debug("the item guid is " + itemGuid);
 					String path = cmgr.findFolderPaths(itemGuid)[0];
 					IPSGuid folderGuid = cmgr.getIdByPath(path);
 					if (folderGuid != null){
-						if (bDebug) System.out.println("DEBUG: Adding item");
-						if (bDebug) System.out.println("folder id is " + folderGuid);
-						if (bDebug) System.out.println("item guid is " + itemGuid );
+						log.debug("Adding item");
+						log.debug("folder id is " + folderGuid);
+						log.debug("item guid is " + itemGuid );
 						work.addItem(folderGuid, itemGuid);
-						if (bDebug) System.out.println("after adding the item");
+						log.debug("after adding the item");
 					}
 				}
-			}
-			for( String currEdition: editions){
-				long workId = rxsvc.queueDemandWork(Integer.parseInt(currEdition), work);
-				System.out.println("work id is = " +workId);
-				Long jobId = rxsvc.getDemandRequestJob(workId);
-				System.out.println("job id is = " + jobId);
+				//run the editions
+				log.debug("DEBUG: running editions");
+				for( String currEdition: editions){
+					long workId = rxsvc.queueDemandWork(Integer.parseInt(currEdition), work);
+					log.debug("work id is = " +workId);
+					Long jobId = rxsvc.getDemandRequestJob(workId);
+					log.debug("job id is = " + jobId);
 
-				if (waitForStatus) {
-					int totalTime = 0;
-					while (jobId == null && totalTime < timeOut) {
-						System.out.println("in the while loop");
-						jobId = rxsvc.getDemandRequestJob(workId);
-						if (jobId == null) {
-							System.out.println("in the if (jobid == null)");
-							totalTime += waitTime;
-							Thread.sleep(waitTime);
+					if (waitForStatus) {
+						int totalTime = 0;
+						while (jobId == null && totalTime < timeOut) {
+							log.debug("in the while loop");
+							jobId = rxsvc.getDemandRequestJob(workId);
+							if (jobId == null) {
+								log.debug("in the if (jobid == null)");
+								totalTime += waitTime;
+								Thread.sleep(waitTime);
+							}
 						}
-					}
-					System.out.println("job id is = after while = " + jobId);
-					int count;
-					if (jobId == null)
-						count = -2;
-					else {
-						IPSPublisherJobStatus.State state;
-						totalTime = 0;
-						do {
-							state = rxsvc.getDemandWorkStatus(workId);
-							totalTime += waitTime;
-							Thread.sleep(waitTime);
-						} while (state == IPSPublisherJobStatus.State.QUEUEING
-								&& totalTime < timeOut);
-						if (state == IPSPublisherJobStatus.State.QUEUEING)
-							count = -1;
+						log.debug("job id is = after while = " + jobId);
+						int count;
+						if (jobId == null)
+							count = -2;
 						else {
-							IPSPublisherJobStatus status = rxsvc.getPublishingJobStatus(jobId.longValue());
-							count = status.countTotalItems();
+							IPSPublisherJobStatus.State state;
+							totalTime = 0;
+							do {
+								state = rxsvc.getDemandWorkStatus(workId);
+								totalTime += waitTime;
+								Thread.sleep(waitTime);
+							} while (state == IPSPublisherJobStatus.State.QUEUEING
+									&& totalTime < timeOut);
+							if (state == IPSPublisherJobStatus.State.QUEUEING)
+								count = -1;
+							else {
+								IPSPublisherJobStatus status = rxsvc.getPublishingJobStatus(jobId.longValue());
+								count = status.countTotalItems();
 
+							}
 						}
+						switch(count){
+						case -2:
+							log.debug("Queuing the items timed out.");
+							break;
+						case -1:
+							log.debug("Took a long time to queue items");
+							break;
+						default:
+							log.debug("Queued " + count + " items");
+						}
+					} else {
+						log.debug("Tried to send " + idsToPublish.size()
+								+ " to Queue, not waiting for response");
 					}
-					switch(count){
-					case -2:
-						log.debug("Queuing the items timed out.");
-						if (bDebug) System.out.println("Queuing the items timed out.");
-						break;
-					case -1:
-						log.debug("Took a long time to queue items");
-						if (bDebug) System.out.println("Took a long time to queue items");
-						break;
-					default:
-						log.debug("Queued " + count + " items");
-						if (bDebug) System.out.println("Queued " + count + " items");
-					}
-				} else {
-					log.debug("Tried to send " + idsToPublish.size()
-							+ " to Queue, not waiting for response");
 				}
 			}
 		} catch (Exception nfx) {
@@ -357,14 +329,34 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 * @return List of parent items
 	 */
 	private List<Integer> getParents(int currItemId, boolean navon) {
-		if (bDebug) System.out.println("beginning of get parent");
+		log.debug("getParents: beginning of get parent");
 		List<Integer>localPublishList = null;	//list of items to return
 		
 		if(navon){
-			localPublishList = new ArrayList<Integer>();
+			localPublishList = new ArrayList<Integer>();	//list of items to return
 			localPublishList.add(currItemId);
 		}
 		else{
+			//if this item is not the transition root, don't do anything
+	    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);
+			PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(currItemId);					
+			log.debug("getParents: Getting Workflow Info");
+			String transition = request.getParameter("sys_transitionid");
+			int transitionID = Integer.parseInt(transition);
+			int wfState = contentItemSummary.getContentStateId();
+			int wfId = contentItemSummary.getWorkflowAppId();		   
+			PSWorkflow workflow = workflowService.loadWorkflow(new PSGuid(PSTypeEnum.WORKFLOW, wfId));
+			PSState state = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, wfState),
+					new PSGuid(PSTypeEnum.WORKFLOW,wfId));	   
+			Document errorDoc = PSXmlDocumentBuilder.createXmlDocument();
+			WorkflowValidationContext wvc = new WorkflowValidationContext(request, contentItemSummary, log, errorDoc, workflow, state, transitionID);
+			PSComponentSummary psCS = validator.getTransitionRoot(contentItemSummary, wvc);
+			if (psCS.getContentId() != currItemId) {
+				log.debug("getParents: not transition root, id:" + currItemId);
+				localPublishList = new ArrayList<Integer>();	//list of items to return
+				return localPublishList;
+			}
+			//if we get here this item is the transition root.
 			List<IPSGuid> glist = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(currItemId)));
 			List<PSCoreItem> items = null;
 			PSCoreItem item = null;
@@ -375,7 +367,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			if (bDebug) System.out.println("before checking the top type");
+			log.debug("getParents: before checking the top type");
 			Long typeId = item.getContentTypeId();
 			//		if(CGV_TopTypeChecker.URLAutoSlotType(typeId.intValue(),cmgr) ){
 			//			//|| 	CGV_TopTypeChecker.TopicSearchAutoSlotType(typeId.intValue(),cmgr)){
@@ -388,21 +380,24 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			//				return null;
 			//			}
 			//		}
-			if(CGV_TopTypeChecker.topType(typeId.intValue(),cmgr)){
+			boolean isTop = ContentItemWFValidatorAndTransitioner.isTopType(typeId.intValue(),wvc);
+			if(isTop){
+				//if this is a topmost content type, don't get the parents
 				//if didn't get any parents, create list and add current item to it
-				if (bDebug) System.out.println("got into the null list");
-				localPublishList = new ArrayList<Integer>();
+				log.debug("getParents: is top type, got into the null list");
+				if (localPublishList == null) {
+					localPublishList = new ArrayList<Integer>();	//list of items to return
+				}
 				localPublishList.add(currItemId);
 			}
-			if(!CGV_TopTypeChecker.topType(typeId.intValue(),cmgr) || CGV_TopTypeChecker.multiPagePages(typeId.intValue(),cmgr)) 
+			else
 			{
-				//if this is a topmost content type, don't get the parents
-				if (bDebug) System.out.println("!top type statement");
+				log.debug("getParents: !top type statement");
 				try {
-					if (bDebug) System.out.println("getParents before get parents cids");
+					log.debug("getParents: before get parents cids");
 					IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
 					localPublishList = pcm.getParentCIDs(cid, false, 0);	//gets 1 layer of parents
-					if (bDebug) System.out.println("got localPublishList");
+					log.debug("getParents: got localPublishList");
 				} catch (PSErrorException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -415,12 +410,12 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 						List<Integer> parentsList = this.getParents(sItem, navon);	//recurses! foiled again! 
 						if (parentsList != null) {
 							for (int p : parentsList) {
-								if (bDebug) System.out.println("DEBUG: parent item CID: " + p);
+								log.debug("getParents: DEBUG: parent item CID: " + p);
 								tempList.add(p);
 							}
 						}
 					}
-					if (bDebug) System.out.println("before temp list");
+					log.debug("getParents: before temp list");
 					for (int tItem : tempList) {
 						//add the items to the list to be returned
 						localPublishList.add(tItem);
@@ -440,84 +435,28 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			
 			//Always add the current item to the list
 			if (localPublishList == null) {
-				System.out.println("null list, creating and adding individual item " + currItemId);
+				log.debug("getParents: null list, creating and adding individual item " + currItemId);
 				//if didn't get any parents, create list and add current item to it
-				//if (bDebug) System.out.println("got into the null list");
 				localPublishList = new ArrayList<Integer>();
 				localPublishList.add(currItemId);
 			}
 			else{
-				System.out.println("we had a non null list, addint the individual item " + currItemId);
-				localPublishList.add(currItemId);
-			}
-
-
-
-			//		//Check for publishing Navons.
-			//		IPSGuid folderGuid = null;
-			//		if(!localPublishList.isEmpty()){
-			//			System.out.println("In the Navon statement, localPublishList.size = " + localPublishList.size());
-			//			for (int i : localPublishList) {
-			//				System.out.println("The current int = " + i);
-			//				IPSGuid itemGuid = gmgr.makeGuid(i, PSTypeEnum.LEGACY_CONTENT);
-			//				//if (bDebug) System.out.println("DEBUG: the item guid is " + itemGuid);
-			//				String path = null;
-			//				try {
-			//					path = cmgr.findFolderPaths(itemGuid)[0];
-			//				} catch (PSErrorException e) {
-			//					// TODO Auto-generated catch block
-			//					e.printStackTrace();
-			//				}
-			//				try {
-			//					if( path != null ){
-			//						folderGuid = cmgr.getIdByPath(path);
-			//					}
-			//				} catch (PSErrorException e) {
-			//					// TODO Auto-generated catch block
-			//					e.printStackTrace();
-			//				}
-			//				try {
-			//					if( folderGuid != null ){
-			//						addToList = pcm.getNavonCIDs(folderGuid);
-			//					}
-			//				} catch (PSErrorException e) {
-			//					// TODO Auto-generated catch block
-			//					e.printStackTrace();
-			//				}
-			//				if( !addToList.isEmpty() ){
-			//					for( Integer addInteger : addToList ){
-			//						localPublishList.add(addInteger);
-			//					}
-			//				}
-			//
-			//			}
-			//		}
-
-	
+				if (!isTop) {
+					//if top type, already on list
+					log.debug("getParents: we had a non null list, add in the individual item " + currItemId);
+					localPublishList.add(currItemId);
+				}
+			}	
 		}
 		
-		System.out.println("DEBUG: Printing out the list to publish....");
+		log.debug("getParents: Printing out the list to publish....");
 		if(localPublishList != null){
 			for( Integer printInt : localPublishList ){
-				System.out.println(printInt);
+				log.debug(printInt);
 			}
 		}
 		return localPublishList;
 	}
-
-//	/**
-//	 * @param onDemandEditionId
-//	 */
-//	public void setOnDemandEditionId(int onDemandEditionId) {
-//		this.onDemandEditionId = onDemandEditionId;
-//	}
-//
-//	/**
-//	 * @return int onDemandEditionId
-//	 */
-//	public int getOnDemandEditionId() {
-//		return onDemandEditionId;
-//	}
 
 	/**
 	 * @return boolean waitForStatus
