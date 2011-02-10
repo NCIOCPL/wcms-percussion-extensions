@@ -1,16 +1,13 @@
 package gov.cancer.wcm.workflow;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import gov.cancer.wcm.util.CGV_TypeNames;
 import gov.cancer.wcm.workflow.checks.BaseRelationshipWFTransitionCheck;
 import gov.cancer.wcm.workflow.checks.RelationshipWFTransitionCheckResult;
 
-import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
@@ -21,8 +18,6 @@ import com.percussion.error.PSException;
 import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.catalog.PSTypeEnum;
-import com.percussion.services.guidmgr.IPSGuidManager;
-import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.guidmgr.data.PSGuid;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
@@ -32,14 +27,8 @@ import com.percussion.services.workflow.data.PSState;
 import com.percussion.services.workflow.data.PSTransition;
 import com.percussion.services.workflow.data.PSWorkflow;
 import com.percussion.util.PSItemErrorDoc;
-import com.percussion.utils.guid.IPSGuid;
 import com.percussion.utils.request.PSRequestInfo;
 import com.percussion.webservices.PSErrorException;
-import com.percussion.webservices.PSErrorsException;
-import com.percussion.webservices.content.IPSContentWs;
-import com.percussion.webservices.content.PSContentWsLocator;
-import com.percussion.webservices.security.IPSSecurityWs;
-import com.percussion.webservices.security.PSSecurityWsLocator;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 
@@ -60,8 +49,6 @@ public class ContentItemWFValidatorAndTransitioner {
 	private static IPSSystemWs systemWebService;
 	private static IPSWorkflowService workflowService;
 	private static PSOWorkflowInfoFinder workInfoFinder;
-	private static IPSContentWs contentWebService;
-	private static IPSGuidManager guidManager;	
 
 	static {
 		contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
@@ -69,8 +56,6 @@ public class ContentItemWFValidatorAndTransitioner {
 		systemWebService = PSSystemWsLocator.getSystemWebservice();
 		workflowService = PSWorkflowServiceLocator.getWorkflowService();
 		workInfoFinder = new PSOWorkflowInfoFinder();
-		contentWebService = PSContentWsLocator.getContentWebservice();
-		guidManager = PSGuidManagerLocator.getGuidMgr();	
 	}
 
 	public ContentItemWFValidatorAndTransitioner(Log log) {
@@ -231,9 +216,9 @@ public class ContentItemWFValidatorAndTransitioner {
 					List<PSTransition> transitionList = wvc.getTransitions(itemStartState.getName());
 
 					//5. For all triggers in the list from Step 4, PercussionTransition(item).
-					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
+//					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
 					for( PSTransition t :transitionList ){
-						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
+//						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
 						//try {
 						wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
 								", Trigger Name: "+t.getTrigger());
@@ -261,7 +246,7 @@ public class ContentItemWFValidatorAndTransitioner {
 
 	}
 
-	private PSComponentSummary getTransitionRoot(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {
+	public PSComponentSummary getTransitionRoot(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {
 
 		wvc.getLog().debug("getTransitionRoot: Checking for root for content item : " + contentItemSummary.getContentId());
 
@@ -706,13 +691,13 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * Checks to see if all Parent/Ancestor navons have a public revision.
 	 * @return
 	 */
-	private static boolean areParentNavonsPublic(PSComponentSummary contentItemSummary) {
+//	private static boolean areParentNavonsPublic(PSComponentSummary contentItemSummary) {
 		//TODO:Implement areParentNavonsPublic
 		//getParentFolderRelationships()
 		//wvc.addError(ERR_FIELD, ERR_FIELD_DISP, NAVON_NOT_PUBLIC, args)
 
-		return false;
-	}
+//		return false;
+//	}
 
 	/**
 	 * Helper method to get a PSComponentSummary by contentID.  Classes can call
