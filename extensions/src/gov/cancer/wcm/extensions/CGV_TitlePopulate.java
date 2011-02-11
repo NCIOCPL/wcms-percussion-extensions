@@ -13,6 +13,7 @@ import com.percussion.extension.PSParameterMismatchException;
 import com.percussion.security.PSAuthorizationException;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.server.PSRequestValidationException;
+import com.percussion.util.IPSHtmlParameters;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
 import org.apache.commons.lang.StringUtils;
@@ -47,30 +48,32 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 			throws PSAuthorizationException, PSRequestValidationException,
 			PSParameterMismatchException, PSExtensionProcessingException {
 		
+        String cmd = request.getParameter(IPSHtmlParameters.SYS_COMMAND);
+        if (cmd.equalsIgnoreCase("modify")) {
 		
-		String fieldName = CGVConstants.DISPLAY_TITLE_FLD;
-		
-		if (params.length > 0 && StringUtils.isNotBlank(params[0].toString())) {
-			fieldName = params[0].toString();
-		}
-		
-		String displaytitle = request.getParameter(fieldName);
-		
-		LOGGER.debug("******INVOKING titlePopulate");
-		String newTitle = modifyTitle(displaytitle);
-
-		//Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
-		//Pattern q = Pattern.compile(".*\\[#[0-9]{4}\\]");
-		Pattern q = Pattern.compile(displaytitle + "\\[#[0-9]{4}\\]");
-		
-		if(request.getParameter(fieldName) != null && request.getParameter("sys_title") != null){
-			//Matcher m = q.matcher(displaytitle);
-			Matcher m = q.matcher(request.getParameter("sys_title"));
-			//Check to see if the sys_title already has [#XXXX] appended.
-			if( !m.matches() ){	
-				request.setParameter("sys_title", newTitle);
+			String fieldName = CGVConstants.DISPLAY_TITLE_FLD;
+			
+			if (params.length > 0 && StringUtils.isNotBlank(params[0].toString())) {
+				fieldName = params[0].toString();
 			}
-		}
+			String displaytitle = request.getParameter(fieldName);
+			
+			LOGGER.debug("******INVOKING titlePopulate on " + displaytitle);
+			String newTitle = modifyTitle(displaytitle);
+	
+			//Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
+			//Pattern q = Pattern.compile(".*\\[#[0-9]{4}\\]");
+			Pattern q = Pattern.compile(displaytitle + "\\[#[0-9]{4}\\]");
+			
+			if(request.getParameter(fieldName) != null && request.getParameter("sys_title") != null){
+				//Matcher m = q.matcher(displaytitle);
+				Matcher m = q.matcher(request.getParameter("sys_title"));
+				//Check to see if the sys_title already has [#XXXX] appended.
+				if( !m.matches() ){	
+					request.setParameter("sys_title", newTitle);
+				}
+			}
+        }
 	}
 
 	/**
