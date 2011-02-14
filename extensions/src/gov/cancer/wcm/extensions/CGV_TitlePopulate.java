@@ -49,7 +49,7 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 			PSParameterMismatchException, PSExtensionProcessingException {
 		
         String cmd = request.getParameter(IPSHtmlParameters.SYS_COMMAND);
-        if (cmd.equalsIgnoreCase("modify")) {
+        if (cmd != null && cmd.equalsIgnoreCase("modify")) {
 		
 			String fieldName = CGVConstants.DISPLAY_TITLE_FLD;
 			
