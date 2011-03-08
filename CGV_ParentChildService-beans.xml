@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+   "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+      <bean id="CGV_ParentChildService" class="gov.cancer.wcm.extensions.CGV_ParentChildService">
+        <property name="transition">
+			<map>
+				<entry key="CancerGov Workflow">
+					<map>
+						<entry key="3">
+							<map>
+								<entry key="fromState" value="Draft" />
+								<entry key="toState" value="Review" />
+								<entry key="trigger" value="Submit" />
+							</map>
+						</entry>
+						<entry key="14">
+							<map>
+								<entry key="fromState" value="Review" />
+								<entry key="toState" value="Draft" />
+								<entry key="trigger" value="Disapprove" />
+							</map>
+						</entry>
+						<entry key="6">
+							<map>
+								<entry key="fromState" value="Review" />
+								<entry key="toState" value="Pending" />
+								<entry key="trigger" value="Approve" />
+							</map>
+						</entry>
+						<entry key="17">
+							<map>
+								<entry key="fromState" value="Pending" />
+								<entry key="toState" value="Review" />
+								<entry key="trigger" value="backToReview" />
+							</map>
+						</entry>
+						<entry key="18">
+							<map>
+								<entry key="fromState" value="Pending" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="ForcetoPublic" />
+							</map>
+						</entry>
+						<entry key="9">
+							<map>
+								<entry key="fromState" value="Public" />
+								<entry key="toState" value="Editing" />
+								<entry key="trigger" value="Quick Edit" />
+							</map>
+						</entry>
+						<entry key="15">
+							<map>
+								<entry key="fromState" value="Reapproval" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="Reapprove" />
+							</map>
+						</entry>
+						<entry key="20">
+							<map>
+								<entry key="fromState" value="ArchiveApproval" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="DisapproveArchive" />
+							</map>
+						</entry>
+						<entry key="12">
+							<map>
+								<entry key="fromState" value="Archived" />
+								<entry key="toState" value="Public" />
+								<entry key="trigger" value="Republish" />
+							</map>
+						</entry>
+						<entry key="11">
+							<map>
+								<entry key="fromState" value="Editing" />
+								<entry key="toState" value="Reapproval" />
+								<entry key="trigger" value="Resubmit" />
+							</map>
+						</entry>
+						<entry key="16">
+							<map>
+								<entry key="fromState" value="Reapproval" />
+								<entry key="toState" value="Editing" />
+								<entry key="trigger" value="Disapprove" />
+							</map>
+						</entry>
+						<entry key="21">
+							<map>
+								<entry key="fromState" value="Archived" />
+								<entry key="toState" value="Editing" />
+								<entry key="trigger" value="Revise" />
+							</map>
+						</entry>
+						<entry key="8">
+							<map>
+								<entry key="fromState" value="Public" />
+								<entry key="toState" value="ArchiveApproval" />
+								<entry key="trigger" value="RequestArchive" />
+							</map>
+						</entry>
+						<entry key="19">
+							<map>
+								<entry key="fromState" value="ArchiveApproval" />
+								<entry key="toState" value="Archived" />
+								<entry key="trigger" value="ApproveArchive" />
+							</map>
+						</entry>
+					</map>
+				</entry>
+			</map>          
+       </property> 
+    </bean> 
+</beans>
