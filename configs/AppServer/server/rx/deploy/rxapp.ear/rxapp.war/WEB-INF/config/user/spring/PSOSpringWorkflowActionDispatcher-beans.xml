@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+   "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+  <!-- List each controller bean below -->
+  
+   <!-- A sample controller bean entry 
+   <bean id="myController" 
+      class="com.mycompany.MyControllerClass"/>
+    -->
+    
+   <!-- A sample dispatch servlet controller bean entry
+   <bean id="myDispatchController" class= "org.springframework.web.servlet.mvc.ServletWrappingController">
+     <property name="servletClass">
+       <value>com.mycompany.myServletClass</value>
+     </property>
+     <property name="initParameters">
+       <props>
+         <prop key="debug">true</prop>
+       </props>
+     </property>
+   </bean>
+   --> 
+      <bean id="psoWFActionService" class="com.percussion.pso.workflow.PSOWFActionService"
+      init-method="init">
+        <property name="transitionActions">
+          <map>
+              <entry key="CancerGov Workflow">
+                  <map>
+                     <entry key="Preview">
+                         <list>
+				<value>CGV_OnDemandPublishContent</value>
+				<value>sys_TouchParentItems</value>
+                            <value>CGV_ParentChild</value>
+                         </list>
+                     </entry> 
+                     <entry key="Staging">
+                         <list>
+				<value>CGV_OnDemandPublishContent</value>
+				<value>sys_TouchParentItems</value>
+                            <value>CGV_ParentChild</value>
+                         </list>
+                     </entry> 
+                     <entry key="toPublic">
+                         <list>
+				<value>CGV_OnDemandPublishContent</value>
+				<value>sys_TouchParentItems</value>
+                            <value>CGV_ParentChild</value>
+                         </list>
+                     </entry> 
+					  <entry key="Reapprove">
+                         <list>
+				<value>CGV_OnDemandPublishContent</value>
+				<value>sys_TouchParentItems</value>
+                            <value>CGV_ParentChild</value>
+                         </list>
+                     </entry> 
+					  <entry key="Republish">
+                         <list>
+				<value>CGV_OnDemandPublishContent</value>
+				<value>sys_TouchParentItems</value>
+                            <value>CGV_ParentChild</value>
+                         </list>
+                     </entry> 
+
+                  </map>
+              </entry>
+          </map>          
+       </property> 
+    </bean> 
+
+  <!-- add mappings here -->
+<!--
+   <bean id="psoSpringWorkflowActionDispatcher" class="com.percussion.pso.workflow.PSOSpringWorkflowActionDispatcher"
+      init-method="init">
+       <property name="transitionActions">
+          <map>
+              <entry key="Standard Workflow">
+                  <map>
+                     <entry key="Return to Public">
+                         <list>
+                            <value>PSOPublishContent</value>
+                         </list>
+                     </entry> 
+                  </map>
+              </entry>
+          </map>          
+       </property>
+    </bean>
+-->
+</beans>

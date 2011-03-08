@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PSXExtensionHandlerConfiguration handlerName="Java">
+   <Extension categorystring="" context="global/percussion/user/" deprecated="no" handler="Java" name="CGV_NavonUrlPopulate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Changes the pretty_url_folder_name of a Navon to mirror it's folder name. Special chars. are replaced with _</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_NavonUrlPopulate</initParam>
+      <interface name="com.percussion.extension.IPSRequestPreProcessor"/>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="jexl" context="global/percussion/user/" deprecated="no" handler="Java" name="CGV_AssemblyTools" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">CGov Assembly Tools</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.jexl.CGV_AssemblyTools</initParam>
+      <interface name="com.percussion.extension.IPSJexlExpression"/>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="" context="global/percussion/user/" deprecated="no" handler="Java" name="GGV_Parent_ChildValidator" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description"/>
+      <initParam name="com.percussion.extension.version">6</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_ParentChildValidator</initParam>
+      <interface name="com.percussion.extension.IPSItemValidator"/>
+      <interface name="com.percussion.extension.IPSResultDocumentProcessor"/>
+      <PSXExtensionParamDef id="0">
+         <name>DestinationStates</name>
+         <dataType>java.lang.String</dataType>
+         <description>test</description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="" context="global/percussion/user/" deprecated="no" handler="Java" name="CGV_WorkflowItemValidator" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description"/>
+      <initParam name="com.percussion.extension.version">6</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_WorkflowItemValidator</initParam>
+      <interface name="com.percussion.extension.IPSItemValidator"/>
+      <interface name="com.percussion.extension.IPSResultDocumentProcessor"/>
+      <PSXExtensionParamDef id="0">
+         <name>DestinationStates</name>
+         <dataType>java.lang.String</dataType>
+         <description>test</description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>   
+   <Extension categorystring="" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_systitlePopulate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Populates the sys_title field with the long_title and appends 4 random numbers on the end to help ensure uniqueness.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_TitlePopulate</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <interface name="com.percussion.extension.IPSRequestPreProcessor"/>
+      <PSXExtensionParamDef id="0">
+         <name>fieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>The field to use for populating the sys_title field.</description>
+      </PSXExtensionParamDef>      
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="validation" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_FolderValidate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Validate that the sys_title does not have encoded characters.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_FolderValidate</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <interface name="com.percussion.extension.IPSFieldValidator"/>
+      <PSXExtensionParamDef id="0">
+         <name>contentTypeId</name>
+         <dataType>java.lang.String</dataType>
+         <description>The content type id (html param).</description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="contenteditor" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_ParentChild" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">When a parent item is moved, child items are moved along workflows with the parent.  Uses some logic to figure what moves where and to what state.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_ParentChild</initParam>
+      <interface name="com.percussion.extension.IPSWorkflowAction"/>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="contenteditor" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_OnDemandPublishContent" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">When an item is updated, its top-most parents are pushed into a queue to be published on demand.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_OnDemandPublishContent</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <interface name="com.percussion.extension.IPSWorkflowAction"/>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="validation" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_PrettyURLValidate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Validate that the pretty_url_name does not have encoded characters.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_URLEncoding</initParam>
+      <interface name="com.percussion.extension.IPSFieldValidator"/>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="contenteditor" context="user/" deprecated="no" handler="Java" name="CGV_UniqueFieldInFolderValidate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Validate that a field is unique within the folder.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_UniqueFieldWithInFoldersValidator</initParam>
+      <interface name="com.percussion.extension.IPSFieldValidator"/>
+      <PSXExtensionParamDef id="0">
+         <name>value</name>
+         <dataType>java.lang.String</dataType>
+         <description>Value</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="1">
+         <name>fieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional, default = fieldname) The name of the field providing the value.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="2">
+         <name>excludePromotableVersions</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional, default = false) If True, suppress this validation for items that are promotable
+	        versions of another item.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="3">
+         <name>checkPaths</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional) If set will check uniqueness in each comma separated path/Site e.g. //Sites/SiteA/%,//Sites/SiteB/% </description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="relationship" context="user/" deprecated="no" handler="Java" name="CGV_UniqueInFolderEffect" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Ensures that specified field in content items is unique within folder, but ignores translation items.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_UniqueInFolderEffect</initParam>
+      <interface name="com.percussion.relationship.IPSEffect"/>
+      <PSXExtensionParamDef id="0">
+         <name>fieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>The name of the field providing the value.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="1">
+         <name>checkPaths</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional) If set will check uniqueness in each comma separated path/Site e.g. //Sites/SiteA/%,//Sites/SiteB/% </description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="relationship" context="user/" deprecated="no" handler="Java" name="CGV_UniqueInFolderAllEffect" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Ensures that specified field in content items is unique within folder.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_UniqueInFolderAllEffect</initParam>
+      <interface name="com.percussion.relationship.IPSEffect"/>
+      <PSXExtensionParamDef id="0">
+         <name>fieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>The name of the field providing the value.</description>
+      </PSXExtensionParamDef>
+      <PSXExtensionParamDef id="1">
+         <name>checkPaths</name>
+         <dataType>java.lang.String</dataType>
+         <description>(Optional) If set will check uniqueness in each comma separated path/Site e.g. //Sites/SiteA/%,//Sites/SiteB/% </description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="relationship" context="user/" deprecated="no" handler="Java" name="CGV_RelationshipEffectTest" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Test of relationship effects for pre-workflow.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_RelationshipEffectTest</initParam>
+      <interface name="com.percussion.relationship.IPSEffect"/>
+      <suppliedResources/>
+   </Extension>   
+   <Extension categorystring="scheduledTask" context="user/" deprecated="no" handler="Java" name="CGV_LinkCheckTask" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Fetches all nciLink content items, tests their URLs, and stores a problem report in the database</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_LinkCheckTask</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <interface name="com.percussion.services.schedule.IPSTask"/>
+      <suppliedResources/>
+   </Extension>
+</PSXExtensionHandlerConfiguration>

@@ -1,0 +1,243 @@
+  <assemblytemplate id="1">
+    <guid>0-4-530</guid>
+    <active-assembly-type>Normal</active-assembly-type>
+    <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
+    <assembly-url>../assembler/render</assembly-url>
+    <bindings>
+      <binding id="2">
+        <execution-order>1</execution-order>
+        <expression>$sys.variables.rxs_navbase</expression>
+        <id>0</id>
+        <jexl-script id="3">
+          <text>$sys.variables.rxs_navbase;</text>
+        </jexl-script>
+        <variable>$rxs_navbase</variable>
+      </binding>
+    </bindings>
+    <charset>UTF-8</charset>
+    <content-ids/>
+    <description>EI Home Page</description>
+    <global-template/>
+    <global-template-usage>None</global-template-usage>
+    <label>P - EI Home</label>
+    <location-prefix/>
+    <location-suffix/>
+    <mime-type>text/html</mime-type>
+    <name>rffPgEiHome</name>
+    <output-format>Page</output-format>
+    <publish-when>Default</publish-when>
+    <site-ids>
+      <site-id>301</site-id>
+    </site-ids>
+    <style-sheet-path/>
+    <template>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
+
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;title&gt;#displayfield("displaytitle")&lt;/title&gt;
+    &lt;link rel="stylesheet" href="${rxs_navbase}/css/rxs_styles.css" type="text/css" /&gt;
+    &lt;script src="${rxs_navbase}/js/mouseover.js" 
+	    language="javascript" type="text/javascript"&gt;;&lt;/script&gt;
+    &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8" /&gt;
+    &lt;meta name="keywords" content="#displayfield('keywords')" /&gt;
+    &lt;meta name="description" content="#displayfield('description')" /&gt;
+    &lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+	#linkback_head()
+  &lt;/head&gt;
+  &lt;body&gt;
+    #slot("rffNav" "" "" "" "" "template=rffSnNavPreload")
+	#startAAPage()
+    &lt;div id="EIPage"&gt;
+      &lt;div id="TopPortion"&gt;
+           &lt;div id="TopSpot"&gt;
+             &lt;div id="TopSearchBox"&gt;
+               &lt;form name="QueryForm" method="post" action="#" height="30"&gt;
+                 &lt;input type="text" name="SearchString" size="10" maxlength="50" value="Search" /&gt;
+                 &lt;input type="image" border="0" name="imageField" src="$rxs_navbase/images/go_black.gif" width="34" height="12" /&gt;
+               &lt;/form&gt;
+             &lt;/div&gt;
+             &lt;div id="region_form"&gt;
+               &lt;form name="formRegion"&gt;
+                 &lt;select name="RegionMenu"&gt;
+              &lt;option selected="selected"&gt;Region/Country&lt;/option&gt;
+              &lt;option value=""&gt;Fran&amp;ccedil;ais Home&lt;/option&gt;
+              &lt;option value=""&gt;US English Home&lt;/option&gt;
+                 &lt;/select&gt;
+               &lt;/form&gt;
+             &lt;/div&gt;
+           &lt;/div&gt;
+           &lt;div id="banner"&gt;
+             &lt;div id="nav_top"&gt;
+              #set($cellstart = $tools.alternator.make(true, ['&lt;tr valign="top"&gt;&lt;td class="lc_column"&gt;', '&lt;td class="lc_column"&gt;']))
+              #set($cellend = $tools.alternator.make(true, ['&lt;/td&gt;', '&lt;/td&gt;&lt;/tr&gt;']))
+        		#set($index = 0)
+               #initslot("rffHomeImage" "")
+			   #startAASlot("rffHomeImage")
+                #if($sys.currentslot.relresults.size() &gt; 0)
+				   &lt;table border="0" cellpadding="0" cellspacing="0"&gt;
+                       #foreach( $relresult in $sys.currentslot.relresults )
+                          $cellstart
+                             #slotItem($relresult)
+                          $cellend
+                			 #set($index = $index + 1)
+                       #end
+            		   ## Slot must be closed if we don't have an even count
+            		   #if ($index % 2 != 0)
+            			 $cellstart
+            			 $cellend
+    				   #end
+              		&lt;/table&gt;
+        		#end
+				#endAASlot()
+            #endslot("rffHomeImage")
+             &lt;/div&gt;
+			 &lt;div class="topTable1"&gt;
+               &lt;span class="headergreen"&gt;Markets&lt;/span&gt;
+               &lt;table border="0" cellpadding="0" cellspacing="0"&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;DJIA&lt;/td&gt;
+              &lt;td&gt;8,022.02&lt;/td&gt;
+              &lt;td align="right"&gt;+108.81&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;NASDAQ&lt;/td&gt;
+              &lt;td&gt;1,327.99&lt;/td&gt;
+              &lt;td align="right"&gt;+14.16&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;S&amp;amp;P500&lt;/td&gt;
+              &lt;td&gt;850.17&lt;/td&gt;
+              &lt;td align="right"&gt;+11.24&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;RJQ&lt;/td&gt;
+              &lt;td&gt;45.09&lt;/td&gt;
+              &lt;td align="right"&gt;-1.18&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;WKM&lt;/td&gt;
+              &lt;td&gt;13.16&lt;/td&gt;
+              &lt;td align="right"&gt;+4.98&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;YTB&lt;/td&gt;
+              &lt;td&gt;23.73&lt;/td&gt;
+              &lt;td align="right"&gt;-18.71&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;TWUR&lt;/td&gt;
+              &lt;td&gt;56.27&lt;/td&gt;
+              &lt;td align="right"&gt;-1.01&lt;/td&gt;
+                 &lt;/tr&gt;
+               &lt;/table&gt;
+             &lt;/div&gt;
+             &lt;div class="topTable2"&gt;
+               &lt;span class="headergreen"&gt;Rates&lt;/span&gt;
+               &lt;table border="0" cellpadding="0" cellspacing="0"&gt;
+                 &lt;tr&gt;
+              &lt;td class="tableHighLight"&gt;MORTGAGES&lt;/td&gt;
+              &lt;td class="tableHighLight"&gt;Rate&lt;/td&gt;
+              &lt;td class="tableHighLight" align="right"&gt;APR&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;30-Year Fixed&lt;/td&gt;
+              &lt;td&gt;5.25&lt;/td&gt;
+              &lt;td align="right"&gt;5.55&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;15-Year Fixed&lt;/td&gt;
+              &lt;td&gt;4.75&lt;/td&gt;
+              &lt;td align="right"&gt;5.17&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;7-Year Arm&lt;/td&gt;
+              &lt;td&gt;4.37&lt;/td&gt;
+              &lt;td align="right"&gt;4.60&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td class="tableHighLight"&gt;Home Equity&lt;/td&gt;
+              &lt;td class="tableHighLight"&gt;Rate&lt;/td&gt;
+              &lt;td class="tableHighLight" align="right"&gt;APR &lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;Line of Credit&lt;/td&gt;
+              &lt;td&gt;3.90&lt;/td&gt;
+              &lt;td align="right"&gt;4.25&lt;/td&gt;
+                 &lt;/tr&gt;
+                 &lt;tr&gt;
+              &lt;td&gt;Installment&lt;/td&gt;
+              &lt;td&gt;6.75&lt;/td&gt;
+              &lt;td align="right"&gt;6.75&lt;/td&gt;
+                 &lt;/tr&gt;
+               &lt;/table&gt;
+             &lt;/div&gt;
+           &lt;/div&gt;
+
+           &lt;div id="horizontal_nav"&gt;
+             #slot("rffNav" "" "" "" "" "template=rffSnEiNavTop")
+           &lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div id="MainPortion"&gt;
+           &lt;div id="LeftSide"&gt;
+             &lt;div id="LeftNav"&gt;
+               #slot("rffNav" "" "" "" "" "template=rffSnEiNavLeft")
+               &lt;br /&gt;
+             &lt;/div&gt;
+           &lt;/div&gt;
+           &lt;div id="MainBody"&gt;
+             &lt;div id="ContentBox"&gt;
+              &lt;div id="MainContent"&gt;
+            	&lt;table border='0' cellspacing='0' cellpadding='0'&gt;
+            		&lt;tr&gt;&lt;td&gt;#field("body")&lt;br/&gt;
+                	&lt;div id="lower_content"&gt;
+                		#set($cellstart = $tools.alternator.make(true, ['&lt;tr valign="top"&gt;&lt;td class="lc_column"&gt;', '&lt;td class="lc_column"&gt;', '&lt;td class="lc_column"&gt;']))
+                		#set($cellend = $tools.alternator.make(true, ['&lt;/td&gt;', '&lt;/td&gt;', '&lt;/td&gt;&lt;/tr&gt;']))
+                		#set($index = 0)
+                	    #initslot("rffHomeList" "")
+               		    #startAASlot("rffHomeList")
+                        #if($sys.currentslot.relresults.size() &gt; 0)
+                		   &lt;table style="margin-right: 15px" border="0" cellpadding="0" cellspacing="0"&gt;
+                               #foreach( $relresult in $sys.currentslot.relresults )
+                    			 $cellstart
+                                 #slotItem($relresult)
+                    			 $cellend
+                    			 #set($index = $index + 1)
+                    		   #end
+                    		   ## Slot must be closed if we don't have an even count
+                    		   #if ($index % 3 != 0)
+                    			 $cellstart
+                    			 $cellend
+                    			 #set($index = $index + 1)
+                    		   #end
+                    		   #if ($index % 3 != 0)
+                    			 $cellstart
+                    			 $cellend
+                    			 #set($index = $index + 1)
+                    		   #end		   
+                		   &lt;/table&gt;
+                		#end
+					    #endAASlot()
+                   #endslot("rffHomeList")
+                	 &lt;/div&gt;
+            	 &lt;/td&gt;&lt;td id="Related"&gt;&lt;div class="RelatedContent"&gt;#slot("rffEvents" "Event Calendars" "" "" "" "sitepath=//Sites/EnterpriseInvestments/%")&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;
+            	&lt;/table&gt;
+              &lt;/div&gt;
+             &lt;/div&gt;
+           &lt;/div&gt;
+           &lt;div id="SiteFooter"&gt;
+             #slot("rffNav" '&lt;div id="nav_lbottom"&gt;' "" "" '&lt;/div&gt;' "template=rffSnEiNavBottom")
+           &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+	#endAAPage()
+  &lt;/body&gt;
+&lt;/html&gt;
+</template>
+    <template-slot-ids>
+      <template-slot-id>501</template-slot-id>
+      <template-slot-id>103</template-slot-id>
+      <template-slot-id>507</template-slot-id>
+    </template-slot-ids>
+    <template-type>Local</template-type>
+    <variant>false</variant>
+  </assemblytemplate>

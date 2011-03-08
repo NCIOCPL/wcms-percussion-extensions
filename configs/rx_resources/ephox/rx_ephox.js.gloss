@@ -1,0 +1,680 @@
+/********************************************************************
+*
+* The code from here on is Cancer.gov customization
+* @author holewr
+*
+***********************************************************************/
+var cGovReq;			//global request object
+var cGovOriginalData;	//data from editor window
+var cGovMassagedData;	//editor data after preprocessing
+var cGovUniqueId;		//id unique within this page
+var cGovEditorName;		//name of editor
+var cGovStatusWindow;	//window for status display
+var cGovCheckboxWindow	//window for term checkboxes
+var cGovCRConst = "&#x000d;";	//carriage return substitute
+var cGovLFConst = "&#x000a;";	//line feed substitute
+/**
+* The following variables should be set from a config file
+*/
+// First two are used if going direct to web service
+//var cGovWebServiceURL = 'http://verdi.nci.nih.gov/u/glossify/';	//url of glossifier web service
+//var cGovWebServiceURL = 'http://pdqupdate.cancer.gov/u/glossify/';	//url of glossifier web service
+// These are used if going to the glossifier proxy running on the same box as Percussion
+//var cGovWebServiceURL = 'http://156.40.134.66:9922/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Blue)
+//var cGovWebServiceURL = 'http://156.40.134.66:9921/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Brown)
+//var cGovWebServiceURL = 'http://156.40.134.66:9925/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Pink)
+//var cGovWebServiceURL = 'http://percussionpre.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (PreProd)
+var cGovWebServiceURL = 'http://percussion.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Prod)
+//var cGovWebServiceURL = 'http://percussionqa.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (QA)
+//var cGovWebServiceURL = 'http://percussionint.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (Int)
+//var cGovWebServiceURL = 'http://percussionca.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (CA)
+var cGovPreviewURL = "www.cancer.gov";	//dictionary preview URL
+var cGovElementPrefix = "ns1:";
+var cGovSoapPrefix = "soapenv";
+var cGovWSNameSpace = "cancer.gov/glossproxy";
+//var cGovWSNameSpace = "cips.nci.nih.gov/cdr";
+//var cGovSoapMethod = "cips.nci.nih.gov/cdr/glossify";
+var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
+
+/**
+ * Method to fetch Ephox content, glossify it, and reset it into the editor.
+ * This method is a custom cancer.gov method
+ * 
+ */
+function cGovEphoxGlossify()
+{
+	cGovUniqueId = 0;
+	cGovEditorName = _rxAllEditors[0].name;
+	// Get the content from the editor using an existing function
+	cGovOriginalData = _editLiveInstance.getContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName));
+	// Get glossification info from web service and apply it
+	cGovEphoxDoGlossify(cGovOriginalData);
+}
+
+/**
+* Send the glossification request to the web service
+*
+*/
+function cGovEphoxDoGlossify(data) {
+	// Pre-process the string to encode cr and lf and flag previous glossify results
+	cGovMassagedData = cGovPrepareStr(data);
+	// Wrap in CDATA so markup doesn't hose everything
+	var safeData = "<![CDATA[" + cGovMassagedData + "]]>";
+	// XML SOAP command for web service
+	var soapCommand = "<?xml version=\"1.0\"?>" +
+		"<soapenv:Envelope " +
+//		"xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' " +
+//		"xmlns:xsd='http://www.w3.org/2001/XMLSchema' " +
+		"xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' " +
+		"xmlns:m='" + cGovWSNameSpace + "'> " +
+//		"soapenv:encodingStyle='http://schemas.xmlsoap.org/soap/encoding'>" +
+		"<soapenv:Header/>" +
+		"<soapenv:Body>" +
+			"<m:glossify>" +
+				"<m:fragment>" + safeData + "</m:fragment>" +
+				"<m:dictionaries>" +
+					"<m:string>Cancer.gov</m:string>" +
+				"</m:dictionaries>" +
+				"<m:languages>" +
+					"<m:string>en</m:string>" +
+				"</m:languages>" +
+			"</m:glossify>" +
+		"</soapenv:Body>" +
+		"</soapenv:Envelope>";
+//alert("command:\n" + soapCommand);
+	// Get request object depending on browser
+	if (window.XMLHttpRequest) {
+		try {
+			cGovReq = new XMLHttpRequest();
+		}
+		catch (e) {
+			cGovReq = false;
+		}
+	}
+	else if (window.ActiveXObject) {
+		try {
+			cGovReq = new ActiveXObject("Msxml2.XMLHTTP");
+		}
+		catch (e) {
+			try {
+				cGovReq = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			catch (e) {
+				cGovReq = false;
+			}
+		}
+	}
+	if (cGovReq) {
+		//Display status window
+		cGovStatusWindow = window.open("","","height=480,width=640");
+		cGovStatusWindow.document.write('<html><head><title>GlossifyDocumentPrep</title>');
+		cGovStatusWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
+		cGovStatusWindow.document.write('<script language="javascript" type="text/javascript">');
+		cGovStatusWindow.document.write("var prg_width = 200;");
+		cGovStatusWindow.document.write("function progress() {");
+        cGovStatusWindow.document.write("var node = document.getElementById('progress');");
+        cGovStatusWindow.document.write("var w = node.style.width.match(/\\d+/);");
+		cGovStatusWindow.document.write("if (w == prg_width)");
+        cGovStatusWindow.document.write("w = 0;");
+		cGovStatusWindow.document.write("node.style.width = parseInt(w) + 5 + 'px';");
+        cGovStatusWindow.document.write("}");
+        cGovStatusWindow.document.write("setInterval(progress, 250);");		
+		cGovStatusWindow.document.write('</script></head>');
+		cGovStatusWindow.document.write('<body><div><div style="border: 1px solid black; width:200px; height:10px;"><div id="progress" style="height:10px; width:0px; background-color:red;"/></div></div>');
+		cGovStatusWindow.document.write("<h2>Processing document, please wait.........</h2></body></html>");
+
+		// Do this on completion of asynchronous call
+		cGovReq.onreadystatechange = cGovProcessReqChange;
+
+		// Open request and set its headers
+		cGovReq.open("POST", cGovWebServiceURL, true);
+//		cGovReq.setRequestHeader("AcceptEncoding", "gzip,deflate");	//if this is added, actual ws doesn't work
+//		cGovReq.setRequestHeader("Content-Type", "text/xml;charset=UTF-8");
+		cGovReq.setRequestHeader("Content-Type", "text/xml");
+		cGovReq.setRequestHeader("SOAPAction", cGovSoapMethod);
+//		cGovReq.setRequestHeader("User-Agent", "Jakarta Commons-HttpClient/3.1");	//if this is added, actual ws doesn't work
+		// Send the request
+		cGovReq.send(soapCommand);
+		return true;
+	}
+	else {
+		alert("Your browser does not appear to support this functionality.");
+	}
+	return false;
+}
+
+/**
+* Class containing values of each Term returned from the service
+*
+*/
+function termObject() {
+	this.start = 0;
+	this.length = 0;
+	this.docId = "";
+	this.dictionary = "";
+	this.language = "";
+	this.first = true;
+}
+
+/**
+* Completion callback
+*
+*/
+function cGovProcessReqChange() {
+	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
+//alert("got response, text:\n" + cGovReq.responseText);
+		cGovStatusWindow.close();
+		//Web service transaction has completed, parse the response
+		var env = cGovReq.responseXML.getElementsByTagName(cGovSoapPrefix + ":Envelope");
+//alert("got env");
+		var body = env[0].getElementsByTagName(cGovSoapPrefix + ":Body");
+//alert("got body");
+		var resp = body[0].getElementsByTagName(cGovElementPrefix + "glossifyResponse");
+//alert("got glossifyResponse");
+		var glossifyResult = resp[0].getElementsByTagName(cGovElementPrefix + "glossifyResult");
+//alert("got glossifyResult");
+		var terms = glossifyResult[0].getElementsByTagName(cGovElementPrefix + "Term");
+//alert("got term");
+		// Put the terms values into an array
+		var termsArray = cGovBuildTermsArray(terms);
+		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
+//alert("cGovMassagedData:\n" + cGovMassagedData);
+		
+		// Set up HTML window with javascript and checkboxed text
+		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
+		cGovCheckboxWindow.document.write('<html><head>');
+		cGovCheckboxWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
+		cGovCheckboxWindow.document.write('</head>');
+		cGovCheckboxWindow.document.write('<script language="Javascript">');
+		cGovCheckboxWindow.document.write('function returnChecks() {');
+		cGovCheckboxWindow.document.write('	var checkArray = [];');
+		cGovCheckboxWindow.document.write('	if (document.Glossify.terms != null) {');
+		cGovCheckboxWindow.document.write('		boxes = document.Glossify.terms.length;');
+		cGovCheckboxWindow.document.write('		if (boxes == null) {');
+		cGovCheckboxWindow.document.write('			if (document.Glossify.terms.checked) {');
+		cGovCheckboxWindow.document.write('				checkArray.push(document.Glossify.terms.value);');
+		cGovCheckboxWindow.document.write('			}');
+		cGovCheckboxWindow.document.write('		}');
+		cGovCheckboxWindow.document.write('		else {');
+		cGovCheckboxWindow.document.write('			for (i=0;i<boxes;i++) {');
+		cGovCheckboxWindow.document.write('				if (document.Glossify.terms[i].checked) {');
+		cGovCheckboxWindow.document.write('					checkArray.push(document.Glossify.terms[i].value);');
+		cGovCheckboxWindow.document.write('				}');
+		cGovCheckboxWindow.document.write('			}');
+		cGovCheckboxWindow.document.write('		}');
+		cGovCheckboxWindow.document.write('	}');
+		cGovCheckboxWindow.document.write('window.opener.submitter(checkArray);');
+		cGovCheckboxWindow.document.write('window.close();');
+		cGovCheckboxWindow.document.write('}\n</script>');
+		cGovCheckboxWindow.document.write('<body>');
+		cGovCheckboxWindow.document.write('<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">');
+		cGovCheckboxWindow.document.write('<h2>Please check/uncheck the word(s) you want glossified</h2>');
+		cGovCheckboxWindow.document.write('<hr>\n' + cGovMassagedData + '<hr>\n');
+		cGovCheckboxWindow.document.write('<input type="submit" value="Submit Changes">');
+		cGovCheckboxWindow.document.write('</form>\n</body>\n</html>');
+	}
+//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
+}
+
+/**
+* Callback called when popup window is submitted
+* Gets array of checked checkbox values, modifies the text to go into the editor
+*
+*/
+function submitter(checkArray) {
+//TODO: delete dictionary preview URL once we add it
+//	if (!cGovCheckboxWindow.closed)
+//		cGovCheckboxWindow.close();
+	var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
+	var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
+	var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
+	var rxFixCRs = new RegExp(cGovCRConst);
+	var rxFixLFs = new RegExp(cGovLFConst);
+	var finalText = cGovStripCheckboxes(rxCheckBox, cGovMassagedData);
+	finalText = cGovFixFinalLinks(rxFixLinks, finalText, checkArray);
+	finalText = cGovKillFonts(rxKillFonts, finalText);
+	finalText = cGovFixCRLF(rxFixCRs, finalText, "\r");
+	finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
+	//finish up by restoring text to editor
+	_editLiveInstance.setContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName), finalText);
+}
+
+/**
+* Strip checkbox markup from the final text
+*
+*/
+function cGovStripCheckboxes(theRegExp, theText) {
+	var done = false;
+	var offset = 0;
+	while (!done) {
+		var temp = theText.substr(offset);
+		if (temp == null) {
+			done = true;
+		}
+		else {
+			var target = theRegExp.exec(temp);
+			if (target == null) {
+				done = true;
+			}
+			else {
+				offset += target.index;
+				theText = theText.replace(target[0],"");
+			}
+		}
+	}
+//alert("end of cGovStripCheckboxes, theText= " + theText);
+	return theText;
+}
+
+/**
+* Fix up the links in the final text
+*
+*/
+function cGovFixFinalLinks(theRegExp, theText, checkArray) {
+	var done = false;
+	var offset = 0;
+	while (!done) {
+		var temp = theText.substr(offset);
+		if (temp == null) {
+			done = true;
+		}
+		else {
+//alert("temp= " + temp + " length= " + temp.length);
+			var target = theRegExp.exec(temp);
+//alert("ran regexp");
+			if (target == null) {
+//alert("done"); 
+				done = true;
+			}
+			else {
+				offset += target.index;
+//alert("target[0]= " + target[0]);
+//alert("target[1]= " + target[1]);
+//alert("target[2]= " + target[2]);
+//alert("target[3]= " + target[3]);
+				var good = false;
+				for (i=0;i<checkArray.length;i++) {
+					if (checkArray[i] == target[1]) {
+						good = true;
+						break;
+					}
+				}
+				if (good) {
+				//user checked this one
+					theText = theText.replace(target[0], "<a " + target[2] + ">" + target[3] + "</a>");
+				}
+				else {
+				//user didn't check this one
+					theText = theText.replace(target[0], target[3]);
+					offset += target[3].length;
+				}
+			}
+		}
+	}
+//alert("end of cGovFixFinalLinks, theText= " + theText);
+	return theText;
+}
+
+/**
+* Strip the special font markup from the final text
+*
+*/
+function cGovKillFonts(theRegExp, theText) {
+	var done = false;
+	var offset = 0;
+	while (!done) {
+		var temp = theText.substr(offset);
+		if (temp == null) {
+			done = true;
+		}
+		else {
+			var target = theRegExp.exec(temp);
+			if (target == null) {
+				done = true;
+			}
+			else {
+				offset += target.index;
+				theText = theText.replace(target[0], target[1]);
+			}
+		}
+	}
+	return theText;
+}
+
+/**
+* Change CR and LF codes back to CRLF
+*
+*/
+function cGovFixCRLF(theRegExp, theText, replacement) {
+	var done = false;
+	var offset = 0;
+	while (!done) {
+		var temp = theText.substr(offset);
+		if (temp == null) {
+			done = true;
+		}
+		else {
+			var target = theRegExp.exec(temp);
+			if (target == null) {
+				done = true;
+			}
+			else {
+				offset += target.index;
+				theText = theText.replace(target[0], replacement);
+			}
+		}
+	}
+	return theText;
+	
+}
+
+/**
+* Build array of values from fetched terms
+*
+*/
+function cGovBuildTermsArray(terms) {
+	var termsArray = [];	//array of term values
+//alert("terms count = " + terms.length);
+	for (i=0;i<terms.length;i++) {
+	// fetch the values for each Term returned by the service
+		var term = new termObject();
+		var start = terms[i].getElementsByTagName(cGovElementPrefix + "start");
+		term.start = start[0].childNodes[0].nodeValue;
+		var len = terms[i].getElementsByTagName(cGovElementPrefix + "length");
+		term.length = len[0].childNodes[0].nodeValue;
+		var docId = terms[i].getElementsByTagName(cGovElementPrefix + "docId");
+		term.docId = docId[0].childNodes[0].nodeValue;
+		var dictionary = terms[i].getElementsByTagName(cGovElementPrefix + "dictionary");
+		term.dictionary = dictionary[0].childNodes[0].nodeValue;
+		var language = terms[i].getElementsByTagName(cGovElementPrefix + "language");
+		term.language = language[0].childNodes[0].nodeValue;
+		var first = terms[i].getElementsByTagName(cGovElementPrefix + "firstOccurrence");
+		term.first = first[0].childNodes[0].nodeValue;
+		termsArray[i] = term;
+	}
+	return termsArray;
+}
+
+/**
+* Build the string with formatting and checkboxes for use in the term selection window
+*
+*/
+function cGovBuildCBDisplayString(data, termsArray) {
+	// Go through the terms array in reverse order, insert terms links into massaged data with unique ids
+	for (i=termsArray.length - 1;i>=0;i--) {
+		var tobj = termsArray[i];
+		cGovUniqueId++;
+		var firstPart = data.substr(0, parseInt(tobj.start));
+		var text = data.substr(parseInt(tobj.start), parseInt(tobj.length));
+		var lastPart = data.substr(parseInt(tobj.start) + parseInt(tobj.length));
+		// Determine if we need to highlight the term
+		//Build the newterm string
+		data = firstPart + "<input type=checkbox name=terms value=" + cGovUniqueId + "><a __newterm=\"" + cGovUniqueId + "\" class=\"definition\" href=\"/Common/PopUps/popDefinition.aspx?id=" + tobj.docId + "&version=Patient&language=English\" onclick=\"javascript:popWindow('defbyid','" + tobj.docId + "&version=Patient&language=English'); return false;\">" + text + "</a>" + lastPart;
+	}
+	var rxNewOldterm = new RegExp("<a __(?:new|old)term=\".+?>(.+?)</a>");
+	data = cGovDoRegExpFonts(rxNewOldterm, data);
+	// add checkbox (checked) to __oldterms
+	rxOldterm = new RegExp("<a __oldterm=\"(.+?)\"");
+	data = cGovDoRegExpAddChecks(rxOldterm, data);
+//alert("final data for display = \n" + data);
+	return data;
+}
+
+/**
+* Prepare the data for sending to web service. Replace cr and lf with code, mark old web service
+* provided URLs with __oldterm
+*
+*/
+function cGovPrepareStr(data) {
+//alert("In cGovPrepareStr, data= " + data);
+	var tempData = data;
+	var result="";
+	// These expressions look for two specific styles of links and then change them from
+	//	<a whatever> to <a __oldterm>
+	//	<a href="/dictionary/db_alpha.aspx?expand=s#symptom" onclick="javascript:popWindow('definition','symptom'); return false;">symptoms</a>
+	//	<a class="definition" href="/Common/PopUps/popDefinition.aspx?term=bone marrow&amp;version=Patient&amp;language=English" onclick="javascript:popWindow('definition','bone marrow&amp;version=Patient&amp;language=English');  return(false);">bone marrow</a>
+	// The most complete patterns (from the old Admin Tool code) don't work here:
+	//	<a\s+(href=\"/dictionary/db_alpha.aspx\?expand=.+?>.+?</a>)
+	//	<a\\s+(class=\"definition\".+?>.+?</a>)
+	// The following two expressions expect the links to be in a particular order. The second set expect
+	// a different order. No matter what order they are in in the editor, they always seem to come back the
+	// second way. If this turns out to not be the case, we'll have to run the first two expressions as well
+	// as the second.
+//	var rxDict1 = new RegExp("<a\\s+(href=.+dictionary/db_alpha.aspx.+</a>)","i");
+	var rxDef1 = new RegExp("<a\\s+(class=\"definition\".+?>.+?</a>)");
+	var rxDict2 = new RegExp("<a\\s+(onclick=\"javascript:popWindow.+?href=.+?dictionary/db_alpha.aspx.+?</a>)","i");
+	var rxDef2 = new RegExp("<a\\s+(onclick=\"javascript:popWindow.+?href=.+?popDefinition.aspx.+?</a>)");
+	var rxDef3 = new RegExp("<a\\s+(href=\"/Common/PopUps/popDefinition.aspx.+?</a>)");
+	tempData = cGovDoRegExp1(rxDict2, tempData);
+	tempData = cGovDoRegExp1(rxDef2, tempData);
+	tempData = cGovDoRegExp1(rxDef1, tempData);
+	tempData = cGovDoRegExp1(rxDef3, tempData);
+	for (var i=0;i<tempData.length;i++) {
+		var c = tempData.charAt(i);
+		if (c == "\n") {
+			result += cGovLFConst;
+		}
+		else if (c == "\r") {
+			result += cGovCRConst;
+		}
+		else if (c == "’") {	//apostrophe
+			result += "&#146;";
+		}
+		else if (c == "‘") {	//left single quote
+			result += "&#145;";
+		}
+		else if (c == "“") {	//left double quote
+			result += "&#147;";
+		}
+		else if (c == "”") {	//right doulbe quote
+			result += "&#148;";
+		}
+		else if (c == "—") {	//em dash
+			result += "&#151;";
+		}
+		else if (c == "–") {	//en dash
+			result += "&#150;";
+		}
+		else if (c == "©") {
+			result += "&#169;";
+		}
+		else if (c == "™") {
+			result += "&#153;";
+		}
+		else if (c == "®") {
+			result += "&#174;";
+		}
+		else if (c == "…") {	//ellipses
+			result += "&#133;";
+		}
+		else if (c == "•") {	//bullet
+			result += "&#149;";
+		}
+		else if (c == "ä") {	//a umlaut
+			result += "&#228;";
+		}
+		else if (c == "á") {	//a accent
+			result += "&#225;";
+		}
+		else if (c == "Ä") {	//A umlaut
+			result += "&#196;";
+		}
+		else if (c == "Á") {	//A accent
+			result += "&#193;";
+		}
+		else if (c == "é") {	//e accent
+			result += "&#233;";
+		}
+		else if (c == "ë") {	//e umlaut
+			result += "&#235;";
+		}
+		else if (c == "É") {	//E accent
+			result += "&#201;";
+		}
+		else if (c == "Ë") {	//E umlaut
+			result += "&#203;";
+		}
+		else if (c == "í") {	//i accent
+			result += "&#237;";
+		}
+		else if (c == "ï") {	//i umlaut
+			result += "&#239;";
+		}
+		else if (c == "Í") {	//I accent
+			result += "&#205;";
+		}
+		else if (c == "Ï") {	//I umlaut
+			result += "&#207;";
+		}
+		else if (c == "ó") {	//o accent
+			result += "&#243;";
+		}
+		else if (c == "ö") {	//o umlaut
+			result += "&#246;";
+		}
+		else if (c == "Ó") {	//O accent
+			result += "&#211;";
+		}
+		else if (c == "Ö") {	//O umlaut
+			result += "&#214;";
+		}
+		else if (c == "ú") {	//u accent
+			result += "&#250;";
+		}
+		else if (c == "ü") {	//u umlaut
+			result += "&#252;";
+		}
+		else if (c == "Ú") {	//U accent
+			result += "&#218;";
+		}
+		else if (c == "Ü") {	//U umlaut
+			result += "&#220;";
+		}
+		else if (c == "ñ") {	//n tilde
+			result += "&#241;";
+		}
+		else if (c == "Ñ") {	//N tilde
+			result += "&#209;";
+		}
+		else {
+			result += c;
+		}
+	}
+//alert("result = " + result);
+	return result;
+}
+
+/**
+* Called for each regex, does the actual work of finding and editing the target link
+*
+*/
+function cGovDoRegExp1(theRegExp, result) {
+	var done = false;
+	var offset = 0;
+	while (!done) {
+		var temp = result.substr(offset);
+		if (temp == null) {
+			done = true;
+		}
+		else {
+			var target = theRegExp.exec(temp);
+//alert("target = " + target);
+			if (target == null) {
+				done = true;
+			}
+			else {
+				offset += target.index;
+				var iDed = cGovAddUniqueID(target[1]);
+				result = result.replace(target[0],iDed);
+//alert("result = " + result);
+				offset += iDed.length;
+			}
+		}
+	}
+	return result;
+}
+
+/**
+* Run regex and add checkboxes to links marked with "__oldterm"
+*
+*/
+function cGovDoRegExpAddChecks(theRegExp, data) {
+	var done = false;
+	var offset = 0;
+	while (!done) {
+		var temp = data.substr(offset);
+		if (temp == null) {
+			done = true;
+		}
+		else {
+			var target = theRegExp.exec(temp);
+			if (target == null) {
+				done = true;
+			}
+			else {
+				offset += target.index;
+				var addition = "<input type=checkbox name=terms checked value=" + target[1] + ">" + target[0];
+				data = data.replace(target[0], addition);
+				offset += addition.length;
+			}
+		}
+	}
+	return data;
+}
+
+/**
+* Add highlighting font to first occurence of each term
+*
+*/
+function cGovDoRegExpFonts(theRegExp, data) {
+	var done = false;
+	var offset = 0;
+	var existingTermsArray = [];
+	while (!done) {
+		var temp = data.substr(offset);
+		if (temp == null) {
+			done = true;
+		}
+		else {
+			var target = theRegExp.exec(temp);
+			if (target == null) {
+				done = true;
+			}
+			else {
+				var found = false;
+				for (j=0;j<existingTermsArray.length;j++) {
+					if (existingTermsArray[j] == target[1].toLowerCase()) {
+						found = true;
+						break;
+					}
+				}
+				offset += target.index;
+				if (!found) {
+					existingTermsArray.push(target[1].toLowerCase());
+					data = data.replace(target[1], '<font __type=\"glossifyTemp\" style=\"background-color: #ffff00;\">' + target[1] + '</font>');
+				}
+				offset += target[0].length;
+			}
+		}
+	}
+	return data;
+}
+/**
+* Add the __oldterm= to the old links
+*
+*/
+function cGovAddUniqueID(data) {
+	cGovUniqueId++;
+	var uniqueID = "<a __oldterm=\"" + cGovUniqueId + "\" " + data;
+	return uniqueID;
+}
+
+/*
+TODO: add preview URL to dictionary for the checkbox window, remove it afterwards (see line 131 of GlossifyDocument.aspx.cs) (ask Bryan about this - can't find it in configs)
+TODO: configure css, fonts, javascripts, etc. (mostly on CDE site)
+TODO: on perc sites, need ../nciadmin.css stylesheet for status window (currently required styles are on the page because it's not finding the css file)
+TODO: add configuration of URLs, etc. in external file
+*/
+
+
+

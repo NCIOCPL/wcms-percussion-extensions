@@ -1,0 +1,219 @@
+  <assemblytemplate id="1">
+    <guid>0-4-697</guid>
+    <active-assembly-type>Normal</active-assembly-type>
+    <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
+    <assembly-url>../assembler/render</assembly-url>
+    <bindings>
+      <binding id="2">
+        <execution-order>1</execution-order>
+        <expression>$sys.variables.rxs_navbase</expression>
+        <id>0</id>
+        <jexl-script id="3">
+          <text>$sys.variables.rxs_navbase;</text>
+        </jexl-script>
+        <variable>$rxs_navbase</variable>
+      </binding>
+      <binding id="4">
+        <execution-order>2</execution-order>
+        <expression>$tools.number.toNumber($tools.list.get($sys.params.get('sys_context'),0)) &gt; 0 </expression>
+        <id>0</id>
+        <jexl-script id="5">
+          <text>$tools.number.toNumber($tools.list.get($sys.params.get('sys_context'),0)) &gt; 0;</text>
+        </jexl-script>
+        <variable>$isPublish</variable>
+      </binding>
+      <binding id="6">
+        <execution-order>3</execution-order>
+        <expression>$sys.item.getProperty("date_display_mode").Values[0].Long+$sys.item.getProperty("date_display_mode").Values[1].Long+$sys.item.getProperty("date_display_mode").Values[2].Long</expression>
+        <id>0</id>
+        <jexl-script id="7">
+          <text>$sys.item.getProperty("date_display_mode").Values[0].Long+$sys.item.getProperty("date_display_mode").Values[1].Long+$sys.item.getProperty("date_display_mode").Values[2].Long;</text>
+        </jexl-script>
+        <variable>$dateDisplay</variable>
+      </binding>
+      <binding id="8">
+        <execution-order>4</execution-order>
+        <expression>$sys.variables.rxs_imageBase </expression>
+        <id>0</id>
+        <jexl-script id="9">
+          <text>$sys.variables.rxs_imageBase;</text>
+        </jexl-script>
+        <variable>$rxs_imageBase</variable>
+      </binding>
+    </bindings>
+    <charset>UTF-8</charset>
+    <content-ids/>
+    <description>Single page, no body header, no rightnav, with Content Header</description>
+    <global-template/>
+    <global-template-usage>Default</global-template-usage>
+    <label>CancerGov SinglePage Content With Content Header</label>
+    <location-prefix/>
+    <location-suffix/>
+    <mime-type>text/html</mime-type>
+    <name>cgvPgBooklet</name>
+    <output-format>Page</output-format>
+    <publish-when>Never</publish-when>
+    <site-ids>
+      <site-id>307</site-id>
+    </site-ids>
+    <style-sheet-path/>
+    <template>#define($bodySlot)##
+&lt;span class="page-title"&gt;#field("long_title")&lt;/span&gt;&lt;br /&gt;##
+#field("body")##
+##slot("cgvBody" "" "" "" "" "")##
+##CGOV_Html_DisplayBackToTop()##
+#{end}##
+##
+#set($genericHTMLTemplate = "~/SnippetTemplates/GenericHtmlContentSnippet.ascx")##
+##
+#define($templateSnippets)##
+#set($myContentId = "#Get_Content_Item_ID($sys)")
+#CDE_PubXml_CreateTemplateSnippetInfos( "cgvBody" $genericHTMLTemplate $bodySlot $myContentId)##
+#{end}##
+##
+#if( $isPublish )##
+## Comma-separated list of slots which should be blocked.
+##set( $blockedSlots = [] )##
+#set( $blockedSlots = ["cgvBodyHeader","cgvContentHeader", "cgvRightNav"] )##
+#CDE_PubXml_OutputSinglePageAssemblyInfo("DefaultCancerGovTemplate" $templateSnippets $blockedSlots "en")##
+#else##
+&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;##
+##
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;#displayfield("long_title")&lt;/title&gt;
+&lt;link rel="stylesheet" href="${rxs_navbase}/stylesheets/nci.css" type="text/css" /&gt;
+&lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+&lt;/head&gt;
+&lt;body&gt;##
+## Start snippet 	
+##	
+## Site Banner 
+&lt;div id="bannerDiv" align="center"&gt;##        
+## SkipNav 
+&lt;table width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#a90101"&gt;##
+&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;&lt;div class="skip"&gt;&lt;a title="Skip to content" href="#skiptocontent"&gt;Skip to content&lt;/a&gt;##
+&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;##	
+##	
+## end SkipNav      
+##
+## Site Banner 
+&lt;div id="sitebanner" align="center"&gt;##          
+#slot("cgvSiteBanner" "" "" "" "" "")##
+&lt;/div&gt;##    
+## end Site Banner    
+&lt;/div&gt;##
+## End Site Banner 
+##	
+##	        
+## Page Core 	
+&lt;div align="center"&gt;##
+##	      
+## Content Header 
+## 
+&lt;div id="headerzone" align="center"&gt;##
+&lt;table cellspacing="0" width="751" cellpadding="0" border="0" bgcolor="#FFFFFF"&gt;##
+&lt;tr&gt;##
+&lt;td align="left"&gt;##	
+#slot("cgvContentHeader" "" "" "" "" "")##       
+&lt;/td&gt;##
+&lt;/tr&gt;##
+&lt;/table&gt;##
+##  
+##Date/Spanish English Tabs
+&lt;table cellspacing="0" width="751" cellpadding="0" border="0" bgcolor="#FFFFFF"&gt;##
+#CGOV_Html_Date_Display()##
+&lt;tr&gt;##
+&lt;td valign="top" bgcolor="#ffffff"&gt;&lt;img width="10" height="15" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;##
+&lt;/td&gt;##
+&lt;/tr&gt;##     
+##end Date/Spanish English Tabs 
+&lt;/table&gt;##
+&lt;/div&gt;##
+## end Content Header
+##    
+##  
+## 
+&lt;table width="771" cellspacing="0" cellpadding="0" border="0"&gt;##
+&lt;tr&gt;##		
+&lt;td valign="top"&gt;&lt;img src="$rxs_imageBase/spacer.gif" width="9" height="1" alt="" border="0"&gt;&lt;/td&gt;##
+##			
+## LeftNav 
+&lt;td valign="top" id="leftzone"&gt;##    
+&lt;table width="178" cellspacing="0" cellpadding="0" border="0"&gt;##
+&lt;tbody&gt;##
+&lt;tr&gt;##
+&lt;td valign="top" align="left"&gt;##        
+#set($spacer = '&lt;img height="6" border="0" alt="" src="http://www.cancer.gov/images/spacer.gif"&gt;')##
+#slot("cgvLeftNav" "" "" "$spacer" "" "")##    
+&lt;/td&gt;##
+&lt;td valign="top"&gt;&lt;img width="16" height="1" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##
+&lt;/tr&gt;##
+&lt;/tbody&gt;##
+&lt;/table&gt;##
+&lt;table width="1" cellspacing="0" cellpadding="0" border="0"&gt;##
+&lt;tbody&gt;##
+&lt;tr&gt;##
+&lt;td&gt;&lt;img width="1" height="6" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##
+&lt;/tr&gt;##
+&lt;/tbody&gt;##
+&lt;/table&gt;##
+&lt;/td&gt;##
+## end LeftNav 
+##  
+## Body 
+&lt;td width="100%" valign="top" id="contentzone"&gt;&lt;a name="skiptocontent"&gt;&lt;/a&gt;##
+&lt;table width="571" cellspacing="0" cellpadding="0" border="0"&gt;##
+&lt;tr&gt;##
+&lt;td valign="top"&gt;##
+##
+## Body Header 
+## &lt;div id="bodyheader"&gt;  
+## #CDE_XmlPub_BlockedSlotsElement("cgvBodyHeader")	
+## &lt;/div&gt;
+## end Body Header
+##    
+##			
+## Body Content will be rendered here.
+## The body slot is defined at the top of the template
+## and is shared with the XML generation
+$bodySlot
+##	 
+## RightNav 
+## &lt;div id="rightzone"&gt;         
+## #CDE_XmlPub_BlockedSlotsElement("cgvRightNav")	 
+## &lt;/div&gt;
+## end RightNav 
+&lt;/td&gt;##
+&lt;/tr&gt;##
+&lt;/table&gt;##
+##
+&lt;/td&gt;##
+## end Body 
+&lt;td valign="top"&gt;&lt;img width="10" height="1" border="0" alt="" src="$rxs_imageBase/spacer.gif"&gt;&lt;/td&gt;##
+&lt;/tr&gt;##
+&lt;/tbody&gt;##
+&lt;/table&gt;##     
+&lt;/div&gt;##
+## End Page Core  
+##       
+## Footer 
+&lt;div id="footerzone" align="center"&gt;##    
+#slot("cgvFooter" "" "" "" "" "")##
+&lt;/div&gt;##
+## end Footer 
+## 
+## End snippet 	
+&lt;/body&gt;
+&lt;/html&gt;
+#end</template>
+    <template-slot-ids>
+      <template-slot-id>527</template-slot-id>
+      <template-slot-id>533</template-slot-id>
+      <template-slot-id>525</template-slot-id>
+      <template-slot-id>529</template-slot-id>
+      <template-slot-id>530</template-slot-id>
+    </template-slot-ids>
+    <template-type>Shared</template-type>
+    <variant>false</variant>
+  </assemblytemplate>

@@ -1,0 +1,67 @@
+  <assemblytemplate id="1">
+    <guid>0-4-525</guid>
+    <active-assembly-type>Normal</active-assembly-type>
+    <assembler>Java/global/percussion/assembly/velocityAssembler</assembler>
+    <assembly-url>../assembler/render</assembly-url>
+    <bindings/>
+    <charset>UTF-8</charset>
+    <content-ids/>
+    <description>EI Full Page Event</description>
+    <global-template/>
+    <global-template-usage>Default</global-template-usage>
+    <label>P - EI Event</label>
+    <location-prefix/>
+    <location-suffix/>
+    <mime-type>text/html</mime-type>
+    <name>rffPgEiEvent</name>
+    <output-format>Page</output-format>
+    <publish-when>Default</publish-when>
+    <site-ids>
+      <site-id>301</site-id>
+    </site-ids>
+    <style-sheet-path/>
+    <template>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"&gt;
+
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;#displayfield("displaytitle")&lt;/title&gt;
+	&lt;meta content="Percussion Rhythmyx" name="generator"/&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div id="breadcrumbs"&gt;
+      #slot("rffNav" "" "" "" "" "template=rffSnEiNavBreadcrumbs")
+    &lt;/div&gt;
+    &lt;div id="ContentBox"&gt;
+		
+      &lt;div id="MainContent"&gt;
+	&lt;div class="ArticleAbstractChar"&gt;
+	  &lt;h1&gt;
+	    #field("displaytitle")
+	  &lt;/h1&gt;
+	  #field("body")
+	  &lt;br /&gt;
+	  &lt;span class="displaytitle"&gt;Details&lt;/span&gt;
+	  &lt;table border="0" cellpadding="0" cellspacing="0"&gt;
+	  &lt;tr&gt;&lt;th align='left'&gt;Start:&lt;/th&gt;&lt;td&gt;#datefield("event_start" "MM.dd.yyyy")&lt;/td&gt;&lt;/tr&gt;
+	  #datefield_if_set("&lt;tr&gt;&lt;th align='left'&gt;End:&lt;/th&gt;&lt;td&gt;" "event_end" "MM.dd.yyyy" "&lt;/td&gt;&lt;/tr&gt;")
+      #field_if_set("&lt;tr&gt;&lt;th align='left'&gt;Location:&lt;/th&gt;&lt;td&gt;" "event_location" "&lt;/td&gt;&lt;/tr&gt;")
+	  #set($event_type = $sys.item.getProperty("rx:event_type"))
+	  #if ($event_type)&lt;tr&gt;&lt;th align='left'&gt;Type:&lt;/th&gt;&lt;td&gt;$rx.keyword.getLabel("FF_Event_Types",$event_type.String)&lt;/td&gt;&lt;/tr&gt;#end
+	  &lt;/table&gt;
+	  #slot("rffContacts" '&lt;span class="Contact"&gt;Contact:' '' '' '&lt;/span&gt;' '')	    
+	&lt;/div&gt;
+
+	#slot("rffList" '&lt;div class="list"&gt;&lt;span class="relatedHeader"&gt;Related...&lt;/span&gt;&lt;br /&gt;' '' '&lt;br /&gt;' '&lt;/div&gt;' '')
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</template>
+    <template-slot-ids>
+      <template-slot-id>509</template-slot-id>
+      <template-slot-id>504</template-slot-id>
+      <template-slot-id>518</template-slot-id>
+    </template-slot-ids>
+    <template-type>Local</template-type>
+    <variant>false</variant>
+  </assemblytemplate>

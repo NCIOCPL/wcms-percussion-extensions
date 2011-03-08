@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PSXContentEditor contentType="346" enableRelatedContent="yes" iconSource="0" iconValue="" objectType="1" workflowId="6">
+  <PSXDataSet id="768">
+    <name>cgvFactSheet</name>
+    <description>default template</description>
+    <transactionType>none</transactionType>
+    <PSXContentEditorPipe id="0">
+      <name>cePipe</name>
+      <description>This is the ContentEditorLocaDef for Default ContentType</description>
+      <InputDataExits>
+        <PSXExtensionCallSet id="0">
+          <PSXExtensionCall id="10011">
+            <name>Java/global/percussion/xmldom/sys_xdTextCleanup</name>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>table_of_contents</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>rxW2Ktidy.properties</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>rxW2KserverPageTags.xml</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text></text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text></text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>yes</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="10010">
+            <name>Java/global/percussion/xmldom/sys_xdTextCleanup</name>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>body</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>rxW2Ktidy.properties</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>rxW2KserverPageTags.xml</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text></text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text></text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+            <PSXExtensionParamValue id="0">
+              <value>
+                <PSXTextLiteral id="0">
+                  <text>yes</text>
+                </PSXTextLiteral>
+              </value>
+            </PSXExtensionParamValue>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/content/CGV_systitlePopulate</name>
+          </PSXExtensionCall>
+        </PSXExtensionCallSet>
+      </InputDataExits>
+      <PSXContainerLocator>
+        <PSXTableSet>
+          <PSXTableLocator>
+            <PSXBackEndCredential id="0">
+              <alias>Cred1</alias>
+              <comment></comment>
+              <datasource></datasource>
+            </PSXBackEndCredential>
+          </PSXTableLocator>
+          <PSXTableRef alias="CT_CGVFACTSHEET" name="CT_CGVFACTSHEET"/>
+        </PSXTableSet>
+      </PSXContainerLocator>
+      <PSXContentEditorMapper>
+        <SystemFieldExcludes>
+          <FieldRef>sys_contentexpirydate</FieldRef>
+          <FieldRef>sys_contentstartdate</FieldRef>
+          <FieldRef>sys_pathname</FieldRef>
+          <FieldRef>sys_pubdate</FieldRef>
+          <FieldRef>sys_reminderdate</FieldRef>
+          <FieldRef>sys_suffix</FieldRef>
+        </SystemFieldExcludes>
+        <SharedFieldIncludes>
+          <SharedFieldGroupName>cgvPublishedPageMetaData</SharedFieldGroupName>
+          <SharedFieldGroupName>cgvSearchMetadata</SharedFieldGroupName>
+          <SharedFieldGroupName>cgvContentDates</SharedFieldGroupName>
+          <SharedFieldGroupName>cgvDateDisplayMode</SharedFieldGroupName>
+          <SharedFieldGroupName>cgvHtmlContentData</SharedFieldGroupName>
+          <SharedFieldGroupName>cgvPageNavigation</SharedFieldGroupName>
+        </SharedFieldIncludes>
+        <PSXFieldSet name="CT_cgvFactSheet" repeatability="zeroOrMore" supportsSequencing="yes" type="parent" userSearchable="yes">
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="placeholder" showInPreview="yes" showInSummary="yes" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>CT_CGVFACTSHEET</tableAlias>
+                <column>PLACEHOLDER</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>50</DataFormat>
+            <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="type" showInPreview="yes" showInSummary="yes" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>CT_CGVFACTSHEET</tableAlias>
+                <column>TYPE</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>50</DataFormat>
+            <DefaultValue>
+              <DataLocator>
+                <PSXTextLiteral id="0">
+                  <text>cgvFactSheet</text>
+                </PSXTextLiteral>
+              </DataLocator>
+            </DefaultValue>
+            <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+            <PSXPropertySet>
+              <PSXProperty locked="yes" name="cleanupBrokenInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="yes" name="mayHaveInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+            </PSXPropertySet>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="usage" showInPreview="yes" showInSummary="yes" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>CT_CGVFACTSHEET</tableAlias>
+                <column>USAGE</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>50</DataFormat>
+            <DefaultValue>
+              <DataLocator>
+                <PSXTextLiteral id="0">
+                  <text>FactSheet</text>
+                </PSXTextLiteral>
+              </DataLocator>
+            </DefaultValue>
+            <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+            <PSXPropertySet>
+              <PSXProperty locked="no" name="allowActiveTags">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="yes" name="cleanupBrokenInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="no" name="cleanupNamespaces">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="no" name="mayContainIDs">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="yes" name="mayHaveInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+            </PSXPropertySet>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+        </PSXFieldSet>
+        <PSXUIDefinition>
+          <PSXDisplayMapper fieldSetRef="CT_cgvFactSheet" id="0">
+            <PSXDisplayMapping>
+              <FieldRef>sys_title</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_communityid</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_lang</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_currentview</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_workflowid</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_hibernateVersion</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>placeholder</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Placeholder:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10063" name="sys_HiddenInput"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Placeholder:</PSXDisplayText>
+                </ErrorLabel>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>long_title</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>short_title</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>long_description</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>short_description</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>meta_description</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>meta_keywords</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>date_first_published</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>date_last_modified</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>date_last_reviewed</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>date_next_review</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>cgvDateDisplayMode</FieldRef>
+              <PSXUISet/>
+              <PSXDisplayMapper fieldSetRef="cgvDateDisplayMode" id="1">
+                <PSXDisplayMapping>
+                  <FieldRef>date_display_mode</FieldRef>
+                  <PSXUISet/>
+                </PSXDisplayMapping>
+              </PSXDisplayMapper>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>body</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>backtotop</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>table_of_contents</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>pretty_url_name</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>do_not_index</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>cgvSearchMetadata</FieldRef>
+              <PSXUISet/>
+              <PSXDisplayMapper fieldSetRef="cgvSearchMetadata" id="2">
+                <PSXDisplayMapping>
+                  <FieldRef>search_filter</FieldRef>
+                  <PSXUISet/>
+                </PSXDisplayMapping>
+              </PSXDisplayMapper>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>usage</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Usage:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10399" name="sys_DropDownSingle"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Usage:</PSXDisplayText>
+                </ErrorLabel>
+                <PSXChoices sortOrder="ascending" type="local">
+                  <PSXEntry default="no" sequence="-1">
+                    <PSXDisplayText>FactSheet</PSXDisplayText>
+                    <Value>FactSheet</Value>
+                  </PSXEntry>
+                </PSXChoices>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>type</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Type:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10211" name="sys_HiddenInput"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Type:</PSXDisplayText>
+                </ErrorLabel>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>displaytitle</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+          </PSXDisplayMapper>
+        </PSXUIDefinition>
+      </PSXContentEditorMapper>
+      <userProperties>
+        <userProperty name="Control10046_Dependency10010">sys_xdTextCleanup</userProperty>
+        <userProperty name="Control10048_DependencyIds">10011</userProperty>
+        <userProperty name="Control10046_DependencyIds">10010</userProperty>
+        <userProperty name="Control10048_Dependency10011">sys_xdTextCleanup</userProperty>
+      </userProperties>
+    </PSXContentEditorPipe>
+    <PSXRequestor directDataStream="no" id="0">
+      <requestPage>cgvFactSheet</requestPage>
+      <SelectionParams/>
+      <ValidationRules/>
+      <characterEncoding>UTF-8</characterEncoding>
+      <MimeProperties>
+        <html>
+          <PSXTextLiteral id="0">
+            <text>text/html</text>
+          </PSXTextLiteral>
+        </html>
+        <htm>
+          <PSXTextLiteral id="0">
+            <text>text/html</text>
+          </PSXTextLiteral>
+        </htm>
+      </MimeProperties>
+    </PSXRequestor>
+  </PSXDataSet>
+  <PSXValidationRules maxErrorsToStop="10"/>
+  <PSXInputTranslations/>
+  <PSXOutputTranslations/>
+  <PSXWorkflowInfo type="inclusionary" values="6"/>
+</PSXContentEditor>

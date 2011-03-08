@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PSXContentEditor contentType="341" enableRelatedContent="yes" iconSource="0" iconValue="" objectType="1" workflowId="6">
+  <PSXDataSet id="768">
+    <name>nciTile</name>
+    <description>default template</description>
+    <transactionType>none</transactionType>
+    <PSXContentEditorPipe id="0">
+      <name>cePipe</name>
+      <description>This is the ContentEditorLocaDef for Default ContentType</description>
+      <InputDataExits>
+        <PSXExtensionCallSet id="0">
+          <PSXExtensionCall id="10431">
+            <name>Java/global/percussion/generic/sys_FileInfo</name>
+          </PSXExtensionCall>
+          <PSXExtensionCall id="0">
+            <name>Java/global/percussion/content/CGV_systitlePopulate</name>
+          </PSXExtensionCall>
+        </PSXExtensionCallSet>
+      </InputDataExits>
+      <PSXContainerLocator>
+        <PSXTableSet>
+          <PSXTableLocator>
+            <PSXBackEndCredential id="0">
+              <alias>Cred1</alias>
+              <comment></comment>
+              <datasource></datasource>
+            </PSXBackEndCredential>
+          </PSXTableLocator>
+          <PSXTableRef alias="CT_NCITILE" name="CT_NCITILE"/>
+        </PSXTableSet>
+      </PSXContainerLocator>
+      <PSXContentEditorMapper>
+        <SystemFieldExcludes>
+          <FieldRef>sys_contentexpirydate</FieldRef>
+          <FieldRef>sys_contentstartdate</FieldRef>
+          <FieldRef>sys_pathname</FieldRef>
+          <FieldRef>sys_pubdate</FieldRef>
+          <FieldRef>sys_reminderdate</FieldRef>
+          <FieldRef>sys_suffix</FieldRef>
+        </SystemFieldExcludes>
+        <SharedFieldIncludes>
+          <SharedFieldGroupName>cgvPublishedPageMetaData</SharedFieldGroupName>
+          <SharedFieldGroupName>sharedimage</SharedFieldGroupName>
+          <SharedFieldExcludes>
+            <FieldRef>do_not_index</FieldRef>
+            <FieldRef>long_description</FieldRef>
+            <FieldRef>meta_description</FieldRef>
+            <FieldRef>meta_keywords</FieldRef>
+            <FieldRef>pretty_url_name</FieldRef>
+            <FieldRef>short_description</FieldRef>
+            <FieldRef>short_title</FieldRef>
+            <FieldRef>img2</FieldRef>
+            <FieldRef>img2_ext</FieldRef>
+            <FieldRef>img2_filename</FieldRef>
+            <FieldRef>img2_height</FieldRef>
+            <FieldRef>img2_size</FieldRef>
+            <FieldRef>img2_type</FieldRef>
+            <FieldRef>img2_width</FieldRef>
+          </SharedFieldExcludes>
+        </SharedFieldIncludes>
+        <PSXFieldSet name="CT_nciTile" repeatability="zeroOrMore" supportsSequencing="yes" type="parent" userSearchable="yes">
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="placeholder" showInPreview="yes" showInSummary="yes" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>CT_NCITILE</tableAlias>
+                <column>PLACEHOLDER</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>50</DataFormat>
+            <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="type" showInPreview="yes" showInSummary="yes" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>CT_NCITILE</tableAlias>
+                <column>TYPE</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>50</DataFormat>
+            <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+            <PSXPropertySet>
+              <PSXProperty locked="yes" name="cleanupBrokenInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="yes" name="mayHaveInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+            </PSXPropertySet>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="url" showInPreview="yes" showInSummary="yes" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>CT_NCITILE</tableAlias>
+                <column>URL</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>255</DataFormat>
+            <OccurrenceSettings delimiter=";" dimension="required" multiValuedType="delimited"/>
+            <FieldRules>
+              <PSXFieldValidationRules maxErrorsToStop="2147483647">
+                <PSXRule boolean="and">
+                  <PSXExtensionCallSet id="0">
+                    <PSXExtensionCall id="0">
+                      <name>Java/global/percussion/content/sys_ValidateRequiredField</name>
+                      <PSXExtensionParamValue id="0">
+                        <value>
+                          <PSXSingleHtmlParameter id="0">
+                            <name>url</name>
+                          </PSXSingleHtmlParameter>
+                        </value>
+                      </PSXExtensionParamValue>
+                    </PSXExtensionCall>
+                  </PSXExtensionCallSet>
+                </PSXRule>
+                <PSXApplyWhen ifFieldEmpty="yes"/>
+              </PSXFieldValidationRules>
+            </FieldRules>
+            <PSXPropertySet>
+              <PSXProperty locked="yes" name="cleanupBrokenInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="yes" name="mayHaveInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+            </PSXPropertySet>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+          <PSXField forceBinary="no" mimetype="text/plain" modificationType="user" name="usage" showInPreview="yes" showInSummary="yes" type="local">
+            <DataLocator>
+              <PSXBackEndColumn id="0">
+                <tableAlias>CT_NCITILE</tableAlias>
+                <column>USAGE</column>
+                <columnAlias></columnAlias>
+              </PSXBackEndColumn>
+            </DataLocator>
+            <DataType>text</DataType>
+            <DataFormat>50</DataFormat>
+            <DefaultValue>
+              <DataLocator>
+                <PSXTextLiteral id="0">
+                  <text>Tile</text>
+                </PSXTextLiteral>
+              </DataLocator>
+            </DefaultValue>
+            <OccurrenceSettings delimiter=";" dimension="optional" multiValuedType="delimited"/>
+            <PSXPropertySet>
+              <PSXProperty locked="no" name="allowActiveTags">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="yes" name="cleanupBrokenInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="no" name="cleanupNamespaces">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="no" name="mayContainIDs">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+              <PSXProperty locked="yes" name="mayHaveInlineLinks">
+                <Value type="Boolean">no</Value>
+              </PSXProperty>
+            </PSXPropertySet>
+            <PSXSearchProperties enableTransformation="no" id="0" tokenizeSearchContent="no" userCustomizable="yes" userSearchable="yes" visibleToGlobalQuery="yes"/>
+          </PSXField>
+        </PSXFieldSet>
+        <PSXUIDefinition>
+          <PSXDisplayMapper fieldSetRef="CT_nciTile" id="0">
+            <PSXDisplayMapping>
+              <FieldRef>sys_title</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_communityid</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_lang</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_currentview</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_workflowid</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>sys_hibernateVersion</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>placeholder</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Placeholder:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10066" name="sys_HiddenInput"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Placeholder:</PSXDisplayText>
+                </ErrorLabel>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>long_title</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img_alt</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_height</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_width</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_ext</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_filename</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_size</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>img1_type</FieldRef>
+              <PSXUISet/>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>url</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Url:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10183" name="sys_EditBox">
+                  <PSXParam name="maxlength">
+                    <DataLocator>
+                      <PSXTextLiteral id="0">
+                        <text>255</text>
+                      </PSXTextLiteral>
+                    </DataLocator>
+                  </PSXParam>
+                </PSXControlRef>
+                <ErrorLabel>
+                  <PSXDisplayText>Url:</PSXDisplayText>
+                </ErrorLabel>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>type</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Type:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10239" name="sys_HiddenInput"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Type:</PSXDisplayText>
+                </ErrorLabel>
+              </PSXUISet>
+            </PSXDisplayMapping>
+            <PSXDisplayMapping>
+              <FieldRef>usage</FieldRef>
+              <PSXUISet>
+                <Label>
+                  <PSXDisplayText>Usage:</PSXDisplayText>
+                </Label>
+                <PSXControlRef id="10432" name="sys_DropDownSingle"/>
+                <ErrorLabel>
+                  <PSXDisplayText>Usage:</PSXDisplayText>
+                </ErrorLabel>
+                <PSXChoices sortOrder="ascending" type="local">
+                  <PSXEntry default="no" sequence="-1">
+                    <PSXDisplayText>Tile</PSXDisplayText>
+                    <Value>Tile</Value>
+                  </PSXEntry>
+                </PSXChoices>
+              </PSXUISet>
+            </PSXDisplayMapping>
+          </PSXDisplayMapper>
+        </PSXUIDefinition>
+      </PSXContentEditorMapper>
+      <userProperties>
+        <userProperty name="Control76_Dependency10431">sys_FileInfo</userProperty>
+        <userProperty name="Control76_DependencyIds">10431</userProperty>
+      </userProperties>
+    </PSXContentEditorPipe>
+    <PSXRequestor directDataStream="no" id="0">
+      <requestPage>nciTile</requestPage>
+      <SelectionParams/>
+      <ValidationRules/>
+      <characterEncoding>UTF-8</characterEncoding>
+      <MimeProperties>
+        <html>
+          <PSXTextLiteral id="0">
+            <text>text/html</text>
+          </PSXTextLiteral>
+        </html>
+        <htm>
+          <PSXTextLiteral id="0">
+            <text>text/html</text>
+          </PSXTextLiteral>
+        </htm>
+      </MimeProperties>
+    </PSXRequestor>
+  </PSXDataSet>
+  <PSXValidationRules maxErrorsToStop="10"/>
+  <PSXInputTranslations/>
+  <PSXOutputTranslations/>
+  <PSXWorkflowInfo type="inclusionary" values="6"/>
+</PSXContentEditor>
