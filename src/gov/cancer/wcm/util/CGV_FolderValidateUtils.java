@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import javax.jcr.ItemNotFoundException;
 import javax.jcr.RepositoryException;
@@ -504,6 +505,47 @@ public class CGV_FolderValidateUtils {
     	PSCoreItem item = items.get(0);
 		return item;
 	}
+    
+    /**
+     * Returns a list of Strings containing all of the sites that a 
+     * piece of content lives in.
+     * @param contentid
+     * @param navon - is the item a navon?  If it is, append "Navon" to the site name.
+     * @return
+     * @throws PSErrorException
+     */
+    public List<String> getSites(int contentid, boolean navon) throws PSErrorException
+    {	
+		List<String> sites = new ArrayList<String>();
+		IPSGuid guid = guidManager.makeGuid(new PSLocator(contentid, -1));
+		List<String> itemPaths = Arrays.asList(contentWs.findFolderPaths(guid)); 
+		for( String currPath : itemPaths ){
+			StringTokenizer st = new StringTokenizer(currPath, "/");
+			String sitePath = "";
+			if(st.countTokens() >= 2){
+				st.nextToken();
+				sitePath = st.nextToken();
+			}
+			else{
+				throw new PSErrorException();
+			}
+			if(!navon){
+				if(!sitePath.equalsIgnoreCase("") && !sites.contains(sitePath)){
+					sites.add(sitePath);
+				}
+			}
+			else{
+				if(sitePath != ""){
+					sitePath += "Navon";
+					if(!sites.contains(sitePath)){
+						sites.add(sitePath);
+					}
+				}
+			}
+		}
+		
+    	return sites;
+    }
 
     public IPSExtensionDef getExtensionDef() {
         return extensionDef;
