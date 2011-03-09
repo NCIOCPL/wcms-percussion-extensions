@@ -1,5 +1,6 @@
 package gov.cancer.wcm.extensions;
 
+import gov.cancer.wcm.util.CGV_FolderValidateUtils;
 import gov.cancer.wcm.util.CGV_ParentChildManager;
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
@@ -22,12 +23,14 @@ import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
+import com.percussion.pso.utils.PSONodeCataloger;
 import com.percussion.rx.publisher.IPSPublisherJobStatus;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.rx.publisher.data.PSDemandWork;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.catalog.PSTypeEnum;
+import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.guidmgr.data.PSGuid;
@@ -42,6 +45,7 @@ import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
+import com.percussion.webservices.system.PSSystemWsLocator;
 import com.percussion.xml.PSXmlDocumentBuilder;
 
 
@@ -60,6 +64,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	private static IPSWorkflowService workflowService;
 	private static IPSCmsContentSummaries contentSummariesService;
 	
+	private static CGV_FolderValidateUtils valUtil = null;
 	private IPSRequestContext request = null;
 	private Map<String,Map<String,List<String>>> editionList;
 	private boolean waitForStatus = true;
@@ -108,6 +113,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			workflowService = PSWorkflowServiceLocator.getWorkflowService();
 			contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 		}
+    	if (valUtil == null) {
+	    	valUtil = new CGV_FolderValidateUtils();
+	        if (valUtil.getContentManager() == null) valUtil.setContentManager(PSContentMgrLocator.getContentMgr());
+	        if (valUtil.getContentWs() == null) valUtil.setContentWs(PSContentWsLocator.getContentWebservice());
+	        if (valUtil.getGuidManager() == null) valUtil.setGuidManager(PSGuidManagerLocator.getGuidMgr());
+	        if (valUtil.getNodeCataloger() == null) valUtil.setNodeCataloger(new PSONodeCataloger());
+	        if (valUtil.getSystemWs() == null) valUtil.setSystemWs(PSSystemWsLocator.getSystemWebservice()); 
+    	}
 	}
 
 	public CGV_OnDemandPublishService() {
@@ -137,6 +150,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		
 		Boolean navon = false;
 		Boolean tcga = false;
+		Boolean cgv = false;
 		Boolean shared_site = false;
 		
 		List<IPSGuid> loadList = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(request.getParameter("sys_contentid"))));
@@ -153,13 +167,32 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		Long contentTypeId = item.getContentTypeId();
 		
 		if(CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr)){
+			//set site == navon.
 			navon = true;
 		}
 		if(CGV_TopTypeChecker.isTCGAContent(contentTypeId.intValue(),cmgr)){
 			tcga = true;
 		}
 		if(CGV_TopTypeChecker.isCrossSiteContent(contentTypeId.intValue(),cmgr)){
-			shared_site = true;
+			//Find what site to use.
+			List<String> sites = null;
+			try {
+				sites = valUtil.getSites(contentId);
+			} catch (PSErrorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(!sites.isEmpty()){
+				for(String site : sites){
+					if(site.equalsIgnoreCase("TCGA")){
+						tcga = true;
+					}
+					else if(site.equalsIgnoreCase("CancerGov")){
+						cgv = true;
+					}
+				}
+			}
+			//shared_site = true;
 		}
 		
 //		CGV_StateHelper stateHelp = new CGV_StateHelper(request, navon);
@@ -183,12 +216,14 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			m = editionList.get("CGV_Navon_Workflow");
 
 		}
-		if(shared_site){
+//		if(shared_site){
+//			m = editionList.get("Shared Workflow");
+//		}else 
+		if(tcga && cgv){
 			m = editionList.get("Shared Workflow");
 		}
 		else if(tcga){
 			m = editionList.get("TCGA Workflow");
-
 		}
 		else{
 			m = editionList.get("CancerGov Workflow");
@@ -322,7 +357,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		initServices();
 	}
-
+	
 	/**
 	 * Get recursive list of all parent content items to this item
 	 * @param currItemId
@@ -503,5 +538,6 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	public void setRequest(IPSRequestContext request) {
 		this.request = request;
 	}
+	
 
 }
