@@ -164,6 +164,10 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		}
 
 		Long contentTypeId = item.getContentTypeId();
+		
+		if(CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr)){
+			navon = true;
+		}
 
 		int id = Integer.parseInt(request.getParameter("sys_contentid"));	
 		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(id);	
