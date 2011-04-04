@@ -164,10 +164,11 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		}
 
 		Long contentTypeId = item.getContentTypeId();
-		
-		if(CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr)){
-			navon = true;
-		}
+
+//		if(CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr)){
+//			navon = true;
+//		}
+		navon = isNavon(Integer.parseInt(request.getParameter("sys_contentid")));
 
 		int id = Integer.parseInt(request.getParameter("sys_contentid"));	
 		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(id);	
@@ -213,8 +214,8 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 
 					for(String path : itemPaths){
 						PSDemandWork work = new PSDemandWork();
-						List<String> editions = findEditions(path, CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr), publishingFlag.equalsIgnoreCase("y"));
-
+						//List<String> editions = findEditions(path, CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr), publishingFlag.equalsIgnoreCase("y"));
+						List<String> editions = findEditions(path, isNavon(i), publishingFlag.equalsIgnoreCase("y"));
 						IPSGuid folderGuid = cmgr.getIdByPath(path);
 						if (folderGuid != null){
 							log.debug("Adding item");
@@ -310,6 +311,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	/**
 	 * Get recursive list of all parent content items to this item
 	 * @param currItemId
+	 * @param navon - is the item a navon?
 	 * @return List of parent items
 	 */
 	private List<Integer> getParents(int currItemId, boolean navon) {
@@ -382,7 +384,8 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 					IPSGuid cid = gmgr.makeGuid(new PSLocator(currItemId));
 					localPublishList = pcm.getParentCIDs(cid, false, 0);	//gets 1 layer of parents
 					log.debug("getParents: got localPublishList");
-				} catch (PSErrorException e) {
+				} 
+				catch (PSErrorException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					return null;
@@ -391,7 +394,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 					//create a temp list to hold new parents items so we don't screw the loop
 					List<Integer>tempList = new ArrayList<Integer>();
 					for (int sItem : localPublishList) {
-						List<Integer> parentsList = this.getParents(sItem, navon);	//recurses! foiled again! 
+						List<Integer> parentsList = this.getParents(sItem, isNavon(sItem));	//recurses! foiled again! 
 						if (parentsList != null) {
 							for (int p : parentsList) {
 								log.debug("getParents: DEBUG: parent item CID: " + p);
@@ -402,7 +405,8 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 					log.debug("getParents: before temp list");
 					for (int tItem : tempList) {
 						//add the items to the list to be returned
-						localPublishList.add(tItem);
+						if(!localPublishList.contains(tItem))
+							localPublishList.add(tItem);
 					}
 				}
 			}
@@ -442,6 +446,28 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		return localPublishList;
 	}
 
+	/**
+	 * Returns if an item is a navon or not.
+	 * @return
+	 */
+	private boolean isNavon(int contentID){
+		List<IPSGuid> loadList = Collections.<IPSGuid> singletonList(gmgr.makeGuid(new PSLocator(contentID)));
+		List<PSCoreItem> items = null;
+		PSCoreItem item = null;
+		try {
+			items = cmgr.loadItems(loadList, true, false, false, false);
+			item = items.get(0);
+		} catch (PSErrorResultsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Long contentTypeId = item.getContentTypeId();
+		
+		return CGV_TopTypeChecker.navon(contentTypeId.intValue(),cmgr);
+	}
+	
+	
 	/**
 	 * Returns the list of editions to run for an item based off of
 	 * its site path, and if it is a navon or not.
