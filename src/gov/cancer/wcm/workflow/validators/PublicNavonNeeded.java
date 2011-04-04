@@ -83,7 +83,7 @@ public class PublicNavonNeeded extends BaseContentTypeValidator {
 
 				//return (validFlag.equals("y") || validFlag.equals("i"));	
 				//if(!validFlag.equals("y") && !validFlag.equals("i"))
-				if(!validFlag.equals("y") && !validFlag.equals("e"))
+				if(!validFlag.equals("y") && !validFlag.equals("e") && !validFlag.equals("s") && !validFlag.equals("i"))
 				{
 					allNavonsPublic = false;
 					wvc.getLog().debug("The navon with content id: " + summary.getContentId() + ", is not in Public." );

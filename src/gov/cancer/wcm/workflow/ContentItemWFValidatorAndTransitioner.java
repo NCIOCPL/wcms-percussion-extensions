@@ -195,6 +195,7 @@ public class ContentItemWFValidatorAndTransitioner {
 				/**
 				 * Transition Items
 				 * --------------------------------------------------------------------------
+				 * PRECURSOR: Check if the item is in an ignore workflow.
 				 * 1.  Find the state item is in.
 				 * 2.  From the config, get the list of transition mappings/triggers.
 				 * 3.  Compare original context destination, to current state of item.
@@ -203,34 +204,54 @@ public class ContentItemWFValidatorAndTransitioner {
 				 * --------------------------------------------------------------------------
 				 */
 
-				//1. Find the state item is in.
-				PSState itemStartState = null;
-				try {
-					itemStartState = workInfoFinder.findWorkflowState(Integer.toString(item.getContentId()));
-				} catch (PSException e) {
-					e.printStackTrace();
-					//TODO: Log the error.
+				//PRECURSOR:  Check if the item is in an ignore workflow
+				int itemState = item.getContentStateId();
+				int itemWFId = item.getWorkflowAppId();		   
+
+				PSWorkflow itemWorkflow = workflowService.loadWorkflow(new PSGuid(PSTypeEnum.WORKFLOW, itemWFId));
+				PSState iState = workflowService.loadWorkflowState(new PSGuid(PSTypeEnum.WORKFLOW_STATE, itemState),
+						new PSGuid(PSTypeEnum.WORKFLOW,itemWFId));	   
+
+				//Check to see if the workflow code is going to be ignored (configurable list of triggers/workflows to ignore)
+
+				boolean ignore = false;
+				for( String currWkflw : ignoreCheck.getIgnoreWorkflows() ){
+					//If the current workflow is in the list of ignored workflows, return.
+					if(itemWorkflow.getName().equalsIgnoreCase(currWkflw) && !ignore){
+						ignore = true;
+					}
 				}
-				if(itemStartState != null ){
-					//2, 3, and 4.
-					List<PSTransition> transitionList = wvc.getTransitions(itemStartState.getName());
 
-					//5. For all triggers in the list from Step 4, PercussionTransition(item).
-//					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
-					for( PSTransition t :transitionList ){
-//						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
-						//try {
-						wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
-								", Trigger Name: "+t.getTrigger());
+				if(!ignore){
+					//1. Find the state item is in.
+					PSState itemStartState = null;
+					try {
+						itemStartState = workInfoFinder.findWorkflowState(Integer.toString(item.getContentId()));
+					} catch (PSException e) {
+						e.printStackTrace();
+						//TODO: Log the error.
+					}
+					if(itemStartState != null ){
+						//2, 3, and 4.
+						List<PSTransition> transitionList = wvc.getTransitions(itemStartState.getName());
 
-						PercussionWFTransition.transitionItem(item.getContentId(), t.getTrigger(), "", null);
-						//systemWebService.transitionItems(temp, t.getTrigger());
+						//5. For all triggers in the list from Step 4, PercussionTransition(item).
+						//					IPSGuid guid = guidManager.makeGuid(item.getCurrentLocator());
+						for( PSTransition t :transitionList ){
+							//						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
+							//try {
+							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
+									", Trigger Name: "+t.getTrigger());
+
+							PercussionWFTransition.transitionItem(item.getContentId(), t.getTrigger(), "", null);
+							//systemWebService.transitionItems(temp, t.getTrigger());
 
 
-						//						} catch (PSErrorsException e) {
-						//							// TODO Auto-generated catch block
-						//							e.printStackTrace();
-						//						}
+							//						} catch (PSErrorsException e) {
+							//							// TODO Auto-generated catch block
+							//							e.printStackTrace();
+							//						}
+						}
 					}
 				}
 			}
@@ -445,7 +466,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	throws WFValidationException
 	{
 		List<PSRelationship> rels = new ArrayList<PSRelationship>();
-		
+
 		PSRelationshipFilter filter = new PSRelationshipFilter();		
 		//This is going to be the current/edit revision for this content item.
 		filter.setDependent(contentItemLocator);		
@@ -464,7 +485,7 @@ public class ContentItemWFValidatorAndTransitioner {
 		//means the item is shared.
 		//ArrayList<PSRelationship> followRels = new ArrayList<PSRelationship>();
 		ArrayList<Integer> uniqueOwners = new ArrayList<Integer>();
-		
+
 		for(PSRelationship rel: rels) {
 			String relName = rel.getConfig().getName();
 			BaseRelationshipWFTransitionCheck transitionCheck = workflowConfig.getRelationshipConfigs().GetRelationshipWFTransitionConfigOrDefault(relName);
@@ -474,10 +495,10 @@ public class ContentItemWFValidatorAndTransitioner {
 				}
 			}
 		}
-		
+
 		return uniqueOwners.size();
 	}
-	
+
 	/**
 	 * Checks how many relationships exist coming into the item.  This will check
 	 * ALL relationships, not just ones that are marked as follow relationships.
@@ -490,7 +511,7 @@ public class ContentItemWFValidatorAndTransitioner {
 	throws WFValidationException
 	{
 		List<PSRelationship> rels = new ArrayList<PSRelationship>();
-		
+
 		PSRelationshipFilter filter = new PSRelationshipFilter();		
 		//This is going to be the current/edit revision for this content item.
 		filter.setDependent(contentItemLocator);		
@@ -509,17 +530,17 @@ public class ContentItemWFValidatorAndTransitioner {
 		//means the item is shared.
 		//ArrayList<PSRelationship> followRels = new ArrayList<PSRelationship>();
 		ArrayList<Integer> uniqueOwners = new ArrayList<Integer>();
-		
+
 		for(PSRelationship rel: rels) {
 			if(!uniqueOwners.contains(rel.getOwner().getId())){
 				uniqueOwners.add(rel.getOwner().getId());
 			}
 		}
-		
+
 		return uniqueOwners.size();
 	}
-	
-	
+
+
 	/**
 	 * Determines if an item is participating in more than one Active Assembly relationship
 	 * as a dependent. (checks the follow relationships)
@@ -531,38 +552,38 @@ public class ContentItemWFValidatorAndTransitioner {
 	public static boolean isShared(PSLocator contentItemLocator, WorkflowValidationContext wvc)
 	throws WFValidationException
 	{
-		
+
 		return (numberOfUniqueFollowRels(contentItemLocator, wvc) > 1);
-		
-		
-//		List<PSRelationship> rels = new ArrayList<PSRelationship>();
-//
-//		PSRelationshipFilter filter = new PSRelationshipFilter();		
-//		//This is going to be the current/edit revision for this content item.
-//		filter.setDependent(contentItemLocator);		
-//		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
-//
-//		try {
-//			rels = systemWebService.loadRelationships(filter);
-//		} catch (Exception ex) {
-//			wvc.getLog().error("isShared: Could not get content type name for id: " + contentItemLocator.getId(), ex);
-//			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
-//		}
-//
-//		//Count the number of follow relationships to see if it is shared.  More than one follow
-//		//means the item is shared.
-//		int owner = -1;
-//		for(PSRelationship rel: rels) {
-//
-//			if(owner == -1){
-//				owner = rel.getOwner().getId();
-//			}
-//			else if(owner != rel.getOwner().getId())
-//			{
-//				return true;
-//			}
-//		}
-//		return false;
+
+
+		//		List<PSRelationship> rels = new ArrayList<PSRelationship>();
+		//
+		//		PSRelationshipFilter filter = new PSRelationshipFilter();		
+		//		//This is going to be the current/edit revision for this content item.
+		//		filter.setDependent(contentItemLocator);		
+		//		filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+		//
+		//		try {
+		//			rels = systemWebService.loadRelationships(filter);
+		//		} catch (Exception ex) {
+		//			wvc.getLog().error("isShared: Could not get content type name for id: " + contentItemLocator.getId(), ex);
+		//			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);			
+		//		}
+		//
+		//		//Count the number of follow relationships to see if it is shared.  More than one follow
+		//		//means the item is shared.
+		//		int owner = -1;
+		//		for(PSRelationship rel: rels) {
+		//
+		//			if(owner == -1){
+		//				owner = rel.getOwner().getId();
+		//			}
+		//			else if(owner != rel.getOwner().getId())
+		//			{
+		//				return true;
+		//			}
+		//		}
+		//		return false;
 	}
 
 	/**
@@ -596,10 +617,10 @@ public class ContentItemWFValidatorAndTransitioner {
 				return (contentItemSummary.getPublicRevision() != -1);
 			}
 		}
- 
+
 		greaterOrEqual = workflowConfig.getWorkflowStates().greaterThanOrEqual(state.getName(), wvc.getDestinationState().getName());
 		return (contentItemSummary.getPublicRevision() != -1) || greaterOrEqual;
-		
+
 	}	
 
 	/**
@@ -691,13 +712,13 @@ public class ContentItemWFValidatorAndTransitioner {
 	 * Checks to see if all Parent/Ancestor navons have a public revision.
 	 * @return
 	 */
-//	private static boolean areParentNavonsPublic(PSComponentSummary contentItemSummary) {
-		//TODO:Implement areParentNavonsPublic
-		//getParentFolderRelationships()
-		//wvc.addError(ERR_FIELD, ERR_FIELD_DISP, NAVON_NOT_PUBLIC, args)
+	//	private static boolean areParentNavonsPublic(PSComponentSummary contentItemSummary) {
+	//TODO:Implement areParentNavonsPublic
+	//getParentFolderRelationships()
+	//wvc.addError(ERR_FIELD, ERR_FIELD_DISP, NAVON_NOT_PUBLIC, args)
 
-//		return false;
-//	}
+	//		return false;
+	//	}
 
 	/**
 	 * Helper method to get a PSComponentSummary by contentID.  Classes can call

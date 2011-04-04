@@ -229,8 +229,8 @@ public class CGV_ParentChildManager {
 			parents = getParents(src);
 		}
 		if(!parents.isEmpty()){
+			returnThis = new ArrayList<Integer>();
 			for( PSItemSummary item : parents ){
-				returnThis = new ArrayList<Integer>();
 				returnThis.add(loadItem(item.getGUID()).getContentId());
 			}
 		}
