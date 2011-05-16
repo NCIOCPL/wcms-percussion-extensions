@@ -362,6 +362,21 @@
 						</list>
 					</constructor-arg>
 				</bean>				
+				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
+					<constructor-arg><value>ParentChildIgnore</value></constructor-arg>
+					<constructor-arg>
+						<list>
+							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
+							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
+							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<!-- At this point we know we are going to transition the dependent, but can we? -->
+							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />								
+							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
+			</list>
+		</constructor-arg>
+				</bean>			
 			</list>
 		</constructor-arg>
 		<constructor-arg>

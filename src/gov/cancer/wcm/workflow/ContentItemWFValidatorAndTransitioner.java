@@ -1,6 +1,7 @@
 package gov.cancer.wcm.workflow;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import gov.cancer.wcm.util.CGV_TypeNames;
@@ -18,6 +19,8 @@ import com.percussion.error.PSException;
 import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.catalog.PSTypeEnum;
+import com.percussion.services.guidmgr.IPSGuidManager;
+import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.guidmgr.data.PSGuid;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
@@ -27,8 +30,12 @@ import com.percussion.services.workflow.data.PSState;
 import com.percussion.services.workflow.data.PSTransition;
 import com.percussion.services.workflow.data.PSWorkflow;
 import com.percussion.util.PSItemErrorDoc;
+import com.percussion.utils.guid.IPSGuid;
 import com.percussion.utils.request.PSRequestInfo;
 import com.percussion.webservices.PSErrorException;
+import com.percussion.webservices.PSErrorsException;
+import com.percussion.webservices.content.IPSContentWs;
+import com.percussion.webservices.content.PSContentWsLocator;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
 
@@ -49,6 +56,8 @@ public class ContentItemWFValidatorAndTransitioner {
 	private static IPSSystemWs systemWebService;
 	private static IPSWorkflowService workflowService;
 	private static PSOWorkflowInfoFinder workInfoFinder;
+	protected static IPSGuidManager gmgr = null;
+	protected static IPSContentWs cmgr = null;
 
 	static {
 		contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
@@ -56,6 +65,8 @@ public class ContentItemWFValidatorAndTransitioner {
 		systemWebService = PSSystemWsLocator.getSystemWebservice();
 		workflowService = PSWorkflowServiceLocator.getWorkflowService();
 		workInfoFinder = new PSOWorkflowInfoFinder();
+		gmgr = PSGuidManagerLocator.getGuidMgr();
+		cmgr = PSContentWsLocator.getContentWebservice();
 	}
 
 	public ContentItemWFValidatorAndTransitioner(Log log) {
@@ -190,6 +201,9 @@ public class ContentItemWFValidatorAndTransitioner {
 
 			PSComponentSummary[] itemsToTransition = wvc.getItemsToTransition();
 			wvc.getLog().debug("Items to transition: " + itemsToTransition.length);
+			
+			//if any of the items are checked out to the same user, check them in
+			checkin( Arrays.asList(itemsToTransition), wvc);
 
 			for(PSComponentSummary item : itemsToTransition){
 				/**
@@ -242,10 +256,15 @@ public class ContentItemWFValidatorAndTransitioner {
 							//try {
 							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
 									", Trigger Name: "+t.getTrigger());
-
+						//5. For all triggers in the list from Step 4, PercussionTransition(item).
+						for( PSTransition t :transitionList ){
+							//						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
+							//try {
+							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
+									", Trigger Name: "+t.getTrigger());
+							
 							PercussionWFTransition.transitionItem(item.getContentId(), t.getTrigger(), "", null);
 							//systemWebService.transitionItems(temp, t.getTrigger());
-
 
 							//						} catch (PSErrorsException e) {
 							//							// TODO Auto-generated catch block
@@ -265,6 +284,22 @@ public class ContentItemWFValidatorAndTransitioner {
 		//PSItemErrorDoc.addError(errorDoc, ERR_FIELD, ERR_FIELD_DISP, "Stopping For Testing", null);
 		//throw new PSException("STOPPING");
 
+	}
+	
+	private void checkin(List<PSComponentSummary> items, WorkflowValidationContext wvc){
+		List<IPSGuid> checkinList = new ArrayList<IPSGuid>();
+		for(PSComponentSummary item : items){
+			//isCheckedOutToOtherUser returns null if the user is the same as the checked out user
+			if(isCheckedOutToOtherUser(item, wvc) == null){
+				checkinList.add(gmgr.makeGuid(new PSLocator(item.getContentId())));
+			} 
+		}
+		try {
+			cmgr.checkinItems(checkinList, null);
+		} catch (PSErrorsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public PSComponentSummary getTransitionRoot(PSComponentSummary contentItemSummary, WorkflowValidationContext wvc) {
