@@ -289,7 +289,9 @@ public class ContentItemWFValidatorAndTransitioner {
 			} 
 		}
 		try {
-			cmgr.checkinItems(checkinList, null);
+			if(!checkinList.isEmpty()){
+				cmgr.checkinItems(checkinList, null);
+			}
 		} catch (PSErrorsException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
