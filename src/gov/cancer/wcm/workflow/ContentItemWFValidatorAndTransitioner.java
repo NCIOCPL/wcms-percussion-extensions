@@ -256,12 +256,6 @@ public class ContentItemWFValidatorAndTransitioner {
 							//try {
 							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
 									", Trigger Name: "+t.getTrigger());
-						//5. For all triggers in the list from Step 4, PercussionTransition(item).
-						for( PSTransition t :transitionList ){
-							//						List<IPSGuid> temp = Collections.<IPSGuid>singletonList(guid);
-							//try {
-							wvc.getLog().debug("Transitioning item with content id: "+item.getContentId()+
-									", Trigger Name: "+t.getTrigger());
 							
 							PercussionWFTransition.transitionItem(item.getContentId(), t.getTrigger(), "", null);
 							//systemWebService.transitionItems(temp, t.getTrigger());
