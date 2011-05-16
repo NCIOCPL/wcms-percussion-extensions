@@ -543,7 +543,6 @@ public class CGV_FolderValidateUtils {
 				}
 			}
 		}
-		
     	return sites;
     }
 
