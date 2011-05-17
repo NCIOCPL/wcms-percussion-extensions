@@ -547,6 +547,7 @@ public class CGV_FolderValidateUtils {
 		
     	return sites;
     }
+<<<<<<< .working
     
     /**
      * Returns a list of Strings containing all of the site paths that a piece 
@@ -657,9 +658,251 @@ public class CGV_FolderValidateUtils {
     	}
     	return unique;
     }
+=======
+    
+    /**
+     * Returns a list of Strings containing all of the site paths that a piece 
+     * of content lives in.
+     * "//Sites/<Site Name>/%"
+     * @param contentid
+     * @return
+     * @throws PSErrorException
+     */
+    public List<String> getSitePaths(int contentid) throws PSErrorException
+    {	
+		List<String> paths = new ArrayList<String>();
+		IPSGuid guid = guidManager.makeGuid(new PSLocator(contentid, -1));
+		List<String> itemPaths = Arrays.asList(contentWs.findFolderPaths(guid)); 
+		for( String currPath : itemPaths ){
+			StringTokenizer st = new StringTokenizer(currPath, "/");
+			String sitePath = "//";
+			if(st.countTokens() >= 2){
+				sitePath += st.nextToken()+"/"+st.nextToken()+"/";
+			}
+			else{
+				throw new PSErrorException();
+			}
+			if(sitePath != "" && !paths.contains(sitePath)){
+				paths.add(sitePath);
+			}
+		}
+		
+    	return paths;
+    }
+    
+    /**
+     *  See if a field value is unique in the given site for a new item.
+     * @param folderId id of the folder
+     * @param fieldName name of the field
+     * @param fieldValue the desired value of the field for the new item.
+     * @param  path If set will check this path for uniqueness,  can use % to check subfolders
+     * @param contentId the content ID of the item
+     * @return true if its unique.
+     * @throws PSErrorException
+     * @throws InvalidQueryException
+     * @throws RepositoryException
+     * @throws PSErrorResultsException
+     * @throws PSException 
+     */
+    public boolean isFieldValueUniqueInSite(int folderId, String fieldName, String fieldValue, String typeList, int contentId)
+    throws PSErrorException, InvalidQueryException, RepositoryException, PSErrorResultsException, PSException {
+		log.debug("isFieldValueUniqueInSite(): folderId = "+ folderId + " fieldName = " + fieldName + " fieldValue = " + fieldValue + " contentId = " + contentId);
+    	boolean unique = true;
+    	List<String> paths = new ArrayList<String>();
+    	if (folderId != 0) {
+//			List<String> sitePaths = new ArrayList<String>();
+//			try {
+//				sitePaths = getSitePaths(contentId);
+//			} catch (PSErrorException e) {
+//				e.printStackTrace();
+//			}
+//			if(sitePaths.isEmpty()){
+//				throw new PSException("No site path found for the current object.");
+//			}
+    		
+    		log.debug("isFieldValueUniqueInSite(): folderId != 0");
+    		//if item isn't in folder we don't check for uniqueness
+    		IPSGuid guid = guidManager.makeGuid(new PSLocator(folderId, -1));
+    		List<PSFolder> folders = contentWs.loadFolders(asList(guid));
+    		//else {
+    		log.debug("isFieldValueUniqueInFolder(): path = null");
+    		String path = ! folders.isEmpty() ? folders.get(0).getFolderPath() : null;
+			StringTokenizer st = new StringTokenizer(path, "/");
+			String sitePath = "//";
+			if(st.countTokens() >= 2){
+				sitePath += st.nextToken()+"/"+st.nextToken()+"/%";
+			}
+			else{
+				throw new PSErrorException();
+			}
+    		paths.add(sitePath);
+    		//}
+	    	if (paths != null  && paths.size() != 0) {
+	    		log.debug("isFieldValueUniqueInSite(): got path list");
+	    		for (String pathItem : paths ) {
+	    			if (unique ) {
+	    				if (fieldValue != null) {
+		    				String jcrQuery = "";
+		    				if (contentId == 0)
+		    					jcrQuery = getQueryForValueInFolder(fieldName, fieldValue, pathItem, typeList);
+		    				else
+		    					jcrQuery = getQueryForValueInFolderWithCid(fieldName, fieldValue, pathItem, typeList, contentId);
+		    				log.debug("isFieldValueUniqueInSite(): jcrQuery = " + jcrQuery);
+		    				log.trace(jcrQuery);
+		    				Query q = contentManager.createQuery(jcrQuery, Query.SQL);
+		    				QueryResult results = contentManager.executeQuery(q, -1, null, null);
+		    				RowIterator rows = results.getRows();
+		    				long size = rows.getSize();
+		    				
+		    				unique = size > 0 ? false : true;
+		    				log.debug("isFieldValueUniqueInSite(): unique = " + unique);
+	    				}
+	    				else {
+	    					unique = isNullUnique(fieldName, pathItem, typeList, contentId);
+	    				}
+	    			}
+	    		}
+	    	}
+	    	else {
+	    		log.error("The folder id: " + folderId + " did not have a path (BAD)");
+	    	}
+    	}
+    	return unique;
+    }
+=======
+    
+    /**
+     * Returns a list of Strings containing all of the sites that a 
+     * piece of content lives in.
+     * @param contentid
+     * @param navon - is the item a navon?  If it is, append "Navon" to the site name.
+     * @return
+     * @throws PSErrorException
+     */
+    public List<String> getSites(int contentid, boolean navon) throws PSErrorException
+    {	
+		List<String> sites = new ArrayList<String>();
+		IPSGuid guid = guidManager.makeGuid(new PSLocator(contentid, -1));
+		List<String> itemPaths = Arrays.asList(contentWs.findFolderPaths(guid)); 
+		for( String currPath : itemPaths ){
+			StringTokenizer st = new StringTokenizer(currPath, "/");
+			String sitePath = "";
+			if(st.countTokens() >= 2){
+				st.nextToken();
+				sitePath = st.nextToken();
+			}
+			else{
+				throw new PSErrorException();
+			}
+			if(!navon){
+				if(!sitePath.equalsIgnoreCase("") && !sites.contains(sitePath)){
+					sites.add(sitePath);
+				}
+			}
+			else{
+				if(sitePath != ""){
+					sitePath += "Navon";
+					if(!sites.contains(sitePath)){
+						sites.add(sitePath);
+					}
+				}
+			}
+		}
+		
+    	return sites;
+    }
+>>>>>>> .merge-right.r2579
+>>>>>>> .merge-right.r2603
+
+<<<<<<< .working
 
 
+=======
+    
+    /**
+     * Returns a list of Strings containing all of the sites that a 
+     * piece of content lives in.
+     * @param contentid
+     * @param navon - is the item a navon?  If it is, append "Navon" to the site name.
+     * @return
+     * @throws PSErrorException
+     */
+    public List<String> getSites(int contentid, boolean navon) throws PSErrorException
+    {	
+		List<String> sites = new ArrayList<String>();
+		IPSGuid guid = guidManager.makeGuid(new PSLocator(contentid, -1));
+		List<String> itemPaths = Arrays.asList(contentWs.findFolderPaths(guid)); 
+		for( String currPath : itemPaths ){
+			StringTokenizer st = new StringTokenizer(currPath, "/");
+			String sitePath = "";
+			if(st.countTokens() >= 2){
+				st.nextToken();
+				sitePath = st.nextToken();
+			}
+			else{
+				throw new PSErrorException();
+			}
+			if(!navon){
+				if(!sitePath.equalsIgnoreCase("") && !sites.contains(sitePath)){
+					sites.add(sitePath);
+				}
+			}
+			else{
+				if(sitePath != ""){
+					sitePath += "Navon";
+					if(!sites.contains(sitePath)){
+						sites.add(sitePath);
+					}
+				}
+			}
+		}
+		
+    	return sites;
+    }
+    
+    /**
+     * Returns a list of Strings containing all of the sites that a 
+     * piece of content lives in.
+     * @param contentid
+     * @param navon - is the item a navon?  If it is, append "Navon" to the site name.
+     * @return
+     * @throws PSErrorException
+     */
+    public List<String> getSites(int contentid, boolean navon) throws PSErrorException
+    {	
+		List<String> sites = new ArrayList<String>();
+		IPSGuid guid = guidManager.makeGuid(new PSLocator(contentid, -1));
+		List<String> itemPaths = Arrays.asList(contentWs.findFolderPaths(guid)); 
+		for( String currPath : itemPaths ){
+			StringTokenizer st = new StringTokenizer(currPath, "/");
+			String sitePath = "";
+			if(st.countTokens() >= 2){
+				st.nextToken();
+				sitePath = st.nextToken();
+			}
+			else{
+				throw new PSErrorException();
+			}
+			if(!navon){
+				if(!sitePath.equalsIgnoreCase("") && !sites.contains(sitePath)){
+					sites.add(sitePath);
+				}
+			}
+			else{
+				if(sitePath != ""){
+					sitePath += "Navon";
+					if(!sites.contains(sitePath)){
+						sites.add(sitePath);
+					}
+				}
+			}
+		}
+		
+    	return sites;
+    }
 
+
+>>>>>>> .merge-right.r2603
     public IPSExtensionDef getExtensionDef() {
         return extensionDef;
     }
