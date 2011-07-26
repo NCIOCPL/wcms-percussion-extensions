@@ -59,19 +59,26 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 			String displaytitle = request.getParameter(fieldName);
 			
 			LOGGER.debug("******INVOKING titlePopulate on " + displaytitle);
-			String newTitle = modifyTitle(displaytitle);
+			
 	
 			//Pattern q = Pattern.compile("\\[#[0-9]{4}\\]");
-			//Pattern q = Pattern.compile(".*\\[#[0-9]{4}\\]");
-			Pattern q = Pattern.compile(displaytitle + "\\[#[0-9]{4}\\]");
+			Pattern q = Pattern.compile(".*\\[#[0-9]{4}\\]");
+			//Pattern q = Pattern.compile(displaytitle + "\\[#[0-9]{4}\\]");
 			
 			if(request.getParameter(fieldName) != null && request.getParameter("sys_title") != null){
 				//Matcher m = q.matcher(displaytitle);
 				Matcher m = q.matcher(request.getParameter("sys_title"));
 				//Check to see if the sys_title already has [#XXXX] appended.
+				String newTitle = "";
 				if( !m.matches() ){	
-					request.setParameter("sys_title", newTitle);
+					newTitle = modifyTitle(displaytitle, false, "");
 				}
+				else{
+					String numbers = request.getParameter("sys_title").substring(
+							request.getParameter("sys_title").length()-7, request.getParameter("sys_title").length());
+					newTitle = modifyTitle(displaytitle, true, numbers);
+				}
+				request.setParameter("sys_title", newTitle);
 			}
         }
 	}
@@ -79,17 +86,22 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 	/**
 	 * Add a random number to the end of the title
 	 * @param displayTitle the title to modify
+	 * @param keepNumbers - should we keep the four numbers on the end of the title?
 	 * @return String modified title
 	 */
-	private static String modifyTitle(String displayTitle) {
+	private static String modifyTitle(String displayTitle, boolean keepNumbers, String numbers) {
 		if(displayTitle != null){
 			if(displayTitle.length() >= 248 ){
 				displayTitle = displayTitle.substring(0, 247);
 			}
 		}
 		int randNum=get4DigitRandomNumber();
-		String sysTitle=displayTitle+"[#"+randNum+"]";
-		return sysTitle;
+		if(!keepNumbers){
+			return displayTitle+"[#"+randNum+"]";
+		}
+		else{
+			return displayTitle+numbers;
+		}
 	}
 	
 	public boolean canModifyStyleSheet() {

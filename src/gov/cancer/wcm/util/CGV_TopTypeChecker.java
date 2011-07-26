@@ -4,12 +4,14 @@
 package gov.cancer.wcm.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.percussion.services.content.data.PSContentTypeSummary;
+import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
 
 /**
@@ -19,7 +21,7 @@ import com.percussion.webservices.content.IPSContentWs;
  */
 public class CGV_TopTypeChecker {
 	private static boolean bDebug = false;
-	
+
 	/**
 	 * Returns true if this contentTypeId is in the list of topmost content types
 	 * @param contentTypeId - id to check
@@ -44,7 +46,7 @@ public class CGV_TopTypeChecker {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns true if this contentTypeId is a navon or nav tree.
 	 * @param contentTypeId - id to check
@@ -71,7 +73,7 @@ public class CGV_TopTypeChecker {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns true if this contentTypeId is in the list of content types for multi page containers
 	 * @param contentTypeId - id to check
@@ -96,7 +98,7 @@ public class CGV_TopTypeChecker {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns true if this contentTypeId is in the list of page types in a multi page.
 	 * @param contentTypeId - id to check
@@ -129,11 +131,14 @@ public class CGV_TopTypeChecker {
 	 * @param	checList - the list of auto Slot needed content types, generated from the onDemand xml config file.
 	 * @return a list of content id's that need to be published.  Never null, possibly empty (if no content itds are to be published).
 	 */
-	public static List<Integer> autoSlotChecker(int contentTypeId, IPSContentWs cmgr, Map<String,List<String>> checkList) {
-		
+	public static List<Integer> autoSlotChecker(
+			int contentTypeId, IPSContentWs cmgr, Map<String,Map<String,List<String>>> checkList, String site)
+			{
+
 		List<Integer> returnThis = new ArrayList<Integer>();
 		Set<String> keySet = checkList.keySet();
-		Iterator<String> it = keySet.iterator();
+		Iterator<String> it = keySet.iterator();			
+
 		String curr;
 		while( it.hasNext() ){
 			curr = it.next();
@@ -142,22 +147,21 @@ public class CGV_TopTypeChecker {
 			if(summaries.size() != 0 ){
 				PSContentTypeSummary summaryItem = summaries.get(0);
 				if (contentTypeId == summaryItem.getGuid().getUUID()) {
-					List<String> m = checkList.get(curr);
-					for( String s:m ){
-						returnThis.add(Integer.parseInt(s));
+					Map<String, List<String>> siteMapping = checkList.get(curr);
+					if(siteMapping != null){
+						List<String> m = siteMapping.get(site);
+						//List<String> m = checkList.get(curr);
+						if(m != null){
+							for( String s:m ){
+								returnThis.add(Integer.parseInt(s));
+							}
+						}
 					}
 				}
 			}
 		}
 		return returnThis;
-//		if( checkList.containsKey(Integer.toString(contentTypeId)) )
-//		{
-//			List<String> m = checkList.get(Integer.toString(contentTypeId));
-//			for( String s: m ){
-//				returnThis.add(Integer.parseInt(s));
-//			}
-//		}
-	}
+			}
 
 	/**
 	 * Returns true if this contentTypeId is in the list of TCGA content types
@@ -183,7 +187,7 @@ public class CGV_TopTypeChecker {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns true if this contentTypeId is in the list of Shared content types
 	 * @param contentTypeId - id to check

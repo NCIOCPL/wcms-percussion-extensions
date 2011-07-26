@@ -72,13 +72,13 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	private boolean waitForStatus = true;
 	private int timeOut = 20000;
 	private int waitTime = 100;
-	private Map<String,List<String>> autoSlot;
+	private Map<String,Map<String,List<String>>> autoSlot;
 
-	public Map<String, List<String>> getAutoSlot() {
+	public Map<String,Map<String,List<String>>> getAutoSlot() {
 		return autoSlot;
 	}
 
-	public void setAutoSlot(Map<String, List<String>> autoSlot) {
+	public void setAutoSlot(Map<String,Map<String,List<String>>> autoSlot) {
 		this.autoSlot = autoSlot;
 	}
 
@@ -191,7 +191,19 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 		List<Integer> idsToPublish = null;	//the list to publish
 		log.debug("before checking of the top type");
 		//if this is not the ultimate parent, get parents
-		idsToPublish = getParents(contentId, navon);
+		
+		IPSGuid guidToFindSite = gmgr.makeGuid(id, PSTypeEnum.LEGACY_CONTENT);
+		List<String> paths;
+		String siteName = null;
+		try {
+			paths = Arrays.asList(cmgr.findFolderPaths(guidToFindSite));
+			siteName = getSiteName(paths.get(0));
+		} catch (PSErrorException e) {
+			e.printStackTrace();
+		}
+		
+		
+		idsToPublish = getParents(contentId, navon, siteName);
 		log.debug("Item CID: " + contentId);
 		log.debug("Need to publish " + idsToPublish.size() + " items");
 
@@ -312,9 +324,10 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 	 * Get recursive list of all parent content items to this item
 	 * @param currItemId
 	 * @param navon - is the item a navon?
+	 * @param site - name of the site it item lives in
 	 * @return List of parent items
 	 */
-	private List<Integer> getParents(int currItemId, boolean navon) {
+	private List<Integer> getParents(int currItemId, boolean navon, String site) {
 		log.debug("getParents: beginning of get parent");
 		List<Integer>localPublishList = null;	//list of items to return
 
@@ -394,7 +407,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 					//create a temp list to hold new parents items so we don't screw the loop
 					List<Integer>tempList = new ArrayList<Integer>();
 					for (int sItem : localPublishList) {
-						List<Integer> parentsList = this.getParents(sItem, isNavon(sItem));	//recurses! foiled again! 
+						List<Integer> parentsList = this.getParents(sItem, isNavon(sItem), site);	//recurses! foiled again! 
 						if (parentsList != null) {
 							for (int p : parentsList) {
 								log.debug("getParents: DEBUG: parent item CID: " + p);
@@ -412,7 +425,7 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			}
 			List<Integer> addToList = new ArrayList<Integer>();
 			//Check auto slot list in the config file.
-			addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot);
+			addToList = CGV_TopTypeChecker.autoSlotChecker(typeId.intValue(),cmgr, autoSlot, site);
 			if( !addToList.isEmpty() ){
 				if(localPublishList == null)
 					localPublishList = new ArrayList<Integer>();
@@ -559,6 +572,23 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 
 	public void setRequest(IPSRequestContext request) {
 		this.request = request;
+	}
+	
+	/**
+	 * Finds the site root name for any folder path.
+	 * @param fullPath - full string for any folder.
+	 * @return - just the Site name of that folder.
+	 */
+	private String getSiteName(String fullPath){
+		//Get the names of the new folders from the config file.
+		StringTokenizer st = new StringTokenizer(fullPath, "/");
+		if(st.countTokens() >= 2){
+			st.nextToken();
+			return st.nextToken();
+		}
+		else{
+			return null;
+		}
 	}
 
 

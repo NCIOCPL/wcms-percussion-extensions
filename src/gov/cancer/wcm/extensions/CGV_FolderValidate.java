@@ -43,7 +43,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CGV_FolderValidate implements IPSFieldValidator
 {
-	private static Log LOGGER = LogFactory.getLog(CGV_TitlePopulate.class);
+	private static Log LOGGER = LogFactory.getLog(CGV_FolderValidate.class);
  
 	/* (non-Javadoc)
 	 * @see com.percussion.extension.IPSUdfProcessor#processUdf(java.lang.Object[], com.percussion.server.IPSRequestContext)
@@ -94,7 +94,7 @@ public class CGV_FolderValidate implements IPSFieldValidator
 			System.out.println("Folder!");
 			String systitle = request.getParameter("sys_title");
 			if( systitle != null ){
-				System.out.println("sys title = " + systitle);
+				LOGGER.debug("sys title = " + systitle);
 				return validateFolder(systitle);
 			}
 			else{
@@ -102,7 +102,7 @@ public class CGV_FolderValidate implements IPSFieldValidator
 			}
 		}
 		else{
-			System.out.println("Not a folder");
+			LOGGER.debug("Not a folder");
 		}
 		return true;
 
@@ -119,6 +119,7 @@ public class CGV_FolderValidate implements IPSFieldValidator
 		String regex = "[A-Za-z0-9\\-\\_\\.]*";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(url);
+		LOGGER.debug("Validate="+m.matches());
 		return m.matches();
 	}
 

@@ -27,19 +27,21 @@ public class CGV_LinkChecker {
 		LinkResult linkResult = new LinkResult();
 		
 		try {
-			if (url.length() > 5 && url.substring(0,4).equalsIgnoreCase("http")) {
-				URL u = new URL(url);
-				HttpURLConnection conn = null;
-				conn = (HttpURLConnection)u.openConnection();
-				conn.setRequestMethod("GET");
-				conn.setReadTimeout(30000);
-				conn.setInstanceFollowRedirects(false);
-				conn.setDoOutput(true);
-				conn.connect();
-				linkResult.setCode(conn.getResponseCode());
-				linkResult.setMessage(conn.getResponseMessage());
-				//TODO: do we need to do the header analysis that the old one does?
+			//if url lacks the host, add it (assume gancer.gov)
+			if (!(url.length() > 5 && url.substring(0,4).equalsIgnoreCase("http"))) {
+				url = "http://www.cancer.gov" + url;
 			}
+			URL u = new URL(url);
+			HttpURLConnection conn = null;
+			conn = (HttpURLConnection)u.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setReadTimeout(30000);
+			conn.setInstanceFollowRedirects(false);
+			conn.setDoOutput(true);
+			conn.connect();
+			linkResult.setCode(conn.getResponseCode());
+			linkResult.setMessage(conn.getResponseMessage());
+			//TODO: do we need to do the header analysis that the old one does?
 		}
 		catch (MalformedURLException e) {
 			linkResult.setCode(400);
