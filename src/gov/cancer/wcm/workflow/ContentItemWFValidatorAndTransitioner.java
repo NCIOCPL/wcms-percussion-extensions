@@ -654,6 +654,35 @@ public class ContentItemWFValidatorAndTransitioner {
 
 	}	
 
+	
+	/**
+	 * Checks to see if the contentTypeID that is passed in is a top type.
+	 * @param contentTypeID
+	 * @param wvc
+	 * @return
+	 */
+	public static boolean isTopType(long contentTypeID) 
+	throws WFValidationException
+	{
+
+		String contentTypeName = null;
+
+		try {
+			contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
+		} catch (Exception ex) {
+			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
+		}
+
+		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
+
+		if (config == null) {
+			throw new WFValidationException("System Error Occured. Please Check the logs.", true);			
+		}
+
+		return config.getIsTopType();		
+	}
+	
+	
 	/**
 	 * Checks to see if the contentTypeID that is passed in is a top type.
 	 * @param contentTypeID
@@ -681,6 +710,63 @@ public class ContentItemWFValidatorAndTransitioner {
 		}
 
 		return config.getIsTopType();		
+	}
+	
+	
+	
+	/**
+	 * Checks to see if the contentTypeID that is passed in is a top type.
+	 * @param contentTypeID
+	 * @return
+	 */
+	public static boolean isPublishable(long contentTypeID) 
+	throws WFValidationException
+	{
+
+		String contentTypeName = null;
+
+		try {
+			contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
+		} catch (Exception ex) {
+			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
+		}
+
+		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
+
+		if (config == null) {
+			throw new WFValidationException("System Error Occured. Please Check the logs.", true);			
+		}
+
+		return config.getIsPublishable();		
+	}
+	
+	/**
+	 * Checks to see if the contentTypeID that is passed in is a top type.
+	 * @param contentTypeID
+	 * @param wvc
+	 * @return
+	 */
+	public static boolean isPublishable(long contentTypeID, WorkflowValidationContext wvc) 
+	throws WFValidationException
+	{
+
+		String contentTypeName = null;
+
+		try {
+			contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
+		} catch (Exception ex) {
+			wvc.getLog().error("isTopType: Could not get content type name for id: " + contentTypeID, ex);
+			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
+		}
+
+		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
+
+		if (config == null) {
+			wvc.getLog().error("isTopType: Recieved a null content type config when validating an item.");
+			throw new WFValidationException("System Error Occured. Please Check the logs.", true);			
+		}
+
+		return config.getIsPublishable();		
 	}
 
 	/**

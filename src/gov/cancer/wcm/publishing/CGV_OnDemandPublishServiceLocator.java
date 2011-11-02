@@ -1,4 +1,4 @@
-package gov.cancer.wcm.extensions;
+package gov.cancer.wcm.publishing;
 import com.percussion.services.PSBaseServiceLocator;
 
 /**

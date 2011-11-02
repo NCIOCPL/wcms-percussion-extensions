@@ -9,21 +9,457 @@
 		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<bean id="CGV_OnDemandPublishService" class="gov.cancer.wcm.extensions.CGV_OnDemandPublishService" >
+	<bean id="CGV_OnDemandPublishService" class="gov.cancer.wcm.publishing.CGV_OnDemandPublishService" >
+		<property name="publishingEditions">
+			<map>
+				<entry key="//Sites/CancerGov/">
+					<map>
+						<entry key="CancerGov Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>CancerGov_Staging_Now</value>
+									<value>DB_CGovstaging_PubNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>CancerGov_Staging_Now</value>
+									<value>DB_CGovstaging_PubNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>CancerGov_Staging_Now</value>
+									<value>CancerGov_Publish_Now</value>
+									<value>DB_CGovstaging_PubNow</value>
+									<value>DB_cancerGov_PubNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+						<entry key="CGV_Navon_Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>CancerGov_Staging_Now</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>CancerGov_Staging_Now</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>CancerGov_Staging_Now</value>
+									<value>CancerGov_Publish_Now</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+					</map>
+				</entry>
+				<entry key="//Sites/TCGA/">
+					<map>
+						<entry key="CancerGov Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>TCGA_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>TCGA_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>TCGA_Staging_PublishNow</value>
+									<value>TCGA_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+						<entry key="CGV_Navon_Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>TCGA_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>TCGA_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>TCGA_Staging_PublishNow</value>
+									<value>TCGA_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+					</map>
+				</entry>
+				<entry key="//Sites/Imaging/">
+					<map>
+						<entry key="General Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>Imaging_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>Imaging_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>Imaging_Staging_PublishNow</value>
+									<value>Imaging_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+						<entry key="CGV_Navon_Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>Imaging_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>Imaging_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>Imaging_Staging_PublishNow</value>
+									<value>Imaging_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+					</map>
+				</entry>
+				<entry key="//Sites/Proteomics/">
+					<map>
+						<entry key="General Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>Proteomics_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>Proteomics_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>Proteomics_Staging_PublishNow</value>
+									<value>Proteomics_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+						<entry key="CGV_Navon_Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>Proteomics_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>Proteomics_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>Proteomics_Staging_PublishNow</value>
+									<value>Proteomics_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+					</map>
+				</entry>
+				<entry key="//Sites/CCOP/">
+					<map>
+						<entry key="General Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>CCOP_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>CCOP_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>CCOP_Staging_PublishNow</value>
+									<value>CCOP_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+						<entry key="CGV_Navon_Workflow">
+							<map>
+								<entry key="Staging (P)">
+								<list>
+									<value>CCOP_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Staging (D)">
+								<list>
+									<value>CCOP_Staging_PublishNow</value>
+								</list>
+								</entry>
+								<entry key="Public">
+								<list>
+									<value>CCOP_Staging_PublishNow</value>
+									<value>CCOP_PublishNow</value>
+								</list>
+								</entry>
+							</map>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</property>
+		
+		
+		<!--
 		<property name="editionList">
 			<map>
-				<entry key="CancerGov Workflow">
+				<SITE NAME >
+				<entry key="CancerGov">
+					<map>
+						<! publish_onDemandEditionId || preview_onDemandEditionId > 
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<!int values, edition id >
+								<value>318</value>
+								<value>315</value>
+								<value>324</value>
+								<value>321</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>318</value>
+								<value>324</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="TCGA">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>339</value>
+								<value>342</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>342</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="CancerGovNavon">
 					<map>
 						<entry key="publish_onDemandEditionId">
 							<list>
 								<value>315</value>
-								<value>345</value>
+								<value>318</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>318</value>
+							</list>
+						</entry>
+					</map>
+				</entry>				
+				<entry key="TCGANavon">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>339</value>
+								<value>342</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>342</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="ImagingNavon">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>376</value>
+								<value>380</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>380</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="ProteomicsNavon">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>392</value>
+								<value>396</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>396</value>
+							</list>
+						</entry>
+					</map>
+				</entry>				
+				<entry key="Imaging">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>376</value>
+								<value>380</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>380</value>
+							</list>
+						</entry>
+					</map>
+				</entry>				
+				<entry key="Proteomics">
+					<map>
+						<entry key="publish_onDemandEditionId">
+							<list>
+								<value>392</value>
+								<value>396</value>
+							</list>
+						</entry>
+						<entry key="preview_onDemandEditionId">
+							<list>
+								<value>396</value>
 							</list>
 						</entry>
 					</map>
 				</entry>
 			</map>
 		</property>
+		<property name="autoSlot">
+			<map>
+				<entry key="cgvPromoUrl">
+					<map>
+						<entry key="CancerGov">
+							<list><value>310</value></list>
+						</entry>
+					</map>
+				</entry>	
+				<entry key="cgvTopicSearchCategory">
+					<map>
+						<entry key="CancerGov">
+							<list></list>
+						</entry>
+					</map>
+				</entry>	
+				<entry key="nciStyleSheetInfo">
+					<map>
+						<entry key="CancerGov">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="nciPageTemplateInfo">
+					<map>
+						<entry key="CancerGov">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="nciPageTemplateCollection">
+					<map>
+						<entry key="CancerGov">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="genJavaScriptExternalInfo">
+					<map>
+						<entry key="Proteomics">
+							<list></list>
+						</entry>
+						<entry key="Imaging">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="genJavaScriptInternalInfo">
+					<map>
+						<entry key="Proteomics">
+							<list></list>
+						</entry>
+						<entry key="Imaging">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="genPageTemplateInfo">
+					<map>
+						<entry key="Proteomics">
+							<list></list>
+						</entry>
+						<entry key="Imaging">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="genStyleSheetInfo">
+					<map>
+						<entry key="Proteomics">
+							<list></list>
+						</entry>
+						<entry key="Imaging">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="genPageTemplateCollection">
+					<map>
+						<entry key="Proteomics">
+							<list></list>
+						</entry>
+						<entry key="Imaging">
+							<list></list>
+						</entry>
+					</map>
+				</entry>
+			</map>
+		</property> -->
 		<property name="waitForStatus" value="true"/>
 		<property name="timeOut" value="20000"/>
 		<property name="waitTime" value="100"/>

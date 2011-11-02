@@ -94,6 +94,7 @@ public class CGV_ParentChildManager {
 	public List<PSItemSummary> getParents(IPSGuid source) throws PSErrorException {
 		PSRelationshipFilter filter = new PSRelationshipFilter();
 		filter.limitToEditOrCurrentOwnerRevision(true);
+		filter.setCommunityFiltering(false);
 		filter.setCategory("rs_activeassembly");
 		if(bDebug){System.out.println("finding the parents");}
 		return PSContentWsLocator.getContentWebservice().findOwners(source, filter, false);

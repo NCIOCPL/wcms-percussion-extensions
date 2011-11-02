@@ -1,7 +1,7 @@
 package gov.cancer.wcm.util;
 
-import gov.cancer.wcm.extensions.CGV_OnDemandPublishService;
-import gov.cancer.wcm.extensions.CGV_OnDemandPublishServiceLocator;
+import gov.cancer.wcm.publishing.CGV_OnDemandPublishService;
+import gov.cancer.wcm.publishing.CGV_OnDemandPublishServiceLocator;
 import gov.cancer.wcm.extensions.CGV_ParentChildService;
 import gov.cancer.wcm.extensions.CGV_ParentChildServiceLocator;
 

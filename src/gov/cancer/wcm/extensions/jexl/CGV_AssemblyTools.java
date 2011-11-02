@@ -23,13 +23,17 @@ import org.apache.commons.logging.LogFactory;
 import com.percussion.cms.objectstore.PSAaRelationship;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.design.objectstore.PSLocator;
+import com.percussion.design.objectstore.PSRelationshipPropertyData;
 import com.percussion.extension.IPSJexlExpression;
 import com.percussion.extension.IPSJexlMethod;
 import com.percussion.extension.IPSJexlParam;
 import com.percussion.extension.PSJexlUtilBase;
+import com.percussion.pso.finder.PSOReverseSlotContentFinder;
 import com.percussion.pso.jexl.PSONavTools;
+import com.percussion.pso.jexl.PSORelationshipTools;
 import com.percussion.pso.jexl.PSOQueryTools;
 import com.percussion.pso.jexl.PSOSlotTools;
+import com.percussion.pso.jexl.PSOObjectFinder;
 import com.percussion.pso.utils.PSOSlotContents;
 import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.assembly.IPSAssemblyItem;
@@ -37,6 +41,7 @@ import com.percussion.services.assembly.IPSAssemblyService;
 import com.percussion.services.assembly.IPSTemplateSlot;
 import com.percussion.services.assembly.PSAssemblyServiceLocator;
 import com.percussion.services.catalog.PSTypeEnum;
+import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.contentmgr.IPSContentMgr;
 import com.percussion.services.contentmgr.IPSNode;
 import com.percussion.services.contentmgr.IPSNodeDefinition;
@@ -48,9 +53,11 @@ import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
 import com.percussion.services.workflow.data.PSState;
 import com.percussion.utils.guid.IPSGuid;
+import com.percussion.pso.utils.PSOSlotRelations;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
+
 
 public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpression{
 
@@ -121,6 +128,28 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 		return 0;
 	}
 
+	@IPSJexlMethod(description = "Returns the assembly item that cooresponds to a piece of content's translated copy.", params = {
+			@IPSJexlParam(name = "item", description = "The IPSAssemblyItem to find the translation for.") })
+			public IPSAssemblyItem translationItem(IPSAssemblyItem item)
+	throws RepositoryException 
+	{
+		PSOSlotTools pso = new PSOSlotTools();
+		Map<String,Object> map = new HashMap<String,Object>();
+		List<IPSAssemblyItem> li = null;
+		try {
+			li = pso.getSlotContents(item, "cgvTranslationFinder", map);
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(li != null){
+			if(!li.isEmpty()){
+				return li.get(0);
+			}
+		}
+		return null;
+	}
+	
 	@IPSJexlMethod(description = "Finds the linking url for a microsite index.", params = {
 			@IPSJexlParam(name = "item", description = "The IPSAssemblyItem to find the microsite index link for.") })
 			public IPSAssemblyItem getMicrositeIndexURL(IPSAssemblyItem item)
@@ -200,5 +229,144 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 		//Something broke, return null.
 		return null;
 	}
+	
+	
+	@IPSJexlMethod(description = "Generates the guid of the translation of the guid passed in", params = {
+			@IPSJexlParam(name = "parentGuid", description = "The Guid of the parent item.")})
+			public IPSGuid getParentTranslationGUID(IPSGuid ownerGuid)
+	throws RepositoryException {
+        IPSAssemblyService asm = PSAssemblyServiceLocator.getAssemblyService();
+        PSOObjectFinder objFinder = new PSOObjectFinder();
+        PSOSlotContents slotContents = new PSOSlotContents();
+        PSOReverseSlotContentFinder revSlFinder = new PSOReverseSlotContentFinder();
 
+
+		
+        //IPSGuid ownerGuid = objFinder.getGuidById(parentCID);
+		String session = objFinder.getPSSessionId();
+		String slotName = "cgvTranslationFinder";
+		IPSTemplateSlot slot = null;
+		List<PSAaRelationship> aaRels = null;
+		String transCID = null;
+		
+		try{
+			slot = asm.findSlotByName(slotName);
+		}
+		catch(Throwable e){
+			System.out.println("Slot not found: Slot name invalid");
+		}
+		
+		//Get all of the relationships between an owner and all dependents in a given slot
+		if(slot != null){
+			try{
+				 aaRels = PSOSlotRelations.getSlotRelations(ownerGuid, slot, session);
+			}
+			catch(Throwable e){
+				System.out.println("List of Relationships not created");
+			}
+		}
+
+		if (aaRels != null){
+			if (aaRels.size()>0){
+				transCID = aaRels.get(0).getDependent().getPart("contentid");
+				return objFinder.getGuidById(transCID);
+			}
+		}
+
+		System.out.println("Returning NULL child name");
+		return null;
+	}
+
+	
+	@IPSJexlMethod(description = "Generates the page/slide number to link directly to a given page", params = {
+			@IPSJexlParam(name = "ownerGuid", description = "The IPSAssemblyItem of the parent item."),
+			@IPSJexlParam(name = "childItem", description = "The IPSAssemblyItem of the child item to generate the url for."),
+			@IPSJexlParam(name = "slotName", description = "The slot that the child item is a part of in the parent."),
+			@IPSJexlParam(name = "childNameFragment", description = "the prefix to the number that this method returns (i.e. page in 'page2'.")})
+			public String generateChildName(IPSGuid ownerGuid, int childContentId, String slotName, String childNameFragment)
+	throws RepositoryException {
+		
+		//Tools
+        IPSAssemblyService asm = PSAssemblyServiceLocator.getAssemblyService();
+        PSOObjectFinder objFinder = new PSOObjectFinder();
+
+        //Variables
+		int pagenum = 0;
+		//IPSGuid ownerGuid = parentItem.getId();
+		IPSTemplateSlot slot = null;
+		String session = objFinder.getPSSessionId();
+		List<PSAaRelationship> aaRels = null;
+		String relContentId = null;
+		//String childContentId = null;
+		
+		//Get the slot from the slot name
+		try{
+			slot = asm.findSlotByName(slotName);
+		}
+		catch(Throwable e){
+			System.out.println("Slot not found: Slot name invalid");
+		}
+		
+		//Get all of the relationships between an owner and all dependents in a given slot
+		if(slot != null){
+			try{
+				 aaRels = PSOSlotRelations.getSlotRelations(ownerGuid, slot, session);
+			}
+			catch(Throwable e){
+				System.out.println("List of Relationships not created");
+			}
+		}
+
+
+		//Go through all relationships and compare their dependent to the child item
+		if (aaRels != null){
+			if (aaRels.size()>0){
+				for (PSAaRelationship rel : aaRels){
+					pagenum = rel.getSortRank() + 1;
+					relContentId = rel.getDependent().getPart("contentid");
+					//childContentId = childItem.getNode().getProperty("rx:sys_contentid").getValue().getString();
+					if(relContentId.equals(Integer.toString(childContentId))){
+						return "/" + childNameFragment + pagenum;
+					}
+				}
+			}
+		}
+
+		System.out.println("Returning NULL child name");
+		return null;
+	}
+	
+	
+	
+	@IPSJexlMethod(description = "Finds the parent item for a child.", params = {
+			@IPSJexlParam(name = "item", description = "The IPSAssemblyItem to find the booklet page link for."),
+			@IPSJexlParam(name = "parentFinderSlot", description = "The slot created to find the parent of a certain content type")})
+			public IPSAssemblyItem getBookletParent(IPSAssemblyItem item, String parentFinderSlot)
+	throws RepositoryException {
+
+		//Tools
+		PSOSlotTools slotTools = new PSOSlotTools();
+
+		//Variables
+		List<IPSAssemblyItem> parentBooklet = null;
+		Map<String,Object> emParams = new HashMap<String,Object>();
+
+		//Get the parent of the assembly item using a parentFinder slot you have created
+		try{
+			parentBooklet = slotTools.getSlotContents(item, parentFinderSlot, emParams);
+		}
+		catch(Throwable e){
+			e.printStackTrace();
+		}
+
+		//Slot tools returns a list so get the first item.
+		if (parentBooklet != null){
+			if (parentBooklet.size()>0){
+				return parentBooklet.get(0);
+			}
+		}
+		System.out.println("Returning NULL booklet parent");
+
+		return null;
+	}
 }

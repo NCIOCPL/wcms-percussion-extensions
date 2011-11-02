@@ -136,6 +136,9 @@ public class CGV_TopTypeChecker {
 			{
 
 		List<Integer> returnThis = new ArrayList<Integer>();
+		if(checkList == null && bDebug) {
+			System.out.print("DEBUG: checkList is NULL ");
+		}
 		Set<String> keySet = checkList.keySet();
 		Iterator<String> it = keySet.iterator();			
 

@@ -6,6 +6,7 @@ public class ContentTypeConfig {
 	private boolean isTopType;
 	//private boolean requiresParentNavonsPublic;
 	private String name;
+	private boolean isPublishable;
 	private CTValidatorCollection validatorCollection;
 
 	public CTValidatorCollection getValidatorCollection() {
@@ -23,9 +24,17 @@ public class ContentTypeConfig {
 		return this.isTopType;
 	}
 	
-	private ContentTypeConfig(String name, boolean isTopType, CTValidatorCollection validatorCollection) {
+	/**
+	 * @return the isPublishable
+	 */
+	public boolean getIsPublishable() {
+		return this.isPublishable;
+	}
+	
+	private ContentTypeConfig(String name, boolean isTopType, boolean isPublishable, CTValidatorCollection validatorCollection) {
 		this.name = name;
 		this.isTopType = isTopType;
+		this.isPublishable = isPublishable;
 		//this.requiresParentNavonsPublic = requiresParentNavonsPublic;
 		this.validatorCollection = validatorCollection;
 	}

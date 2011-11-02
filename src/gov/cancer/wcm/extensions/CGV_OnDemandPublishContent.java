@@ -1,13 +1,15 @@
 package gov.cancer.wcm.extensions;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+//import org.apache.commons.logging.Log;
+//import org.apache.commons.logging.LogFactory;
 
 import com.percussion.extension.IPSWorkFlowContext;
 import com.percussion.extension.IPSWorkflowAction;
 import com.percussion.extension.PSDefaultExtension;
 import com.percussion.extension.PSExtensionProcessingException;
 import com.percussion.server.IPSRequestContext;
-
+import gov.cancer.wcm.publishing.CGV_OnDemandPublishService;
+import gov.cancer.wcm.publishing.CGV_OnDemandPublishServiceLocator;
+import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 /**
  * Workflow action to manage publication through a queue
@@ -21,7 +23,7 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
    /**
     * Logger for this class
     */
-	private static final Log LOGGER = LogFactory.getLog(CGV_OnDemandPublishContent.class);
+	//private static final Log LOGGER = LogFactory.getLog(CGV_OnDemandPublishContent.class);
 	private boolean bDebug = true;	//print to console if true
 	/**
     * Service class to invoke publishing routine
@@ -47,7 +49,7 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
          svc = CGV_OnDemandPublishServiceLocator.getCGV_OnDemandPublishService();
 //    	  svc = new CGV_OnDemandPublishService();
       }
-      svc.setRequest(request);
+      
    }
    
    /**
@@ -60,12 +62,20 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
    public void performAction(IPSWorkFlowContext wfContext, 
 		   IPSRequestContext request) throws PSExtensionProcessingException{
 	   
-	   if (bDebug) System.out.println("DEBUG: performAction");
-	   initServices(request);
-	   if (bDebug) System.out.println("DEBUG: performAction Initted services");
-	   int contentId = wfContext.getContentID();
-	   if (bDebug) System.out.println("DEBUG: performAction content id is " + contentId);
-	   svc.queueItemSet(contentId, request);
-	   if (bDebug) System.out.println("DEBUG: performAction queue item set is done running");
+	   //if the content item does not have isExclusive set, we know that it is
+	   //the item which was transitioned (the last item to move through the workflow)
+	   if(!ContentItemWFValidatorAndTransitioner.isExclusive(request)){
+		   if (bDebug) System.out.println("DEBUG: performAction");
+		   initServices(request);
+		   
+		   if (bDebug) System.out.println("DEBUG: performAction Initted services");
+		   int contentId = wfContext.getContentID();
+		   
+		   if (bDebug) System.out.println("DEBUG: performAction content id is " + contentId);
+		   svc.publishOnDemand(contentId);
+		   
+		   if (bDebug) System.out.println("DEBUG: performAction queue item set is done running");
+	   
+	   }
    }
 }
