@@ -1,6 +1,8 @@
 package gov.cancer.wcm.extensions.jexl;
 
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
+import com.percussion.pso.jexl.PSOFolderTools;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +29,7 @@ import com.percussion.design.objectstore.PSRelationshipPropertyData;
 import com.percussion.extension.IPSJexlExpression;
 import com.percussion.extension.IPSJexlMethod;
 import com.percussion.extension.IPSJexlParam;
+import com.percussion.extension.PSExtensionProcessingException;
 import com.percussion.extension.PSJexlUtilBase;
 import com.percussion.pso.finder.PSOReverseSlotContentFinder;
 import com.percussion.pso.jexl.PSONavTools;
@@ -369,4 +372,43 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 
 		return null;
 	}
+
+	
+
+	@IPSJexlMethod(description = "Returns true if the content item is on the given site, else false", params = {
+			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
+			@IPSJexlParam(name = "siteName", description = "The name of the site in the path (i.e. CancerGov, CCOP, etc.)")})
+			public boolean isOnSite(String itemPath, String siteName){
+				String[] pathsList = null;
+				IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
+				IPSGuid pathGuid = null;
+				
+				//Takes the items path and finds the id for it
+				try {
+					pathGuid = contentWS.getIdByPath(itemPath);
+				} catch (PSErrorException e1) {
+					e1.printStackTrace();
+				}
+				
+				//Uses the id to find all paths where the content resides
+				try {
+					pathsList = contentWS.findFolderPaths(pathGuid);
+				} catch (PSErrorException e) {
+					e.printStackTrace();
+				}
+			
+				//as long as there are paths in the list, check each to see if the content is in the siteName path.
+				if(pathsList != null){
+					for( String path : pathsList){
+						String[] pathParts = path.split("/");
+						if (pathParts[3].equals(siteName)){
+							return true;
+						}
+					}
+				}
+								
+			return false;
+		
+		}
+
 }
