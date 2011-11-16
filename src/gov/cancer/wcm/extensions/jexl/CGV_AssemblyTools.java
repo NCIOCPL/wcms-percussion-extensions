@@ -5,9 +5,11 @@ import com.percussion.pso.jexl.PSOFolderTools;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -410,5 +412,28 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 			return false;
 		
 		}
+	
+	@IPSJexlMethod(description = "finds a pages alternate site path", params = {
+			@IPSJexlParam(name = "content_id", description = "the content id of the item to find all paths for (String)"),
+			@IPSJexlParam(name = "siteName", description = "The name of the site in the path (i.e. CancerGov, CCOP, etc.)") })
+			public String findSitePaths(String content_id, String siteName)
+	throws RepositoryException {
+		IPSGuid itemGUID = PSGuidManagerLocator.getGuidMgr().makeGuid(new PSLocator(Integer.parseInt(content_id)));
+		List<String> paths = new ArrayList<String>();
+		try{
+			paths = Arrays.asList(PSContentWsLocator.getContentWebservice().findFolderPaths(itemGUID));
+		}
+		catch (PSErrorException e) {e.printStackTrace();}
+		for(String path : paths){
+			String[] pathParts = path.split("/");
+			if (pathParts[3].equals(siteName)){
+				//return the path after the //Sites/SITENAME...
+				return path.substring(8+siteName.length(), path.length());
+			}
+		}
+		
+		return "";
+					
+	}
 
 }
