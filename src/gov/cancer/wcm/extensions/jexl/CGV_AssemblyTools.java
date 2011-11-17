@@ -380,6 +380,19 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 
 		return null;
 	}
+	@IPSJexlMethod(description = "Returns the default template name", params = {
+			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) ")})
+
+	public int getSiteIdFromPath(String path){
+
+		String[] pathParts = path.split("/");
+		String siteName = pathParts[3];
+		IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
+		IPSSite aSite = siteManager.loadSite(siteName);
+		return aSite.getGUID().getUUID();
+
+	}
+	
 
 	@IPSJexlMethod(description = "Returns the default template name", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
@@ -418,8 +431,8 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 	
 
 	@IPSJexlMethod(description = "Returns the path if the content item is on the given site, else an empty string", params = {
-			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
-			@IPSJexlParam(name = "siteName", description = "The name of the site in the path (i.e. CancerGov, CCOP, etc.)")})
+			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item with the sys_title (i.e. //Sites/CancerGov/...) "),
+			@IPSJexlParam(name = "siteName", description = "The name of the site in the path to find the item on (i.e. CancerGov, CCOP, etc.)")})
 			public String isOnSite(String itemPath, String siteName){
 				String[] pathsList = null;
 				IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
