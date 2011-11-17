@@ -43,8 +43,11 @@ import com.percussion.pso.utils.PSOSlotContents;
 import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.assembly.IPSAssemblyItem;
 import com.percussion.services.assembly.IPSAssemblyService;
+import com.percussion.services.assembly.IPSAssemblyTemplate;
 import com.percussion.services.assembly.IPSTemplateSlot;
+import com.percussion.services.assembly.PSAssemblyException;
 import com.percussion.services.assembly.PSAssemblyServiceLocator;
+import com.percussion.services.assembly.jexl.PSLocationUtils;
 import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.contentmgr.IPSContentMgr;
@@ -56,6 +59,9 @@ import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.services.guidmgr.data.PSGuid;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
+import com.percussion.services.sitemgr.IPSSite;
+import com.percussion.services.sitemgr.IPSSiteManager;
+import com.percussion.services.sitemgr.PSSiteManagerLocator;
 import com.percussion.services.workflow.data.PSState;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.pso.utils.PSOSlotRelations;
@@ -375,12 +381,46 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 		return null;
 	}
 
+	@IPSJexlMethod(description = "Returns the default template name", params = {
+			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
+			@IPSJexlParam(name = "itemNode", description = "The Node of the item to find the default template for"),
+			@IPSJexlParam(name = "siteGuid", description = "The GUID of the site to find the default template for")})
+			public String NCIFindDefaultTemplate(String itemPath, IPSNode itemNode, String siteName){
+				IPSAssemblyService aService = PSAssemblyServiceLocator.getAssemblyService();
+				IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
+				IPSAssemblyItem aItem = aService.createAssemblyItem();
+				PSLocationUtils locationUtils = new PSLocationUtils();	
+				
+				
+				IPSSite aSite = siteManager.loadSite(siteName);
+				IPSGuid siteID = aSite.getGUID();
+				IPSAssemblyTemplate aTemplate = null;
+				
+				aItem.setNode(itemNode);
+				aItem.setPath(itemPath);
+				aItem.setSiteId(siteID);
+				try {
+					aItem.normalize();
+				} catch (PSAssemblyException e) {
+					System.out.println("normailzation failed");
+					e.printStackTrace();
+				}
+				
+				try {
+					aTemplate = locationUtils.findDefaultTemplate(aItem);
+				} catch (PSAssemblyException e) {
+					System.out.println("Find default Template failed");
+					e.printStackTrace();
+				}
+				
+				return aTemplate.getName();			
+			}
 	
 
-	@IPSJexlMethod(description = "Returns true if the content item is on the given site, else false", params = {
+	@IPSJexlMethod(description = "Returns the path if the content item is on the given site, else an empty string", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
 			@IPSJexlParam(name = "siteName", description = "The name of the site in the path (i.e. CancerGov, CCOP, etc.)")})
-			public boolean isOnSite(String itemPath, String siteName){
+			public String isOnSite(String itemPath, String siteName){
 				String[] pathsList = null;
 				IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
 				IPSGuid pathGuid = null;
@@ -404,12 +444,12 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 					for( String path : pathsList){
 						String[] pathParts = path.split("/");
 						if (pathParts[3].equals(siteName)){
-							return true;
+							return path;
 						}
 					}
 				}
 								
-			return false;
+			return "";
 		
 		}
 	
