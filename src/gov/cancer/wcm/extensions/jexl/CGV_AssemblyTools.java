@@ -396,6 +396,8 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 
 		}
 	
+	
+	
 
 	@IPSJexlMethod(description = "Returns the default template name", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
@@ -459,8 +461,15 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				//as long as there are paths in the list, check each to see if the content is in the siteName path.
 				if(pathsList != null){
 					for( String path : pathsList){
-						if (path.substring(0,path.indexOf("/",8)).equals(sitePath)){
-							return path;
+						System.out.println(path);
+						if (path.indexOf("/",8)>0){
+							System.out.println(path);
+							if (path.substring(0,path.indexOf("/",8)).equals(sitePath)){
+								System.out.println(path.substring(0,path.indexOf("/",8)));
+								System.out.println(sitePath);
+
+								return path;
+							}
 						}
 					}
 				}
