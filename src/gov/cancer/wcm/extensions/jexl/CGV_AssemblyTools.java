@@ -383,29 +383,33 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 	@IPSJexlMethod(description = "Returns the default template name", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) ")})
 
-	public int getSiteIdFromPath(String path){
+		public int getSiteIdFromPath(String path){
+			System.out.println("the path is: " + path );
+			String[] pathParts = path.split("/");
+			String siteName = pathParts[3];
+			IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
+			IPSSite aSite = siteManager.loadSite(siteName);
+			System.out.println("The site is: "+ siteName);
+			System.out.println("The site guid is: "+ aSite.getGUID());
+			System.out.println("The site UUID is: "+ aSite.getGUID().getUUID());
+			return aSite.getGUID().getUUID();
 
-		String[] pathParts = path.split("/");
-		String siteName = pathParts[3];
-		IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
-		IPSSite aSite = siteManager.loadSite(siteName);
-		return aSite.getGUID().getUUID();
-
-	}
+		}
 	
 
 	@IPSJexlMethod(description = "Returns the default template name", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
 			@IPSJexlParam(name = "itemNode", description = "The Node of the item to find the default template for"),
-			@IPSJexlParam(name = "siteGuid", description = "The GUID of the site to find the default template for")})
-			public String NCIFindDefaultTemplate(String itemPath, IPSNode itemNode, String siteName){
+			@IPSJexlParam(name = "sitePath", description = "The path of the site to find the default template for")})
+			public String NCIFindDefaultTemplate(String itemPath, IPSNode itemNode, String sitePath){
 				IPSAssemblyService aService = PSAssemblyServiceLocator.getAssemblyService();
 				IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
 				IPSAssemblyItem aItem = aService.createAssemblyItem();
 				PSLocationUtils locationUtils = new PSLocationUtils();	
 				
-				
-				IPSSite aSite = siteManager.loadSite(siteName);
+				String[] pathParts = sitePath.split("/");
+
+				IPSSite aSite = siteManager.loadSite(pathParts[3]);
 				IPSGuid siteID = aSite.getGUID();
 				IPSAssemblyTemplate aTemplate = null;
 				
@@ -432,8 +436,8 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 
 	@IPSJexlMethod(description = "Returns the path if the content item is on the given site, else an empty string", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item with the sys_title (i.e. //Sites/CancerGov/...) "),
-			@IPSJexlParam(name = "siteName", description = "The name of the site in the path to find the item on (i.e. CancerGov, CCOP, etc.)")})
-			public String isOnSite(String itemPath, String siteName){
+			@IPSJexlParam(name = "sitePath", description = "A percussion path to the site (i.e. //Sites/CancerGov/...) ")})
+			public String isOnSite(String itemPath, String sitePath){
 				String[] pathsList = null;
 				IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
 				IPSGuid pathGuid = null;
@@ -455,8 +459,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				//as long as there are paths in the list, check each to see if the content is in the siteName path.
 				if(pathsList != null){
 					for( String path : pathsList){
-						String[] pathParts = path.split("/");
-						if (pathParts[3].equals(siteName)){
+						if (path.substring(0,path.indexOf("/",8)).equals(sitePath)){
 							return path;
 						}
 					}
