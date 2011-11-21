@@ -380,7 +380,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 
 		return null;
 	}
-	@IPSJexlMethod(description = "Returns the default template name", params = {
+	@IPSJexlMethod(description = "Returns the Site ID", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) ")})
 
 		public int getSiteIdFromPath(String path){
@@ -443,7 +443,14 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				String[] pathsList = null;
 				IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
 				IPSGuid pathGuid = null;
+				if(itemPath.length()>= sitePath.length()){
+					if(itemPath.substring(0, sitePath.length()).equals(sitePath)){
+						return itemPath;
+					}
+				}
 				
+				String[] itemPathSplit = itemPath.split("/");
+				String itemName = itemPathSplit[(itemPathSplit.length)-1];
 				//Takes the items path and finds the id for it
 				try {
 					pathGuid = contentWS.getIdByPath(itemPath);
@@ -451,30 +458,47 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 					e1.printStackTrace();
 				}
 				
+				System.out.println("DEBUG isOnSite: pathGuid: " + pathGuid);
+
+				
 				//Uses the id to find all paths where the content resides
 				try {
 					pathsList = contentWS.findFolderPaths(pathGuid);
 				} catch (PSErrorException e) {
 					e.printStackTrace();
 				}
+				
+				for(String path1 : pathsList){
+					System.out.println("DEBUG isOnSite: path: " + path1);
+				}
 			
 				//as long as there are paths in the list, check each to see if the content is in the siteName path.
 				if(pathsList != null){
 					for( String path : pathsList){
 						System.out.println(path);
-						if (path.indexOf("/",8)>0){
+						if (path.length() >= sitePath.length()){
 							System.out.println(path);
-							if (path.substring(0,path.indexOf("/",8)).equals(sitePath)){
-								System.out.println(path.substring(0,path.indexOf("/",8)));
-								System.out.println(sitePath);
-
-								return path;
+							String subPath = path.substring(0,(sitePath.length()));
+							System.out.println("DEBUG isOnSite: subPath: " +subPath);
+							System.out.println("DEBUG isOnSite: sitePath: " +sitePath);
+							if (subPath.equals(sitePath)){
+								return path + "/" + itemName;
 							}
+							
+							else{
+								System.out.println("DEBUG isOnSite: path was not on site:" + sitePath);
+
+							}
+						}
+						else{
+							System.out.println("DEBUG isOnSite: path was not formatted correctly: " + path);
 						}
 					}
 				}
-								
-			return "";
+				else{	
+					System.out.println("DEBUG isOnSite: pathsList was NULL");
+				}				
+				return "NO ITEM ON SITE";
 		
 		}
 	
