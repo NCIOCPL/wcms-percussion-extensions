@@ -445,11 +445,11 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				String[] pathsList = null;
 				IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
 				IPSGuid pathGuid = null;
-				if(itemPath.length()>= sitePath.length()){
+				/*if(itemPath.length()>= sitePath.length()){
 					if(itemPath.substring(0, sitePath.length()).equals(sitePath)){
 						return itemPath;
 					}
-				}
+				}*/
 				
 				String[] itemPathSplit = itemPath.split("/");
 				String itemName = itemPathSplit[(itemPathSplit.length)-1];
@@ -460,7 +460,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 					e1.printStackTrace();
 				}
 				
-				System.out.println("DEBUG isOnSite: pathGuid: " + pathGuid);
+				//System.out.println("DEBUG isOnSite: pathGuid: " + pathGuid);
 
 				
 				//Uses the id to find all paths where the content resides
@@ -470,40 +470,52 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 					e.printStackTrace();
 				}
 				
-				for(String path1 : pathsList){
-					System.out.println("DEBUG isOnSite: path: " + path1);
-				}
+	
 			
 				//as long as there are paths in the list, check each to see if the content is in the siteName path.
 				if(pathsList != null){
 					for( String path : pathsList){
-						System.out.println(path);
+						//System.out.println(path);
 						if (path.length() >= sitePath.length()){
-							System.out.println(path);
+							//System.out.println(path);
 							String subPath = path.substring(0,(sitePath.length()));
-							System.out.println("DEBUG isOnSite: subPath: " +subPath);
-							System.out.println("DEBUG isOnSite: sitePath: " +sitePath);
+							//System.out.println("DEBUG isOnSite: subPath: " +subPath);
+							//System.out.println("DEBUG isOnSite: sitePath: " +sitePath);
 							if (subPath.equals(sitePath)){
 								return path + "/" + itemName;
 							}
 							
 							else{
-								System.out.println("DEBUG isOnSite: path was not on site:" + sitePath);
+								//System.out.println("DEBUG isOnSite: path was not on site:" + sitePath);
 
 							}
 						}
 						else{
-							System.out.println("DEBUG isOnSite: path was not formatted correctly: " + path);
+							//System.out.println("DEBUG isOnSite: path was not formatted correctly: " + path);
 						}
 					}
 				}
 				else{	
-					System.out.println("DEBUG isOnSite: pathsList was NULL");
+					//System.out.println("DEBUG isOnSite: pathsList was NULL");
 				}				
 				return "";
 		
 		}
 	
+	@IPSJexlMethod(description = "Returns a path to the folder that contains the item path passed in   ", params = {
+			@IPSJexlParam(name = "itemPath", description = "Path to the item in //Sites/<SITENAME>/folders .../ItemName form.")})
+			public String getFolderPathFromItemPath(String itemPath){
+				String folderPath = "";
+				String[] itemParts = itemPath.split("/");
+				for (int i=0; i<itemParts.length-1; i++){
+					folderPath = folderPath + itemParts[i] + "/";
+				}
+					
+				return folderPath;
+	}
+	
+	
+
 	@IPSJexlMethod(description = "Returns a context variable for a given Site, using a specified ID.  " +
 			"Null if the property isn't defined.", params = {
 			@IPSJexlParam(name = "sitePath", description = "Path to the site in //Sites/<SITENAME> form."),
