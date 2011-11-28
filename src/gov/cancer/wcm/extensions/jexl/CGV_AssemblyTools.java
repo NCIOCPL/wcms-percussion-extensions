@@ -514,7 +514,17 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				return folderPath;
 	}
 	
-	
+	@IPSJexlMethod(description = "Returns a path to the site that contains the item path passed in   ", params = {
+			@IPSJexlParam(name = "itemPath", description = "Path to the item in //Sites/<SITENAME>/folders .../ItemName form.")})
+			public String getSitePathFromItemPath(String itemPath){
+				String sitePath = "";
+				String[] itemParts = itemPath.split("/");
+				for (int i=0; i<4; i++){
+					sitePath = sitePath + itemParts[i] + "/";
+				}
+					
+				return sitePath;
+	}
 
 	@IPSJexlMethod(description = "Returns a context variable for a given Site, using a specified ID.  " +
 			"Null if the property isn't defined.", params = {

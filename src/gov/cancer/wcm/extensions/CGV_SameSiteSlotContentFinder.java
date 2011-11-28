@@ -6,6 +6,8 @@
  */
 package gov.cancer.wcm.extensions;
 
+import gov.cancer.wcm.extensions.jexl.CGV_AssemblyTools;
+
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -169,7 +171,8 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
          if(isRelationshipInSlot(rel, sourceSlot) && isDependentOnSameSite(rel.getDependent(), sourceItem.getPath())) // and relationship is on same site as content item
          {
             IPSGuid guid = gmgr.makeGuid(rel.getDependent()); 
-            IPSGuid templateGuid = guid;
+            long relTemplateID = Long.valueOf(rel.getUserProperty("sys_variantid").getValue());
+            IPSGuid templateGuid = gmgr.makeGuid(relTemplateID, com.percussion.services.catalog.PSTypeEnum.TEMPLATE);
             SlotItem si = new SlotItem(guid, templateGuid, sortrank);
             sortrank++;
             rval.add(si);
@@ -193,6 +196,7 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
 	private boolean isDependentOnSameSite(PSLocator dep, String ownerPath){
 	
 		//TODO get path from dep locator
+		CGV_AssemblyTools aTools = new CGV_AssemblyTools();
 		IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
 		String[] pathsList = null;
 		IPSGuid depGuid = gmgr.makeGuid(dep);
@@ -206,7 +210,7 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
 		
 		if (pathsList != null){
 			for(String path : pathsList){
-				if(ownerPath.substring(0, path.length()).equals(path)){
+				if(aTools.getSitePathFromItemPath(ownerPath).equals(aTools.getSitePathFromItemPath(path))){
 					return true;
 				}
 			}
