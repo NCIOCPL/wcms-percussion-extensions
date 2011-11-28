@@ -168,8 +168,9 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
          PSRelationship rel =  iter.next();
          if(isRelationshipInSlot(rel, sourceSlot) && isDependentOnSameSite(rel.getDependent(), sourceItem.getPath())) // and relationship is on same site as content item
          {
-            IPSGuid guid = gmgr.makeGuid(rel.getOwner()); 
-            SlotItem si = new SlotItem(guid, slotTemplate.getGUID(), sortrank);
+            IPSGuid guid = gmgr.makeGuid(rel.getDependent()); 
+            IPSGuid templateGuid = guid;
+            SlotItem si = new SlotItem(guid, templateGuid, sortrank);
             sortrank++;
             rval.add(si);
          }
