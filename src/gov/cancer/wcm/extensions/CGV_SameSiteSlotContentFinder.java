@@ -1,4 +1,10 @@
 /*
+ * gov.cancer.wcm.extensions CGV_SameSiteSlotContentFinder.java
+ * 
+ * @author NickSchultz
+ * 
+ * Much of the code was used from (modified with different criteria):
+ * 
  * com.percussion.pso.finder PSOReverseSlotContentFinder.java
  *  
  * @author DavidBenua
@@ -42,7 +48,7 @@ import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
 
 /**
- * This slot finder returns all of the Active Assembly parents of the current item.  The results 
+ * This slot finder returns all of the Active Assembly children of the current item which are on the current site.  The results 
  * can be limited by Slot name. 
  * The parameters may be supplied in the usual ways: via the slot finder parameters in the slot, or 
  * vai the template. 
@@ -108,29 +114,23 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
    {
       Set<SlotItem> rval = new LinkedHashSet<SlotItem>();
       Map<String, ? extends Object> args = slot.getFinderArguments();
-      String template = null;
       String sourceSlotName = null; 
       String orderBy = null; 
       String limitToPublic = null; 
       int maxResults = -1; 
       
-      template = getValue(args, selectors, PARAM_TEMPLATE, null);
       sourceSlotName = getValue(args, selectors, PARAM_SOURCESLOT, null); 
       orderBy = getValue(args, selectors, PARAM_ORDERBY, null);
       limitToPublic = getValue(args, selectors, PARAM_LIMITPUBLIC, null );
       if(log.isDebugEnabled())
       {
-         log.debug("Starting Reverse Slot Content Finder. Template="+ template + " source slot=" 
+         log.debug("Starting Reverse Slot Content Finder. source slot=" 
                + sourceSlotName + " order by " + orderBy + " public=" + limitToPublic); 
       }
-      if (StringUtils.isBlank(template))
-      {
-         throw new IllegalArgumentException("template is a required argument");
-      }
+     
             
       initServices();
       IPSTemplateSlot sourceSlot = null; 
-      IPSAssemblyTemplate slotTemplate = asm.findTemplateByName(template);
       if(StringUtils.isNotBlank(sourceSlotName))
       {
          sourceSlot = asm.findSlotByName(sourceSlotName);
@@ -186,12 +186,7 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
      return rval;
    }
 
-   /**
-    * Determines if the relationship given references the slot. 
-    * @param rel the relationship to check. 
-    * @param slot the slot. If <code>null</code> all relationships return <code>true</code>
-    * @return <code>true</code> if the relationship meets the slot criteria. 
-    */
+
 	
 	private boolean isDependentOnSameSite(PSLocator dep, String ownerPath){
 	
@@ -217,6 +212,12 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
 		}
 		return false;
 	}
+	   /**
+	    * Determines if the relationship given references the slot. 
+	    * @param rel the relationship to check. 
+	    * @param slot the slot. If <code>null</code> all relationships return <code>true</code>
+	    * @return <code>true</code> if the relationship meets the slot criteria. 
+	    */
 	
    private boolean isRelationshipInSlot(PSRelationship rel, IPSTemplateSlot slot)
    {
