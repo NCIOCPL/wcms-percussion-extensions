@@ -196,6 +196,11 @@
 			<dataType>java.lang.String</dataType>
 			<description>One or more comma separated field components. Each component names a field available in the related content objects and a direction. The syntax of this mirrors that for the JSR-170 queries.</description>
 		</PSXExtensionParamDef>
+		<PSXExtensionParamDef id="3">
+			<name>template</name>
+			<dataType>java.lang.String</dataType>
+			<description>The name of the template to use.</description>
+		</PSXExtensionParamDef>
 		<suppliedResources/>
 	</Extension>
 </PSXExtensionHandlerConfiguration>
