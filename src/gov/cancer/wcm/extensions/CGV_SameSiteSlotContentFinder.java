@@ -28,7 +28,6 @@ import com.percussion.cms.objectstore.PSRelationshipProcessorProxy;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.design.objectstore.PSRelationshipSet;
-import com.percussion.error.PSErrorException;
 import com.percussion.pso.utils.PSORequestContext;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.assembly.IPSAssemblyItem;
@@ -114,23 +113,28 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
    {
       Set<SlotItem> rval = new LinkedHashSet<SlotItem>();
       Map<String, ? extends Object> args = slot.getFinderArguments();
+      String template = null;
       String sourceSlotName = null; 
       String orderBy = null; 
       String limitToPublic = null; 
-      int maxResults = -1; 
-      
+      template = getValue(args, selectors, PARAM_TEMPLATE, null);
       sourceSlotName = getValue(args, selectors, PARAM_SOURCESLOT, null); 
       orderBy = getValue(args, selectors, PARAM_ORDERBY, null);
       limitToPublic = getValue(args, selectors, PARAM_LIMITPUBLIC, null );
       if(log.isDebugEnabled())
       {
-         log.debug("Starting Reverse Slot Content Finder. source slot=" 
-               + sourceSlotName + " order by " + orderBy + " public=" + limitToPublic); 
-      }
+          log.debug("Starting Reverse Slot Content Finder. Template="+ template + " source slot=" 
+                + sourceSlotName + " order by " + orderBy + " public=" + limitToPublic); 
+       }
+       if (StringUtils.isBlank(template))
+       {
+          throw new IllegalArgumentException("template is a required argument");
+       }
      
             
       initServices();
       IPSTemplateSlot sourceSlot = null; 
+      IPSAssemblyTemplate slotTemplate = asm.findTemplateByName(template);
       if(StringUtils.isNotBlank(sourceSlotName))
       {
          sourceSlot = asm.findSlotByName(sourceSlotName);
@@ -171,8 +175,12 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
          if(isRelationshipInSlot(rel, sourceSlot) && isDependentOnSameSite(rel.getDependent(), sourceItem.getPath())) // and relationship is on same site as content item
          {
             IPSGuid guid = gmgr.makeGuid(rel.getDependent()); 
-            long relTemplateID = Long.valueOf(rel.getUserProperty("sys_variantid").getValue());
-            IPSGuid templateGuid = gmgr.makeGuid(relTemplateID, com.percussion.services.catalog.PSTypeEnum.TEMPLATE);
+            //using template set in AA table editor
+            //long relTemplateID = Long.valueOf(rel.getUserProperty("sys_variantid").getValue());
+            //IPSGuid templateGuid = gmgr.makeGuid(relTemplateID, com.percussion.services.catalog.PSTypeEnum.TEMPLATE);
+            
+            //using template from template parameter to this slot.
+            IPSGuid templateGuid = slotTemplate.getGUID();
             SlotItem si = new SlotItem(guid, templateGuid, sortrank);
             sortrank++;
             rval.add(si);
@@ -190,7 +198,6 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
 	
 	private boolean isDependentOnSameSite(PSLocator dep, String ownerPath){
 	
-		//TODO get path from dep locator
 		CGV_AssemblyTools aTools = new CGV_AssemblyTools();
 		IPSContentWs contentWS = PSContentWsLocator.getContentWebservice();
 		String[] pathsList = null;
@@ -242,6 +249,7 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
       return com.percussion.services.assembly.IPSSlotContentFinder.Type.COMPUTED;
    }
 
+   public static final String PARAM_TEMPLATE = "template";
    /**
     * Order By Parameter
     */
