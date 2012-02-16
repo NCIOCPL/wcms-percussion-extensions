@@ -96,6 +96,7 @@ public class CGV_TitlePopulate extends PSDefaultExtension implements
 			}
 		}
 		int randNum=get4DigitRandomNumber();
+		displayTitle = displayTitle.replaceAll("/", ",");
 		if(!keepNumbers){
 			return displayTitle+"[#"+randNum+"]";
 		}
