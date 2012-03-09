@@ -188,7 +188,16 @@ public class CGV_Reports extends PSDefaultExtension{
 								depGuid = psoObjFinder.getGuidById(Integer.toString(dep.getId()));
 							}
 						}
-						
+						if(depGuid == null){
+							customLinkInfo.put("tgt_sys_title", "");
+							customLinkInfo.put("tgt_long_title", "");
+							customLinkInfo.put("tgt_short_title", "");
+							customLinkInfo.put("tgt_long_desc", "");
+							customLinkInfo.put("tgt_short_desc", "");
+							customLinkInfo.put("tgt_path", "");
+							retList.add(customLinkInfo);
+							continue;
+						}
 						IPSNode depNode = psoObjFinder.getNodeByGuid(depGuid);
 						Long ctypeID = depNode.getProperty("rx:sys_contenttypeid").getLong();
 						String ctypeName = "";
