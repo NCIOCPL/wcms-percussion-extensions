@@ -122,6 +122,19 @@
          <description>(Optional) If set will check uniqueness in each comma separated path/Site e.g. //Sites/SiteA/%,//Sites/SiteB/% </description>
       </PSXExtensionParamDef>
       <suppliedResources/>
+   </Extension>   
+   <Extension categorystring="relationship" context="user/" deprecated="no" handler="Java" name="CGV_AutoShare" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Shares the content item to the mobile site, used for press releases</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_AutoShare</initParam>
+      <interface name="com.percussion.relationship.IPSEffect"/>
+      <PSXExtensionParamDef id="0">
+         <name>contentTypeId</name>
+         <dataType>java.lang.String</dataType>
+         <description>the Content type id, used to determine the destination path</description>
+      </PSXExtensionParamDef>
+      <suppliedResources/>
    </Extension>
    <Extension categorystring="relationship" context="user/" deprecated="no" handler="Java" name="CGV_UniqueInFolderEffect" restoreRequestParamsOnError="no">
       <initParam name="com.percussion.user.description">Ensures that specified field in content items is unique within folder, but ignores translation items.</initParam>
