@@ -1,146 +1,225 @@
 package gov.cancer.wcm.extensions;
 
+import gov.cancer.wcm.util.CGV_FolderValidateUtils;
+
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import gov.cancer.wcm.util.CGV_FolderValidateUtils;
+import org.springframework.beans.factory.InitializingBean;
 
 import com.percussion.cms.PSCmsException;
 import com.percussion.cms.objectstore.PSCoreItem;
-import com.percussion.cms.objectstore.PSInvalidContentTypeException;
-import com.percussion.cms.objectstore.server.PSItemDefManager;
+import com.percussion.cms.objectstore.PSFolder;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
 import com.percussion.extension.PSExtensionProcessingException;
 import com.percussion.extension.PSParameterMismatchException;
-import com.percussion.pso.jexl.PSOObjectFinder;
-import com.percussion.pso.utils.PSOExtensionParamsHelper;
 import com.percussion.pso.utils.PSONodeCataloger;
+import com.percussion.pso.utils.RxItemUtils;
 import com.percussion.relationship.IPSEffect;
 import com.percussion.relationship.IPSExecutionContext;
 import com.percussion.relationship.PSEffectResult;
 import com.percussion.server.IPSRequestContext;
-import com.percussion.services.assembly.jexl.PSLocationUtils;
-import com.percussion.services.contentmgr.IPSNode;
+import com.percussion.services.PSBaseServiceLocator;
+import com.percussion.services.content.data.PSItemStatus;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
+import com.percussion.webservices.PSErrorsException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.webservices.content.PSContentWsLocator;
 import com.percussion.webservices.system.PSSystemWsLocator;
 
 
-public class CGV_AutoShare implements IPSEffect{
+public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, InitializingBean{
 	private CGV_FolderValidateUtils valUtil = null;
     private static final Log log = LogFactory.getLog(CGV_AutoShare.class);
-    private HashMap<String, HashMap<String,String>> rulesMap = null;
-
+    
+    
+	private Map<String,Map<String, String>> autoShareRules;
 	
-	public boolean copyItemAsLink(IPSGuid itemGuid, String destinationFolderPath){
-		IPSContentWs contentWs = valUtil.getContentWs();
-		
-		if (itemGuid == null){
-			return false;
+	public Map<String, Map<String, String>> getAutoShareRules() {
+		return autoShareRules;
+	}
+
+	public void setAutoShareRules(Map<String, Map<String, String>> newAutoShareRules) {
+		this.autoShareRules = newAutoShareRules;
+	}
+	
+	public String getSourcePath(String contentType, String locale){
+		Map<String,String> cTypeRules = autoShareRules.get(contentType);
+		if (locale.equals("es")){
+			return cTypeRules.get("srcPathES");
 		}
-		ArrayList<IPSGuid> gList = new ArrayList<IPSGuid>();
-		gList.add(itemGuid);
-		try {
-			contentWs.addFolderChildren(destinationFolderPath, gList);
-		} catch (PSErrorException e2) {
-			e2.printStackTrace();
-			return false;
+		else{
+			return cTypeRules.get("srcPathEN");
 		}
-		return true;
+	}
+	
+	public String getTargetPath(String contentType, String locale){
+		Map<String,String> cTypeRules = autoShareRules.get(contentType);
+		if (locale.equals("es-us")){
+			return cTypeRules.get("tgtPathES");
+		}
+		else{
+			return cTypeRules.get("tgtPathEN");
+		}
 	}
 
 	@Override
 	public void attempt(Object[] params, IPSRequestContext request,
 			IPSExecutionContext context, PSEffectResult result)
 			throws PSExtensionProcessingException, PSParameterMismatchException {
-		/*if (context.isPreConstruction()) {
-			PSOObjectFinder psoObjFinder = new PSOObjectFinder();
-			PSLocationUtils locUtils = new PSLocationUtils();
+		if (context.isPreConstruction()) {
 			IPSContentWs contentWs = valUtil.getContentWs();
-			PSOExtensionParamsHelper h = new PSOExtensionParamsHelper(valUtil.getExtensionDef(), params, request, log);
 			PSRelationship originating = context.getOriginatingRelationship(); 
 			IPSGuid depGuid = valUtil.getGuidManager().makeGuid(originating.getDependent());
-			IPSGuid ownerGuid = valUtil.getGuidManager().makeGuid(originating.getOwner());
-			PSItemDefManager iDefMgr = PSItemDefManager.getInstance();
-			IPSNode folder = null;
-			String folderPath = "";
-			
-			Map<String,String> paramMap = h.getExtensionParameters();
-	        long  cTypeId = Long.parseLong(paramMap.get("contentTypeId"));
-	        String contentTypeName = "";
-
+			List<PSItemStatus> statusList = null;
+			List<PSCoreItem> items = null;
+			PSCoreItem itemToShare = null;
+		
+			List<IPSGuid> glist = Collections.<IPSGuid>singletonList(depGuid);
 			try {
-				contentTypeName = iDefMgr.contentTypeIdToName(cTypeId);
-			} catch (PSInvalidContentTypeException e1) {
-				result.setError("Invalid Content type id");
-				e1.printStackTrace();
+				statusList = contentWs.prepareForEdit(glist);
+				items = contentWs.loadItems(glist, true, false, false, false);
+
+			} catch (PSErrorResultsException e3) {
+				result.setError("Cannot load item to share");
+				e3.printStackTrace();
+				return;
+
+			}
+			if (items != null && items.size()>0){
+				itemToShare = items.get(0);
+			}
+			else{
+				result.setError("Cannot load item to share");
 				return;
 			}
-			
-			try {
-				folder = psoObjFinder.getNodeByGuid(ownerGuid);
-				if(folder != null){
-					folderPath = locUtils.path(folder);
-				}
-			} catch (RepositoryException e) {
-				result.setError("Unable to find source folder path");
-				e.printStackTrace();
-				return;
+			String typeName = "";
+			if( itemToShare.getItemDefinition() != null) {
+			  // The "friendly name" is retrieved with getLabel().
+			  typeName = itemToShare.getItemDefinition().getName();
 			}
-			String destPath = "//Sites/MobileCancerGov/Testing";
-			PSCoreItem item = null;
-
-			boolean contentTypeMatch = contentTypeName.equals("cgvPressRelease");
-			HashMap<String, String> rulesSet = rulesMap.get("cgvPressRelease");
-			boolean inRightFolder = folderPath.contains(rulesSet.get("srcPath")) || folderPath.contains(rulesSet.get("srcPathES"));
-			
-			contentTypeMatch = contentTypeMatch && inRightFolder;
-
-			if (!alreadyShared && contentTypeMatch ){
-				ArrayList<IPSGuid> gList = new ArrayList<IPSGuid>();
-				gList.add(depGuid);
-				List<Node> nList = null;
-				try {
-					nList = valUtil.getContentManager().findItemsByGUID(gList, null);
-				} catch (RepositoryException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+			boolean isInBean = false;
+			for(String cTypeKey : autoShareRules.keySet()){
+				if (cTypeKey.equals(typeName)){
+					isInBean = true;
 				}
-				Node n = nList.get(0);
-				//get dest path
-
-	
-				request.setPrivateObject("alreadyShared", "true");
-				
-				try {
-					contentWs.addFolderChildren(destPath, gList);
-				} catch (PSErrorException e) {
-					e.printStackTrace();
-				}
+			}
+			if(!isInBean){
 				result.setSuccess();
 				return;
 			}
+			String tfShared = "true";
+			String locale = "";
+			try {
+				tfShared = RxItemUtils.getFieldValue(itemToShare, "hasBeenAutoShared");
+				locale = RxItemUtils.getFieldValue(itemToShare, "sys_lang");
+			} catch (PSCmsException e2) {
+				result.setError("Cannot parse hasBeenAutoShared field");
+				e2.printStackTrace();
+				return;
+			}
+			if(tfShared == null){tfShared = "true";}
+			boolean alreadyShared = Boolean.parseBoolean(tfShared);
+
+
+			if (!alreadyShared){
+				RxItemUtils.setFieldValue(itemToShare, "hasBeenAutoShared", "true");
+				String destPath;
+				try {
+					destPath = getDestinationPath(typeName, locale, itemToShare);
+				} catch (PSCmsException e1) {
+					result.setError("Failed to get date for destination path");
+					e1.printStackTrace();
+					return;
+				}
+
+				try {
+					contentWs.saveItems(items, false, false);
+				} catch (PSErrorResultsException e2) {
+					result.setError("Failed to save item after edit");
+					e2.printStackTrace();
+					return;
+				}
+				try {
+					contentWs.releaseFromEdit(statusList, false);
+				} catch (PSErrorsException e2) {
+					result.setError("Failed to release item after edit");
+					e2.printStackTrace();
+					return;
+				}
+				
+				String[] folders = new String[1];
+				folders[0] = destPath;
+				try {
+					List<PSFolder> folderList = contentWs.loadFolders(folders);
+				} catch (PSErrorResultsException e1) {
+					result.setSuccess();
+					return;
+				}
+				
+
+				try {
+					contentWs.addFolderChildren(destPath, glist);
+				} catch (PSErrorException e) {
+					result.setError("Failed to share content to secondary folder");
+					e.printStackTrace();
+					return;
+				}
+				
+				result.setSuccess();
+				return;
+			}
+			else{
+				try {
+					contentWs.saveItems(items, false, false);
+				} catch (PSErrorResultsException e2) {
+					result.setError("Failed to save item without edit");
+					e2.printStackTrace();
+					return;
+				}
+				try {
+					contentWs.releaseFromEdit(statusList, false);
+				} catch (PSErrorsException e2) {
+					result.setError("Failed to release item without edit");
+					e2.printStackTrace();
+					return;
+				}
+			}
+			
 			result.setSuccess();
 			return;
-		}*/
+		}
 		result.setSuccess();
 		return;
+	}
+	
+	private String getDestinationPath(String contentTypeName, String locale, PSCoreItem itemToShare) 
+			throws PSCmsException{
+		String basePath = getTargetPath(contentTypeName, locale);
+		if(!basePath.endsWith("/")){
+			basePath = basePath + "/";
+		}
+		Date pubDate = null;
+		try {
+			pubDate = RxItemUtils.getFieldDate(itemToShare, "date_first_published");
+		} catch (PSCmsException e) {
+			throw new PSCmsException(e);
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+		return basePath+sdf.format(pubDate);
+		
 	}
 
 	@Override
@@ -162,15 +241,8 @@ public class CGV_AutoShare implements IPSEffect{
 	@Override
 	public void init(IPSExtensionDef extensionDef, File arg1)
 			throws PSExtensionException {
-		if (rulesMap == null){
-			rulesMap = new HashMap<String, HashMap<String,String>>();
-			HashMap<String,String> prRules = new HashMap<String,String>();
-			prRules.put("srcPath", "//Sites/CancerGov/newscenter/pressreleases/");
-			prRules.put("tgtPath", "//Sites/MobileCancerGov/news/pressreleases/");
-			prRules.put("srcPathES", "//Sites/CancerGov/espanol/noticias/");
-			prRules.put("tgtPathES", "//Sites/MobileCancerGov/es/noticias/comunicadosdeprensa/");
-			rulesMap.put("cgvPressRelease", prRules);
-		}
+		CGV_AutoShare beanObj = (CGV_AutoShare) getBean("CGV_AutoShare");
+		setAutoShareRules(beanObj.getAutoShareRules());
 		
 		if (valUtil == null) {
 	    	valUtil = new CGV_FolderValidateUtils();
@@ -183,6 +255,10 @@ public class CGV_AutoShare implements IPSEffect{
     	}
     	log.debug("CGV_AutoShare: end of init()");
 		
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {	
 	}
 
 
