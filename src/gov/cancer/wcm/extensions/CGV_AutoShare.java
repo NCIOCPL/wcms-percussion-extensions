@@ -14,13 +14,16 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.percussion.cms.PSCmsException;
+import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSFolder;
 import com.percussion.design.objectstore.PSRelationship;
+import com.percussion.error.PSException;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
 import com.percussion.extension.PSExtensionProcessingException;
 import com.percussion.extension.PSParameterMismatchException;
+import com.percussion.pso.utils.PSOItemSummaryFinder;
 import com.percussion.pso.utils.PSONodeCataloger;
 import com.percussion.pso.utils.RxItemUtils;
 import com.percussion.relationship.IPSEffect;
@@ -86,6 +89,18 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			List<PSItemStatus> statusList = null;
 			List<PSCoreItem> items = null;
 			PSCoreItem itemToShare = null;
+			PSComponentSummary depSum = null;
+			try {
+				 depSum = PSOItemSummaryFinder.getSummary(depGuid);
+			} catch (PSException e4) {
+				result.setError("Cannot get item summary, may be folder");
+				e4.printStackTrace();
+				return;
+			}
+			if(depSum.isFolder()){
+				result.setSuccess();
+				return;
+			}
 		
 			List<IPSGuid> glist = Collections.<IPSGuid>singletonList(depGuid);
 			try {
