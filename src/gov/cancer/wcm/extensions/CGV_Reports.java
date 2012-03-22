@@ -1,5 +1,7 @@
 package gov.cancer.wcm.extensions;
 
+import gov.cancer.wcm.extensions.jexl.CGV_AssemblyTools;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +41,11 @@ import com.percussion.services.assembly.IPSTemplateSlot;
 import com.percussion.services.assembly.PSAssemblyException;
 import com.percussion.services.assembly.PSAssemblyServiceLocator;
 import com.percussion.services.assembly.jexl.PSLocationUtils;
-import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.contentmgr.IPSContentMgr;
 import com.percussion.services.contentmgr.IPSNode;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.IPSGuidManager;
+import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.util.IPSHtmlParameters;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
@@ -54,8 +56,6 @@ import com.percussion.webservices.security.IPSSecurityWs;
 import com.percussion.webservices.security.PSSecurityWsLocator;
 import com.percussion.webservices.system.IPSSystemWs;
 import com.percussion.webservices.system.PSSystemWsLocator;
-import gov.cancer.wcm.extensions.jexl.CGV_AssemblyTools;
-import com.percussion.services.guidmgr.PSGuidManagerLocator;
 
 public class CGV_Reports extends PSDefaultExtension{
 	
@@ -298,8 +298,29 @@ public class CGV_Reports extends PSDefaultExtension{
 					else{
 						fieldUsageInfo.put("content_id", row.getValue("rx:sys_contentid").getString());
 						fieldUsageInfo.put("sys_title",row.getValue("rx:sys_title").getString());
-						IPSGuid itemGuid = gmgr.makeGuid(row.getValue("rx:sys_contentid").getString(), PSTypeEnum.CONTENT);
+						IPSGuid itemGuid = gmgr.makeGuid(new PSLocator(row.getValue("rx:sys_contentid").getString()));
 						guidList.add(itemGuid);
+						String dataFieldQry = "select rx:sys_contentid, rx:"+dataField+" from rx:"+contentType+" where rx:sys_contentid = "+row.getValue("rx:sys_contentid").getString();
+						Query dfQuery = null;
+						QueryResult dfQresults = null;
+						dfQuery = contentMgr.createQuery(dataFieldQry, Query.SQL);
+						if(dfQuery != null){
+							dfQresults = contentMgr.executeQuery(dfQuery, -1, null, null);
+						}
+						if(dfQresults != null){
+							RowIterator dfrows = dfQresults.getRows();
+							while(dfrows.hasNext()){
+								Row dfrow = dfrows.nextRow();
+								Value dataVal = dfrow.getValue("rx:"+dataField);
+								String dataString = "";
+								if(dataVal != null){
+									dataString = dataVal.getString();
+								}
+								fieldUsageInfo.put("data_field", dataString);
+
+							}
+							
+						}
 						/*Value dataVal = row.getValue("rx:"+dataField);
 						String dataString = "";
 						if(dataVal != null){
@@ -317,7 +338,7 @@ public class CGV_Reports extends PSDefaultExtension{
 			e4.printStackTrace();
 		}
 		
-		List<PSCoreItem> itemList = null;
+		/*List<PSCoreItem> itemList = null;
 		try {
 			itemList = contentWS.loadItems(guidList, false, false, false, true);
 		} catch (PSErrorResultsException e) {
@@ -340,7 +361,7 @@ public class CGV_Reports extends PSDefaultExtension{
 			itemInfo.put("data_field", dataString);
 			retList.put(cid, itemInfo);
 			
-		}
+		}*/
 		
 		
 		
@@ -348,6 +369,149 @@ public class CGV_Reports extends PSDefaultExtension{
 		return retList;
 }
 
+	public HashMap<String, HashMap<String, HashMap<String, HashMap<String, String>>>> report_BestBets(){
+		
+		IPSContentMgr contentMgr = PSContentMgrLocator.getContentMgr();
+		//boolean includeSubfolders = Boolean.parseBoolean(subfolders);
+
+		PSOObjectFinder psoObjFinder = new PSOObjectFinder();
+		HashMap<String, HashMap<String, HashMap<String, HashMap<String, String>>>> reportMap = new HashMap<String,HashMap<String, HashMap<String, HashMap<String, String>>>>();
+		PSItemDefManager itemDefMgr = PSItemDefManager.getInstance();
+        IPSAssemblyService asm = PSAssemblyServiceLocator.getAssemblyService();
+	    IPSTemplateSlot slot = null;
+		try {
+			slot = asm.findSlotByName("cgvBestBetsListItems");
+		} catch (PSAssemblyException e3) {
+			e3.printStackTrace();
+		}
+	    int slotidint = slot.getGUID().getUUID();
+	    String slotid = Integer.toString(slotidint);
+
+        	
+
+		String qry = "select jcr:path, rx:sys_contentid, rx:sys_title, rx:long_title from rx:cgvBestBetsCategory";
+		Query query = null;
+		QueryResult qresults = null;
+		
+		try {
+			query = contentMgr.createQuery(qry, Query.SQL);
+			if(query != null){
+				qresults = contentMgr.executeQuery(query, -1, null, null);
+			}
+			if(qresults != null){
+				RowIterator rows = qresults.getRows();
+				while(rows.hasNext()){
+					
+					Row row = rows.nextRow();
+					String contentPath = "";
+					Value cpathval = row.getValue("jcr:path");
+					if(cpathval != null){
+						contentPath = cpathval.getString();
+					}
+					else{
+						continue;
+					}
+					
+					String groupingName = contentPath.substring(contentPath.lastIndexOf("/")+1);
+					HashMap<String, HashMap<String, HashMap<String, String>>> bestBetGrouping = reportMap.get(groupingName);
+					if (bestBetGrouping == null){
+						bestBetGrouping = new HashMap<String, HashMap<String, HashMap<String, String>>>();
+					}
+					HashMap<String, HashMap<String, String>> bestBetCategory = bestBetGrouping.get(row.getValue("rx:long_title").getString());
+					if (bestBetCategory == null){
+						bestBetCategory = new HashMap<String, HashMap<String, String>>();
+					}
+
+					
+					IPSSystemWs systemWebService = PSSystemWsLocator.getSystemWebservice();
+
+					List<PSRelationship> rels = new ArrayList<PSRelationship>();
+					PSRelationshipFilter filter = new PSRelationshipFilter();
+					//This is going to be the current/edit revision for this content item.
+					filter.setOwner(new PSLocator(row.getValue("rx:sys_contentid").getString()));
+					filter.setCategory(PSRelationshipFilter.FILTER_CATEGORY_ACTIVE_ASSEMBLY);
+					
+					try {
+						rels = systemWebService.loadRelationships(filter);
+					} catch (PSErrorException e1) {
+						e1.printStackTrace();
+					}
+						
+
+				
+					for(PSRelationship rel : rels){
+						PSLocator dep =  rel.getDependent();
+						IPSGuid depGuid = null;
+						
+						if(rel.getProperty(IPSHtmlParameters.SYS_SLOTID).equals(slotid)){		
+							depGuid = psoObjFinder.getGuidById(Integer.toString(dep.getId()));
+							IPSNode depNode = psoObjFinder.getNodeByGuid(depGuid);
+							Long ctypeID = depNode.getProperty("rx:sys_contenttypeid").getLong();
+							String ctypeName = "";
+							String ctypeLabel = "";
+							try {
+								ctypeName = itemDefMgr.contentTypeIdToName(ctypeID);
+								ctypeLabel = itemDefMgr.contentTypeIdToLabel(ctypeID);
+							} catch (PSInvalidContentTypeException e) {
+								e.printStackTrace();
+							}
+							
+							String liqry = "select jcr:path, rx:sys_contentid, rx:sys_title, rx:long_title from rx:"+ctypeName+" where rx:sys_contentid = "+Integer.toString(depGuid.getUUID());
+							Query liquery = null;
+							QueryResult liqresults = null;
+							
+							
+							liquery = contentMgr.createQuery(liqry, Query.SQL);
+							if(liquery != null){
+								liqresults = contentMgr.executeQuery(liquery, -1, null, null);
+							}
+							if(liqresults != null){
+								RowIterator lirows = liqresults.getRows();
+								while(lirows.hasNext()){
+									
+									Row lirow = lirows.nextRow();
+									HashMap<String, String> listItem = new HashMap<String, String>();
+									String listItemName = "";
+									String listItemURL = "";
+									if(lirow.getValue("rx:sys_title")!= null){
+										listItemName = lirow.getValue("rx:sys_title").getString();
+									}
+									else{
+										continue;
+									}
+									if(lirow.getValue("jcr:path")!=null){
+										listItemURL = lirow.getValue("jcr:path").getString();
+									}
+									else{
+										continue;
+									}
+									listItem.put("name", listItemName);
+									listItem.put("url", listItemURL);
+									listItem.put("contentType", ctypeLabel);
+									bestBetCategory.put(listItemName, listItem);
+								}
+							}
+						}
+					String categoryName = "";
+					if (row.getValue("rx:long_title")!= null){
+						categoryName = row.getValue("rx:long_title").getString();
+					}
+					bestBetGrouping.put(categoryName, bestBetCategory);
+					reportMap.put(groupingName, bestBetGrouping);
+					}
+				}
+			}
+
+		} catch (InvalidQueryException e4) {
+			e4.printStackTrace();
+		} catch (RepositoryException e4) {
+			e4.printStackTrace();
+		}
+
+		return reportMap;
+}
+	
+	
 	@IPSJexlMethod(description = "returns a map of datafield names mapped to a map of other information (fieldLabel, fieldControllerRef ", params = 
 			@IPSJexlParam(name = "contentTypeName", description = "the name of the content type to return the fields for"))
 	public HashMap<String, HashMap<String, String>> getDataFieldNames(String contentTypeName){
