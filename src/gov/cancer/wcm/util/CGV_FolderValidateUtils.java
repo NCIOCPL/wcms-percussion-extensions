@@ -29,7 +29,6 @@ import org.apache.commons.logging.LogFactory;
 import com.percussion.cms.objectstore.IPSFieldValue;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSFolder;
-import com.percussion.cms.objectstore.PSItemDefinition;
 import com.percussion.cms.objectstore.PSItemField;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
@@ -81,20 +80,8 @@ public class CGV_FolderValidateUtils {
     	throws Exception {
     	log.debug("[doAttempt]getting field");        
     	PSItemField field = item.getFieldByName(fieldName);
-    	PSItemDefinition itemDef = item.getItemDefinition();
-
-    	// If the field is null, find out if the item is a folder.
-    	// If so, we'll want to compare the sys_title for uniqueness
-    	if( field == null && itemDef != null){
-    		String typename = item.getItemDefinition().getName();
-    		if(typename.equals("Folder")){
-    			field = item.getFieldByName("sys_title");
-			}
-    	}
-    	
     	if (field == null) {
-    		// If this field doesn't exist in this type, and the type
-    		// is not a folder, then success.
+    		//this field doesn't exist in this type so success
     		log.debug("[doAttempt]setting success - field is null");        
     		result.setSuccess();
     	}
@@ -350,9 +337,9 @@ public class CGV_FolderValidateUtils {
     public String getQueryForValueInFolder(String fieldName, String fieldValue, String path, String typeList) {
         return format(
                 "select rx:sys_contentid, rx:{0} " +
-                "from {3}, rx:folder " +
+                "from {3} " +
                 "where " +
-                "(rx:{0} = ''{1}'' or rx:sys_title = ''{1}'' )" +
+                "rx:{0} = ''{1}'' " +
                 "and " +
                 "jcr:path like ''{2}''", 
                 fieldName, fieldValue, path, typeList);
@@ -371,9 +358,9 @@ public class CGV_FolderValidateUtils {
     public String getQueryForValueInFolderWithCid(String fieldName, String fieldValue, String path, String typeList, int contentId) {
         return format(
                 "select rx:sys_contentid, rx:{0} " +
-                "from {3}, rx:folder " +
+                "from {3} " +
                 "where " +
-                "(rx:{0} = ''{1}'' or rx:sys_title = ''{1}'')" +
+                "rx:{0} = ''{1}'' " +
                 "and " +
                 "rx:sys_contentid != {4} " +
                 "and " +
