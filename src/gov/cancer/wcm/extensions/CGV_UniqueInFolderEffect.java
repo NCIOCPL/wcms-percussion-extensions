@@ -96,17 +96,23 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 			PSOExtensionParamsHelper h = new PSOExtensionParamsHelper(valUtil.getExtensionDef(), params, request, log);
 	        String fieldName = h.getRequiredParameter("fieldName");
 	        log.debug("[attempt]fieldName = " + fieldName);        
-			PSRelationship originating = context.getOriginatingRelationship(); 
+
+			// Retrieve information about the newly created relationship.
+	        PSRelationship originating = context.getOriginatingRelationship();
 			int revision = originating.getDependent().getRevision();
-			if (revision <= -1) {
-				result.setSuccess();
-				log.debug("revision is undefined, report success");
-				return;
-			}
 			int contentId = originating.getDependent().getId();
-			log.debug("[attempt]contentId = " + contentId);
 			int folderId = originating.getOwner().getId();
+
+			log.debug("[attempt]contentId = " + contentId);
 			log.debug("[attempt]folderId = " + folderId);
+
+			
+//			if (revision <= -1) {
+//				result.setSuccess();
+//				log.debug("revision is undefined, report success");
+//				return;
+//			}
+
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
 				PSCoreItem item = valUtil.loadItem(String.valueOf(contentId));
