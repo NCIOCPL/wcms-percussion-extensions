@@ -389,7 +389,7 @@ public class CGV_Reports extends PSDefaultExtension{
 
         	
 
-		String qry = "select jcr:path, rx:sys_contentid, rx:sys_title, rx:long_title from rx:cgvBestBetsCategory";
+		String qry = "select jcr:path, rx:sys_contentid, rx:sys_title, rx:long_title from rx:cgvBestBetsCategory where jcr:path like '//Sites/CancerGov/BestBets%'";
 		Query query = null;
 		QueryResult qresults = null;
 		
@@ -437,7 +437,13 @@ public class CGV_Reports extends PSDefaultExtension{
 						e1.printStackTrace();
 					}
 						
-
+					if(rels.size() == 0){
+						HashMap<String, String> listItem = new HashMap<String, String>();
+						listItem.put("name", "");
+						listItem.put("url", "");
+						listItem.put("contentType", "");
+						bestBetCategory.put("empty", listItem);
+					}
 				
 					for(PSRelationship rel : rels){
 						PSLocator dep =  rel.getDependent();
@@ -467,6 +473,7 @@ public class CGV_Reports extends PSDefaultExtension{
 							}
 							if(liqresults != null){
 								RowIterator lirows = liqresults.getRows();
+								
 								while(lirows.hasNext()){
 									
 									Row lirow = lirows.nextRow();
@@ -492,13 +499,14 @@ public class CGV_Reports extends PSDefaultExtension{
 								}
 							}
 						}
+
+					}
 					String categoryName = "";
 					if (row.getValue("rx:long_title")!= null){
 						categoryName = row.getValue("rx:long_title").getString();
 					}
 					bestBetGrouping.put(categoryName, bestBetCategory);
 					reportMap.put(groupingName, bestBetGrouping);
-					}
 				}
 			}
 
@@ -568,7 +576,7 @@ public class CGV_Reports extends PSDefaultExtension{
 							PSContentEditor cedit = ctypedef.getContentEditor();
 							PSControlRef fieldType = cedit.getFieldControl(fieldName);
 							String ftName = fieldType.getName();
-							if(!fieldType.equals("sys_webImageFX") && !fieldType.equals("sys_File") && !fieldType.equals("sys_HiddenInput") && !fieldType.equals("sys_Table")){
+							if(!ftName.equals("sys_webImageFX") && !ftName.equals("sys_File") && !ftName.equals("sys_HiddenInput") && !ftName.equals("sys_Table")){
 								HashMap<String, String> fieldMap = new HashMap<String, String>();
 	
 								fieldLabel = "";
