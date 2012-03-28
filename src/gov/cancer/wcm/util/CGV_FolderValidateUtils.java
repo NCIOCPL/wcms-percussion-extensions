@@ -83,8 +83,17 @@ public class CGV_FolderValidateUtils {
     	PSItemField field = item.getFieldByName(fieldName);
     	PSItemDefinition itemDef = item.getItemDefinition();
 
+    	// If the field is null, find out if the item is a folder.
+    	// If so, we'll want to compare the sys_title for uniqueness
+    	if( field == null && itemDef != null){
+    		String typename = item.getItemDefinition().getName();
+    		if(typename.equals("Folder")){
+    			field = item.getFieldByName("sys_title");
+			}
+    	}
+
     	if (field == null) {
-    		// If this field doesn't exist in this type, success is automatic.
+    		// If this field still doesn't exist, success is automatic.
     		log.debug("[doAttempt]setting success - field is null");        
     		result.setSuccess();
     	}
@@ -322,15 +331,14 @@ public class CGV_FolderValidateUtils {
 			jcrQuery = getQueryForValueListInFolderWithCid(fieldName, pathItem, typeList, contentId);
 		}
 		log.debug("isNullUnique(): jcrQuery = " + jcrQuery);
-		log.trace(jcrQuery);
-		Query q = contentManager.createQuery(jcrQuery, Query.SQL);
-		QueryResult results = contentManager.executeQuery(q, -1, null, null);
-		RowIterator rows = results.getRows();
+
+		// Check whether any other null rows exist.
+		RowIterator rows = executeQuery(jcrQuery);
 		try {
 			while (rows.hasNext() && unique) {
 				Row row = (Row)rows.next();
 				Value value = row.getValue("rx:" + fieldName);
-				if (value == null) {
+				if (value == null || value.getString().trim().isEmpty()) {
 					//should never get here
 					unique = false;
 				}
