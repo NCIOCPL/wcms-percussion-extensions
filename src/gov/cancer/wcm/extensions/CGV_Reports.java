@@ -576,7 +576,7 @@ public class CGV_Reports extends PSDefaultExtension{
 							PSContentEditor cedit = ctypedef.getContentEditor();
 							PSControlRef fieldType = cedit.getFieldControl(fieldName);
 							String ftName = fieldType.getName();
-							if(!ftName.equals("sys_webImageFX") && !ftName.equals("sys_File") && !ftName.equals("sys_HiddenInput") && !ftName.equals("sys_Table")){
+							if(!ftName.equals("sys_webImageFX") && !ftName.equals("sys_CheckBoxGroup") && !ftName.equals("sys_File") && !ftName.equals("sys_HiddenInput") && !ftName.equals("sys_Table")){
 								HashMap<String, String> fieldMap = new HashMap<String, String>();
 	
 								fieldLabel = "";
