@@ -94,24 +94,6 @@
       <interface name="com.percussion.extension.IPSFieldValidator"/>
       <suppliedResources/>
    </Extension>
-   <Extension categorystring="contenteditor" context="user/" deprecated="no" handler="Java" name="CGV_FolderNameUniqueValidator" restoreRequestParamsOnError="no">
-      <initParam name="com.percussion.user.description">Validate that a folder's name does not conflict with fields within the same folder.</initParam>
-      <initParam name="com.percussion.extension.version">1</initParam>
-      <initParam name="com.percussion.extension.reentrant">yes</initParam>
-      <initParam name="className">gov.cancer.wcm.extensions.CGV_FolderNameUniqueValidator</initParam>
-      <interface name="com.percussion.extension.IPSFieldValidator"/>
-      <PSXExtensionParamDef id="0">
-         <name>validateFieldName</name>
-         <dataType>java.lang.String</dataType>
-         <description>The name of the field providing the value to be validated.</description>
-      </PSXExtensionParamDef>
-      <PSXExtensionParamDef id="1">
-         <name>uniqueFieldName</name>
-         <dataType>java.lang.String</dataType>
-         <description>The name of the field which validateFieldName must not conflict with.</description>
-      </PSXExtensionParamDef>
-      <suppliedResources/>
-   </Extension>   
    <Extension categorystring="contenteditor" context="user/" deprecated="no" handler="Java" name="CGV_UniqueFieldInFolderValidate" restoreRequestParamsOnError="no">
       <initParam name="com.percussion.user.description">Validate that a field is unique within the folder.</initParam>
       <initParam name="com.percussion.extension.version">1</initParam>
