@@ -23,8 +23,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import com.percussion.cms.PSCmsException;
+import com.percussion.cms.objectstore.PSInvalidContentTypeException;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.cms.objectstore.PSRelationshipProcessorProxy;
+import com.percussion.cms.objectstore.server.PSItemDefManager;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.design.objectstore.PSRelationshipSet;
@@ -111,6 +113,7 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
           Map<String, Object> selectors) 
       throws RepositoryException, PSFilterException, PSAssemblyException
    {
+	  PSItemDefManager itemDefMgr = PSItemDefManager.getInstance();
       Set<SlotItem> rval = new LinkedHashSet<SlotItem>();
       Map<String, ? extends Object> args = slot.getFinderArguments();
       String template = null;
@@ -172,7 +175,7 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
       while(iter.hasNext())
       {
          PSRelationship rel =  iter.next();
-         if(isRelationshipInSlot(rel, sourceSlot) && isDependentOnSameSite(rel.getDependent(), sourceItem.getPath())) // and relationship is on same site as content item
+         if(isRelationshipInSlot(rel, sourceSlot) && (isDependentOnSameSite(rel.getDependent(), sourceItem.getPath()) || isDependentContentType(rel.getDependent(), "cgvCustomLink", itemDefMgr))) // and relationship is on same site as content item
          {
             IPSGuid guid = gmgr.makeGuid(rel.getDependent()); 
             //using template set in AA table editor
@@ -194,7 +197,20 @@ public class CGV_SameSiteSlotContentFinder extends PSBaseSlotContentFinder  impl
      return rval;
    }
 
-
+    private boolean isDependentContentType(PSLocator dep, String contentTypeName,PSItemDefManager itemDefMgr){
+    	long contentTypeId = itemDefMgr.getItemContentType(dep);
+    	long comparisonId = -1;
+    	try {
+			comparisonId = itemDefMgr.contentTypeNameToId(contentTypeName);
+		} catch (PSInvalidContentTypeException e) {
+			e.printStackTrace();
+			return false;
+		}
+    	if(comparisonId == contentTypeId){
+    		return true;
+    	}
+    	return false;
+    }
 	
 	private boolean isDependentOnSameSite(PSLocator dep, String ownerPath){
 	
