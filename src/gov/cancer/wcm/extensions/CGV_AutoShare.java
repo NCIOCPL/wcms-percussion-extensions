@@ -104,7 +104,6 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		
 			List<IPSGuid> glist = Collections.<IPSGuid>singletonList(depGuid);
 			try {
-				statusList = contentWs.prepareForEdit(glist);
 				items = contentWs.loadItems(glist, true, false, false, false);
 
 			} catch (PSErrorResultsException e3) {
@@ -117,14 +116,14 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 				itemToShare = items.get(0);
 			}
 			else{
-				result.setError("Cannot load item to share");
+				result.setError("No items loaded - no item to share");
 				return;
 			}
 			String typeName = "";
 			if( itemToShare.getItemDefinition() != null) {
-			  // The "friendly name" is retrieved with getLabel().
 			  typeName = itemToShare.getItemDefinition().getName();
 			}
+			//check if the content type is in the autoShare bean, if not, return out of the autoshare code
 			boolean isInBean = false;
 			for(String cTypeKey : autoShareRules.keySet()){
 				if (cTypeKey.equals(typeName)){
@@ -137,6 +136,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			}
 			String tfShared = "true";
 			String locale = "";
+			//Check if the item has been autoshared before, if yes, do not share again
 			try {
 				tfShared = RxItemUtils.getFieldValue(itemToShare, "hasBeenAutoShared");
 				locale = RxItemUtils.getFieldValue(itemToShare, "sys_lang");
@@ -145,17 +145,25 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 				e2.printStackTrace();
 				return;
 			}
-			if(tfShared == null){tfShared = "true";}
+			if(!tfShared.equals("false")){tfShared = "true";}
 			boolean alreadyShared = Boolean.parseBoolean(tfShared);
 
 
 			if (!alreadyShared){
+				//We have an item that will be shared, but we need to edit it so it does not get shared again
+				try {
+					statusList = contentWs.prepareForEdit(glist);
+				} catch (PSErrorResultsException e3) {
+					// TODO Auto-generated catch block
+					e3.printStackTrace();
+				}
+
 				RxItemUtils.setFieldValue(itemToShare, "hasBeenAutoShared", "true");
 				String destPath;
 				try {
 					destPath = getDestinationPath(typeName, locale, itemToShare);
 				} catch (PSCmsException e1) {
-					result.setError("Failed to get date for destination path");
+					result.setError("Failed to get destination path");
 					e1.printStackTrace();
 					return;
 				}
@@ -184,7 +192,9 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 					return;
 				}
 				
-
+				/*Share the item. This will fire off this folder effect again, but the item will have
+				 * hasbeenautoshared set to true so it will not be shared again
+				 */
 				try {
 					contentWs.addFolderChildren(destPath, glist);
 				} catch (PSErrorException e) {
@@ -196,23 +206,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 				result.setSuccess();
 				return;
 			}
-			else{
-				try {
-					contentWs.saveItems(items, false, false);
-				} catch (PSErrorResultsException e2) {
-					result.setError("Failed to save item without edit");
-					e2.printStackTrace();
-					return;
-				}
-				try {
-					contentWs.releaseFromEdit(statusList, false);
-				} catch (PSErrorsException e2) {
-					result.setError("Failed to release item without edit");
-					e2.printStackTrace();
-					return;
-				}
-			}
-			
+		
 			result.setSuccess();
 			return;
 		}
