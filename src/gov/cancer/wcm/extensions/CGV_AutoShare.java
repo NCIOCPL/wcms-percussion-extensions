@@ -60,7 +60,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 	
 	public String getSourcePath(String contentType, String locale){
 		Map<String,String> cTypeRules = autoShareRules.get(contentType);
-		if (locale.equals("es")){
+		if (locale.equals("es-us")){
 			return cTypeRules.get("srcPathES");
 		}
 		else{
@@ -145,6 +145,11 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 				e2.printStackTrace();
 				return;
 			}
+			
+			// If "already shared" is not explicitly false, force it true.
+			// This way, any non-false value (e.g. blank) is treated as
+			// not needing to be shared.  This prevents unintended
+			// sharing of legacy content.
 			if(!tfShared.equals("false")){tfShared = "true";}
 			boolean alreadyShared = Boolean.parseBoolean(tfShared);
 
@@ -158,6 +163,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 					e3.printStackTrace();
 				}
 
+				// Mark item as previously shared.
 				RxItemUtils.setFieldValue(itemToShare, "hasBeenAutoShared", "true");
 				String destPath;
 				try {
@@ -168,6 +174,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 					return;
 				}
 
+				// Save updated item.
 				try {
 					contentWs.saveItems(items, false, false);
 				} catch (PSErrorResultsException e2) {
