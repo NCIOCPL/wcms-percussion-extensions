@@ -99,19 +99,21 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 
 			// Retrieve information about the newly created relationship.
 	        PSRelationship originating = context.getOriginatingRelationship();
-			int revision = originating.getDependent().getRevision();
 			int contentId = originating.getDependent().getId();
 			int folderId = originating.getOwner().getId();
 
+			// During a Copy | Paste as new copy operation, the new content item has an ID of Integer.MAX_VALUE.
+			// There's no way we can load the actual content item, so we let it fall through and depend on
+			// the workflow validator to check it.  (Besides, a copy in the same folder is going to have a
+			// conflicting value, by definition of being a copy.)
+			if (contentId == Integer.MAX_VALUE){
+				log.debug("CGV_UniqueInFolderEffect.attempt(): contentId == Integer.MAX_VALUE. Assumed to be Copy as New.");
+				result.setSuccess();
+				return;
+			}
+			
 			log.debug("[attempt]contentId = " + contentId);
 			log.debug("[attempt]folderId = " + folderId);
-
-			
-//			if (revision <= -1) {
-//				result.setSuccess();
-//				log.debug("revision is undefined, report success");
-//				return;
-//			}
 
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
