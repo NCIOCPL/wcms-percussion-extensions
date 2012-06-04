@@ -133,12 +133,16 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 		        log.debug("[attempt]setting success - probably a folder");        
 				result.setSuccess();
 	        } catch (Exception e) {
-	           log.error(format("An error happened while checking if " +
-	                 "fieldName: {0} was unique for " +
-	                 "contentId: {1} with ",
-	                 fieldName, request.getParameter("sys_contentid")), e);
-		       log.debug("[attempt]setting error - got exception");        
-	           result.setError("Pretty_URL_Name must be unique within folder");
+
+	        	String msg =  format("An error occured in CGV_UniqueInFolderEffect while checking if " +
+		                 "fieldName: {0} was unique for " +
+		                 "contentId: {1} in folderId: {2}. Error was: \"{3}\"",
+		                 fieldName, contentId, folderId,
+		                 e.getMessage() == null ? "" : e.getMessage());
+
+	        	log.error(msg, e);
+	        	log.debug("[attempt]setting error - got exception");        
+        		result.setError(msg);
 	        }
 		}
 		else {
