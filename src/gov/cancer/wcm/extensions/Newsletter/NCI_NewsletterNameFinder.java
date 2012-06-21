@@ -116,4 +116,52 @@ public class NCI_NewsletterNameFinder extends PSJexlUtilBase implements IPSJexlE
 		
 		return newsletterTitle;
 	}
+	
+	@IPSJexlMethod(description = "Gets the Newsletter title from the long_title of the newsletter issue", params = {
+			@IPSJexlParam(name = "path", description = "The folder path of the current item"),
+			@IPSJexlParam(name = "folderLevels", description = "the number of levels the navon with the Newsletter name is above the item")
+			})
+	public String getIssueDate(String path, int folderLevels){
+		while(folderLevels > 0){
+			try {
+				path = aTools.getParentFromPath(path);
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			}
+			folderLevels -= 1;
+		}
+		
+		String newsletterDate = "";
+		String qry = "select rx:date_first_published, jcr:path from rx:genNewsletterDetails where jcr:path = '"+ path + "'";
+		Query query = null;
+		QueryResult qresults = null;
+		
+			try {
+				query = contentMgr.createQuery(qry, Query.SQL);
+
+				if(query != null){
+					qresults = contentMgr.executeQuery(query, -1, null, null);
+				}
+				if(qresults != null){
+					RowIterator rows = qresults.getRows();
+					if(rows.hasNext()){
+						Row row = rows.nextRow();
+						Value newsletterDateVal = row.getValue("rx:date_first_published");
+						if(newsletterDateVal != null){
+							newsletterDate = newsletterDateVal.getString();
+						}
+					}
+				}
+			} catch (InvalidQueryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (RepositoryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}		
+		
+		
+		
+		return newsletterDate;
+	}
 }

@@ -18,6 +18,7 @@ import com.percussion.cms.PSCmsException;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSFolder;
+import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.error.PSException;
 import com.percussion.extension.IPSExtensionDef;
@@ -89,6 +90,12 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		}
 		IPSContentWs contentWs = valUtil.getContentWs();
 		PSRelationship originating = context.getOriginatingRelationship(); 
+		PSLocator depContentId = originating.getDependent();
+		if(depContentId.getId() == Integer.MAX_VALUE){
+			//This is copy as new, we would not autoshare this.
+			result.setSuccess();
+			return;
+		}
 		IPSGuid depGuid = valUtil.getGuidManager().makeGuid(originating.getDependent());
 		List<PSItemStatus> statusList = null;
 		List<PSCoreItem> items = null;
@@ -97,7 +104,8 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		try {
 			 depSum = PSOItemSummaryFinder.getSummary(depGuid);
 		} catch (PSException e4) {
-			result.setError("Cannot get item summary from dependent GUID");
+			result.setSuccess();
+			//result.setError("Cannot get item summary from dependent GUID");
 			e4.printStackTrace();
 			return;
 		}
@@ -114,7 +122,8 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			items = contentWs.loadItems(glist, true, false, false, false);
 
 		} catch (PSErrorResultsException e3) {
-			result.setError("Cannot load item to share");
+			result.setSuccess();
+			//result.setError("Cannot load item to share");
 			e3.printStackTrace();
 			return;
 
@@ -124,7 +133,9 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			itemToShare = items.get(0);
 		}
 		else{
-			result.setError("No items loaded - no item to share");
+			result.setSuccess();
+	    	log.debug("No items loaded - no item to share");
+	    	//result.setError("No items loaded - no item to share");
 			return;
 		}
 		//Gets Content Type Name
@@ -152,7 +163,8 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			tfShared = RxItemUtils.getFieldValue(itemToShare, "hasBeenAutoShared");
 			locale = RxItemUtils.getFieldValue(itemToShare, "sys_lang");
 		} catch (PSCmsException e2) {
-			result.setError("Cannot parse hasBeenAutoShared or sys_lang field");
+			result.setSuccess();
+			//result.setError("Cannot parse hasBeenAutoShared or sys_lang field");
 			e2.printStackTrace();
 			return;
 		}
@@ -181,7 +193,8 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			try {
 				destPath = getDestinationPath(typeName, locale, itemToShare);
 			} catch (PSCmsException e1) {
-				result.setError("Failed to get destination path");
+				result.setSuccess();
+				//result.setError("Failed to get destination path");
 				e1.printStackTrace();
 				return;
 			}
@@ -213,14 +226,16 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			try {
 				contentWs.saveItems(items, false, false);
 			} catch (PSErrorResultsException e2) {
-				result.setError("Failed to save item after edit");
+				result.setSuccess();
+				//result.setError("Failed to save item after edit");
 				e2.printStackTrace();
 				return;
 			}
 			try {
 				contentWs.releaseFromEdit(statusList, false);
 			} catch (PSErrorsException e2) {
-				result.setError("Failed to release item after edit");
+				result.setSuccess();
+				//result.setError("Failed to release item after edit");
 				e2.printStackTrace();
 				return;
 			}
