@@ -99,19 +99,21 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 
 			// Retrieve information about the newly created relationship.
 	        PSRelationship originating = context.getOriginatingRelationship();
-			int revision = originating.getDependent().getRevision();
 			int contentId = originating.getDependent().getId();
 			int folderId = originating.getOwner().getId();
 
+			// During a Copy | Paste as new copy operation, the new content item has an ID of Integer.MAX_VALUE.
+			// There's no way we can load the actual content item, so we let it fall through and depend on
+			// the workflow validator to check it.  (Besides, a copy in the same folder is going to have a
+			// conflicting value, by definition of being a copy.)
+			if (contentId == Integer.MAX_VALUE){
+				log.debug("CGV_UniqueInFolderEffect.attempt(): contentId == Integer.MAX_VALUE. Assumed to be Copy as New.");
+				result.setSuccess();
+				return;
+			}
+			
 			log.debug("[attempt]contentId = " + contentId);
 			log.debug("[attempt]folderId = " + folderId);
-
-			
-//			if (revision <= -1) {
-//				result.setSuccess();
-//				log.debug("revision is undefined, report success");
-//				return;
-//			}
 
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
@@ -131,12 +133,16 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 		        log.debug("[attempt]setting success - probably a folder");        
 				result.setSuccess();
 	        } catch (Exception e) {
-	           log.error(format("An error happened while checking if " +
-	                 "fieldName: {0} was unique for " +
-	                 "contentId: {1} with ",
-	                 fieldName, request.getParameter("sys_contentid")), e);
-		       log.debug("[attempt]setting error - got exception");        
-	           result.setError("Pretty_URL_Name must be unique within folder");
+
+	        	String msg =  format("An error occured in CGV_UniqueInFolderEffect while checking if " +
+		                 "fieldName: {0} was unique for " +
+		                 "contentId: {1} in folderId: {2}. Error was: \"{3}\"",
+		                 fieldName, contentId, folderId,
+		                 e.getMessage() == null ? "" : e.getMessage());
+
+	        	log.error(msg, e);
+	        	log.debug("[attempt]setting error - got exception");        
+        		result.setError(msg);
 	        }
 		}
 		else {

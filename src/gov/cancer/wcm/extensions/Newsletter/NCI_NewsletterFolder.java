@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,6 +13,7 @@ import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSItemField;
 import com.percussion.cms.objectstore.PSTextValue;
 import com.percussion.design.objectstore.PSLocator;
+import com.percussion.error.PSException;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.IPSResultDocumentProcessor;
 import com.percussion.extension.PSDefaultExtension;
@@ -20,6 +22,8 @@ import com.percussion.extension.PSExtensionProcessingException;
 import com.percussion.extension.PSParameterMismatchException;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.content.data.PSItemSummary;
+import com.percussion.services.contentmgr.IPSContentMgr;
+import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.util.IPSHtmlParameters;
@@ -35,9 +39,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
 
+import gov.cancer.wcm.extensions.jexl.CGV_AssemblyTools;
 import gov.cancer.wcm.workflow.PercussionWFTransition;
 
 import java.util.StringTokenizer;
+
+import javax.jcr.RepositoryException;
+import javax.jcr.Value;
+import javax.jcr.query.InvalidQueryException;
+import javax.jcr.query.Query;
+import javax.jcr.query.QueryResult;
+import javax.jcr.query.Row;
+import javax.jcr.query.RowIterator;
 
 /**
  * This preprocessor creates subfolders for an item when the item gets created.
@@ -109,6 +122,7 @@ IPSResultDocumentProcessor {
 
 		//Check if the current request is from a modify of an item.
 		String cmd = request.getParameter(IPSHtmlParameters.SYS_COMMAND);
+		CGV_AssemblyTools aTools = new CGV_AssemblyTools();
 
 		if (cmd != null && cmd.equalsIgnoreCase("modify")) {
 
@@ -199,11 +213,28 @@ IPSResultDocumentProcessor {
 						//Proceed if the path is not blank.
 						if(!fullPath.equals("")){
 							//Get the configuration mappings
-							Map<String,String> slotMapping = svc.getFolderList(getSiteName(fullPath));	
-							Set<String> newFolders = slotMapping.keySet();	
+							//Map<String,String> slotMapping = svc.getFolderList(getSiteName(fullPath));	
+							//Set<String> newFolders = slotMapping.keySet();	
+							
+							Map<List<String>, Map<String, String>> newFolders = new HashMap<List<String>, Map<String, String>>();
+							try {
+								newFolders = getNewFolderNames(aTools.getParentFromPath(fullPath));
+							} catch (RepositoryException e1) {
+								e1.printStackTrace();
+							}
 							//Add the folders
-							for(String currFolder : newFolders){
-								
+							
+							int slotPosition = 0;
+							List<String> folderOrder = new ArrayList<String>();
+							Set<List<String>> folderOrderSet = newFolders.keySet();
+							Map<String, String> newFoldersMap = new HashMap<String, String>();
+							for(List<String> foList : folderOrderSet){
+								folderOrder = foList;
+								newFoldersMap= newFolders.get(folderOrder);
+							}
+							
+							for(String categoryName : folderOrder){
+								String currFolder = newFoldersMap.get(categoryName);
 								log.debug("CurrFolder=|"+ currFolder + "|FullPath=|" + fullPath +"|");
 								try {
 									cws.addFolder(currFolder, fullPath);
@@ -214,16 +245,16 @@ IPSResultDocumentProcessor {
 								//Build site path string.
 								String sitePath = fullPath + "/" + currFolder;
 
-								List<IPSGuid> aggroWidget = null;
+								List<IPSGuid> newsletterCategory = null;
 								//Create Aggro Widget
-								aggroWidget = createAggroWidgets(sitePath, currFolder);
+								newsletterCategory = createNewsletterCategories(sitePath, categoryName);
 
 
 								//Create lists to hold the unique items in the folders.
 								List<PSItemSummary> navonSummary = getContentTypesInFolder(sitePath, "rffNavon"); //Navon item
-								List<PSItemSummary> aggroWidgetSummary = getContentTypesInFolder(sitePath, "genAggroWidget");	//aggro widget item
+								List<PSItemSummary> newsletterCategorySummary = getContentTypesInFolder(sitePath, "genNewsletterCategory");	//newsletter category item
 
-								if(aggroWidget != null && aggroWidget.size() > 0){
+								if(newsletterCategory != null && newsletterCategory.size() > 0){
 
 									//Checkout the navon
 									try {
@@ -233,23 +264,19 @@ IPSResultDocumentProcessor {
 									}
 
 									//Set the Aggro Widget as the landing page of its navon
-									setItemAsNavLandingPage(navonSummary.get(0), aggroWidget.get(0));
+									setItemAsNavLandingPage(navonSummary.get(0), newsletterCategory.get(0));
 
 									//Set the Aggro Widget in the slot on the newsletter index page
-									addRelationship(aggroWidget.get(0), itemGuid, slotMapping.get(currFolder), svc.getAggroWidgetTemplate());
+									addRelationship(newsletterCategory.get(0), itemGuid, "genSlotBody", "genSnNewsletterCategory", slotPosition);
+									//newItemGuids.add(newsletterCategory.get(0));
 
-									//Checkin the newsletter
-									try {
-										cws.checkinItems(Collections.<IPSGuid> singletonList(itemGuid), "");
-									} catch (PSErrorsException e) {
-										e.printStackTrace();
-									}
+
 
 									//Transition the navon
 									transitionNavons(navonSummary);
 
 									//Transition the Aggro Widget
-									transitionPage(aggroWidgetSummary);
+									transitionPage(newsletterCategorySummary);
 
 									//Checkin the navon
 									try {
@@ -258,7 +285,15 @@ IPSResultDocumentProcessor {
 										e.printStackTrace();
 									}
 								}
+								slotPosition++;
 							}
+							//Checkin the newsletter
+							try {
+								cws.checkinItems(Collections.<IPSGuid> singletonList(itemGuid), "");
+							} catch (PSErrorsException e) {
+								e.printStackTrace();
+							}
+		
 
 							/**
 							 * MAKE THE NEWSLETTER INDEX THE LANDING PAGE
@@ -278,6 +313,8 @@ IPSResultDocumentProcessor {
 							
 							//Transition the navon
 							transitionNavons(newFolderNavon);
+
+							
 						}
 					}
 				}
@@ -287,6 +324,68 @@ IPSResultDocumentProcessor {
 			//For now, don't do anything if the action is not INSERT.
 		}
 		return doc;
+	}
+	
+	private Map<List<String>, Map<String, String>> getNewFolderNames(String fullPath)
+	throws PSExtensionProcessingException{
+		//find configuration item genConfigurationText with long_title Newsletter
+		IPSContentMgr contentMgr = PSContentMgrLocator.getContentMgr();
+		
+		List<String> folderOrder = new ArrayList<String>();
+		Map<String, String> folderMap = new HashMap<String, String>();
+		Map<List<String>, Map<String, String>> retMap = new HashMap<List<String>, Map<String, String>>();
+		String configString = "";
+		
+		String qry = "select jcr:path, rx:sys_contentid, rx:long_title, rx:configuration_text from rx:genConfigurationText where jcr:path like '"+fullPath+"%' and rx:long_title = 'Newsletter'";
+		Query query = null;
+		QueryResult qresults = null;
+		
+			try {
+				query = contentMgr.createQuery(qry, Query.SQL);
+	
+				if(query != null){
+					qresults = contentMgr.executeQuery(query, -1, null, null);
+				}
+				if(qresults != null){
+					RowIterator rows = qresults.getRows();
+					if(rows.hasNext()){
+						Row row = rows.nextRow();
+						Value configValue = row.getValue("rx:configuration_text");
+						if(configValue != null){
+							configString = configValue.getString();
+						}
+					}
+				}
+			} catch (InvalidQueryException e) {
+				e.printStackTrace();
+			} catch (RepositoryException e) {
+				e.printStackTrace();
+			}
+		//parse comma separated text into a list
+			if(configString == ""){
+				return retMap;
+			}
+			String[] configArray = configString.split("\\r?\\n");
+			for(int i=0; i < configArray.length; i++){
+				int lastIdx = configArray[i].lastIndexOf("|");
+				String folderName = "category" + i;
+				String categoryName = "Category" + i;
+				if(lastIdx == -1){
+					String errorMessage = "Invalid Configuration File, please make sure the configuration file has lines of structure <Category Name> | <Folder Name>";
+					log.error(errorMessage);
+				}
+				else{
+					folderName = configArray[i].substring(lastIdx+1);
+					categoryName = configArray[i].substring(0, lastIdx);
+					if(folderName.trim().length() != 0 && categoryName.trim().length() != 0){
+						folderMap.put(categoryName.trim(), folderName.trim());
+						folderOrder.add(categoryName.trim());
+					}
+				}
+			}
+		//return list
+		retMap.put(folderOrder, folderMap);
+		return retMap;
 	}
 
 	/**
@@ -367,6 +466,47 @@ IPSResultDocumentProcessor {
 
 		return guidList;
 	}
+	
+	private List<IPSGuid> createNewsletterCategories(String folder, String title){
+		
+		List<PSCoreItem> newItems = null;
+		try {
+			newItems = cws.createItems("genNewsletterCategory", 1);
+		} catch (PSUnknownContentTypeException e) {
+			e.printStackTrace();
+		} catch (PSErrorException e) {
+			e.printStackTrace();
+		}
+
+		//String length of the existing path
+		List<IPSGuid> guidList = null;
+
+		if(newItems.size() > 0){
+			PSCoreItem singleItem = newItems.remove(0);
+
+			//Set the folder path of the item
+			singleItem.setFolderPaths(Collections.<String> singletonList(folder));
+
+			//Set the fields
+			setField(singleItem, "sys_title", title);
+			setField(singleItem, "long_title", title);
+			setField(singleItem, "short_title", title);
+			//setField(singleItem, "pretty_url_name", title_no_spaces);
+			try {
+				guidList = cws.saveItems(Collections.<PSCoreItem> singletonList(singleItem), false, false);
+			} catch (PSErrorResultsException e) {
+				e.printStackTrace();
+			}
+
+		}
+		else
+		{
+			log.error("More folder paths provided, than available items.");
+		}
+
+		return guidList;
+	}
+	
 
 
 	/**
@@ -411,7 +551,7 @@ IPSResultDocumentProcessor {
 	 * @param dependent - IPSGuid of the dependent item to be the landing page.
 	 */
 	private void setItemAsNavLandingPage(PSItemSummary navon, IPSGuid dependent){
-		addRelationship(dependent, navon.getGUID(), "rffNavLandingPage", svc.getLandingPageTemplate());
+		addRelationship(dependent, navon.getGUID(), "rffNavLandingPage", svc.getLandingPageTemplate(), -1);
 	}
 
 	/**
@@ -421,10 +561,10 @@ IPSResultDocumentProcessor {
 	 * @param slotName - name of the slot to create the rel for.
 	 * @param template - name of the template to assign dependent to in the slotName.
 	 */
-	private void addRelationship(IPSGuid dependent, IPSGuid owner, String slotName, String template){
+	private void addRelationship(IPSGuid dependent, IPSGuid owner, String slotName, String template, int slotIdx){
 
 		try {
-			cws.addContentRelations(owner, Collections.<IPSGuid>singletonList(dependent),slotName, template, "", 0);
+			cws.addContentRelations(owner, Collections.<IPSGuid>singletonList(dependent),slotName, template, "", slotIdx);
 		} catch (PSErrorException e) {
 			e.printStackTrace();
 		}

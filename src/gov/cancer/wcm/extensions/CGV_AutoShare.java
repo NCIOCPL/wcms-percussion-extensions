@@ -4,6 +4,7 @@ import gov.cancer.wcm.util.CGV_FolderValidateUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.percussion.cms.PSCmsException;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSFolder;
+import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.error.PSException;
 import com.percussion.extension.IPSExtensionDef;
@@ -60,7 +62,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 	
 	public String getSourcePath(String contentType, String locale){
 		Map<String,String> cTypeRules = autoShareRules.get(contentType);
-		if (locale.equals("es")){
+		if (locale.equals("es-us")){
 			return cTypeRules.get("srcPathES");
 		}
 		else{
@@ -82,143 +84,170 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 	public void attempt(Object[] params, IPSRequestContext request,
 			IPSExecutionContext context, PSEffectResult result)
 			throws PSExtensionProcessingException, PSParameterMismatchException {
-		if (context.isPreConstruction()) {
-			IPSContentWs contentWs = valUtil.getContentWs();
-			PSRelationship originating = context.getOriginatingRelationship(); 
-			IPSGuid depGuid = valUtil.getGuidManager().makeGuid(originating.getDependent());
-			List<PSItemStatus> statusList = null;
-			List<PSCoreItem> items = null;
-			PSCoreItem itemToShare = null;
-			PSComponentSummary depSum = null;
-			try {
-				 depSum = PSOItemSummaryFinder.getSummary(depGuid);
-			} catch (PSException e4) {
-				result.setError("Cannot get item summary, may be folder");
-				e4.printStackTrace();
-				return;
-			}
-			if(depSum.isFolder()){
-				result.setSuccess();
-				return;
-			}
-		
-			List<IPSGuid> glist = Collections.<IPSGuid>singletonList(depGuid);
-			try {
-				statusList = contentWs.prepareForEdit(glist);
-				items = contentWs.loadItems(glist, true, false, false, false);
-
-			} catch (PSErrorResultsException e3) {
-				result.setError("Cannot load item to share");
-				e3.printStackTrace();
-				return;
-
-			}
-			if (items != null && items.size()>0){
-				itemToShare = items.get(0);
-			}
-			else{
-				result.setError("Cannot load item to share");
-				return;
-			}
-			String typeName = "";
-			if( itemToShare.getItemDefinition() != null) {
-			  // The "friendly name" is retrieved with getLabel().
-			  typeName = itemToShare.getItemDefinition().getName();
-			}
-			boolean isInBean = false;
-			for(String cTypeKey : autoShareRules.keySet()){
-				if (cTypeKey.equals(typeName)){
-					isInBean = true;
-				}
-			}
-			if(!isInBean){
-				result.setSuccess();
-				return;
-			}
-			String tfShared = "true";
-			String locale = "";
-			try {
-				tfShared = RxItemUtils.getFieldValue(itemToShare, "hasBeenAutoShared");
-				locale = RxItemUtils.getFieldValue(itemToShare, "sys_lang");
-			} catch (PSCmsException e2) {
-				result.setError("Cannot parse hasBeenAutoShared field");
-				e2.printStackTrace();
-				return;
-			}
-			if(tfShared == null){tfShared = "true";}
-			boolean alreadyShared = Boolean.parseBoolean(tfShared);
-
-
-			if (!alreadyShared){
-				RxItemUtils.setFieldValue(itemToShare, "hasBeenAutoShared", "true");
-				String destPath;
-				try {
-					destPath = getDestinationPath(typeName, locale, itemToShare);
-				} catch (PSCmsException e1) {
-					result.setError("Failed to get date for destination path");
-					e1.printStackTrace();
-					return;
-				}
-
-				try {
-					contentWs.saveItems(items, false, false);
-				} catch (PSErrorResultsException e2) {
-					result.setError("Failed to save item after edit");
-					e2.printStackTrace();
-					return;
-				}
-				try {
-					contentWs.releaseFromEdit(statusList, false);
-				} catch (PSErrorsException e2) {
-					result.setError("Failed to release item after edit");
-					e2.printStackTrace();
-					return;
-				}
-				
-				String[] folders = new String[1];
-				folders[0] = destPath;
-				try {
-					List<PSFolder> folderList = contentWs.loadFolders(folders);
-				} catch (PSErrorResultsException e1) {
-					result.setSuccess();
-					return;
-				}
-				
-
-				try {
-					contentWs.addFolderChildren(destPath, glist);
-				} catch (PSErrorException e) {
-					result.setError("Failed to share content to secondary folder");
-					e.printStackTrace();
-					return;
-				}
-				
-				result.setSuccess();
-				return;
-			}
-			else{
-				try {
-					contentWs.saveItems(items, false, false);
-				} catch (PSErrorResultsException e2) {
-					result.setError("Failed to save item without edit");
-					e2.printStackTrace();
-					return;
-				}
-				try {
-					contentWs.releaseFromEdit(statusList, false);
-				} catch (PSErrorsException e2) {
-					result.setError("Failed to release item without edit");
-					e2.printStackTrace();
-					return;
-				}
-			}
-			
+		if (!context.isPreConstruction()) {
 			result.setSuccess();
 			return;
 		}
+		IPSContentWs contentWs = valUtil.getContentWs();
+		PSRelationship originating = context.getOriginatingRelationship(); 
+		PSLocator depContentId = originating.getDependent();
+		if(depContentId.getId() == Integer.MAX_VALUE){
+			//This is copy as new, we would not autoshare this.
+			result.setSuccess();
+			return;
+		}
+		IPSGuid depGuid = valUtil.getGuidManager().makeGuid(originating.getDependent());
+		List<PSItemStatus> statusList = null;
+		List<PSCoreItem> items = null;
+		PSCoreItem itemToShare = null;
+		PSComponentSummary depSum = null;
+		try {
+			 depSum = PSOItemSummaryFinder.getSummary(depGuid);
+		} catch (PSException e4) {
+			result.setSuccess();
+			//result.setError("Cannot get item summary from dependent GUID");
+			e4.printStackTrace();
+			return;
+		}
+		//This code is only concerned with content items, not folders
+		if(depSum.isFolder()){
+			result.setSuccess();
+			return;
+		}
+		
+	
+		//Creates a list with a single item (the new item) to use in the load items call
+		List<IPSGuid> glist = Collections.<IPSGuid>singletonList(depGuid);
+		try {
+			items = contentWs.loadItems(glist, true, false, false, false);
+
+		} catch (PSErrorResultsException e3) {
+			result.setSuccess();
+			//result.setError("Cannot load item to share");
+			e3.printStackTrace();
+			return;
+
+		}
+		//Checks if an item was returned
+		if (items != null && items.size()>0){
+			itemToShare = items.get(0);
+		}
+		else{
+			result.setSuccess();
+	    	log.debug("No items loaded - no item to share");
+	    	//result.setError("No items loaded - no item to share");
+			return;
+		}
+		//Gets Content Type Name
+		String typeName = "";
+		if( itemToShare.getItemDefinition() != null) {
+		  typeName = itemToShare.getItemDefinition().getName();
+		}
+		//check if the content type is in the autoShare bean, if not, return out of the autoshare code
+		boolean isInBean = false;
+		for(String cTypeKey : autoShareRules.keySet()){
+			if (cTypeKey.equals(typeName)){
+				isInBean = true;
+			}
+		}
+		//if the content type is not in the bean it shouldnt be autoshared, 
+		//so we can exit out of the Autoshare code
+		if(!isInBean){
+			result.setSuccess();
+			return;
+		}
+		String tfShared = "true";
+		String locale = "";
+		//Check if the item has been autoshared before, if yes, do not share again
+		try {
+			tfShared = RxItemUtils.getFieldValue(itemToShare, "hasBeenAutoShared");
+			locale = RxItemUtils.getFieldValue(itemToShare, "sys_lang");
+		} catch (PSCmsException e2) {
+			result.setSuccess();
+			//result.setError("Cannot parse hasBeenAutoShared or sys_lang field");
+			e2.printStackTrace();
+			return;
+		}
+		
+		// If "already shared" is not explicitly false, force it true.
+		// This way, any non-false value (e.g. blank) is treated as
+		// not needing to be shared.  This prevents unintended
+		// sharing of legacy content.
+		if(!tfShared.equals("false")){tfShared = "true";}
+		boolean alreadyShared = Boolean.parseBoolean(tfShared);
+
+
+		if (!alreadyShared){
+			
+			//Get the list of folder paths for the item.  
+			//It should be null, because the item has not been added to the first folder yet
+			//If it is null we set it to be an empty list
+			List<String> folderPaths = itemToShare.getFolderPaths();	
+			if(folderPaths == null){
+				folderPaths = new ArrayList<String>();
+			}
+			//Gets the path to share to based on the content type name, locale and item
+			//The content type name and locale are used to lookup the base path in the bean
+			//the item provides a date, which we use to append a year to the base path
+			String destPath;
+			try {
+				destPath = getDestinationPath(typeName, locale, itemToShare);
+			} catch (PSCmsException e1) {
+				result.setSuccess();
+				//result.setError("Failed to get destination path");
+				e1.printStackTrace();
+				return;
+			}
+			
+			//Check to see if the item is already in the destination folder.
+			//If it is, return out of the autoshare code
+			if (folderPaths.contains(destPath)){
+				result.setSuccess();
+				return;
+			}				
+			
+			//We have an item that will be shared, but we need to edit it so it does not get shared again
+			try {
+				statusList = contentWs.prepareForEdit(glist);
+			} catch (PSErrorResultsException e3) {
+				// TODO Auto-generated catch block
+				e3.printStackTrace();
+			}
+
+			
+			// Mark item as previously shared.
+			RxItemUtils.setFieldValue(itemToShare, "hasBeenAutoShared", "true");
+			
+			//add item to destination folder
+			folderPaths.add(destPath);
+			itemToShare.setFolderPaths(folderPaths);
+
+			// Save updated item.
+			try {
+				contentWs.saveItems(items, false, false);
+			} catch (PSErrorResultsException e2) {
+				result.setSuccess();
+				//result.setError("Failed to save item after edit");
+				e2.printStackTrace();
+				return;
+			}
+			try {
+				contentWs.releaseFromEdit(statusList, false);
+			} catch (PSErrorsException e2) {
+				result.setSuccess();
+				//result.setError("Failed to release item after edit");
+				e2.printStackTrace();
+				return;
+			}
+						
+			result.setSuccess();
+			return;
+		}
+	
 		result.setSuccess();
 		return;
 	}
+
 	
 	private String getDestinationPath(String contentTypeName, String locale, PSCoreItem itemToShare) 
 			throws PSCmsException{

@@ -16,6 +16,14 @@
       <interface name="com.percussion.extension.IPSJexlExpression"/>
       <suppliedResources/>
    </Extension>
+   <Extension categorystring="jexl" context="global/percussion/user/" deprecated="no" handler="Java" name="NCI_NewsletterNameFinder" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">NCI Newsletter Name Finders</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.Newsletter.NCI_NewsletterNameFinder</initParam>
+      <interface name="com.percussion.extension.IPSJexlExpression"/>
+      <suppliedResources/>
+   </Extension>
    <Extension categorystring="" context="global/percussion/user/" deprecated="no" handler="Java" name="GGV_Parent_ChildValidator" restoreRequestParamsOnError="no">
       <initParam name="com.percussion.user.description"/>
       <initParam name="com.percussion.extension.version">6</initParam>
@@ -57,6 +65,14 @@
       </PSXExtensionParamDef>      
       <suppliedResources/>
    </Extension>
+      <Extension categorystring="" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_SortDatePopulate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Populates the sort_date field with the data from the date_first_published field unless there is another field defined in the bean.</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_SortDatePopulate</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <interface name="com.percussion.extension.IPSRequestPreProcessor"/>  
+      <suppliedResources/>
+   </Extension>   
    <Extension categorystring="validation" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_FolderValidate" restoreRequestParamsOnError="no">
       <initParam name="com.percussion.user.description">Validate that the sys_title does not have encoded characters.</initParam>
       <initParam name="com.percussion.extension.version">1</initParam>
