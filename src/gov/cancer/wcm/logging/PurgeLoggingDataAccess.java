@@ -4,8 +4,6 @@
 package gov.cancer.wcm.logging;
 
 
-import gov.cancer.wcm.linkcheck.LinkDataAccess;
-
 import static java.text.MessageFormat.format;
 
 import java.sql.Connection;
@@ -32,18 +30,28 @@ import com.percussion.utils.jdbc.PSConnectionHelper;
  */
 public class PurgeLoggingDataAccess {
 
-	public void LogItemState(int contentID){
+	/** Record the details of a single Percussion content item.
+	 * 
+	 * @param contentID Percussion content ID of the content item being purged. 
+	 * @param itemTitle sys_title of the content item being purged.
+	 * @param purgedBy User ID performing the purge
+	 * @param workflowState Workflow state at time of purge.
+	 */
+	public void LogItemState(int contentID,
+				String itemTitle,
+				String purgedBy,
+				String workflowState){
 	
 		try {
+			// We're going to put this in Percussion's database,
+			// so we let Percussion create the connection.
 			Connection conn = PSConnectionHelper.getDbConnection();
 			
-			String query = format("insert into nci_purgelog(contentid,purgeDate) "
-							+"values({0}, getdate())", ""+contentID);
-			//Statement stmt = conn.createStatement();
-			//stmt.execute(query);
-
-			CallableStatement proc = conn.prepareCall("{call NCI_AddPurgeLogEntry(?)}");
-			proc.setInt(1, contentID);
+			CallableStatement proc = conn.prepareCall("{call NCI_AddPurgeLogEntry(?,?,?,?)}");
+			proc.setInt("@PurgedContentID", contentID);
+			proc.setString("@itemTitle", itemTitle);
+			proc.setString("@purgeBy", purgedBy);
+			proc.setString("@workflowState", workflowState);
 			proc.execute();
 			conn.close();
 		} catch (Exception e) {
@@ -55,6 +63,6 @@ public class PurgeLoggingDataAccess {
      * The log instance to use for this class, never <code>null</code>.
      */
     private static final Log log = LogFactory
-            .getLog(LinkDataAccess.class);
+            .getLog(PurgeLoggingDataAccess.class);
 
 }
