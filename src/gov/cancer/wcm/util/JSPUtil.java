@@ -30,6 +30,7 @@ public final class JSPUtil {
 		int i = 0;
 		while (i < valueList.length) {
 			results[i]=Integer.parseInt(valueList[i]);
+			i++;
 		}
 		
 		return results;
