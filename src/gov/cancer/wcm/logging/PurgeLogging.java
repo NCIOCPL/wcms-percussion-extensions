@@ -41,49 +41,57 @@ import com.percussion.webservices.content.*;
 	 * @param username	User id of the user requesting the purge.
 	 * @throws LoggingException 
 	 */
-	public void LogAndPurge(int contentID, String username)
+	public void LogAndPurge(int[] contentIDList, String username)
 		throws LoggingException{
 		
 		try {
 			PurgeLoggingDataAccess plda = new PurgeLoggingDataAccess();
 	
-			PSCoreItem item = FetchSingleContentItem(contentID);
-			String title = getFieldValue(item, "sys_title");
-			String workflowState = getWorkflowState(item);
-			
-			plda.LogItemState(contentID, title, username, workflowState);
+			List<PSCoreItem> itemList = FetchContentItems(contentIDList);
+			for(PSCoreItem item : itemList){
+				String title = getFieldValue(item, "sys_title");
+				String workflowState = getWorkflowState(item);
+				List<String> folderPaths = item.getFolderPaths();
+				
+				plda.LogItemState(item.getContentId(), title, username, workflowState, folderPaths);
+			}
 		} catch(LoggingException e) {
 			throw e;
 		}
 	}
 	
 	/**
-	 * Fetches a single content item from Percussion.
+	 * Fetches a collection of content item from Percussion.
 	 * 
 	 * @param contentID Percussion content ID of the item to purge.
 	 * @return	The PSCoreItem representing the content item.
 	 * @throws LoggingException
 	 */
-	private PSCoreItem FetchSingleContentItem(int contentID) 
+	private List<PSCoreItem> FetchContentItems(int[] contentIDList) 
 		throws LoggingException{
-		
-		IPSGuid contentGuid = guidManager.makeGuid(contentID, PSTypeEnum.LEGACY_CONTENT);
+
+		// Convert integer content IDs into 
 		ArrayList<IPSGuid> itemList = new ArrayList<IPSGuid>();
-		itemList.add(contentGuid);
+		for(int contentID : contentIDList){
+			IPSGuid contentGuid = guidManager.makeGuid(contentID, PSTypeEnum.LEGACY_CONTENT);
+			itemList.add(contentGuid);
+		}
 		
 		IPSContentWs contentSvc = PSContentWsLocator.getContentWebservice();
 	
+		List<PSCoreItem> items = new ArrayList<PSCoreItem>();
+
 		try {
-			List<PSCoreItem> items = contentSvc.loadItems(itemList, false, false, false, true);
+			items.addAll(contentSvc.loadItems(itemList, false, false, false, true));
 			if(items.isEmpty()){
-				String message = format("Unable to fetch item with content id {0}.", contentID);
-				throw new LoggingException(message);
+				throw new LoggingException("Unable to fetch content items.");
 			}
-			return items.get(0);
+			
 		} catch (PSErrorResultsException e) {
-			String message = format("Error fetching item with content id {0}.", contentID);
-			throw new LoggingException(message, e);
+			throw new LoggingException("Error fetching content items.", e);
 		}
+		
+		return items;
 	}
 
 	private String getFieldValue(PSCoreItem item, String fieldname){

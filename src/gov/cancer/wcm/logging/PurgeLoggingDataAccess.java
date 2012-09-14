@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,11 +37,13 @@ public class PurgeLoggingDataAccess {
 	 * @param itemTitle sys_title of the content item being purged.
 	 * @param purgedBy User ID performing the purge
 	 * @param workflowState Workflow state at time of purge.
+	 * @param folderPaths Path(s) within Percussion where the content item was stored.
 	 */
 	public void LogItemState(int contentID,
 				String itemTitle,
 				String purgedBy,
-				String workflowState){
+				String workflowState,
+				List<String> folderPaths){
 	
 		try {
 			// We're going to put this in Percussion's database,
