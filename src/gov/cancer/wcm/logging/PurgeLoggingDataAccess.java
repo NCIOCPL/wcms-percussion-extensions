@@ -49,17 +49,47 @@ public class PurgeLoggingDataAccess {
 			// We're going to put this in Percussion's database,
 			// so we let Percussion create the connection.
 			Connection conn = PSConnectionHelper.getDbConnection();
+
+			String folderParam = joinStrings(folderPaths, ',');
 			
-			CallableStatement proc = conn.prepareCall("{call NCI_AddPurgeLogEntry(?,?,?,?)}");
+			CallableStatement proc = conn.prepareCall("{call NCI_AddPurgeLogEntry(?,?,?,?,?)}");
 			proc.setInt("@PurgedContentID", contentID);
 			proc.setString("@itemTitle", itemTitle);
 			proc.setString("@purgeBy", purgedBy);
 			proc.setString("@workflowState", workflowState);
+			proc.setString("@folderPathList", folderParam);
 			proc.execute();
 			conn.close();
 		} catch (Exception e) {
 			log.error("Couldn't get database connection: " + e.getLocalizedMessage());
 		}
+	}
+
+	/**
+	 * Utility method to combine the elements of a List<String> into
+	 * a single delimited String object.
+	 * 
+	 * @param stringList Collection of String objects to join.
+	 * @param separator	The delimiter between successive values.
+	 * @return a String made by appending the individual strings
+	 * contained in stringList.  If stringList contains one or zero entries,
+	 * the return value does not contain separator.  If stringList contains
+	 * zero entries, the empty string is returned. 
+	 */
+	private String joinStrings(List<String> stringList, char separator){
+
+		StringBuilder sb = new StringBuilder();
+		
+		boolean sbHasContents = false;
+		for(String entry : stringList){
+			if(sbHasContents){
+				sb.append(separator);
+			}
+			sb.append(entry);
+			sbHasContents = true;
+		}
+		
+		return sb.toString();
 	}
 	
     /**
