@@ -65,7 +65,25 @@
       </PSXExtensionParamDef>      
       <suppliedResources/>
    </Extension>
-      <Extension categorystring="" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_SortDatePopulate" restoreRequestParamsOnError="no">
+   <Extension categorystring="" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_MimeTypePopulate" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">Populates the MIME type field based on a bean to allow us to support new file types not yet supported by Percussion.  If the file extension is not in the bean, the mime type field is left alone</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.CGV_MimeTypePopulate</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <interface name="com.percussion.extension.IPSRequestPreProcessor"/>
+      <PSXExtensionParamDef id="0">
+         <name>fileExtensionFieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>The field to find the file type</description>
+      </PSXExtensionParamDef>    
+      <PSXExtensionParamDef id="1">
+         <name>fileMimeTypeFieldName</name>
+         <dataType>java.lang.String</dataType>
+         <description>The field to place the mime type string</description>
+      </PSXExtensionParamDef>    
+      <suppliedResources/>
+   </Extension>
+   <Extension categorystring="" context="global/percussion/content/" deprecated="no" handler="Java" name="CGV_SortDatePopulate" restoreRequestParamsOnError="no">
       <initParam name="com.percussion.user.description">Populates the sort_date field with the data from the date_first_published field unless there is another field defined in the bean.</initParam>
       <initParam name="com.percussion.extension.version">1</initParam>
       <initParam name="className">gov.cancer.wcm.extensions.CGV_SortDatePopulate</initParam>
