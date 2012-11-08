@@ -26,6 +26,30 @@
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>			
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTagListPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>	
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTagCloud</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>					
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvDynamicList</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvLocationRollup</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
 				</bean>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>cgvCancerBulletin</value></constructor-arg>
@@ -294,6 +318,12 @@
 				</bean>
 				<!--Types that should be published on Demand but are not top types -->
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvExternalNewsLink</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="EmptyTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>nciImage</value></constructor-arg>
 					<constructor-arg><value>false</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
@@ -410,7 +440,37 @@
 					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
 				</bean>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genNewsletterArticle</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genNewsletterCategory</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genBiography</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloInstitution</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>gloVideo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloVideoCarousel</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
