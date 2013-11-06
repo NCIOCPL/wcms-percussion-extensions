@@ -1,5 +1,6 @@
 /**
- * 
+ * Used by Publish On Demand to determine to determine what ancestors of
+ * an item to include in a POD publishing job.
  */
 package gov.cancer.wcm.publishing;
 //TODO: ask John about 'site' parameter to top type checker, new definition of autoslot

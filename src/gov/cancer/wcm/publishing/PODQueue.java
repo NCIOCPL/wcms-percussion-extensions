@@ -1,5 +1,5 @@
 /**
- * 
+ * Implements a FIFO queue for storing items to be published.
  */
 package gov.cancer.wcm.publishing;
 
