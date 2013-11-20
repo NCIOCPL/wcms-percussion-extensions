@@ -9,13 +9,16 @@ import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.percussion.cms.objectstore.PSAaRelationship;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.design.objectstore.PSLocator;
+import com.percussion.design.objectstore.PSRelationshipConfig;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.utils.guid.IPSGuid;
@@ -62,6 +65,7 @@ public class TreeAnalyzer {
 	public List<Integer> getAncestorPublishableItemsHelper(int contentItemID, 
 			boolean isNavon,
 			boolean transitionItem){
+		log.trace("Enter getAncestorPublishableItemsHelper");
 		
 		List<Integer> ancestorPublishableItems = new ArrayList<Integer>();
 		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(contentItemID);
@@ -111,12 +115,12 @@ public class TreeAnalyzer {
 				PSRelationshipFilter contentItemFilter = new PSRelationshipFilter();
 				contentItemFilter.setCategory("rs_activeassembly");
 				contentItemFilter.limitToOwnerRevision(true);
+
 				//find all of my parent items of our current contentItem
 				try{
-					List<PSItemSummary> ancestorParentItems = cmgr.findOwners(contentItemGUID, contentItemFilter, false);
+					List<PSItemSummary> ancestorParentItems = findEligibleParentItems(contentItemSummary);
+					ancestorParentItems = cmgr.findOwners(contentItemGUID, contentItemFilter, false);
 					for(PSItemSummary ancestor : ancestorParentItems) {
-						//log.debug("parents Name: " + parent.getName());
-						//log.debug("Content Type Name: " + parent.getContentTypeName() + " Content GUID: " + parent.getGUID()+ " Content ID: " + parent.getGUID().getUUID() );
 				
 						Boolean isAncestorNavon = false;
 						Integer ancestorContentID = 0;
@@ -147,13 +151,66 @@ public class TreeAnalyzer {
 				}
 				
 			}
-			for(Integer ID : ancestorPublishableItems) {
-				log.debug("ID to Publish: " + ID);
+
+			// Log the IDs being returned, but only if debugging is on!
+			if(log.isDebugEnabled()){
+				for(Integer ID : ancestorPublishableItems) {
+					log.debug("ID to Publish: " + ID);
+				}
 			}
 		}
+
+		log.trace("Exit getAncestorPublishableItemsHelper");
 		return ancestorPublishableItems;
 	}
-	
+
+
+	/**
+	 * Finds the content items which are parents to the item described in itemSummary.
+	 * If itemSummary describes a site home page, then all items with relationships
+	 * via sys_inline_link are discarded.
+	 * @param itemSummary
+	 * @return a list of PSItemSummary objects for the parent content items.
+	 * @throws PSErrorException 
+	 */
+	private List<PSItemSummary> findEligibleParentItems(PSComponentSummary itemSummary)
+		throws PSErrorException {
+		if(log.isTraceEnabled()){
+			log.trace("Enter findEligibleParentItems with itemSummary = " + itemSummary.toString());
+		}
+
+		PSLocator itemLocator = new PSLocator(itemSummary.getContentId());
+		IPSGuid contentItemGUID = gmgr.makeGuid(itemLocator);
+
+		// Set up item filter.
+		PSRelationshipFilter itemFilter = new PSRelationshipFilter();
+		
+		// Only the relationships where this item is the dependent. 
+		itemFilter.setDependent(itemLocator);
+		// We're only interested in active assembly relationships.
+		itemFilter.setCategory(PSRelationshipConfig.CATEGORY_ACTIVE_ASSEMBLY);
+		// Only the parent item's most recent revision.
+		itemFilter.limitToOwnerRevision(true);
+
+		// TODO: Remove this line!
+		List<PSItemSummary> parentItems = cmgr.findOwners(contentItemGUID, itemFilter, false);
+
+		// Load the list of relationships.
+		List<PSAaRelationship> relationships = null;
+		relationships = cmgr.loadContentRelations(itemFilter, true);
+		
+		// Filter the returned relationships.  If the  item we're looking at is the site
+		// home page content type, and the relationship uses the sys_inline_link slot,
+		// then ignore the relationship.  Otherwise, add the relationship owner to the
+		// list of eligible parent items.
+		HashSet<PSItemSummary> eligibleItems;
+		
+		//  Gaaaah!  Need to return a collection of PSItemSummary, but relations
+		//  only have Locators.  Need to load the summaries. :-(
+		
+		log.trace("Exit findEligibleParentItems");
+		return parentItems;
+	}
 	
 	
 	/**
