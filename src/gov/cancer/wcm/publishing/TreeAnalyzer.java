@@ -9,6 +9,7 @@ import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -111,15 +112,9 @@ public class TreeAnalyzer {
 					ancestorPublishableItems.add(contentItemID);
 				}
 				
-				IPSGuid contentItemGUID = gmgr.makeGuid(new PSLocator(contentItemID));
-				PSRelationshipFilter contentItemFilter = new PSRelationshipFilter();
-				contentItemFilter.setCategory("rs_activeassembly");
-				contentItemFilter.limitToOwnerRevision(true);
-
 				//find all of my parent items of our current contentItem
 				try{
 					List<PSItemSummary> ancestorParentItems = findEligibleParentItems(contentItemSummary);
-					ancestorParentItems = cmgr.findOwners(contentItemGUID, contentItemFilter, false);
 					for(PSItemSummary ancestor : ancestorParentItems) {
 				
 						Boolean isAncestorNavon = false;
@@ -146,8 +141,11 @@ public class TreeAnalyzer {
 						
 					}
 				}
+				// Log the error, but otherwise swallow it and return without
+				// adding anything to the list of content items.
 				catch (PSErrorException e) {
-					e.printStackTrace();
+					log.error(e.getMessage());
+					log.error(e.getStack());
 				}
 				
 			}
@@ -189,25 +187,68 @@ public class TreeAnalyzer {
 		itemFilter.setDependent(itemLocator);
 		// We're only interested in active assembly relationships.
 		itemFilter.setCategory(PSRelationshipConfig.CATEGORY_ACTIVE_ASSEMBLY);
-		// Only the parent item's most recent revision.
-		itemFilter.limitToOwnerRevision(true);
+		// Only bring back items which link from their most recent revision.
+		itemFilter.limitToEditOrCurrentOwnerRevision(true);
 
-		// TODO: Remove this line!
+		// Load the list of parent items.
 		List<PSItemSummary> parentItems = cmgr.findOwners(contentItemGUID, itemFilter, false);
+		if(log.isDebugEnabled()){
+			for(PSItemSummary item : parentItems){
+				log.debug("Found parent item: " + item.getGUID().getUUID());
+			}
+		}
 
-		// Load the list of relationships.
-		List<PSAaRelationship> relationships = null;
-		relationships = cmgr.loadContentRelations(itemFilter, true);
+		// If the content item has a site home page type, then we need to do some filtering.
+		// For the home page type, we want to exclude all items which own an inline relationship.
+		// (i.e. sys_inline_link, though this may expanded.)  We'd like to do this via the findOwners()
+		// call above, but the PSRelationshipFilter only has a mechanism for the kinds of relationships
+		// you'd like to add versus what you'd like to avoid.
+		if(itemSummary.getContentTypeId() == 469 ||
+			itemSummary.getContentTypeId() == 2304){
+			if(log.isTraceEnabled()){
+				log.trace("Content item " + contentItemGUID + " is a site home page." );
+			}
 		
-		// Filter the returned relationships.  If the  item we're looking at is the site
-		// home page content type, and the relationship uses the sys_inline_link slot,
-		// then ignore the relationship.  Otherwise, add the relationship owner to the
-		// list of eligible parent items.
-		HashSet<PSItemSummary> eligibleItems;
-		
-		//  Gaaaah!  Need to return a collection of PSItemSummary, but relations
-		//  only have Locators.  Need to load the summaries. :-(
-		
+			// Retrieve the list of relationships which the current item participates in.
+			List<PSAaRelationship> relationships = null;
+			relationships = cmgr.loadContentRelations(itemFilter, true);
+			
+			// Filter the list of returned relationships, keeping only a list of the unique
+			// owners, and discarding parents with an inline slot relationship.
+			HashMap<Integer, PSLocator> filteredOwners = new HashMap<Integer, PSLocator>();
+			for(PSAaRelationship rel : relationships){
+				PSLocator owner = rel.getOwner();
+				String slotname = rel.getSlotName(); 
+				if(slotname.compareTo("sys_inline_link") != 0
+					&&	!filteredOwners.containsKey(owner.getId())){
+					filteredOwners.put(owner.getId(), owner);
+					log.debug("Filter is keeping owner: " + owner.getId());
+				}
+			}
+			
+			// Reconcile the filtered list of parent items against the list of all parents. 
+			ArrayList<PSItemSummary> eligibleParents = new ArrayList<PSItemSummary>();
+			for(PSItemSummary parent : parentItems){
+				if(filteredOwners.containsKey(parent.getGUID().getUUID())){
+					eligibleParents.add(parent);
+					if(log.isDebugEnabled()){
+						log.debug("Eligible parent: " + parent.getGUID().getUUID());
+					}
+				}
+				else{
+					if(log.isDebugEnabled()){
+						log.debug("Parent: " + parent.getGUID().getUUID() + " is not eligible.");
+					}
+				}
+			}
+
+			// Replace the list of eligible parents
+			parentItems = eligibleParents;
+		}
+
+		if(log.isDebugEnabled()){
+			log.debug("Returning " + parentItems.size() + " eligible parent items.");
+		}
 		log.trace("Exit findEligibleParentItems");
 		return parentItems;
 	}
