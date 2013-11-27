@@ -1,5 +1,6 @@
 package gov.cancer.wcm.workflow;
 
+import gov.cancer.wcm.workflow.properties.BasePropertyContainer;
 import gov.cancer.wcm.workflow.properties.PropertyCollection;
 import gov.cancer.wcm.workflow.validators.CTValidatorCollection;
 
@@ -8,7 +9,7 @@ public class ContentTypeConfig {
 	/*
 	 * "Well-Known" property names.
 	 */
-	public final static String PROP_IS_SITE_HOME = "SiteHomeProperty"; 
+	public final static String PROP_IS_SITE_HOME = "isSiteRoot"; 
 	
 	private boolean isTopType;
 	//private boolean requiresParentNavonsPublic;
@@ -37,6 +38,25 @@ public class ContentTypeConfig {
 	 */
 	public boolean getIsPublishable() {
 		return this.isPublishable;
+	}
+	
+	/**
+	 * @param propName
+	 * @return True if the content type contains a definition for propName.
+	 */
+	public boolean hasProperty(String propName){
+		return propertyCollection.hasProperty(propName);
+	}
+	
+	/**
+	 * @param propName
+	 * @return The value for the propName property.  Null if propName is not defined.
+	 */
+	public String getProperty(String propName){
+		if(propertyCollection.hasProperty(propName))
+			return propertyCollection.getProperty(propName).getValue();
+		else
+			return null;
 	}
 	
 	/**
