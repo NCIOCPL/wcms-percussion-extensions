@@ -714,6 +714,19 @@ public class ContentItemWFValidatorAndTransitioner {
 		return config.getIsTopType();		
 	}
 	
+	/**
+	 * @param contentTypeID A content type ID.
+	 * @return True if contentTypeID is a site home page type.
+	 */
+	public static boolean isSiteHomeType(long contentTypeID)
+	throws WFValidationException
+	{
+		if(contentTypeID == 469 || contentTypeID == 2304 ){
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	
 	/**

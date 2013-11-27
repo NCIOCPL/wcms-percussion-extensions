@@ -201,8 +201,8 @@ public class TreeAnalyzer {
 		// (i.e. sys_inline_link, though this may expanded.)  We'd like to do this via the findOwners()
 		// call above, but the PSRelationshipFilter only has a mechanism for the kinds of relationships
 		// you'd like to add versus what you'd like to avoid.
-		if(itemSummary.getContentTypeId() == 469 ||
-			itemSummary.getContentTypeId() == 2304){
+		boolean isSiteHomeType = ContentItemWFValidatorAndTransitioner.isSiteHomeType(itemSummary.getContentTypeId());
+		if(isSiteHomeType){
 			if(log.isTraceEnabled()){
 				log.trace("Content item " + contentItemGUID + " is a site home page." );
 			}
