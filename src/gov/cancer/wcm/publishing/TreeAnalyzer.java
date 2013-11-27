@@ -3,14 +3,12 @@
  * an item to include in a POD publishing job.
  */
 package gov.cancer.wcm.publishing;
-//TODO: ask John about 'site' parameter to top type checker, new definition of autoslot
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;

@@ -669,14 +669,16 @@ public class ContentItemWFValidatorAndTransitioner {
 
 		try {
 			contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
-		} catch (Exception ex) {
-			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
+		} catch (Exception ex) {		
+			String message = String.format("Failed to retrieve type name for contentTypeID = %d.", contentTypeID);
+			throw new WFValidationException(message, ex, true);
 		}
 
 		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
 
 		if (config == null) {
-			throw new WFValidationException("System Error Occured. Please Check the logs.", true);			
+			String message = String.format("Failed to retrieve ContentTypeConfig for contentTypeName = %s.", contentTypeName);
+			throw new WFValidationException(message, true);			
 		}
 
 		return config.getIsTopType();		
