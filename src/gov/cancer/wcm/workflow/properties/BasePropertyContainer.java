@@ -25,5 +25,7 @@ public abstract class BasePropertyContainer {
 	}
 	
 	public BasePropertyContainer(String propertyName, String propertyValue){
+		this.name = propertyName;
+		this.value = propertyValue;
 	}
 }
