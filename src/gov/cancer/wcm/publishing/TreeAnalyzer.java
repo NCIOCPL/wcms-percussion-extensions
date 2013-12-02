@@ -1,6 +1,6 @@
 /**
- * Used by Publish On Demand to determine to determine what ancestors of
- * an item to include in a POD publishing job.
+ * Used by Publish On Demand to determine what ancestors of an item
+ * should be included in a Publish On Demand job.
  */
 package gov.cancer.wcm.publishing;
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
@@ -25,9 +25,7 @@ import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.services.content.data.PSItemSummary;
-/**
- * @author John Doyle based on holewr
- */
+
 
 public class TreeAnalyzer {
 	private static final Log log = LogFactory.getLog(TreeAnalyzer.class);
