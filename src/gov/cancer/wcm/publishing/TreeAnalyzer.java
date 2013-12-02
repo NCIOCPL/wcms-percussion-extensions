@@ -8,7 +8,7 @@ import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -211,13 +211,13 @@ public class TreeAnalyzer {
 			
 			// Filter the list of returned relationships, keeping only a list of the unique
 			// owners, and discarding parents with an inline slot relationship.
-			HashMap<Integer, PSLocator> filteredOwners = new HashMap<Integer, PSLocator>();
+			HashSet<Integer> filteredOwners = new HashSet<Integer>();
 			for(PSAaRelationship rel : relationships){
 				PSLocator owner = rel.getOwner();
 				String slotname = rel.getSlotName(); 
 				if(slotname.compareTo("sys_inline_link") != 0
-					&&	!filteredOwners.containsKey(owner.getId())){
-					filteredOwners.put(owner.getId(), owner);
+					&&	!filteredOwners.contains(owner.getId())){
+					filteredOwners.add(owner.getId());
 					log.debug("Filter is keeping owner: " + owner.getId());
 				}
 			}
@@ -225,7 +225,7 @@ public class TreeAnalyzer {
 			// Reconcile the filtered list of parent items against the list of all parents. 
 			ArrayList<PSItemSummary> eligibleParents = new ArrayList<PSItemSummary>();
 			for(PSItemSummary parent : parentItems){
-				if(filteredOwners.containsKey(parent.getGUID().getUUID())){
+				if(filteredOwners.contains(parent.getGUID().getUUID())){
 					eligibleParents.add(parent);
 					if(log.isDebugEnabled()){
 						log.debug("Eligible parent: " + parent.getGUID().getUUID());
