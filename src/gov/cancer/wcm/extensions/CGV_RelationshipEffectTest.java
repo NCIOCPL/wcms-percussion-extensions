@@ -23,6 +23,8 @@ import com.percussion.relationship.IPSEffect;
 import com.percussion.relationship.IPSExecutionContext;
 import com.percussion.relationship.PSEffect;
 import com.percussion.relationship.PSEffectResult;
+import com.percussion.relationship.annotation.PSEffectContext;
+import com.percussion.relationship.annotation.PSHandlesEffectContext;
 import com.percussion.relationship.effect.PSEffectUtils;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.util.PSItemErrorDoc;
@@ -36,6 +38,7 @@ import com.percussion.xml.PSXmlTreeWalker;
  * @author bpizzillo
  *
  */
+@PSHandlesEffectContext(required={PSEffectContext.PRE_WORKFLOW})
 public class CGV_RelationshipEffectTest extends PSEffect {
 
 	private static Log log = LogFactory.getLog(CGV_WorkflowItemValidator.class);

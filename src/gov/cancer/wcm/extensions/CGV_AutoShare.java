@@ -28,6 +28,8 @@ import com.percussion.extension.PSParameterMismatchException;
 import com.percussion.pso.utils.PSOItemSummaryFinder;
 import com.percussion.pso.utils.PSONodeCataloger;
 import com.percussion.pso.utils.RxItemUtils;
+import com.percussion.relationship.annotation.PSEffectContext;
+import com.percussion.relationship.annotation.PSHandlesEffectContext;
 import com.percussion.relationship.IPSEffect;
 import com.percussion.relationship.IPSExecutionContext;
 import com.percussion.relationship.PSEffectResult;
@@ -45,6 +47,7 @@ import com.percussion.webservices.content.PSContentWsLocator;
 import com.percussion.webservices.system.PSSystemWsLocator;
 
 
+@PSHandlesEffectContext(required={PSEffectContext.PRE_CONSTRUCTION})
 public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, InitializingBean{
 	private CGV_FolderValidateUtils valUtil = null;
     private static final Log log = LogFactory.getLog(CGV_AutoShare.class);
