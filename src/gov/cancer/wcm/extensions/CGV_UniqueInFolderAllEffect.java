@@ -21,6 +21,8 @@ import com.percussion.pso.utils.PSONodeCataloger;
 import com.percussion.relationship.IPSEffect;
 import com.percussion.relationship.IPSExecutionContext;
 import com.percussion.relationship.PSEffectResult;
+import com.percussion.relationship.annotation.PSEffectContext;
+import com.percussion.relationship.annotation.PSHandlesEffectContext;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
@@ -49,6 +51,7 @@ import com.percussion.webservices.system.PSSystemWsLocator;
  * @author holewr
  *
  */
+@PSHandlesEffectContext(required={PSEffectContext.PRE_WORKFLOW})
 public class CGV_UniqueInFolderAllEffect implements IPSEffect {
 	private CGV_FolderValidateUtils valUtil = null;
 
@@ -125,7 +128,7 @@ public class CGV_UniqueInFolderAllEffect implements IPSEffect {
 	        }
 		}
 		else {
-	        log.debug("[attempt]setting success - not preConstruction");        
+	        log.debug("[attempt]setting success - not preWorkflow");        
 			result.setSuccess();
 		}
 	}
