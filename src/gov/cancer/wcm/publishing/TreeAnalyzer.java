@@ -54,15 +54,22 @@ public class TreeAnalyzer {
 	
 	/**
 	 * @author John Doyle
-	 * @param contentItemID
-	 * @param isNavon
-	 * @param transitionItem
+	 * @param contentItemID A content item which may be added to the Publish on Demand queue along with its ancestors.
+	 * @param isNavon Is this item a Navon?
+	 * @param transitionItem Is this the item that was transitioned?  (Did it trigger the POD job?)
+	 * @param foundItems Contains the set of all content ID discovered so far.  Used to prevent runaway recursion.
 	 * @return
 	 */
-	public List<Integer> getAncestorPublishableItemsHelper(int contentItemID, 
+	private List<Integer> getAncestorPublishableItemsHelper(int contentItemID, 
 			boolean isNavon,
-			boolean transitionItem){
+			boolean transitionItem,
+			HashSet<Integer> foundItems){
 		log.trace("Enter getAncestorPublishableItemsHelper");
+		if(log.isDebugEnabled()){
+			log.debug("contentItemID " + contentItemID);
+			log.debug("isNavon " + isNavon);
+			log.debug("transitionItem " + transitionItem);
+		}
 		
 		List<Integer> ancestorPublishableItems = new ArrayList<Integer>();
 		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(contentItemID);
@@ -90,7 +97,7 @@ public class TreeAnalyzer {
 			if(!transitionItem && isTopType){
 				log.debug("getAncestorPublishableItems: I am not the item transitioned, and I am a top type");
 				//add the current item to the publishable items list and do NOT continue to recurse up the tree
-				ancestorPublishableItems.add(contentItemID);				
+				ancestorPublishableItems.add(contentItemID);
 			}
 			//if the current item is not a top type we want to keep searching for its parents
 			//Edge Conditions:
@@ -119,11 +126,18 @@ public class TreeAnalyzer {
 						ancestorContentID = ancestor.getGUID().getUUID();
 						isAncestorNavon = isNavon(contentTypeID);
 						
-						//recurse to find all of the publishable parent items from this parent
-						parentPublishableItems = getAncestorPublishableItemsHelper(
-								ancestorContentID, 
-								isAncestorNavon, 
-								false);
+						// Recurse to find all of the publishable parent items from this parent.
+						// If the item was previously found, don't check it again, otherwise we
+						// risk runaway recursion.  It's OK for a single item to be the owner of
+						// multiple relationships, but if one of the dependents is a child of another,
+						// the graph becomes circular.  The recursion should stop when we hit a top type,
+						// but this should handle any edge case we've overlooked (e.g. top type not configured as such).
+						if(!foundItems.contains(ancestorContentID)){
+							foundItems.add(ancestorContentID);
+							parentPublishableItems = getAncestorPublishableItemsHelper(ancestorContentID, isAncestorNavon, false, foundItems);
+						} else {
+							log.debug("Content item " + ancestorContentID + " was not previously found. Not checking again.");
+						}
 						
 						//For each parent item, check to see if its already in the
 						//publish list.
@@ -264,8 +278,11 @@ public class TreeAnalyzer {
 		
 		List<Integer> publishableItems = new ArrayList<Integer>();
 		
-		
-		publishableItems = getAncestorPublishableItemsHelper(contentItemID, isNavon, transitionItem);
+		HashSet<Integer> foundItems = new HashSet<Integer>();
+
+		// The current content item is already known, add it to the list of known items.
+		foundItems.add(contentItemID);
+		publishableItems = getAncestorPublishableItemsHelper(contentItemID, isNavon, transitionItem, foundItems);
 		
 		return publishableItems;
 		
