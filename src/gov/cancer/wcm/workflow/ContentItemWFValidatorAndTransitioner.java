@@ -669,14 +669,16 @@ public class ContentItemWFValidatorAndTransitioner {
 
 		try {
 			contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
-		} catch (Exception ex) {
-			throw new WFValidationException("System Error Occured. Please Check the logs.", ex, true);
+		} catch (Exception ex) {		
+			String message = String.format("Failed to retrieve type name for contentTypeID = %d.", contentTypeID);
+			throw new WFValidationException(message, ex, true);
 		}
 
 		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
 
 		if (config == null) {
-			throw new WFValidationException("System Error Occured. Please Check the logs.", true);			
+			String message = String.format("Failed to retrieve ContentTypeConfig for contentTypeName = %s.", contentTypeName);
+			throw new WFValidationException(message, true);			
 		}
 
 		return config.getIsTopType();		
@@ -712,6 +714,38 @@ public class ContentItemWFValidatorAndTransitioner {
 		return config.getIsTopType();		
 	}
 	
+	/**
+	 * @param contentTypeID A content type ID.
+	 * @return True if contentTypeID is a site home page type.
+	 */
+	public static boolean isSiteHomeType(long contentTypeID)
+	throws WFValidationException
+	{
+		/*
+		 * Start out by retrieving the content type name.
+		 * Use the content type name to retrieve the configuration object
+		 * for that content type.  Once we have that, we can check whether
+		 * the content type has the SiteHome Property set.
+		 */
+
+		String contentTypeName;
+		try{
+			contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
+		} catch (Exception ex) {		
+			String message = String.format("Failed to retrieve type name for contentTypeID = %d.", contentTypeID);
+			throw new WFValidationException(message, ex, true);
+		}
+
+		// Get the configuration data for this content type.
+		ContentTypeConfig config = workflowConfig.getContentTypes().getContentTypeOrDefault(contentTypeName);
+
+		if (config == null) {
+			String message = String.format("Failed to retrieve ContentTypeConfig for contentTypeName = %s.", contentTypeName);
+			throw new WFValidationException(message, true);			
+		}		
+
+		return config.hasProperty(ContentTypeConfig.PROP_IS_SITE_HOME);
+	}
 	
 	
 	/**

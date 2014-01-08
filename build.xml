@@ -87,7 +87,7 @@
 		>
 			<compilerarg value = "-Xlint:unchecked" />
 		</javac>
-		<copy todir="${bin}">
+		 <copy todir="${bin}">
     		<fileset dir="${src}">
       			<include name="**/*.xml"/>
     			<include name="**/*.properties" />
@@ -155,12 +155,6 @@
 	</target>
 	
 	<target name="testbuild" description="build for local test">		
-		<echo>Stopping ${rhythmyx.service}</echo>
-		
-		<exec executable="net.exe" failonerror="false">
-			<arg line="stop ${rhythmyx.service}"/>
-			<env key="COMSPEC" path="${comspec}"/>
-		</exec>
 		<property name="build.number" value="test build" /> 
 		<antcall target="jarbuilder"/>
 		<delete file="${rhythmyx.home}/AppServer/server/rx/log/server.log" verbose="true" failonerror="false" />
@@ -168,16 +162,33 @@
 		<copy todir="${rhythmyx.rxapp.WEB-INF}" verbose="true" >
 			<fileset dir="WEB-INF" />
 		</copy>
-		<!--copy file="mybeans.xml" todir="${rhythmyx.rxapp.spring-config}" verbose="true" /  -->
+	</target>
+
+	<!--
+		Older version of the testbuild target.  This version retains the
+		attempt to stop and restart the Rhythmyx server before copying
+		the JAR file.  (NOTE: invokes the antCall task to avoid having
+		the same code twice.)
+	-->
+	<target name="testbuildALT" description="legacy build for local test">		
+		<echo>Stopping ${rhythmyx.service}</echo>
+		
+		<exec executable="net.exe" failonerror="false">
+			<arg line="stop ${rhythmyx.service}"/>
+			<env key="COMSPEC" path="${comspec}"/>
+		</exec>
 		<echo>waiting for shutdown...</echo>
 	    <sleep seconds="30" /> 
+
+		<antcall target="testbuild" />
+
 		<echo>Restarting ${rhythmyx.service}</echo>
 		<exec executable="net.exe" failonerror="true">
 			<arg line="start ${rhythmyx.service}"/>
 			<env key="COMSPEC" path="${comspec}"/>
 		</exec>
 	</target>
-
+	
 	<target name="dist" depends="init, clean, javadoc" description="generate the distribution">
 		<buildnumber/>
 		<antcall target="jarbuilder"/>

@@ -1,20 +1,23 @@
 /**
- * 
+ * Used by Publish On Demand to determine what ancestors of an item
+ * should be included in a Publish On Demand job.
  */
 package gov.cancer.wcm.publishing;
-//TODO: ask John about 'site' parameter to top type checker, new definition of autoslot
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.percussion.cms.objectstore.PSAaRelationship;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.design.objectstore.PSLocator;
+import com.percussion.design.objectstore.PSRelationshipConfig;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.utils.guid.IPSGuid;
@@ -22,9 +25,7 @@ import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.services.content.data.PSItemSummary;
-/**
- * @author John Doyle based on holewr
- */
+
 
 public class TreeAnalyzer {
 	private static final Log log = LogFactory.getLog(TreeAnalyzer.class);
@@ -61,6 +62,7 @@ public class TreeAnalyzer {
 	public List<Integer> getAncestorPublishableItemsHelper(int contentItemID, 
 			boolean isNavon,
 			boolean transitionItem){
+		log.trace("Enter getAncestorPublishableItemsHelper");
 		
 		List<Integer> ancestorPublishableItems = new ArrayList<Integer>();
 		PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(contentItemID);
@@ -106,16 +108,10 @@ public class TreeAnalyzer {
 					ancestorPublishableItems.add(contentItemID);
 				}
 				
-				IPSGuid contentItemGUID = gmgr.makeGuid(new PSLocator(contentItemID));
-				PSRelationshipFilter contentItemFilter = new PSRelationshipFilter();
-				contentItemFilter.setCategory("rs_activeassembly");
-				contentItemFilter.limitToOwnerRevision(true);
 				//find all of my parent items of our current contentItem
 				try{
-					List<PSItemSummary> ancestorParentItems = cmgr.findOwners(contentItemGUID, contentItemFilter, false);
+					List<PSItemSummary> ancestorParentItems = findEligibleParentItems(contentItemSummary);
 					for(PSItemSummary ancestor : ancestorParentItems) {
-						//log.debug("parents Name: " + parent.getName());
-						//log.debug("Content Type Name: " + parent.getContentTypeName() + " Content GUID: " + parent.getGUID()+ " Content ID: " + parent.getGUID().getUUID() );
 				
 						Boolean isAncestorNavon = false;
 						Integer ancestorContentID = 0;
@@ -141,18 +137,117 @@ public class TreeAnalyzer {
 						
 					}
 				}
+				// Log the error, but otherwise swallow it and return without
+				// adding anything to the list of content items.
 				catch (PSErrorException e) {
-					e.printStackTrace();
+					log.error(e.getMessage());
+					log.error(e.getStack());
 				}
 				
 			}
-			for(Integer ID : ancestorPublishableItems) {
-				log.debug("ID to Publish: " + ID);
+
+			// Log the IDs being returned, but only if debugging is on!
+			if(log.isDebugEnabled()){
+				for(Integer ID : ancestorPublishableItems) {
+					log.debug("ID to Publish: " + ID);
+				}
 			}
 		}
+
+		log.trace("Exit getAncestorPublishableItemsHelper");
 		return ancestorPublishableItems;
 	}
-	
+
+
+	/**
+	 * Finds the content items which are parents to the item described in itemSummary.
+	 * If itemSummary describes a site home page, then all items with relationships
+	 * via sys_inline_link are discarded.
+	 * @param itemSummary
+	 * @return a list of PSItemSummary objects for the parent content items.
+	 * @throws PSErrorException 
+	 */
+	private List<PSItemSummary> findEligibleParentItems(PSComponentSummary itemSummary)
+		throws PSErrorException {
+		if(log.isTraceEnabled()){
+			log.trace("Enter findEligibleParentItems with itemSummary = " + itemSummary.toString());
+		}
+
+		PSLocator itemLocator = new PSLocator(itemSummary.getContentId());
+		IPSGuid contentItemGUID = gmgr.makeGuid(itemLocator);
+
+		// Set up item filter.
+		PSRelationshipFilter itemFilter = new PSRelationshipFilter();
+		
+		// Only the relationships where this item is the dependent. 
+		itemFilter.setDependent(itemLocator);
+		// We're only interested in active assembly relationships.
+		itemFilter.setCategory(PSRelationshipConfig.CATEGORY_ACTIVE_ASSEMBLY);
+		// Only bring back items which link from their most recent revision.
+		itemFilter.limitToEditOrCurrentOwnerRevision(true);
+
+		// Load the list of parent items.
+		List<PSItemSummary> parentItems = cmgr.findOwners(contentItemGUID, itemFilter, false);
+		if(log.isDebugEnabled()){
+			for(PSItemSummary item : parentItems){
+				log.debug("Found parent item: " + item.getGUID().getUUID());
+			}
+		}
+
+		// If the content item has a site home page type, then we need to do some filtering.
+		// For the home page type, we want to exclude all items which own an inline relationship.
+		// (i.e. sys_inline_link, though this may expanded.)  We'd like to do this via the findOwners()
+		// call above, but the PSRelationshipFilter only has a mechanism for the kinds of relationships
+		// you'd like to add versus what you'd like to avoid.
+		boolean isSiteHomeType = ContentItemWFValidatorAndTransitioner.isSiteHomeType(itemSummary.getContentTypeId());
+		if(isSiteHomeType){
+			if(log.isTraceEnabled()){
+				log.trace("Content item " + contentItemGUID + " is a site home page." );
+			}
+		
+			// Retrieve the list of relationships which the current item participates in.
+			List<PSAaRelationship> relationships = null;
+			relationships = cmgr.loadContentRelations(itemFilter, true);
+			
+			// Filter the list of returned relationships, keeping only a list of the unique
+			// owners, and discarding parents with an inline slot relationship.
+			HashSet<Integer> filteredOwners = new HashSet<Integer>();
+			for(PSAaRelationship rel : relationships){
+				PSLocator owner = rel.getOwner();
+				String slotname = rel.getSlotName(); 
+				if(slotname.compareTo("sys_inline_link") != 0
+					&&	!filteredOwners.contains(owner.getId())){
+					filteredOwners.add(owner.getId());
+					log.debug("Filter is keeping owner: " + owner.getId());
+				}
+			}
+			
+			// Reconcile the filtered list of parent items against the list of all parents. 
+			ArrayList<PSItemSummary> eligibleParents = new ArrayList<PSItemSummary>();
+			for(PSItemSummary parent : parentItems){
+				if(filteredOwners.contains(parent.getGUID().getUUID())){
+					eligibleParents.add(parent);
+					if(log.isDebugEnabled()){
+						log.debug("Eligible parent: " + parent.getGUID().getUUID());
+					}
+				}
+				else{
+					if(log.isDebugEnabled()){
+						log.debug("Parent: " + parent.getGUID().getUUID() + " is not eligible.");
+					}
+				}
+			}
+
+			// Replace the list of eligible parents
+			parentItems = eligibleParents;
+		}
+
+		if(log.isDebugEnabled()){
+			log.debug("Returning " + parentItems.size() + " eligible parent items.");
+		}
+		log.trace("Exit findEligibleParentItems");
+		return parentItems;
+	}
 	
 	
 	/**

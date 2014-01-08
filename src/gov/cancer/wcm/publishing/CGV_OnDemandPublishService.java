@@ -312,13 +312,15 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			workItem.setTransitionItemName(contentItemSummary.getName());
 			workItem.setTimeEntered(System.currentTimeMillis());
 			workItem.setWorkID(contentID + "-" + workItem.getEdition());
-			//TODO: ONLY HERE FOR DEBUGGING PURPOSES
+			
+			if(log.isDebugEnabled()){
 				log.debug("Publishing Work Edition with the following Info:");
 				log.debug("Edition ID: " + workItem.getEdition());
 				for(PublishItem p : workItem.getItems()) {
 					log.debug("Content ID: " + p.contentID);
 				}
-			//ENDTODO: 
+			}
+
 			//put the PODWork item on the Queue.
 			PODQueue.put(workItem);
 		}
