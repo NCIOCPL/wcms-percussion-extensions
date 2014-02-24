@@ -1,0 +1,1185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.1.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<!-- This bean defines extra configuration information about content types in the system -->
+	<!-- If a content type is not defined in the map, then the Default config will be used -->
+	<!-- Constructor Arguments: 
+			1. The name of the content type
+			2. Is the content type a top type
+			3. Does the content type require that the parent navons have a public revision
+			
+	-->
+	<bean id="ContentTypesConfig" class="gov.cancer.wcm.workflow.ContentTypesConfigCollection">
+		<constructor-arg>
+			<list>
+				
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvBlogPost</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvBooklet</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>			
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTagListPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>	
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTagCloud</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>					
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvDynamicList</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvLocationRollup</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerBulletin</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerTypeHome</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerTypePortalGeneralPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerTypePortalHome</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerTypePortalHomeLink</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerTypePortalListPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvClinicalTrialResult</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvContentSearch</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvDocTitleBlock</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvDrugInfoSummary</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvFactSheet</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvFeaturedClinicalTrial</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvPowerPoint</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvPressRelease</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTopicSearchCategory</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciFile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciGeneral</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciHome</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="HomePagePropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciLandingPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciAppModulePage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciErrorPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaCancerSelected</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaCancerType</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaCitation</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaEvent</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaListPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMIndex</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMInteractive</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMVideo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaNewsRelease</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaSeries</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvBestBetsCategory</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvConfigurationFile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvAutoRSS</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvManualRSS</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciLink</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvMicrositeIndex</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMImage</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<!-- NCI TYPES, CONFIGURATION LEVEL OBJECTS -->
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvConfigurationFile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciJavaScriptExternalInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciJavaScriptInternalInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciPageTemplateInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciStyleSheetInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciPageTemplateCollection</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<!--Types that should be published on Demand but are not top types -->
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvExternalNewsLink</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciImage</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloImage</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaImage</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>nciTile</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaMMAudio</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTimelyContentBlock</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genTCItem</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>tcgaTimelyImageFeature</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<!--End non top types that should be on demand-->
+				<!-- STANDARD TEMPLATES, PAGE LEVEL -->
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genAggroWidget</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genAppModPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genErrorPage</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genEvent</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genFacet</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genFundingOpp</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genGeneral</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genHome</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="HomePagePropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genLanding</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genNews</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genNewsletterDetails</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genNewsletterArticle</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genNewsletterCategory</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genBiography</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloInstitution</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloVideo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloVideoCarousel</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<!-- STANDARD TEMPLATES, PUBLISHABLE TYPES -->
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genConfigurationFile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genFile</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genJavaScriptInternalInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genPageTemplateInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genPromoURLConfig</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genStyleSheetInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<!-- STANDARD TEMPLATES, SNIPPET TYPES-->
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>genExternalLink</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+			</list>
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+				<constructor-arg><value>default</value></constructor-arg>
+				<constructor-arg><value>false</value></constructor-arg>
+				<constructor-arg><value>false</value></constructor-arg>
+				<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+				<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>	
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<!-- This section defines the ContentType Validator classes so they
+		may be referenced in the CTListConfig.	
+	-->
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not a Top Type or
+		is a Top Type with a public revision.
+	 -->
+	
+	<bean id="ValidationAlwaysFires" class="gov.cancer.wcm.workflow.validators.ValidationIgnoreConditionCollection">
+		<constructor-arg>
+			<list>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="IgnoreParentItemValidation" class="gov.cancer.wcm.workflow.validators.ValidationIgnoreConditionCollection">
+		<constructor-arg>
+			<list>
+				<!--<bean id="RequireUI" class="gov.cancer.wcm.workflow.validators.RequireUIWarningIgnoreCondition" />-->
+				<bean id="ExemptGroup" class="gov.cancer.wcm.workflow.validators.ExemptGroupIgnoreCondition">
+					<constructor-arg>
+						<list>
+							<value>Admin</value>
+							<value>LinkArchiver</value>
+						</list>
+					</constructor-arg>
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="PublicNavonNeeded" class="gov.cancer.wcm.workflow.validators.PublicNavonNeeded">
+		<constructor-arg>
+			<list>
+				<value>Creation</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg><ref bean="ValidationAlwaysFires" /></constructor-arg>
+	</bean>
+	
+	<bean id="ParentItemsAreArchived" class="gov.cancer.wcm.workflow.validators.ParentItemsAreArchived">
+		<constructor-arg>
+			<list>
+				<value>Archiving</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg><ref bean="IgnoreParentItemValidation" /></constructor-arg>
+	</bean>
+
+	<bean id="PublishableTypeValidators" class="gov.cancer.wcm.workflow.validators.CTValidatorCollection">
+		<constructor-arg>
+			<list>
+				<ref bean="PublicNavonNeeded" />
+				<ref bean="ParentItemsAreArchived" />
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="DefaultValidators" class="gov.cancer.wcm.workflow.validators.CTValidatorCollection">
+		<constructor-arg>
+			<list>
+				<ref bean="ParentItemsAreArchived" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="ValidatorIgnoreConfig" class="gov.cancer.wcm.workflow.ValidatorIgnoreConfig">
+		<!-- Ignore Workflow Triggers -->
+		<constructor-arg>
+			<list>
+				<value>Migrate</value>
+				<value>MigrateFromEditing</value>
+				<value>MigratePrivateArchive</value>
+				<value>DirectToPublic</value>
+			</list>
+		</constructor-arg>
+		<!-- Ignore Workflows  -->
+		<constructor-arg>
+			<list>
+				<value>CGV_Navon_Workflow</value>
+				<value>CancerGov_PDQ_Workflow</value>
+			</list>
+		</constructor-arg>
+	</bean>
+		
+	<!-- This section defines the RelationshipWFTransitionStopCondition classes so they
+		may be referenced in the RelationshipWFTransitionChecks below.	
+	-->
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not a Top Type or
+		is a Top Type with a public revision.
+	 -->
+	<bean id="TopTypeRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.TopTypeRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
+
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not shared or
+		is shared with a public revision.
+	 -->
+	<bean id="SharedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.SharedRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
+
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent is not in another community or
+		is in another community with a public revision.
+	 -->
+	<bean id="OtherCommunityRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.OtherCommunityRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
+
+	<!-- RelationshipWFTransitionStopCondition to check if the dependent uses another workflow or
+		uses another workflow with a public revision.
+	 -->
+	<bean id="OtherWorkflowRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.OtherCommunityRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
+
+	<!-- RelationshipWFTransitionStopCondition to check if the user has rights to transition
+		a dependent.
+	 -->
+	<bean id="WFTransitionAvailableRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.WFTransitionAvailableRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
+	
+
+	<!-- RelationshipWFTransitionStopCondition to check if a dependent is checked out by another user. 
+		this is not a condition which is ok to continue.
+	-->
+	<bean id="OtherUserLockedRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.OtherUserLockedRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Both</value></constructor-arg>
+	</bean>
+	
+
+	<!-- RelationshipWFTransitionStopCondition to check the dependent's relationships.
+	 -->
+	<bean id="DependentsCheckRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.DependentsCheckRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
+	
+	<!-- ContentTypeValidationRelationshipWFTransitionStopCondition to check the dependent's validation list.
+	 -->
+	<bean id="ContentTypeValidationRelationshipWFTransitionStopCondition" class="gov.cancer.wcm.workflow.stopConditions.ContentTypeValidationRelationshipWFTransitionStopCondition">
+	    <!-- Direction (Up|Down|Both) of both when to do this check  -->
+		<constructor-arg><value>Down</value></constructor-arg>
+	</bean>
+	
+
+		
+	<!-- Defines configuration for relationships -->
+	<!-- Bean class types define how we should handle child items:
+	   RelationshipWFTransitionFollowCheck => 
+		          The dependents of the relationship should be transitioned with the owner
+			       if the business rules allow. If the dependent meets a stop condition 
+					 then it will follow the rules of the CGV_RelationshipWFTransitionStopConfig.
+		RelationshipWFTransitionStopCheck => 
+		        The dependents of the relationship will not be transitioned with the owner,
+		        furthermore, the transition of the owner will stop if any dependents do not
+			     have a public revision.
+	    RelationshipWFTransitionIgnoreCheck => 
+					 The dependents of the relationship will not be transition with the
+		          owner, and the transition will not stop if the dependent does not have a
+			       public revision.  This is the out of the box behavior of Percussion.
+	-->
+	<bean id="RelationshipChecks" class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionChecksCollection">
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
+					<constructor-arg><value>CDE</value></constructor-arg>
+					<constructor-arg>
+						<list>
+							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
+							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />												
+							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<!-- At this point we know we are going to transition the dependent, but can we? -->	
+							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />		
+							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
+							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
+						</list>
+					</constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
+					<constructor-arg><value>Pages</value></constructor-arg>
+					<constructor-arg>
+						<list>
+							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
+							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
+							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<!-- At this point we know we are going to transition the dependent, but can we? -->
+							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />								
+							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
+							<ref bean="DependentsCheckRelationshipWFTransitionStopCondition" />
+						</list>
+					</constructor-arg>
+				</bean>				
+				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
+					<constructor-arg><value>ParentChildIgnore</value></constructor-arg>
+					<constructor-arg>
+						<list>
+							<ref bean="OtherCommunityRelationshipWFTransitionStopCondition" />
+							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
+							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />
+							<ref bean="SharedRelationshipWFTransitionStopCondition" />
+							<!-- At this point we know we are going to transition the dependent, but can we? -->
+							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />								
+							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
+							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
+			</list>
+		</constructor-arg>
+				</bean>			
+			</list>
+		</constructor-arg>
+		<constructor-arg>
+			<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionPublicRevisionCheck">
+				<constructor-arg><value>default</value></constructor-arg>
+			</bean>
+		</constructor-arg>
+	</bean>
+	
+	<!--
+		This begins the Workflow Transition Mappings
+
+		A workflow transition mapping consists of two list of transitions.
+		The first list is a of transitions for creating/publishing content.
+		The second list is transitions for archving content.
+		
+		An individual entry in the list of transitions consists of a workflow state (e.g. "Draft")
+		and a list of destination states (e.g. "Staging (D)").  Each destination state includes a
+		list of triggers (from the workflow definition).
+		
+		A given source state (e.g. "Public") may appear in both transition lists,
+		however individual transitions may only appear in a single list.  E.g. the "Public"
+		workflow state has "Draft" and "Editing" transitions in the list for content creation,
+		and a "Pending Archive" transition in the archival list.
+	-->
+	
+	<!-- Defines the transition mappings for the CancerGov Workflow. -->
+	<bean id="CGovWorkflowTransitionMap" class="gov.cancer.wcm.workflow.WFTransitionMap">
+		<!-- The first constructor-arg is for content creation transitions -->
+		<constructor-arg>
+			<map>
+				<!-- From State as Defined in Workflow-->
+				<entry key="Draft">
+					<map>
+						<!-- To State.  If there should NOT be a transition to the state, leave it out. -->
+						<entry key="Staging (D)">
+							<!-- 
+							List of transition triggers as defined in the workflow, in the order of when they should be called  
+							to be made to get to the to state.  Note: Items should either stay publishable or stay unpublishable
+							therefore a move from Draft to Restaging should really be Draft to Staging since moving to Restaging
+							would actually make that unpublishable component publishable.
+							So for example, from Draft to Public there are a number of states which the item must be transitioned to.  
+							So the list should contain the transitions from Draft->S1,...,Sn->Public
+							-->
+							<list>								
+								<value>Staging</value>
+							</list>
+						</entry>
+						<entry key="Review (D)">
+							<list>								
+								<value>Staging</value>
+								<value>submitForReview</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>								
+								<value>Staging</value>
+								<value>submitForReview</value>
+								<value>Approve</value>
+							</list>
+						</entry>
+						<entry key="Staging (P)">
+							<list>								
+								<value>Staging</value>
+							</list>
+						</entry>
+						<entry key="Review (P)">
+							<list>								
+								<value>Staging</value>
+								<value>submitForReview</value>
+							</list>
+						</entry>						
+					</map>
+				</entry>
+				<entry key="Staging (D)">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>backToDraft</value>
+							</list>
+						</entry>					
+						<entry key="Review (D)">
+							<list>
+								<value>submitForReview</value>								
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>
+								<value>submitForReview</value>
+								<value>Approve</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>backToDraft</value>
+							</list>
+						</entry>
+						<entry key="Review (P)">
+							<list>
+								<value>submitForReview</value>								
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="Review (D)">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>Disapprove</value>
+							</list>
+						</entry>					
+						<entry key="Public">
+							<list>
+								<value>Approve</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>Disapprove</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="Public">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>Quick Edit</value>
+							</list>
+						</entry>					
+						<entry key="Editing">
+							<list>
+								<value>Quick Edit</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="Editing">
+					<map>
+						<entry key="Staging (D)">
+							<list>
+								<value>Preview</value>
+							</list>
+						</entry>
+						<entry key="Review (P)">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+								<value>Reapprove</value>
+							</list>
+						</entry>
+						<entry key="Staging (P)">
+							<list>
+								<value>Preview</value>
+							</list>
+						</entry>
+						<entry key="Review (P)">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="Staging (P)">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>backToEdit</value>
+							</list>
+						</entry>					
+						<entry key="Review (D)">
+							<list>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>							
+								<value>Resubmit for Review</value>
+								<value>Reapprove</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>backToEdit</value>
+							</list>
+						</entry>
+						<entry key="Review (P)">
+							<list>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="Review (P)">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>noApproval</value>
+							</list>
+						</entry>					
+						<entry key="Public">
+							<list>
+								<value>Reapprove</value>
+							</list>
+						</entry>
+						<entry key="Editing">
+							<list>
+								<value>noApproval</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
+				<entry key="Pending Archive">
+					<map>
+						<entry key="Public">
+							<list>
+								<value>DisapproveArchive</value>
+							</list>
+						</entry>						
+					</map>
+				</entry>
+				<entry key="Private Archive">
+					<map>
+						<entry key="Draft">
+							<list>
+								<value>Archive_to_Draft</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
+			</map>
+		</constructor-arg>
+		<!-- THe second constructor-arg is for archiving transitions -->
+		<constructor-arg>
+			<map>
+				<!--  From State -->
+				<entry key="Public">
+					<map>
+						<!--  To State -->
+						<entry key="Pending Archive">
+							<list>
+								<value>RequestArchive</value>
+							</list>
+						</entry>					
+					</map>
+				</entry>
+				<entry key="Pending Archive">
+					<map>
+						<!--  To State -->
+						<entry key="Private Archive">
+							<list>
+								<value>ApproveArchive</value>
+							</list>
+						</entry>
+					</map>					
+				</entry>				
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="CGovWorkflowStates" class="gov.cancer.wcm.workflow.WFStates">
+	<constructor-arg>
+		<map>
+			<entry key="Draft">
+				<value>1</value>
+			</entry>
+			<entry key="Editing">
+				<value>1</value>
+			</entry>
+			<entry key="Staging (D)">
+				<value>3</value>
+			</entry>
+			<entry key="Staging (P)">
+				<value>3</value>
+			</entry>
+			<entry key="Review (D)">
+				<value>5</value>
+			</entry>
+			<entry key="Review (P)">
+				<value>5</value>
+			</entry>
+			<entry key="Pending Archive">
+				<value>7</value>
+			</entry>
+			<entry key="Private Archive">
+				<value>10</value>
+			</entry>
+			<entry key="Public">
+				<value>10</value>
+			</entry>
+		</map>
+	</constructor-arg>
+</bean>
+	
+	<!-- This defines the state transition mappings for different workflows. -->
+	<bean id="WorkflowTransitionMappings" class="gov.cancer.wcm.workflow.WFTransitionMappings">
+		<constructor-arg>
+			<map>
+				<!-- This should be the name of the workflow as defined in workbench-->
+				<entry key="CancerGov Workflow"><ref bean="CGovWorkflowTransitionMap" /></entry>
+				<entry key="General Workflow"><ref bean="CGovWorkflowTransitionMap" /></entry>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	
+	<!-- This section defines content item properties -->
+	<bean id="SiteHomeProperty" class="gov.cancer.wcm.workflow.properties.GeneralProperty">
+		<constructor-arg><value>isSiteRoot</value></constructor-arg>
+		<constructor-arg><value>true</value></constructor-arg>
+	</bean>
+
+	<bean id="HomePagePropertyList" class="gov.cancer.wcm.workflow.properties.PropertyCollection">
+		<constructor-arg>
+			<list>
+				<ref bean="SiteHomeProperty" />				
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="EmptyPropertyList" class="gov.cancer.wcm.workflow.properties.PropertyCollection">
+		<constructor-arg>
+			<list>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<!-- MAIN BEAN -->
+	<!-- This bean defines workflow configuration information -->		
+	<bean id="CGV_WorkflowConfiguration" class="gov.cancer.wcm.workflow.WorkflowConfiguration">
+		<constructor-arg><ref bean="ContentTypesConfig"/></constructor-arg>
+		<constructor-arg><ref bean="RelationshipChecks"/></constructor-arg>
+		<constructor-arg><ref bean="WorkflowTransitionMappings" /></constructor-arg>
+		<constructor-arg><ref bean="ValidatorIgnoreConfig" /></constructor-arg>
+		<constructor-arg><ref bean="CGovWorkflowStates" /></constructor-arg>
+	</bean>
+</beans>
