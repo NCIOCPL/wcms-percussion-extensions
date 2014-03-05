@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" 
+   "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+    <bean id="CGV_MimeTypes" class="gov.cancer.wcm.extensions.CGV_MimeTypePopulate">
+		<property name="mimeTypeRules">
+			<map>
+				<entry key=".epub" value="application/epub+zip" />
+				<entry key=".mobi" value="application/x-mobipocket-ebook" />
+			</map>
+		</property>
+	</bean>
+</beans>
