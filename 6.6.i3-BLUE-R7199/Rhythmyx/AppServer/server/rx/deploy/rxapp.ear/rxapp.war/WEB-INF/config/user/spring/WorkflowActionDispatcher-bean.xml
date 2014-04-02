@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.1.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+   <!-- This is used to define the actions you want the workflow action dispatcher 
+      sys_WorkflowActionDispatcher to execute when a transition occurs. Setting this up 
+      is a two step process. First you must assign sys_WorkflowActionDispacther to the 
+      transitions you want to have the dispatcher execute actions for. Then you must create 
+      a xml mapping for the workflow, each transition you put the dispatcher on and the 
+      list of actions you want the dispatcher to execute for the transition. See the example 
+      below. -->
+    <bean id="sys_WorkflowActionService" class="com.percussion.workflow.actions.PSWFActionService"
+      init-method="init">
+        <property name="transitionActions">
+          <map>
+			  <!-- The following entry specifies the workflow -->
+              <entry key="Standard Workflow">
+                  <map>
+				     <!-- The following entry specifies the transition -->
+                     <entry key="Return to Public">
+					     <!-- The following list contains the list of actions you 
+						      want the dispatcher to execute when the transition
+							  occurs -->
+                         <list>
+                            <value>sys_TouchParentItems</value>
+                         </list>
+                     </entry> 
+                  </map>
+              </entry>
+          </map>          
+       </property>  
+   </bean>
+</beans>
