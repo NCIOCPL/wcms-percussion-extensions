@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.1.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<bean id="NCI_NewsletterFolderService" class="gov.cancer.wcm.extensions.Newsletter.NCI_NewsletterFolderService" >
+		<property name="folderNames">
+			<map>
+				<!-- SITE NAME -->
+				<entry key="Imaging">
+					<map>
+						<!-- Blank List for Imaging-->
+					</map>
+				</entry>
+				<entry key="Proteomics">
+					<map>
+						<!-- String / String-->
+						<!-- Key = Folder Name, Value = Slot Name -->
+						<entry key="leadershipupdate"><value>genSlotBody</value></entry>
+						<entry key="antibodies"><value>genSlotBodyBottom</value></entry>
+						<entry key="features"><value>genSlotBody</value></entry>
+						<entry key="researcherspotlight"><value>genSlotColumn1</value></entry>
+						<entry key="industrynews"><value>genSlotColumn2</value></entry>
+					</map>
+				</entry>
+				<entry key="CancerGov">
+					<map>
+						<!-- Blank List for CGV -->
+					</map>
+				</entry>
+				<entry key="TCGA">
+					<map>
+						<!-- Blank List for TCGA-->
+					</map>
+				</entry>
+			</map>
+		</property>
+		<!-- Name of the template the aggro widget uses to go into the slots on a newsletter -->
+		<property name="aggroWidgetTemplate" value="genSnAggroWidget"/>
+		<!-- Name of the template pages use to be added in the navon as the navLandingPage -->
+		<property name="landingPageTemplate" value="cgvSnTitleLink"/>
+		<!-- List of Strings, containing the names of the triggers to make a navon public -->
+		<property name="navonTranstions">
+			<list>
+				<value>Staging</value>
+				<value>submitForReview</value>
+				<value>Approve</value>
+			</list>
+		</property>
+		<!-- List of Strings, containing the names of the triggers to make a page public -->
+		<property name="pageTranstions">
+			<list>
+			</list>
+		</property>
+	</bean>
+</beans>
