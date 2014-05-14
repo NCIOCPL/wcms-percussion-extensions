@@ -28,7 +28,7 @@ import com.percussion.webservices.content.PSContentWsLocator;
 public class PublicNavonNeeded extends BaseContentTypeValidator {
 
 	@Override
-	public boolean validate(PSComponentSummary dependentContentItemSummary,
+	public boolean isValid(PSComponentSummary dependentContentItemSummary,
 			PSRelationship rel, WorkflowValidationContext wvc) {		
 		
 		wvc.getLog().debug("Checking to see if all navons are in public for item with content id: " + dependentContentItemSummary.getContentId());
@@ -99,8 +99,9 @@ public class PublicNavonNeeded extends BaseContentTypeValidator {
 		return allNavonsPublic; //There is no navon, so no need to check.
 	}
 	
-	public PublicNavonNeeded(List<PublishingDirection> validationDirections) {
-		super(validationDirections);
+	public PublicNavonNeeded(List<PublishingDirection> validationDirections,
+			ValidationIgnoreConditionCollection ignoreConditions) {
+		super(validationDirections, ignoreConditions);
 	}
 
 }

@@ -64,14 +64,22 @@ public class CGV_SortDatePopulate extends PSBaseServiceLocator implements
 			throws PSAuthorizationException, PSRequestValidationException,
 			PSParameterMismatchException, PSExtensionProcessingException {
 		
-		//Check if this is creation rather than an update.  If this is on creation we continue.
-		//If this is an update we leave the field alone.
-		if(!request.getParameter(IPSHtmlParameters.SYS_COMMAND).equalsIgnoreCase("modify")){
+		// check for the existence of both the command and the sortDate field -
+		// certain requests (clone specifically) can generate an internal request
+		// that lacks many of the expected parameters
+		String command = request.getParameter(IPSHtmlParameters.SYS_COMMAND);
+		String SDFContents = request.getParameter(SORT_DATE_FIELD_NAME);
+		
+		if(command == null || SDFContents == null) {
 			return;
 		}
-		
+
+		//Check if this is creation rather than an update.  If this is on creation we continue.
+		//If this is an update we leave the field alone.
+		if(!command.equalsIgnoreCase("modify")){
+			return;
+		}
 		//Check if sortDate field already contains a value.  If it does, do nothing.
-		String SDFContents = request.getParameter(SORT_DATE_FIELD_NAME);
 		if(SDFContents.length()!=0){
 			return;
 		}

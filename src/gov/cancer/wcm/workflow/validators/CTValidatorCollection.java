@@ -30,9 +30,12 @@ public class CTValidatorCollection {
 			WorkflowValidationContext wvc
 	) {
  
+		// Fire validatators in series.  If any given validation fails,
+		// no further validations are performed.
 		for(BaseContentTypeValidator currValidator : validatorList) {
 			if (currValidator.getValidationDirections().contains(wvc.getPublishingDirection())) {
-				if(!currValidator.validate(dependentContentItemSummary, rel, wvc)){
+				if(currValidator.MustFire(wvc) &&
+						!currValidator.isValid(dependentContentItemSummary, rel, wvc)){
 					return false;
 				}
 			}

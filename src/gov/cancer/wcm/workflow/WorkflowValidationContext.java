@@ -263,7 +263,9 @@ public class WorkflowValidationContext {
 				 _wfStates.get(_initiatingTransition.getToState()).getName()
 				);
 		
-
+		// Determine whether the transition currently in progrss (initiatingToFrom) is an archiving transition
+		// or a content creation transition.
+		// Retrieve the relevant list of triggers.
 		if (config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName()).containsKey(initiatingToFrom)) {
 			_isArchiving = true;
 			_workflowTriggers = config.getTransitionMappings().getContentArchivingTransitionTriggers(initiatingItemWorkflowApp.getName());

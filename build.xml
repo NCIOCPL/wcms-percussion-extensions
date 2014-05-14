@@ -6,7 +6,12 @@
 	</description>
 	
 	<!-- set global properties for this build -->
-    
+
+	<!-- Default for build number.  This may be overridden from the command line
+		 (e.g. Passed in from the integration envrionment's build script. -->
+	<property name="build.number" value="test build" /> 
+
+	
 	<property environment="env"/>
 	<!-- base directory of Rhythmyx installation --> 
 	<property name="rhythmyx.home" location="${env.RHYTHMYX_HOME}"/>
@@ -58,24 +63,11 @@
 		<mkdir dir="${bin}"/>
 	</target>
 
-	<!--target name="compile">
-		<mkdir dir="./bin"/>
-		<javac source="1.5"
-				target="1.5"
-				srcdir="./src/gov/cancer/wcm/"
-				destdir="./bin"
-				debug="true"
-				debuglevel="lines, vars, source">
-			<classpath refid = "project.class.path" />
-			<compilerarg value = "-Xlint:unchecked" />
-		</javac>
-		<jar destfile = "./output/cgv_extensions.jar"
-			basedir="./bin"
-			includes="**gov/**"/>
-				
-	</target-->
-
 	<target name="compile" description="compile the source ">
+
+		<!-- Create required output location -->
+		<mkdir dir="${bin}" />
+
 		<!-- Compile the java code from ${src} into ${bin} -->
 		<javac 
 			srcdir="${src}" 
@@ -113,7 +105,7 @@
 		</javadoc>
 	</target>
 
-	<target name="jarbuilder" depends="compile" description="just build the jar, no server">
+	<target name="jarbuilder" depends="compile" description="Build the jar file">
 		<propertyfile file="${bin}/build.properties">
 			<entry key="build.number" value="${build.number}"/>
 			<entry key="build.date" type="date" pattern="EEEE MMM dd yyyy" value="now"/>
@@ -126,7 +118,9 @@
 		</jar>
 	</target>
 
-	<target name="installExtensions">
+	<target name="installAndDeploy">		
+		
+		<!-- Install the extensions in Rhythmyx. -->
 		<java classname="com.percussion.util.PSExtensionInstallTool" fork="true">
 		    <arg value="${rhythmyx.home}" />
 			<arg value="${basedir}" />
@@ -149,28 +143,34 @@
 			    </fileset>
 				<fileset dir="${rhythmyx.home}/AppServer/server/rx/lib">
 					<include name="javax.servlet.jar" /> 
+					<include name="commons-collections*.jar" />
 		    	</fileset>				
 			</classpath>			
 		</java>     
-	</target>
-	
-	<target name="testbuild" description="build for local test">		
-		<property name="build.number" value="test build" /> 
-		<antcall target="jarbuilder"/>
+
+		<!-- Delete log files. -->
 		<delete file="${rhythmyx.home}/AppServer/server/rx/log/server.log" verbose="true" failonerror="false" />
+		<delete file="${rhythmyx.home}/AppServer/server/rx/log/CancerGov.log" verbose="true" failonerror="false" />
+
+		<!-- Deploy the various components -->
+		<!-- Jar file -->
 		<copy file="${output}/${jarname}" todir="${rhythmyx.rxapp.lib}" verbose="true" />
+		<!-- Beans -->
 		<copy todir="${rhythmyx.rxapp.WEB-INF}" verbose="true" >
-			<fileset dir="WEB-INF" />
+			<fileset dir="Rhythmyx\AppServer\server\rx\deploy\rxapp.ear\rxapp.war\WEB-INF" />
+		</copy>
+		<!-- JSP files -->
+		<copy todir="${rhythmyx.rxapp}/user" verbose="true" >
+			<fileset dir="Rhythmyx\AppServer\server\rx\deploy\rxapp.ear\rxapp.war\user" />
 		</copy>
 	</target>
-
+	
 	<!--
-		Older version of the testbuild target.  This version retains the
-		attempt to stop and restart the Rhythmyx server before copying
-		the JAR file.  (NOTE: invokes the antCall task to avoid having
-		the same code twice.)
+		Alternate version of the installExtensions target.  This version attempts to
+		stop and restart the Rhythmyx server before copying the JAR file.
+		(NOTE: invokes the antCall task to avoid having the same code twice.)
 	-->
-	<target name="testbuildALT" description="legacy build for local test">		
+	<target name="installAndDeploy-ALT" description="legacy build for local test">		
 		<echo>Stopping ${rhythmyx.service}</echo>
 		
 		<exec executable="net.exe" failonerror="false">
@@ -180,7 +180,7 @@
 		<echo>waiting for shutdown...</echo>
 	    <sleep seconds="30" /> 
 
-		<antcall target="testbuild" />
+		<antcall target="installAndDeploy" />
 
 		<echo>Restarting ${rhythmyx.service}</echo>
 		<exec executable="net.exe" failonerror="true">
@@ -196,11 +196,11 @@
 			<zipfileset dir="${output}" includes="${jarname}" prefix="${zipprefix}/output" />
 			<zipfileset dir="." includes="deploy.xml, Extensions.xml, install.bat" prefix="${zipprefix}" />
 		    <zipfileset dir="${bin}" includes="build.properties"  prefix="${zipprefix}" />
-			<zipfileset dir="WEB-INF" prefix="${zipprefix}/WEB-INF" />
+			<zipfileset dir="Rhythmyx\AppServer\server\rx\deploy\rxapp.ear\rxapp.war\WEB-INF" prefix="${zipprefix}/WEB-INF" />
 			<zipfileset dir="${apidoc}" prefix="${zipprefix}/javadoc"/>
 		</zip>			
 	</target>	
 
 	<target name="build"
-		depends="init,clean,compile"/>
+		depends="jarbuilder,installAndDeploy,dist"/>
 </project>

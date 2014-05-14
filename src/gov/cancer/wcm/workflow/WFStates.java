@@ -2,6 +2,8 @@ package gov.cancer.wcm.workflow;
 
 import java.util.Map;
 
+import com.percussion.services.workflow.data.PSState;
+
 /**
  * Defines a weight mapping of workflow states.
  * @author wallsjt
@@ -50,5 +52,16 @@ public class WFStates {
 		}
 	}
 
+	
+	/**
+	 * Returns a bool based off:
+	 * left >= right
+	 * @param left - left hand side of the equation
+	 * @param right - right hand side of the equation
+	 * @return if( left >= right ) true. else, false.
+	 */
+	public boolean greaterThanOrEqual(PSState left, PSState right) throws WFValidationException{
+		return greaterThanOrEqual(left.getName(), right.getName());
+	}
 
 }

@@ -16,6 +16,14 @@
       <interface name="com.percussion.extension.IPSJexlExpression"/>
       <suppliedResources/>
    </Extension>
+   <Extension categorystring="jexl" context="global/percussion/user/" deprecated="no" handler="Java" name="CGV_HTMLTools" restoreRequestParamsOnError="no">
+      <initParam name="com.percussion.user.description">CGov HTML Tools</initParam>
+      <initParam name="com.percussion.extension.version">1</initParam>
+      <initParam name="com.percussion.extension.reentrant">yes</initParam>
+      <initParam name="className">gov.cancer.wcm.extensions.jexl.CGV_HTMLTools</initParam>
+      <interface name="com.percussion.extension.IPSJexlExpression"/>
+      <suppliedResources/>
+   </Extension>   
    <Extension categorystring="jexl" context="global/percussion/user/" deprecated="no" handler="Java" name="NCI_NewsletterNameFinder" restoreRequestParamsOnError="no">
       <initParam name="com.percussion.user.description">NCI Newsletter Name Finders</initParam>
       <initParam name="com.percussion.extension.version">1</initParam>

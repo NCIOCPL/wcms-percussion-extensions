@@ -83,7 +83,7 @@ public class CGV_WorkflowItemValidator extends PSOAbstractItemValidationExit {
 	    	if(super.matchDestinationState(contentid, transitionid, states))
 	    	{
 		    	log.debug("Testing if transition of item is allowed, valid state for test");
-		    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);	    	
+		    	ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner();
 		    	validator.performTest(req, errorDoc);
 	    	} 
 	    	ContentItemWFValidatorAndTransitioner.setExclusive(req, false);

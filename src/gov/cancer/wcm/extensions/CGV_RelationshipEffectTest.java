@@ -143,7 +143,7 @@ public class CGV_RelationshipEffectTest extends PSEffect {
 
 		System.out.println("The exclusive flag does not exist. Calling the transitioner and validator workflow code.");
 		Document errorDoc = PSXmlDocumentBuilder.createXmlDocument();
-		ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner(log);
+		ContentItemWFValidatorAndTransitioner validator = new ContentItemWFValidatorAndTransitioner();
 //		if(!ContentItemWFValidatorAndTransitioner.isExclusive(request)){
 		if(request.getParameter(NCI_EFFECT_FLAG) != "true"){
 			ContentItemWFValidatorAndTransitioner.setExclusive(request, true);
