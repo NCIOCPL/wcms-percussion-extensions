@@ -79,8 +79,12 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
 	   }
 	   else
 	   {
-		   int contentId = wfContext.getContentID();
-		   if (bDebug) System.out.println("DEBUG: performAction skipping excluded content id of " + contentId);
+		   if (bDebug) {
+			   // get content id and type for debug message
+			   String page = request.getRequestPage(false);
+			   int contentId = wfContext.getContentID();
+			   System.out.println("DEBUG: performAction skipping excluded content id of " + contentId + " (type = " + page + ")");
+		   }
 	   }
 	   
    }
