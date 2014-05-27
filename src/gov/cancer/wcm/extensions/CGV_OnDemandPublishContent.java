@@ -77,5 +77,11 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
 		   if (bDebug) System.out.println("DEBUG: performAction queue item set is done running");
 	   
 	   }
+	   else
+	   {
+		   int contentId = wfContext.getContentID();
+		   if (bDebug) System.out.println("DEBUG: performAction skipping excluded content id of " + contentId);
+	   }
+	   
    }
 }
