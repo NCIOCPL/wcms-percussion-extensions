@@ -11,12 +11,12 @@ import java.util.List;
  * @author learnb
  *
  */
-public class OnDemandPublishJobBlocker {
+public class PublishingJobBlocker {
 
 	private String blockedEdition = null;
 	private List<String> blockingList = new ArrayList<String>();
 	
-	public OnDemandPublishJobBlocker(String podEdition, List<String> blockingEditions){
+	public PublishingJobBlocker(String podEdition, List<String> blockingEditions){
 		blockedEdition = podEdition;
 		blockingList.addAll(blockingEditions);
 	}
