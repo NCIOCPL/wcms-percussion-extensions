@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.1.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<!-- This bean defines a list of PublishingJobBlocker objects which contain information about which
+		publishing editions which can prevent another edition from being serviced. -->
+	<bean id="BlockingEditionConfig" class="gov.cancer.wcm.publishing.PublishingJobBlockerCollection">
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.publishing.PublishingJobBlocker">
+					<constructor-arg><value>CancerGov_Publish_Now</value></constructor-arg>
+					<constructor-arg>
+						<list>
+							<value>CancerGov_Full</value>
+							<value>CancerGov_Incremental</value>
+							<value>CancerGov_Staging_Full</value>
+							<value>DB_cancerGov_Full</value>
+							<value>DB_cancerGov_Increment</value>
+							<value>DB_CGovStaging_Full</value>
+							<value>DB_CGovStaging_Increment</value>
+						</list>
+					</constructor-arg>
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+		
+	<!-- MAIN BEAN -->
+	<!-- This bean defines publishing configuration object -->		
+	<bean id="CGV_PublishingConfiguration" class="gov.cancer.wcm.publishing.PublishingConfiguration">
+		<constructor-arg><ref bean="BlockingEditionConfig"/></constructor-arg>
+	</bean>
+</beans>
