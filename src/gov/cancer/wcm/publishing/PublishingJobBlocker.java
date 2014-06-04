@@ -27,4 +27,8 @@ public class PublishingJobBlocker {
 	public String getPODEdition(){
 		return blockedEdition;
 	}
+	
+	public List<String> getBlockingEditions(){
+		return blockingList;
+	}
 }

@@ -21,4 +21,16 @@ public class PublishingJobBlockerCollection {
 			editionMap.put(item.getPODEdition(), item);
 		}
 	}
+	
+	/** Locates the PublishingJobBlocker configuration for the named edition.
+	 * @param editionName name of the edition to retrieve a PublishingJobBlocker.
+	 * @return The matching PublishingJobBlocker object, or null if one does not exist.
+	 */
+	public PublishingJobBlocker getBlockingEditions(String editionName){
+		PublishingJobBlocker blocker = null;
+		if(editionMap.containsKey(editionName))
+			blocker = editionMap.get(editionName);
+		
+		return blocker;
+	}
 }
