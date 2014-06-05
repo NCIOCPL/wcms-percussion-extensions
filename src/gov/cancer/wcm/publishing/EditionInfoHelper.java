@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.percussion.rx.publisher.IPSRxPublisherService;
+import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.services.publisher.IPSEdition;
 import com.percussion.services.publisher.IPSPublisherService;
 import com.percussion.services.publisher.PSPublisherServiceLocator;
@@ -17,17 +19,18 @@ import com.percussion.services.publisher.PSPublisherServiceLocator;
  * @author learnb
  *
  */
-public class EditionHelper {
-	private static final Log log = LogFactory.getLog(EditionHelper.class);
+public class EditionInfoHelper {
+	private static final Log log = LogFactory.getLog(EditionInfoHelper.class);
 	
 	private IPSPublisherService pubSvc = PSPublisherServiceLocator.getPublisherService();
+	private IPSRxPublisherService rxPubSvc = PSRxPublisherServiceLocator.getRxPublisherService();
 	private PublishingConfiguration pubConfig = PublishingConfigurationLocator.getPublishingConfiguration();
 
 	// Dual-mapping for ways to look up edition information.
 	private HashMap<Integer, IPSEdition> editionIDMap = new HashMap<Integer, IPSEdition>();
 	private HashMap<String, IPSEdition> editionNameMap = new HashMap<String, IPSEdition>();
 	
-	public EditionHelper(){
+	public EditionInfoHelper(){
 		log.trace("Create EditionHelper");
 
 		// There's a certain temptation to move the edition retrievals into a static block so it only
@@ -46,67 +49,26 @@ public class EditionHelper {
 	
 	
 	/**
-	 * Determines whether editionID should be allowed to run, or prevented from running
-	 * because one of its blocking editions is running.
+	 * Retrieves the PublishingJobBlocker object for the specified edition ID.
 	 * 
-	 * @param editionID - ID of the edition we 
-	 * @return true if the edition should be blocked from running, false if it should
-	 * be allowed to run.
+	 * @param editionID - ID of the edition to look up. 
+	 * @return The PublishingJobBlocker object matching editionId. If none is found,
+	 * the default blocker is returned.
 	 */
-	public boolean EditionIsBlocked(int editionId){
-		boolean NOT_BLOCKED = false;
-		boolean BLOCKED = true; 
-		
+	public PublishingJobBlocker GetEditionBlocker(int editionId){
 		log.trace("EditionIsBlocked(" + editionId + ")" );
 
 		// Find the edition
 		String editionName = GetEditionName(editionId);
 		if(editionName == null){
-			log.debug("Edition " + editionId + "not found. Handling as not-blocked.");
-			return NOT_BLOCKED;
+			log.debug("Edition " + editionId + "not found. Using default.");
+			editionName = ""; // Name shouldn't matter. We just want whatever the default blocker is. 
 		}
 		
-		// Get the edition's list of blockers.
-		PublishingJobBlocker blockerConfig = pubConfig.getBlockingEditions().getBlockingEditions(editionName);
-		if(blockerConfig == null){
-			log.debug("No blocking configuration found for edition: " + editionName);
-			return NOT_BLOCKED;
-		}
-		
-		// Are any of the blockers running?
-		boolean isBlocked = NOT_BLOCKED;
-		for(String edition : blockerConfig.getBlockingEditions()){
-			// If any blocking edition is running, then the edition
-			// is considered to be blocked.
-			if(EditionIsRunning(edition)){
-				log.debug("Publishing edition " + editionName + " is blocked by " + edition);
-				isBlocked = BLOCKED;
-				break;
-			}
-		}
-				 
-		return isBlocked;
+		// Get the edition's list of blocking rules.
+		return pubConfig.getPublishingJobBlockers().getPublishingBlocker(editionName);
 	}
 
-	
-	/**
-	 * @param editionId ID of the edition to look up.
-	 * @return True if the edition is currently running.
-	 */
-	public boolean EditionIsRunning(int editionId){
-		String editionName = GetEditionName(editionId);
-		return EditionIsRunning(editionName);
-	}
-	
-	/**
-	 * @param editionName Name of the edition to look up.
-	 * @return True if the edition is currently running.
-	 */
-	public boolean EditionIsRunning(String editionName){
-
-		
-		return true;
-	}
 	
 	/**
 	 * @param editionId ID of the edition to look up.
@@ -127,4 +89,41 @@ public class EditionHelper {
 		
 		return editionName;
 	}
+
+	
+	/**
+	 * @param editionName Name of the edition to look up.
+	 * @return True if the edition is currently running.
+	 */
+	public boolean EditionIsRunning(String editionName){
+		log.trace("Enter EditionIsRunning( " + editionName + " )");
+		
+		boolean IS_RUNNING = true;
+		boolean NOT_RUNNING = false;
+		
+		boolean runningStatus;
+
+		// Get edition details.
+		IPSEdition editionDetails = null;
+		if(editionNameMap.containsKey(editionName))
+			editionDetails = editionNameMap.get(editionName);
+		
+		// Query whether it's running.
+		if(editionDetails != null){
+			long jobId = rxPubSvc.getEditionJobId(editionDetails.getGUID());
+			if(jobId > 0) {
+				runningStatus = IS_RUNNING;
+				log.debug("Edition " + editionName + " is currently running.");
+			} else {
+				runningStatus = NOT_RUNNING;
+				log.debug("Edition " + editionName + " is not running.");
+			}
+		} else {
+			log.error("Unable to locate editions details for " + editionName + ". Treating as not running.");
+			runningStatus = NOT_RUNNING;
+		}
+
+		return runningStatus;
+	}
+	
 }
