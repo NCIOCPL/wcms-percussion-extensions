@@ -4,12 +4,7 @@
 package gov.cancer.wcm.publishing;
 
 import java.util.concurrent.BlockingQueue;
-/**
- * @author doylejd
- *
- */
-
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +15,7 @@ public class PODQueue {
 	private static final int ARRAY_SIZE = 1000;
 	
 	static{
-		publishingQueue = new ArrayBlockingQueue<PODWork>(ARRAY_SIZE);
+		publishingQueue = new LinkedBlockingDeque<PODWork>(ARRAY_SIZE);
 	}
 	
 	
