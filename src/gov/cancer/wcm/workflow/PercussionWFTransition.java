@@ -2,8 +2,10 @@ package gov.cancer.wcm.workflow;
 
 import gov.cancer.wcm.workflow.validators.RequireUIWarningIgnoreCondition;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.w3c.dom.Element;
@@ -72,7 +74,13 @@ public class PercussionWFTransition {
 
 		HashMap oldParams = req.getParameters();
 		req.setParameters(new HashMap());
-
+		
+		/*
+		 * Get the initial state of the private objects on the request info so that they can be
+		 * restored later.
+		 */
+		Map<String, Object> oldPrivateObjects = retrievePrivateObjects(req);
+		
 		/* 
 		 * The parentRequest parameter exists for when transitionItem is called from the
 		 * ContentItemWFValidatorAndTransitioner.performTest().  When that method is called from
@@ -121,6 +129,7 @@ public class PercussionWFTransition {
 			throw error;
 		} finally {
 			req.setParameters(oldParams);
+			restorePrivateObjects(req, oldPrivateObjects);
 		}
 	}
 
@@ -163,6 +172,69 @@ public class PercussionWFTransition {
 			if(copiedValue != null){
 				childRequest.setPrivateObject(privateObjectName, copiedValue);
 			}
+		}
+	}
+	
+	/*
+	 * Copies the known private object values from a parent request object into a child request.
+	 */
+	private static Map<String, Object> retrievePrivateObjects(PSRequest childRequest){
+		if(childRequest == null)
+			return Collections.emptyMap(); // Nothing to do.
+		
+		// Hard coded list for now, duplicated from preservePrivateObjects()
+		
+		String[] KnownPrivateObjects = new String[2];
+		Map<String, Object> objectMap = new HashMap<String, Object>();
+
+		// EXCLUSION_FLAG -- Defined in:
+		// gov.cancer.wcm.extensions.CGV_ParentChildValidator
+		// gov.cancer.wcm.extensions.CGV_RelationshipEffectTest
+		// gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner
+		KnownPrivateObjects[0] =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
+		
+		// NCI_EFFECT_FLAG -- Defined in:
+		// gov.cancer.wcm.extensions.CGV_ParentChildValidator
+		// gov.cancer.wcm.workflow.PercussionWFTransition (bottom of this file!)
+		KnownPrivateObjects[1] = NCI_EFFECT_FLAG;
+		
+		// check known private objects and retain values if set
+		for(String privateObjectName : KnownPrivateObjects){
+			Object copiedValue = childRequest.getPrivateObject(privateObjectName);
+			if(copiedValue != null){
+				objectMap.put(privateObjectName, copiedValue);
+			}
+		}
+		
+		return objectMap;
+	}
+	
+	/*
+	 * Returns the request's private objects to the state indicated by the object map.
+	 */
+	private static void restorePrivateObjects(PSRequest childRequest, Map<String, Object> objectMap){
+		if(childRequest == null || objectMap == null)
+			return; // Nothing to do.
+		
+		// Hard coded list for now, duplicated from preservePrivateObjects()
+		
+		String[] KnownPrivateObjects = new String[2];
+
+		// EXCLUSION_FLAG -- Defined in:
+		// gov.cancer.wcm.extensions.CGV_ParentChildValidator
+		// gov.cancer.wcm.extensions.CGV_RelationshipEffectTest
+		// gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner
+		KnownPrivateObjects[0] =  "gov.cancer.wcm.extensions.WorkflowItemValidator.PSExclusionFlag";
+		
+		// NCI_EFFECT_FLAG -- Defined in:
+		// gov.cancer.wcm.extensions.CGV_ParentChildValidator
+		// gov.cancer.wcm.workflow.PercussionWFTransition (bottom of this file!)
+		KnownPrivateObjects[1] = NCI_EFFECT_FLAG;
+		
+		// check known private objects against the request, and set or clear as necessary
+		for(String privateObjectName : KnownPrivateObjects){
+			Object preservedValue = objectMap.get(privateObjectName);
+			childRequest.setPrivateObject(privateObjectName, preservedValue);
 		}
 	}
 	
