@@ -27,9 +27,10 @@ public class PODQueue {
 	 * Retrieve the next publish on demand task eligible for processing.
 	 */
 	public static Work take(){
-		log.debug("Trying to take work off the queue.");
+		log.trace("Entering take()");
 
-		Work itemToPublish = null;
+		EditionInfoHelper editionHelper = new EditionInfoHelper();
+		PODWork itemToPublish = null;
 		
 		try {
 			/*
@@ -37,25 +38,56 @@ public class PODQueue {
 			 * is in progress. To determine the first (if any) task eligible:
 			 * 
 			 * If no items are found, block until something is found.
+			 * Once an item is found, put it back so that if it's not
+			 * eligible to run, it won't lose its place in line.
 			 */
+			log.debug("Trying to take work off the queue.");
 			itemToPublish = publishingQueue.take();
+			publishingQueue.put(itemToPublish);
+			log.trace("Found an item to publish: " + itemToPublish.getEdition());
+			
 
-			/*  Now that an item has been found, test whether it's eligible
+			/*  Now that an item has been found, find the first that's eligible
 			 *  to be published. If the item is not eligible to publish, examine
 			 *  the rest of the queue, polling until something becomes eligible.
 			 */
-			
-			
-			/*  For each item in the queue
-			 *  	Look at the item's edition.\
-			 *  	Get the edition's list of blockers.
-			 *  	Are any of the blockers running?
-			 *  		Yes: Skip to the next item.
-			 *  		No: Return this item.
-			 *  
-			 */
+			itemToPublish = null;
+			while(true){ // Continue until something is eligible.
+				log.trace("Checking for eligible publishing jobs.");
+
+				// For each item in the queue
+				for(PODWork workItem : publishingQueue){
+					log.trace("Checking Work ID: " + workItem.getWorkID());
+					
+					// Is the item blocked?
+					PublishingJobBlocker blocker = editionHelper.GetEditionBlocker(workItem.getEdition());
+					boolean blocked = blocker.editionIsBlocked(editionHelper);
+					
+					if(blocked){
+						// Yes: Skip to the next item.
+						log.debug("Edition " + workItem.getEdition() + " is blocked. Continuing.");
+						continue;
+					} else {
+						// No: Return this item.
+						log.debug("Edition " + workItem.getEdition() + " is not blocked.");
+						itemToPublish = workItem;
+						// Explicitly remove since we're only using take() for blocking.
+						publishingQueue.remove(itemToPublish);
+						break;
+					}
+				}
+				
+				// Did we find an item that is not blocked?
+				//	Yes: Break out of the loop so the item can be returned.
+				//	No: Sleep briefly, then repeat.
+				if(itemToPublish != null)
+					break;
+				else
+					Thread.sleep(30000);
+			}
+
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
 		}
 		return itemToPublish;
 	}

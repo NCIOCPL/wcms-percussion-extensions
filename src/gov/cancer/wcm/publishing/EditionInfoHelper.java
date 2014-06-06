@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.percussion.rx.publisher.IPSPublisherJobStatus;
 import com.percussion.rx.publisher.IPSRxPublisherService;
 import com.percussion.rx.publisher.PSRxPublisherServiceLocator;
 import com.percussion.services.publisher.IPSEdition;
@@ -111,9 +112,24 @@ public class EditionInfoHelper {
 		// Query whether it's running.
 		if(editionDetails != null){
 			long jobId = rxPubSvc.getEditionJobId(editionDetails.getGUID());
+			log.debug("Edition " + editionName + " is running as job: " + jobId);
 			if(jobId > 0) {
-				runningStatus = IS_RUNNING;
-				log.debug("Edition " + editionName + " is currently running.");
+				IPSPublisherJobStatus.State jobState = rxPubSvc.getPublishingJobStatus(jobId).getState();
+				log.debug("JobID " + jobId + " is in state: " + jobState);
+				switch(jobState){
+				case INITIAL:
+				case COMMITTING:
+				case POSTTASKS:
+				case PRETASKS:
+				case QUEUEING:
+				case WORKING:
+					runningStatus = IS_RUNNING;
+					break;
+				default:
+					runningStatus = NOT_RUNNING;
+					break;
+				}
+				
 			} else {
 				runningStatus = NOT_RUNNING;
 				log.debug("Edition " + editionName + " is not running.");
