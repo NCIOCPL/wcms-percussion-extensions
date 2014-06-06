@@ -34,11 +34,6 @@ public class PODPublisher implements Runnable{
 		return INSTANCE;
 	}
 	
-	public static BlockingQueue<PODWork> getPODQueue() 
-	{
-		return PODQueue.returnQueueCopy();
-	}
-	
 	private PODPublisher(){
 		}
 	

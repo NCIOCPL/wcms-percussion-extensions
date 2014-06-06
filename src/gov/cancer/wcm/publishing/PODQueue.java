@@ -87,23 +87,6 @@ public class PODQueue {
 		}
 		//log.info("Queue size after addition: " + publishingQueue.size());
 	}
-	
-	/**
-	 * Return a copy of the current queue for other functions to act on.
-	 * NOTE:  This is just a copy of the current queue, since it is a static object.
-	 */
-	public static BlockingQueue<PODWork> returnQueueCopy(){
-		//BlockingQueue<PODWork> returnThis = publishingQueue;
-		return publishingQueue;
-	}
-	/*
-	private static void checkInit(){
-		if(publishingQueue == null ){
-			publishingQueue = new ArrayBlockingQueue<PODWork>(ARRAY_SIZE);
-		}
-	}*/
-	
-
 }
 
 
