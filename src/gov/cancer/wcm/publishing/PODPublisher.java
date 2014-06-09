@@ -53,7 +53,14 @@ public class PODPublisher implements Runnable{
 		log.debug("Start of run...");
 		
 			while(true){
-				PODQueue.take().doWork();
+				try{
+					PODQueue.take().doWork();
+				}
+				catch(Throwable e){
+					log.error("Error processing POD job.");
+					log.error(e.getMessage());
+					log.error(e.getStackTrace());
+				}
 				
 			}
 		

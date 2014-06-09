@@ -86,7 +86,7 @@ public class PODQueue {
 					Thread.sleep(30000);
 			}
 
-		} catch (InterruptedException e) {
+		} catch (Throwable e) {
 			log.error(e.getMessage());
 		}
 		return itemToPublish;
