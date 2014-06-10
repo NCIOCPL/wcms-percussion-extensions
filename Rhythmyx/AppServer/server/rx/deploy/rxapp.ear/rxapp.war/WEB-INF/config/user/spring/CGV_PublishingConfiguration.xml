@@ -24,8 +24,6 @@
 							<value>CancerGov_Incremental</value>
 							<value>CancerGov_Staging_Full</value>
 							<value>CancerGov_Staging_Incremental</value>
-							<value>CancerGov_PDQ_Full</value>
-							<value>CancerGov_Staging_PDQ_Full</value>
 							<value>DB_cancerGov_Full</value>
 							<value>DB_cancerGov_Increment</value>
 							<value>DB_CGovStaging_Full</value>
@@ -41,8 +39,6 @@
 							<value>CancerGov_Incremental</value>
 							<value>CancerGov_Staging_Full</value>
 							<value>CancerGov_Staging_Incremental</value>
-							<value>CancerGov_PDQ_Full</value>
-							<value>CancerGov_Staging_PDQ_Full</value>
 							<value>DB_cancerGov_Full</value>
 							<value>DB_cancerGov_Increment</value>
 							<value>DB_CGovStaging_Full</value>
@@ -58,8 +54,6 @@
 							<value>CancerGov_Incremental</value>
 							<value>CancerGov_Staging_Full</value>
 							<value>CancerGov_Staging_Incremental</value>
-							<value>CancerGov_PDQ_Full</value>
-							<value>CancerGov_Staging_PDQ_Full</value>
 							<value>DB_cancerGov_Full</value>
 							<value>DB_cancerGov_Increment</value>
 							<value>DB_CGovStaging_Full</value>
@@ -75,8 +69,6 @@
 							<value>CancerGov_Incremental</value>
 							<value>CancerGov_Staging_Full</value>
 							<value>CancerGov_Staging_Incremental</value>
-							<value>CancerGov_PDQ_Full</value>
-							<value>CancerGov_Staging_PDQ_Full</value>
 							<value>DB_cancerGov_Full</value>
 							<value>DB_cancerGov_Increment</value>
 							<value>DB_CGovStaging_Full</value>
@@ -92,8 +84,6 @@
 						<list>
 							<value>CGov_Mobile_Live_Full</value>
 							<value>CGov_Mobile_Preview_Full</value>
-							<value>CGov_Mobile_Live_PDQ_Full</value>
-							<value>CGov_Mobile_Preview_PDQ_Full</value>
 							<value>DB_CGOV_Mobile_Live_Full</value>
 							<value>DB_CGOV_Mobile_Preview_Full</value>
 						</list>
@@ -105,8 +95,6 @@
 						<list>
 							<value>CGov_Mobile_Live_Full</value>
 							<value>CGov_Mobile_Preview_Full</value>
-							<value>CGov_Mobile_Live_PDQ_Full</value>
-							<value>CGov_Mobile_Preview_PDQ_Full</value>
 							<value>DB_CGOV_Mobile_Live_Full</value>
 							<value>DB_CGOV_Mobile_Preview_Full</value>
 						</list>
@@ -118,8 +106,6 @@
 						<list>
 							<value>CGov_Mobile_Live_Full</value>
 							<value>CGov_Mobile_Preview_Full</value>
-							<value>CGov_Mobile_Live_PDQ_Full</value>
-							<value>CGov_Mobile_Preview_PDQ_Full</value>
 							<value>DB_CGOV_Mobile_Live_Full</value>
 							<value>DB_CGOV_Mobile_Preview_Full</value>
 						</list>
@@ -131,8 +117,6 @@
 						<list>
 							<value>CGov_Mobile_Live_Full</value>
 							<value>CGov_Mobile_Preview_Full</value>
-							<value>CGov_Mobile_Live_PDQ_Full</value>
-							<value>CGov_Mobile_Preview_PDQ_Full</value>
 							<value>DB_CGOV_Mobile_Live_Full</value>
 							<value>DB_CGOV_Mobile_Preview_Full</value>
 						</list>
