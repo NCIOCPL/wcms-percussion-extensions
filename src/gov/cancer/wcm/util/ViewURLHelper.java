@@ -3,6 +3,7 @@ package gov.cancer.wcm.util;
 import javax.jcr.RepositoryException;
 
 import com.percussion.cms.objectstore.PSComponentSummary;
+import com.percussion.cms.objectstore.PSInvalidContentTypeException;
 import com.percussion.pso.jexl.PSOObjectFinder;
 import com.percussion.services.assembly.IPSAssemblyTemplate;
 import com.percussion.services.assembly.jexl.PSLocationUtils;
@@ -22,6 +23,7 @@ public class ViewURLHelper {
 
 	private static PSLocationUtils locUtils = new PSLocationUtils();	
 	public static boolean isCopyableURL = false;
+	public static int[] MOBILE_SITE_IDS = {465};
 	
 	/*
 	 * Get GUID from content id:
@@ -105,6 +107,21 @@ public class ViewURLHelper {
 		return sGuid[2];
 	}
 	
+	/*
+	 * Get content type name from content type ID
+	 * @param ctid
+	 */
+	public static String getContentTypeName(int ctid) {
+		int contentTypeId = ctid;
+		String contentTypeName = null;
+		
+		try {
+			contentTypeName = CGV_TypeNames.getTypeName(contentTypeId);
+		} catch (PSInvalidContentTypeException e) {
+			e.printStackTrace();
+		}
+		return contentTypeName;
+	}
 	
 	/*
 	 * Get the content item's live URL from the site ID, site ID, content ID, filter type, & context.
