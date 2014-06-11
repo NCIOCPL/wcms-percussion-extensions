@@ -15,31 +15,49 @@
 		<div class="offset">&nbsp;</div>
 
 <% 
+		// TODO: display secondary URLs
 		// Get content ID, site ID, filter, and context to generate url
-		// TODO: add JS for copy to clipboard button
-		// TODO: dynamic ocntexts - 313 for mobile, 304 for desktop
-		// TODO: determine filter value according to summary.getContentStateId();
-		// TODO: figure out which workflow states should display menu item
 		String url = "";
-		int cid = Integer.parseInt(request.getParameter("sys_contentid"));
-		String path = ViewURLHelper.getPath(cid);
-		int sid = Integer.parseInt(ViewURLHelper.getSIDFromGUID(path));
-		String filter = request.getParameter("loc_filter");
-		int context = Integer.parseInt(request.getParameter("loc_context"));
-		
-		url = ViewURLHelper.getPublishedURL(sid, cid, filter, context);
-		out.println(url);
-%>	
 
+		try {
+			int cid = Integer.parseInt(request.getParameter("sys_contentid"));
+			String path = ViewURLHelper.getPath(cid);
+			int sid = Integer.parseInt(ViewURLHelper.getSIDFromGUID(path));
+			String filter = request.getParameter("loc_filter");
+			int context = Integer.parseInt(request.getParameter("loc_context"));
+			int mobileContext = Integer.parseInt(request.getParameter("loc_mobile_context"));
+			int[] mSites = ViewURLHelper.MOBILE_SITE_IDS;
+
+			// Check if this is a mobile site. If so, use mobile linking context
+			for (int i = 0; i < mSites.length; i++ ) {
+				if(sid == mSites[i]) {
+					context = mobileContext; 
+				}
+			}
+		
+			// Generate actual URL
+			url = ViewURLHelper.getPublishedURL(sid, cid, filter, context);
+			if (ViewURLHelper.isCopyableURL) {
+				out.println("Live site URL: <p>");
+			}
+			out.println(url);
+		}
+		
+		catch (IllegalArgumentException e) {
+			out.println("<p>Error retrieving content URL:<p>" + e);
+		}
+%>	
 		</h3>
-	<div class="toolbar">
+
+		<div class="toolbar">
 		<input type="button" value="Close" onclick="window.close();" class="back">
 <%		
-		if (ViewURLHelper.showCopyButton == true) { 
+		// TODO: add JS for copy to clipboard - button commented out for now
+		// if (ViewURLHelper.isCopyableURL) { 
 %>		
-		&nbsp;
-		<input type="button" value="Copy to Clipboard" class="copy">
-<% } %>		
-	</div>
+		<!-- &nbsp;
+		<input type="button" value="Copy to Clipboard" class="copy"> -->
+<% 		// } %>		
+		</div>
 	</body>
 </html>
