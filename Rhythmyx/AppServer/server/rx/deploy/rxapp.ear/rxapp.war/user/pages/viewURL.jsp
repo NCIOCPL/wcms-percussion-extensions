@@ -4,7 +4,7 @@
 
 <html>
 	<head>
-		<title>Live URL for Content Item</title>
+		<title>Live Page URL</title>
 		<style type="text/css">
 		<%@include file="viewurl.css" %>
 		</style>
@@ -38,7 +38,7 @@
 			// Generate actual URL
 			url = ViewURLHelper.getPublishedURL(sid, cid, filter, context);
 			if (ViewURLHelper.isCopyableURL) {
-				out.println("Live site URL: <p>");
+				out.println("Live Page URL: <p>");
 			}
 			out.println(url);
 		}
@@ -49,15 +49,44 @@
 %>	
 		</h3>
 
-		<div class="toolbar">
-		<input type="button" value="Close" onclick="window.close();" class="back">
-<%		
-		// TODO: add JS for copy to clipboard - button commented out for now
-		// if (ViewURLHelper.isCopyableURL) { 
+		<div class="toolbar"><p>			
+<%			
+			// Check if URL is in a copyable format and the correct content type, otherwise hide "Copy" button.
+			if (ViewURLHelper.isCopyableURL) { 
+			/* 
+			* JS from LMCButton library: http://www.lettersmarket.com/view_blog/a-3-copy_to_clipboard_lmcbutton.html
+			* "Copy" button is a cross-browser flash button (.swf file) that copies the displayed URL to the clipboard
+			* All necessary javascript is contained in this JSP. The .swf file and "Close" button image are saved in 
+			* the images directory.
+			*/
 %>		
-		<!-- &nbsp;
-		<input type="button" value="Copy to Clipboard" class="copy"> -->
-<% 		// } %>		
+			<script type="text/javascript">
+				function isNotEmpty(str) {
+				return !((str == undefined) || (str == ''));
+				}
+
+				function ShowLMCButton(cliptext, capt, js, furl)
+				{
+					var params = 'txt=' + encodeURIComponent(cliptext); 
+					if (!isNotEmpty(furl)) { furl = "/Rhythmyx/rx_resources/images/viewURL/lmcbutton.swf"; }
+					if (isNotEmpty(capt)) { params += '&capt=' + capt; }
+					if (isNotEmpty(js)) { params += '&js=' + js; }
+					 
+					document.write('<object width="40" height="20">');
+					document.write(' <param name="movie" value="' + furl + '">');
+					document.write(' <PARAM NAME=FlashVars VALUE="' + params + '">');
+					document.write(' <embed src="' + furl + '" flashvars="' + params + '"  width="40" height="20"></embed>');
+					document.write('</object>');
+				}
+			</script>			
+			<script type="text/javascript"> ShowLMCButton('<%= url %>', 'Copy');  </script>
+			&nbsp;
+<% 			} %>		
+			
+			<a href="javascript:window.close();">
+				<img src="/Rhythmyx/rx_resources/images/viewURL/jsp_close_button.png" alt="Close" border="0"> 
+			</a>
+			
 		</div>
 	</body>
 </html>
