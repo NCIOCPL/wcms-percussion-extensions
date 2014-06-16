@@ -1,6 +1,7 @@
 package gov.cancer.wcm.extensions;
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.percussion.extension.IPSWorkFlowContext;
 import com.percussion.extension.IPSWorkflowAction;
@@ -22,9 +23,9 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
 {
    /**
     * Logger for this class
-    */
-	//private static final Log LOGGER = LogFactory.getLog(CGV_OnDemandPublishContent.class);
-	private boolean bDebug = true;	//print to console if true
+    */	
+	private static final Log log = LogFactory.getLog(CGV_OnDemandPublishContent.class);
+	
 	/**
     * Service class to invoke publishing routine
     */
@@ -65,17 +66,24 @@ public class CGV_OnDemandPublishContent extends PSDefaultExtension
 	   //if the content item does not have isExclusive set, we know that it is
 	   //the item which was transitioned (the last item to move through the workflow)
 	   if(!ContentItemWFValidatorAndTransitioner.isExclusive(request)){
-		   if (bDebug) System.out.println("DEBUG: performAction");
+		   log.debug("performAction");
 		   initServices(request);
 		   
-		   if (bDebug) System.out.println("DEBUG: performAction Initted services");
+		   log.debug("performAction Initted services");
 		   int contentId = wfContext.getContentID();
 		   
-		   if (bDebug) System.out.println("DEBUG: performAction content id is " + contentId);
+		   log.debug("performAction content id is " + contentId);
 		   svc.publishOnDemand(contentId);
 		   
-		   if (bDebug) System.out.println("DEBUG: performAction queue item set is done running");
-	   
+		   log.debug("performAction queue item set is done running");
 	   }
+	   else
+	   {
+		   // get content id and type for debug message
+		   String page = request.getRequestPage(false);
+		   int contentId = wfContext.getContentID();
+		   log.debug("performAction skipping excluded content id of " + contentId + " (type = " + page + ")");
+	   }
+	   
    }
 }
