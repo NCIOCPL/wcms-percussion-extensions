@@ -1,5 +1,6 @@
 package gov.cancer.wcm.extensions.jexl;
 
+import gov.cancer.wcm.util.TemplateUtils;
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 import com.percussion.pso.jexl.PSOFolderTools;
 
@@ -27,6 +28,7 @@ import javax.jcr.PathNotFoundException;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
+import javax.jcr.UnsupportedRepositoryOperationException;
 import javax.jcr.Value;
 import javax.jcr.ValueFormatException;
 import javax.jcr.nodetype.ItemDefinition;
@@ -82,6 +84,7 @@ import com.percussion.services.assembly.IPSAssemblyTemplate;
 import com.percussion.services.assembly.IPSTemplateSlot;
 import com.percussion.services.assembly.PSAssemblyException;
 import com.percussion.services.assembly.PSAssemblyServiceLocator;
+import com.percussion.services.assembly.data.PSAssemblyWorkItem;
 import com.percussion.services.assembly.jexl.PSLocationUtils;
 import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.content.data.PSItemSummary;
@@ -119,6 +122,8 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 
 	private static Log log = LogFactory.getLog(CGV_AssemblyTools.class);
 	private static IPSContentMgr cmgr = null;
+	private IPSAssemblyItem assemItem = null;
+	
 
 	public CGV_AssemblyTools() {
 		super();
@@ -345,8 +350,14 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 		//Tools
         IPSAssemblyService asm = PSAssemblyServiceLocator.getAssemblyService();
         PSOObjectFinder objFinder = new PSOObjectFinder();
+		
+        IPSAssemblyItem aItem = asm.getCurrentAssemblyItem();
+		if(aItem!=null){
+			this.assemItem=aItem;
+		}
+        
 
-        //Variables
+		//Variables
 		int pagenum = 0;
 		//IPSGuid ownerGuid = parentItem.getId();
 		IPSTemplateSlot slot = null;
@@ -457,21 +468,43 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
 			@IPSJexlParam(name = "itemNode", description = "The Node of the item to find the default template for"),
 			@IPSJexlParam(name = "sitePath", description = "The path of the site to find the default template for")})
-			public String NCIFindDefaultTemplate(String itemPath, IPSNode itemNode, String sitePath){
+			public String NCIFindDefaultTemplate(String itemPath, IPSNode itemNode , String sitePath){
 				IPSAssemblyService aService = PSAssemblyServiceLocator.getAssemblyService();
 				IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
-				IPSAssemblyItem aItem = aService.createAssemblyItem();
+				IPSAssemblyItem aItem = aService.getCurrentAssemblyItem();
 				PSLocationUtils locationUtils = new PSLocationUtils();	
+				
+				IPSAssemblyTemplate template = null;
+				try {
+					template = (IPSAssemblyTemplate) TemplateUtils.getDefaultTemplate(itemNode, itemPath, sitePath);
+				} catch (RepositoryException e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				} 
+				String templateName= template.getName();
+				
+				
+				if(!templateName.equals(null)){
+					return templateName;
+				}
 				
 				String[] pathParts = sitePath.split("/");
 
 				IPSSite aSite = siteManager.loadSite(pathParts[3]);
 				IPSGuid siteID = aSite.getGUID();
 				IPSAssemblyTemplate aTemplate = null;
-				
-				aItem.setNode(itemNode);
-				aItem.setPath(itemPath);
+			
 				aItem.setSiteId(siteID);
+				aItem.setPath(itemPath));
+				
+				
+				
+
+
+
+
+
+
 				try {
 					aItem.normalize();
 				} catch (PSAssemblyException e) {
@@ -694,28 +727,62 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 			@IPSJexlParam(name = "itemNode", description = "The node for the assembly item to get"),
 			@IPSJexlParam(name = "itemPath", description = "path to an instance of the item"),
 			@IPSJexlParam(name = "sitePath", description = "Path to the site in //Sites/<SITENAME> form.")})
-			public IPSAssemblyItem getAssemblyItem(IPSNode itemNode, String itemPath, String sitePath){
+			public IPSAssemblyItem getAssemblyItem(IPSNode itemNode, String itemPath, String sitePath) {
 		
 				IPSAssemblyService aService = PSAssemblyServiceLocator.getAssemblyService();
 				IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
-				IPSAssemblyItem aItem = aService.createAssemblyItem();
+				IPSAssemblyItem aItem = aService.getCurrentAssemblyItem();
 				IPSFilterService fs = PSFilterServiceLocator.getFilterService();
+				HashMap localMap= new HashMap();
+				
+				if(aItem == null){
+					if(this.assemItem==null){
+					aItem = aService.createAssemblyItem();
+					
+					try {
+						localMap.put("sys_contentid", new String[] { itemNode.getProperties("sys_revision").toString() });
+						localMap.put("sys_revision", new String[] { itemNode.getProperty("rx:sys_revision").getValue().toString() });
+						localMap.put("sys_folderid", new String[] { itemNode.getProperties("sys_folderid").toString() });
+						aItem.setParameters(localMap);
+					} catch (RepositoryException e2) {
+						// TODO Auto-generated catch block
+						e2.printStackTrace();
+					}
+					}
+					else{
+						aItem=this.assemItem;
+						aItem.setNode(itemNode);
+					}
+					
+					
+				}
+				else{
+					aItem.setNode(itemNode);
+				}
+	
 				
 				
-		
+
+
 				String[] pathParts = sitePath.split("/");
 
 				IPSSite aSite = siteManager.loadSite(pathParts[3]);
 				IPSGuid siteID = aSite.getGUID();
 				IPSItemFilter itemFilter = fs.createFilter("phFilter", "this is a placeholder filter");
-				String templateName = NCIFindDefaultTemplate(itemPath, itemNode, sitePath);
+				String templateName = NCIFindDefaultTemplate(itemPath, itemNode , sitePath) ;
 				
-				aItem.setNode(itemNode);
+			
+
 				aItem.setPath(itemPath);
+
+
 				aItem.setSiteId(siteID);
 				aItem.setFilter(itemFilter);
+				aItem.setReferenceId(0L);
+				aItem.setJobId(0L);
 				try {
 					aItem.setTemplate(aService.findTemplateByName(templateName));
+					//aItem.setNode(itemNode);
 				} catch (PSAssemblyException e1) {
 					e1.printStackTrace();
 				}
@@ -727,7 +794,12 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 					System.out.println("normalization failed");
 					e.printStackTrace();
 				}
-			
+				
+				
+				
+				
+
+
 				return aItem;
 	}
 	@IPSJexlMethod(description = "returns a map of datafield names mapped to a map of other information (fieldLabel, fieldControllerRef ", params = 
@@ -864,7 +936,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 
 						
 						
-						IPSAssemblyItem customLinkAI = getAssemblyItem(customLinkNode, itemPath, getSitePathFromItemPath(itemPath));
+						//IPSAssemblyItem customLinkAI = getAssemblyItem(customLinkNode, itemPath, getSitePathFromItemPath(itemPath));
 						
 					
 					//Get custom Link fields
@@ -908,12 +980,15 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 						
 					*/	
 					//get Slot items to get target
-						try {
+						/*try {
+
+
 							li = psoSlotTools.getSlotContents(customLinkAI, "cgvBody", map);
 						} catch (Throwable e) {
 							li = null; 
 							e.printStackTrace();
 						}
+						*/
 
 					
 					 //get target info
@@ -1057,7 +1132,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 							} catch (PSErrorException e) {
 								e.printStackTrace();
 							}
-							IPSAssemblyItem customLinkAI = getAssemblyItem(fieldUsageNode, itemPath, getSitePathFromItemPath(itemPath));
+							//IPSAssemblyItem customLinkAI = getAssemblyItem(fieldUsageNode, itemPath, getSitePathFromItemPath(itemPath));
 							
 							ArrayList<IPSGuid> clGuidList = new ArrayList<IPSGuid>();
 							clGuidList.add(itemSummary.getGUID());
