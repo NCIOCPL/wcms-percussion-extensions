@@ -60,8 +60,9 @@ var cGovLFConst = "&#x000a;";	//line feed substitute
 //var cGovWebServiceURL = 'http://percussionca.cancer.gov/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';	//url of glossifier web service (CA)
 var cGovWebServiceURL;	//url of glossifier web service
 var cGovPreviewURL = "www.cancer.gov";	//dictionary preview URL
-var cGovElementPrefix = "ns1:";
+var cGovElementPrefix = "ns1";
 var cGovSoapPrefix = "soapenv";
+var cGovSoapNameSpace = "http:​/​/​schemas.xmlsoap.org/​soap/​envelope/";
 var cGovWSNameSpace = "cancer.gov/glossproxy";
 //var cGovWSNameSpace = "cips.nci.nih.gov/cdr";
 //var cGovSoapMethod = "cips.nci.nih.gov/cdr/glossify";
@@ -204,6 +205,21 @@ function termObject() {
 }
 
 /**
+* Attempts to retrieve elements in a namespace, using a variety of browser-specific methods
+*
+*/
+function getElementsByTagNameNS(parent, namespace, alias, tagname) {
+	elements = parent.getElementsByTagName(alias + ":" + tagname);
+	if(elements.length == 0){
+		elements = parent.getElementsByTagName(tagname);
+	}
+	if(elements.length == 0){
+		elements = parent.getElementsByTagNameNS(namespace, tagname);
+	}
+	return elements;
+}
+
+/**
 * Completion callback
 *
 */
@@ -211,23 +227,19 @@ function cGovProcessReqChange() {
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
 //alert("got response, text:\n" + cGovReq.responseText);
 		cGovStatusWindow.close();
+		
 		//Web service transaction has completed, parse the response
-		if(typeof console == "object") console.log("responseXML = ");
-		if(typeof console == "object") console.log(cGovReq.responseXML);
-		var firstChild = cGovReq.responseXML.firstChild;
-		var firstGrandchild = firstChild.firstChild;
-		if(typeof console == "object") console.log(firstChild);
-		if(typeof console == "object") console.log(firstGrandchild);
-		var env = cGovReq.responseXML.getElementsByTagName(cGovSoapPrefix + ":Envelope");
+		var env = getElementsByTagNameNS(cGovReq.responseXML, cGovSoapNameSpace, cGovSoapPrefix, "Envelope");
 //alert("got env");
-		var body = env[0].getElementsByTagName(cGovSoapPrefix + ":Body");
+		var body = getElementsByTagNameNS(env[0], cGovSoapNameSpace, cGovSoapPrefix, "Body");
 //alert("got body");
-		var resp = body[0].getElementsByTagName(cGovElementPrefix + "glossifyResponse");
+		var resp = getElementsByTagNameNS(body[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResponse");
 //alert("got glossifyResponse");
-		var glossifyResult = resp[0].getElementsByTagName(cGovElementPrefix + "glossifyResult");
+		var glossifyResult = getElementsByTagNameNS(resp[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResult");
 //alert("got glossifyResult");
-		var terms = glossifyResult[0].getElementsByTagName(cGovElementPrefix + "Term");
+		var terms = getElementsByTagNameNS(glossifyResult[0], cGovWSNameSpace, cGovElementPrefix, "Term");
 //alert("got term");
+
 		// Put the terms values into an array
 		var termsArray = cGovBuildTermsArray(terms);
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
@@ -431,17 +443,17 @@ function cGovBuildTermsArray(terms) {
 	for (i=0;i<terms.length;i++) {
 	// fetch the values for each Term returned by the service
 		var term = new termObject();
-		var start = terms[i].getElementsByTagName(cGovElementPrefix + "start");
+		var start = getElementsByTagNameNS(terms[i], cGovWSNameSpace, cGovElementPrefix, "start");
 		term.start = start[0].childNodes[0].nodeValue;
-		var len = terms[i].getElementsByTagName(cGovElementPrefix + "length");
+		var len = getElementsByTagNameNS(terms[i], cGovWSNameSpace, cGovElementPrefix, "length");
 		term.length = len[0].childNodes[0].nodeValue;
-		var docId = terms[i].getElementsByTagName(cGovElementPrefix + "docId");
+		var docId = getElementsByTagNameNS(terms[i], cGovWSNameSpace, cGovElementPrefix, "docId");
 		term.docId = docId[0].childNodes[0].nodeValue;
-		var dictionary = terms[i].getElementsByTagName(cGovElementPrefix + "dictionary");
+		var dictionary = getElementsByTagNameNS(terms[i], cGovWSNameSpace, cGovElementPrefix, "dictionary");
 		term.dictionary = dictionary[0].childNodes[0].nodeValue;
-		var language = terms[i].getElementsByTagName(cGovElementPrefix + "language");
+		var language = getElementsByTagNameNS(terms[i], cGovWSNameSpace, cGovElementPrefix, "language");
 		term.language = language[0].childNodes[0].nodeValue;
-		var first = terms[i].getElementsByTagName(cGovElementPrefix + "firstOccurrence");
+		var first = getElementsByTagNameNS(terms[i], cGovWSNameSpace, cGovElementPrefix, "firstOccurrence");
 		term.first = first[0].childNodes[0].nodeValue;
 		termsArray[i] = term;
 	}
