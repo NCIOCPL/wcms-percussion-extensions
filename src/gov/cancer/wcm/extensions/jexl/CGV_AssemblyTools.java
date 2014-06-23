@@ -495,7 +495,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				IPSAssemblyTemplate aTemplate = null;
 			
 				aItem.setSiteId(siteID);
-				aItem.setPath(itemPath));
+				aItem.setPath(itemPath);
 				
 				
 				
