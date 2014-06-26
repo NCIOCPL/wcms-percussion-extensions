@@ -85,6 +85,14 @@ $("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").m
 	cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[
 );
 
+/**
+* The mouseover event captures transitioning directly from the tabs to the editor - applets can't have
+* events attached, so a mouseover doesn't appear to be triggered in that case.
+*/
+$("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").mouseout(
+	cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[
+);
+
 /*
 *	This selector fires events when elements under the containing div gain focus.
 *   This should account for tab navigation being used to select an editor.
