@@ -70,6 +70,37 @@ var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 var cGovIsEnglish = true;
 var cGovLanguage;
 
+var cGovCurrentEditor = "";
+
+/*
+* This selector is used to determine the currently active Ephox editor.  The in-line xsl causes
+* it to select the containing div of the editor being added to the page, and attaches a mouseover listener
+* to it.  On mouseover, if the div contains an applet (the active editor), then the cGovCurrentEditor
+* variable is set to the editor's name, once again pulled via xsl.
+*
+* The custom code in this file is stamped into the HTML output once per editor on the page, so the below snippet
+* will result in a different jQuery selector (and resulting editor name set) for each editor present.
+*/
+$("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").mouseover(
+	cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[
+);
+
+/*
+*	This selector fires events when elements under the containing div gain focus.
+*   This should account for tab navigation being used to select an editor.
+*/
+$("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").focusin(
+	cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[
+);
+
+function cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[(){
+	// would be better to use .on("mouseover", "applet"), but can't attach listeners to applets
+	// instead, checks for the existence of an applet withing the containing div
+	if($(this).find("applet, object").length > 0) {
+		cGovCurrentEditor = "]]><xsl:value-of select="$name"/><![CDATA[";
+	}
+}
+
 /**
  * Method to fetch Ephox content, glossify it, and reset it into the editor.
  * This method is a custom cancer.gov method
@@ -77,13 +108,16 @@ var cGovLanguage;
  */
 function cGovEphoxGlossify()
 {
+	// do nothing if the current editor is not known (but should have been populated by a mouseover from above)
+	if(cGovCurrentEditor == "") return;
+
 	//alert(_editLiveInstance.getParam("setLocale"))
 	//set language
 	var body = document.body;
 //	alert("body = " + body.innerHTML);
 	var elements = body.getElementsByTagName("input");
 	
-	var meta = _getEditSectionMeta(_activeEditLiveSectionName);
+	var meta = _getEditSectionMeta(cGovCurrentEditor);
 	
 	//cGovLanguage = _editLiveInstance.getParam("setLocale")
 	cGovLanguage = meta.lang.toLowerCase().substr(0,2);
@@ -92,7 +126,7 @@ function cGovEphoxGlossify()
 	}
 //	alert("name = " + elements[i].name + ", value = " + elements[i].value);
 	cGovUniqueId = 0;
-	cGovEditorName = _activeEditLiveSectionName;
+	cGovEditorName = cGovCurrentEditor;
 	cGovWebServiceURL = 'http://' + window.location.host + '/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';
 	// Get the content from the editor using an existing function
 	cGovOriginalData = _editLiveInstance.getContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName));
