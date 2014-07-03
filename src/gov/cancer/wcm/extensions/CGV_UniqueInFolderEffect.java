@@ -135,6 +135,10 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 			//this happens when you create a folder
 		        log.debug("[attempt]setting success - probably a folder");        
 				result.setSuccess();
+	        } catch (PSCmsException e) {
+			// Content ID error
+		        log.debug("[attempt]setting success - check image on publish");        
+				result.setSuccess();
 	        } catch (Exception e) {
 
 	        	String msg =  format("An error occured in CGV_UniqueInFolderEffect while checking if " +
