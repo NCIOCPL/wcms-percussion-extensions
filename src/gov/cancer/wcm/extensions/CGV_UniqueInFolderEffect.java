@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.percussion.cms.objectstore.PSCoreItem;
+import com.percussion.cms.PSCmsException;
 import com.percussion.design.objectstore.PSRelationship;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
