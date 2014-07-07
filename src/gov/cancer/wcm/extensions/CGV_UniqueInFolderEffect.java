@@ -101,7 +101,7 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        log.debug("[attempt]fieldName = " + fieldName);        
 
 			// Retrieve information about the newly created relationship.
-	        PSRelationship originating = context.getOriginatingRelationship();
+	        PSRelationship originating = context.getCurrentRelationship();
 	        if (!(originating.getConfig().getName().equals("FolderContent"))) {
 	        	return;
 	        }
