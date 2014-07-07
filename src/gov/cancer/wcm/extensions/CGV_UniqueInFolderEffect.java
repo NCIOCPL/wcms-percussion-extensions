@@ -102,6 +102,10 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 
 			// Retrieve information about the newly created relationship.
 	        PSRelationship originating = context.getOriginatingRelationship();
+	        if (!(originating.getConfig().getName().equals("FolderContent"))) {
+	        	return;
+	        }
+	        
 			int contentId = originating.getDependent().getId();
 			int folderId = originating.getOwner().getId();
 
