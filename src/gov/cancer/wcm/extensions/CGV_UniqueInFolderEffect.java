@@ -154,6 +154,10 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
         		result.setError(msg);
 	        }
 		}
+		else if (context.isConstruction()) {
+			log.debug("[attempt]setting success - in Construction state! ");        
+			result.setSuccess();
+		}
 		else {
 	        log.debug("[attempt]setting success - not preConstruction");        
 			result.setSuccess();
