@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.design.objectstore.PSRelationship;
+import com.percussion.design.objectstore.PSRelationshipConfig;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
 import com.percussion.extension.PSExtensionProcessingException;
@@ -102,10 +103,22 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 
 			// Retrieve information about the newly created relationship.
 	        PSRelationship current = context.getCurrentRelationship();
-	        if (!(current.getConfig().getName().equals("FolderContent"))) {
-	        	log.debug("[attempt]setting success - not of a FolderContent configuration.");        
+	        String currentConfigName = null;
+	        if (current != null){
+	        	currentConfigName = current.getConfig().getName();
+	        }
+	        
+	        if(!PSRelationshipConfig.TYPE_FOLDER_CONTENT.equals(currentConfigName))
+	        {
+	        	log.debug("[attempt]setting success - current relationship is not of a FolderContent configuration.");        
 				result.setSuccess();
 				return;
+	        }
+	        
+	        PSRelationship originating = context.getOriginatingRelationship();
+	        String originatingConfigName = null;
+	        if (originating != null){
+	        	originatingConfigName = originating.getConfig().getName();
 	        }
 	        
 			int contentId = current.getDependent().getId();
@@ -153,10 +166,6 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        	log.debug("[attempt]setting error - got exception");        
         		result.setError(msg);
 	        }
-		}
-		else if (context.isConstruction()) {
-			log.debug("[attempt]setting success - in Construction state! ");        
-			result.setSuccess();
 		}
 		else {
 	        log.debug("[attempt]setting success - not preConstruction");        
