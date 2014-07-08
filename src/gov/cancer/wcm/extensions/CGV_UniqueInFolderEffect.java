@@ -7,9 +7,6 @@ import static java.text.MessageFormat.format;
 import gov.cancer.wcm.util.CGV_FolderValidateUtils;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -127,40 +124,44 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        	current = originating;
 	        }
 	        
-	        // retrieve the name of the current relationship config 
+	        // retrieve the name and category of the current relationship config
+	        String currentConfigCategory = null;
 	        String currentConfigName = null;
 	        if (current != null){
+	        	currentConfigCategory = current.getConfig().getCategory();
 	        	currentConfigName = current.getConfig().getName();
 	        }
 	        
-        	log.debug("[attempt] current relationship config name is " + currentConfigName);
+        	log.debug("[attempt] current relationship config is " + currentConfigName + " (category = " + currentConfigCategory + ")");
 	        
         	// skip uniqueness test if the current relationship is not of the folder content type
-	        if(!PSRelationshipConfig.TYPE_FOLDER_CONTENT.equals(currentConfigName))
+	        if(!PSRelationshipConfig.CATEGORY_FOLDER.equals(currentConfigCategory))
 	        {
-	        	String warning = "[attempt]setting success - current relationship is not of a FolderContent configuration.";
+	        	String warning = "[attempt]setting success - current relationship is not of a Folder category configuration.";
 	        	log.warn(warning);
 				result.setWarning(warning);
 				return;
 	        }
 	        
-	        // retrieve the originating relationship config name
+	        // retrieve the originating relationship config name and category
+	        String originatingConfigCategory = null;
 	        String originatingConfigName = null;
 	        if (originating != null){
+	        	originatingConfigCategory = originating.getConfig().getCategory();
 	        	originatingConfigName = originating.getConfig().getName();
 	        }
+	        
+	        log.debug("[attempt] originating relationship config is " + originatingConfigName + " (category = " + originatingConfigCategory + ")");
 
 	        // for copies and translations, uniqueness test is skipped - instead, uniqueness will
 	        // be enforced by the workflow transition.
-        	if(PSRelationshipConfig.TYPE_NEW_COPY.equals(originatingConfigName)
-        	|| PSRelationshipConfig.TYPE_TRANSLATION.equals(originatingConfigName)
-        	|| PSRelationshipConfig.TYPE_TRANSLATION_MANDATORY.equals(originatingConfigName))
+        	if(PSRelationshipConfig.CATEGORY_COPY.equals(originatingConfigCategory)
+        	|| PSRelationshipConfig.CATEGORY_TRANSLATION.equals(originatingConfigCategory))
         	{
-        		log.debug("[attempt]setting success - originating relationship is " + originatingConfigName + ", specifically skipping uniqueness test for this relationship.");        
+        		log.debug("[attempt]setting success - originating relationship category is " + originatingConfigCategory + ", specifically skipping uniqueness test for this relationship.");        
 				result.setSuccess();
 				return;
         	}
-	        		
 	        
 			int contentId = current.getDependent().getId();
 			int folderId = current.getOwner().getId();
