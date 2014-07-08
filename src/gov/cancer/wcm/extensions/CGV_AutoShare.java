@@ -93,6 +93,13 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		}
 		IPSContentWs contentWs = valUtil.getContentWs();
 		PSRelationship originating = context.getOriginatingRelationship(); 
+		
+        if (!(originating.getConfig().getName().equals("FolderContent"))) {
+        	log.debug("[attempt]setting success - not of a FolderContent configuration.");        
+			result.setSuccess();
+			return;
+        }
+		
 		PSLocator depContentId = originating.getDependent();
 		if(depContentId.getId() == Integer.MAX_VALUE){
 			//This is copy as new, we would not autoshare this.
