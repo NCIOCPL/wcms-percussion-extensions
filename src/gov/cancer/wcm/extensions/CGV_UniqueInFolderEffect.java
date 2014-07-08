@@ -105,6 +105,7 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        if (!(originating.getConfig().getName().equals("FolderContent"))) {
 	        	log.debug("[attempt]setting success - not of a FolderContent configuration.");        
 				result.setSuccess();
+				return;
 	        }
 	        
 			int contentId = originating.getDependent().getId();
