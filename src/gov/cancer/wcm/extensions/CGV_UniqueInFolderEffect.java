@@ -89,8 +89,23 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	 * @see com.percussion.relationship.IPSEffect#attempt(java.lang.Object[], com.percussion.server.IPSRequestContext, com.percussion.relationship.IPSExecutionContext, com.percussion.relationship.PSEffectResult)
 	 */
 	public void attempt(Object[] params, IPSRequestContext request, IPSExecutionContext context, PSEffectResult result) {
-		if (context.isPreConstruction()) {
-		//only do this check for preDestruction execution context
+		// test to ensure the context is in either a PreConstruction or PreUpdate state.
+		// PreConstruction is seen when a new piece of content is created, or a copy or translation
+		// existing content is generate.
+		// PreUpdate is specifically for content being moved - in this case, the folder relationship
+		// is updated instead of content being created, hence PreUpdate being set instead of
+		// PreConstruction.
+		if (context.isPreConstruction() || context.isPreUpdate()) {
+			
+			if (context.isPreConstruction())
+			{
+				log.debug("[attempt] - context is PreConstruction");
+			}
+			if (context.isPreUpdate())
+			{
+				log.debug("[attempt] - context is PreUpdate");
+			}
+			
 			String userName = request.getUserName();
 			if (userName == null || userName.isEmpty()) {
 				//don't do this if no user (probably migrating)
@@ -99,27 +114,53 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 			}
 			PSOExtensionParamsHelper h = new PSOExtensionParamsHelper(valUtil.getExtensionDef(), params, request, log);
 	        String fieldName = h.getRequiredParameter("fieldName");
-	        log.debug("[attempt]fieldName = " + fieldName);        
+	        log.debug("[attempt]fieldName = " + fieldName);
 
-			// Retrieve information about the newly created relationship.
+			// retrieve current and originating relationships
 	        PSRelationship current = context.getCurrentRelationship();
+	        PSRelationship originating = context.getOriginatingRelationship();
+	        
+	        // current is not guaranteed to be non-null - use originating if current
+	        // is null
+	        if(current == null && originating != null) {
+	        	log.debug("[attempt] current relationship is null - using originating relationship instead.");
+	        	current = originating;
+	        }
+	        
+	        // retrieve the name of the current relationship config 
 	        String currentConfigName = null;
 	        if (current != null){
 	        	currentConfigName = current.getConfig().getName();
 	        }
 	        
+        	log.debug("[attempt] current relationship config name is " + currentConfigName);
+	        
+        	// skip uniqueness test if the current relationship is not of the folder content type
 	        if(!PSRelationshipConfig.TYPE_FOLDER_CONTENT.equals(currentConfigName))
 	        {
-	        	log.debug("[attempt]setting success - current relationship is not of a FolderContent configuration.");        
-				result.setSuccess();
+	        	String warning = "[attempt]setting success - current relationship is not of a FolderContent configuration.";
+	        	log.warn(warning);
+				result.setWarning(warning);
 				return;
 	        }
 	        
-	        PSRelationship originating = context.getOriginatingRelationship();
+	        // retrieve the originating relationship config name
 	        String originatingConfigName = null;
 	        if (originating != null){
 	        	originatingConfigName = originating.getConfig().getName();
 	        }
+
+	        // for copies and translations, uniqueness test is skipped - instead, uniqueness will
+	        // be enforced by the workflow transition.
+        	if(PSRelationshipConfig.TYPE_NEW_COPY.equals(originatingConfigName)
+        	|| PSRelationshipConfig.TYPE_TRANSLATION.equals(originatingConfigName)
+        	|| PSRelationshipConfig.TYPE_TRANSLATION_MANDATORY.equals(originatingConfigName))
+        	{
+        		log.debug("[attempt]setting success - originating relationship is " + originatingConfigName + ", specifically skipping uniqueness test for this relationship.");        
+				result.setSuccess();
+				return;
+        	}
+	        		
 	        
 			int contentId = current.getDependent().getId();
 			int folderId = current.getOwner().getId();
@@ -128,11 +169,11 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 			// There's no way we can load the actual content item, so we let it fall through and depend on
 			// the workflow validator to check it.  (Besides, a copy in the same folder is going to have a
 			// conflicting value, by definition of being a copy.)
-			if (contentId == Integer.MAX_VALUE){
+			/*if (contentId == Integer.MAX_VALUE){
 				log.debug("CGV_UniqueInFolderEffect.attempt(): contentId == Integer.MAX_VALUE. Assumed to be Copy as New.");
 				result.setSuccess();
 				return;
-			}
+			}*/
 			
 			log.debug("[attempt]contentId = " + contentId);
 			log.debug("[attempt]folderId = " + folderId);
@@ -140,16 +181,16 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
 				PSCoreItem item = valUtil.loadItem(String.valueOf(contentId));
-				String sysTitle = item.getFieldByName("sys_title").getValue().getValueAsString();
+				/*String sysTitle = item.getFieldByName("sys_title").getValue().getValueAsString();
 				if (sysTitle.startsWith("[es-us]")) {
 					//don't check field if this is a translation
 					//this is a gross kluge and I'd like to find a better way to know
 			        log.debug("[attempt]setting success - probably a translation");        
 		            result.setSuccess();
 				}
-				else {
+				else {*/
 					valUtil.doAttempt(contentId, fieldName, folderId, checkPaths, item, result);
-				}
+				//}
 			} catch (IllegalArgumentException e) {
 			//this happens when you create a folder
 		        log.debug("[attempt]setting success - probably a folder");        
@@ -168,7 +209,7 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        }
 		}
 		else {
-	        log.debug("[attempt]setting success - not preConstruction");        
+	        log.debug("[attempt]setting success - not preConstruction or preUpdate");        
 			result.setSuccess();
 		}
 	}
