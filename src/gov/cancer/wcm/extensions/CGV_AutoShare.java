@@ -92,13 +92,18 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			return;
 		}
 		IPSContentWs contentWs = valUtil.getContentWs();
-		PSRelationship originating = context.getOriginatingRelationship(); 
 		
-        if (!(originating.getConfig().getName().equals("FolderContent"))) {
+		// retrieve the current and originating relationship - the current relationship will be
+		// used to load the item, and originating to determine if it may be a copied-as-new item.
+		
+		PSRelationship current = context.getCurrentRelationship();
+        if (!(current.getConfig().getName().equals("FolderContent"))) {
         	log.debug("[attempt]setting success - not of a FolderContent configuration.");        
 			result.setSuccess();
 			return;
         }
+		
+		PSRelationship originating = context.getOriginatingRelationship(); 
 		
 		PSLocator depContentId = originating.getDependent();
 		if(depContentId.getId() == Integer.MAX_VALUE){
@@ -106,7 +111,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			result.setSuccess();
 			return;
 		}
-		IPSGuid depGuid = valUtil.getGuidManager().makeGuid(originating.getDependent());
+		IPSGuid depGuid = valUtil.getGuidManager().makeGuid(current.getDependent());
 		List<PSItemStatus> statusList = null;
 		List<PSCoreItem> items = null;
 		PSCoreItem itemToShare = null;

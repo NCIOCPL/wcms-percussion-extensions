@@ -101,15 +101,15 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 	        log.debug("[attempt]fieldName = " + fieldName);        
 
 			// Retrieve information about the newly created relationship.
-	        PSRelationship originating = context.getOriginatingRelationship();
-	        if (!(originating.getConfig().getName().equals("FolderContent"))) {
+	        PSRelationship current = context.getCurrentRelationship();
+	        if (!(current.getConfig().getName().equals("FolderContent"))) {
 	        	log.debug("[attempt]setting success - not of a FolderContent configuration.");        
 				result.setSuccess();
 				return;
 	        }
 	        
-			int contentId = originating.getDependent().getId();
-			int folderId = originating.getOwner().getId();
+			int contentId = current.getDependent().getId();
+			int folderId = current.getOwner().getId();
 
 			// During a Copy | Paste as new copy operation, the new content item has an ID of Integer.MAX_VALUE.
 			// There's no way we can load the actual content item, so we let it fall through and depend on
