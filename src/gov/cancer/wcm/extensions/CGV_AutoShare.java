@@ -131,20 +131,18 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
         
         log.debug("[attempt] originating relationship config is " + originatingConfigName + " (category = " + originatingConfigCategory + ")");
 
-        // for copies, autoshare is skipped
-    	if(PSRelationshipConfig.CATEGORY_COPY.equals(originatingConfigCategory))
+        // for copies and translations, autoshare is skipped.        
+		// There's no way we can load the actual content item, so we let it fall through and depend on
+		// the workflow validator to check it.  (Besides, a copy in the same folder is going to have a
+		// conflicting value, by definition of being a copy.)
+    	if(PSRelationshipConfig.CATEGORY_COPY.equals(originatingConfigCategory) ||
+    			PSRelationshipConfig.CATEGORY_TRANSLATION.equals(originatingConfigCategory))
     	{
     		log.debug("[attempt]setting success - originating relationship category is " + originatingConfigCategory + ", skipping autoshare for this category.");        
 			result.setSuccess();
 			return;
     	}
-		
-		/*PSLocator depContentId = originating.getDependent();
-		if(depContentId.getId() == Integer.MAX_VALUE){
-			//This is copy as new, we would not autoshare this.
-			result.setSuccess();
-			return;
-		}*/
+
 		IPSGuid depGuid = valUtil.getGuidManager().makeGuid(current.getDependent());
 		List<PSItemStatus> statusList = null;
 		List<PSCoreItem> items = null;

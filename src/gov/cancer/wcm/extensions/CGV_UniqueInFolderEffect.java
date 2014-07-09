@@ -166,32 +166,13 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 			int contentId = current.getDependent().getId();
 			int folderId = current.getOwner().getId();
 
-			// During a Copy | Paste as new copy operation, the new content item has an ID of Integer.MAX_VALUE.
-			// There's no way we can load the actual content item, so we let it fall through and depend on
-			// the workflow validator to check it.  (Besides, a copy in the same folder is going to have a
-			// conflicting value, by definition of being a copy.)
-			/*if (contentId == Integer.MAX_VALUE){
-				log.debug("CGV_UniqueInFolderEffect.attempt(): contentId == Integer.MAX_VALUE. Assumed to be Copy as New.");
-				result.setSuccess();
-				return;
-			}*/
-			
 			log.debug("[attempt]contentId = " + contentId);
 			log.debug("[attempt]folderId = " + folderId);
 
 	        String checkPaths = h.getOptionalParameter("checkPaths", null);
 			try {
 				PSCoreItem item = valUtil.loadItem(String.valueOf(contentId));
-				/*String sysTitle = item.getFieldByName("sys_title").getValue().getValueAsString();
-				if (sysTitle.startsWith("[es-us]")) {
-					//don't check field if this is a translation
-					//this is a gross kluge and I'd like to find a better way to know
-			        log.debug("[attempt]setting success - probably a translation");        
-		            result.setSuccess();
-				}
-				else {*/
-					valUtil.doAttempt(contentId, fieldName, folderId, checkPaths, item, result);
-				//}
+				valUtil.doAttempt(contentId, fieldName, folderId, checkPaths, item, result);
 			} catch (IllegalArgumentException e) {
 			//this happens when you create a folder
 		        log.debug("[attempt]setting success - probably a folder");        
