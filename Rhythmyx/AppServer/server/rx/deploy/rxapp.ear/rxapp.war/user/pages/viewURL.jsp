@@ -1,6 +1,7 @@
 <%@ page import="gov.cancer.wcm.util.ViewURLHelper" %>
 <%@ page import="gov.cancer.wcm.util.TemplateUtils" %>
 <%@ page import="java.io.IOException" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <html>
 	<head>
@@ -21,7 +22,9 @@
 
 		try {
 			int cid = Integer.parseInt(request.getParameter("sys_contentid"));
+			int fid = Integer.parseInt(request.getParameter("sys_folderid"));
 			String path = ViewURLHelper.getPath(cid);
+			String fPath = (ViewURLHelper.getPath(fid) + "/" + ViewURLHelper.getNode(fid).getName());
 			int sid = Integer.parseInt(ViewURLHelper.getSIDFromGUID(path));
 			String filter = request.getParameter("loc_filter");
 			int context = Integer.parseInt(request.getParameter("loc_context"));
@@ -35,8 +38,19 @@
 				}
 			}
 		
-			// Generate actual URL
-			url = ViewURLHelper.getPublishedURL(sid, cid, filter, context);
+			// Check folder paths and generate actual URL. In the event that the content
+			// item has been autoshared. If so, use path of current folder 
+			String s = ViewURLHelper.getPublishedURL(sid, cid, filter, context);
+			if (path.equals(fPath)) {
+				url = s;
+			} 
+			else {
+				int i = StringUtils.ordinalIndexOf(fPath, "/", 4);
+				String prettyPath = fPath.substring(i);
+				String prettyURL = s.substring(s.lastIndexOf('/') + 1);
+				url = prettyPath + "/" + prettyURL;
+			}
+			
 			if (ViewURLHelper.isCopyableURL) {
 				out.println("Live Page URL: <p>");
 			}
