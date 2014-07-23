@@ -163,6 +163,10 @@
 		<copy todir="${rhythmyx.rxapp}/user" verbose="true" >
 			<fileset dir="Rhythmyx\AppServer\server\rx\deploy\rxapp.ear\rxapp.war\user" />
 		</copy>
+		<!-- Ephox files -->
+		<copy todir="${rhythmyx.home}/rx_resources/ephox" verbose="true" >
+			<fileset dir="Rhythmyx\rx_resources\ephox" />
+		</copy>
 	</target>
 	
 	<!--

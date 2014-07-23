@@ -17,9 +17,8 @@ import org.springframework.beans.factory.InitializingBean;
 import com.percussion.cms.PSCmsException;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.cms.objectstore.PSCoreItem;
-import com.percussion.cms.objectstore.PSFolder;
-import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
+import com.percussion.design.objectstore.PSRelationshipConfig;
 import com.percussion.error.PSException;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
@@ -39,7 +38,6 @@ import com.percussion.services.content.data.PSItemStatus;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
 import com.percussion.utils.guid.IPSGuid;
-import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
 import com.percussion.webservices.PSErrorsException;
 import com.percussion.webservices.content.IPSContentWs;
@@ -92,14 +90,60 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			return;
 		}
 		IPSContentWs contentWs = valUtil.getContentWs();
-		PSRelationship originating = context.getOriginatingRelationship(); 
-		PSLocator depContentId = originating.getDependent();
-		if(depContentId.getId() == Integer.MAX_VALUE){
-			//This is copy as new, we would not autoshare this.
+		
+		// retrieve current and originating relationships
+        PSRelationship current = context.getCurrentRelationship();
+        PSRelationship originating = context.getOriginatingRelationship();
+        
+        // current is not guaranteed to be non-null - use originating if current
+        // is null
+        if(current == null && originating != null) {
+        	log.debug("[attempt] current relationship is null - using originating relationship instead.");
+        	current = originating;
+        }
+        
+        // retrieve the name and category of the current relationship config
+        String currentConfigCategory = null;
+        String currentConfigName = null;
+        if (current != null){
+        	currentConfigCategory = current.getConfig().getCategory();
+        	currentConfigName = current.getConfig().getName();
+        }
+        
+    	log.debug("[attempt] current relationship config is " + currentConfigName + " (category = " + currentConfigCategory + ")");
+        
+    	// skip share if the current relationship is not of the folder content type
+        if(!PSRelationshipConfig.CATEGORY_FOLDER.equals(currentConfigCategory))
+        {
+        	String warning = "[attempt]setting success - current relationship is not of a Folder category configuration.";
+        	log.warn(warning);
+			result.setWarning(warning);
+			return;
+        }
+        
+        // retrieve the originating relationship config name and category
+        String originatingConfigCategory = null;
+        String originatingConfigName = null;
+        if (originating != null){
+        	originatingConfigCategory = originating.getConfig().getCategory();
+        	originatingConfigName = originating.getConfig().getName();
+        }
+        
+        log.debug("[attempt] originating relationship config is " + originatingConfigName + " (category = " + originatingConfigCategory + ")");
+
+        // for copies and translations, autoshare is skipped.        
+		// There's no way we can load the actual content item, so we let it fall through and depend on
+		// the workflow validator to check it.  (Besides, a copy in the same folder is going to have a
+		// conflicting value, by definition of being a copy.)
+    	if(PSRelationshipConfig.CATEGORY_COPY.equals(originatingConfigCategory) ||
+    			PSRelationshipConfig.CATEGORY_TRANSLATION.equals(originatingConfigCategory))
+    	{
+    		log.debug("[attempt]setting success - originating relationship category is " + originatingConfigCategory + ", skipping autoshare for this category.");        
 			result.setSuccess();
 			return;
-		}
-		IPSGuid depGuid = valUtil.getGuidManager().makeGuid(originating.getDependent());
+    	}
+
+		IPSGuid depGuid = valUtil.getGuidManager().makeGuid(current.getDependent());
 		List<PSItemStatus> statusList = null;
 		List<PSCoreItem> items = null;
 		PSCoreItem itemToShare = null;
@@ -108,12 +152,12 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			 depSum = PSOItemSummaryFinder.getSummary(depGuid);
 		} catch (PSException e4) {
 			result.setSuccess();
-			//result.setError("Cannot get item summary from dependent GUID");
-			e4.printStackTrace();
+			log.warn("Cannot get item summary from dependent GUID", e4);
 			return;
 		}
 		//This code is only concerned with content items, not folders
 		if(depSum.isFolder()){
+			log.debug("Skipping dependent folder - setting success.");
 			result.setSuccess();
 			return;
 		}
@@ -127,7 +171,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		} catch (PSErrorResultsException e3) {
 			result.setSuccess();
 			//result.setError("Cannot load item to share");
-			e3.printStackTrace();
+			log.warn("Cannot load item to share", e3);
 			return;
 
 		}
@@ -156,6 +200,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		//if the content type is not in the bean it shouldnt be autoshared, 
 		//so we can exit out of the Autoshare code
 		if(!isInBean){
+			log.debug("Content type " + typeName + " not in bean - nothing to share");
 			result.setSuccess();
 			return;
 		}
@@ -168,7 +213,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		} catch (PSCmsException e2) {
 			result.setSuccess();
 			//result.setError("Cannot parse hasBeenAutoShared or sys_lang field");
-			e2.printStackTrace();
+			log.warn("Cannot parse hasBeenAutoShared or sys_lang field", e2);
 			return;
 		}
 		
@@ -198,13 +243,14 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			} catch (PSCmsException e1) {
 				result.setSuccess();
 				//result.setError("Failed to get destination path");
-				e1.printStackTrace();
+				log.warn("Failed to get destination path", e1);
 				return;
 			}
 			
 			//Check to see if the item is already in the destination folder.
 			//If it is, return out of the autoshare code
 			if (folderPaths.contains(destPath)){
+				log.debug("Item already in destination folder.");
 				result.setSuccess();
 				return;
 			}				
@@ -214,9 +260,8 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 				statusList = contentWs.prepareForEdit(glist);
 			} catch (PSErrorResultsException e3) {
 				// TODO Auto-generated catch block
-				e3.printStackTrace();
+				log.warn("Exception wile preparing for edit.", e3);
 			}
-
 			
 			// Mark item as previously shared.
 			RxItemUtils.setFieldValue(itemToShare, "hasBeenAutoShared", "true");
@@ -231,7 +276,7 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			} catch (PSErrorResultsException e2) {
 				result.setSuccess();
 				//result.setError("Failed to save item after edit");
-				e2.printStackTrace();
+				log.warn("Failed to save item after edit", e2);
 				return;
 			}
 			try {
@@ -239,12 +284,16 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 			} catch (PSErrorsException e2) {
 				result.setSuccess();
 				//result.setError("Failed to release item after edit");
-				e2.printStackTrace();
+				log.warn("Failed to release item after edit", e2);
 				return;
 			}
 						
+			log.debug("Completed share to folder successfully.");
 			result.setSuccess();
 			return;
+		}
+		else{
+			log.debug("Already shared to folder.");
 		}
 	
 		result.setSuccess();
