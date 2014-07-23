@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+
+<project name="CGV_Extensions" default="build" basedir=".">
+	<description>
+		Extensions for Cancer.gov implementation of Percussion
+	</description>
+	
+	<!-- set global properties for this build -->
+
+	<!-- Default for build number.  This may be overridden from the command line
+		 (e.g. Passed in from the integration envrionment's build script. -->
+	<property name="build.number" value="test build" /> 
+
+	
+	<property environment="env"/>
+	<!-- base directory of Rhythmyx installation --> 
+	<property name="rhythmyx.home" location="${env.RHYTHMYX_HOME}"/>
+	<!-- name of Rhythmyx Service -->
+	<property name="rhythmyx.service" value='"Rhythmyx Server"'/>
+
+	<!-- name of our output jar --> 
+	<property name="jarname" value="cgv_extensions.jar" />	
+	<!-- name of our distribution zip -->
+	<property name="distfile" value="cgv_extensions.zip" />	
+
+	<property name="rhythmyx.deploy" value="${rhythmyx.home}/AppServer/server/rx/deploy" /> 
+	<property name="rhythmyx.rxapp"  value="${rhythmyx.deploy}/rxapp.ear/rxapp.war" /> 
+	<property name="rhythmyx.rxpub"  value="${rhythmyx.deploy}/RxServices.war"/> 
+	<property name="rhythmyx.rxapp.lib"    value="${rhythmyx.rxapp}/WEB-INF/lib"/>
+	<property name="rhythmyx.server.lib"  value="${rhythmyx.home}/AppServer/server/rx/lib" /> 
+	<property name="rhythmyx.rxapp.spring-config"
+	value="${rhythmyx.rxapp}/WEB-INF/config/user/spring" />
+	<property name="rhythmyx.rxapp.WEB-INF" value="${rhythmyx.rxapp}/WEB-INF" />
+
+	<!-- relative paths -->
+	<property name="src" location="src"/>
+	<property name="lib" location="lib"/>
+	<property name="output" location="output"/>
+	<property name="bin" location="bin"/>
+	<property name="apidoc" location="apidoc" />
+	
+	<property name="zipprefix" value="cgv_extensions" /> 
+	
+	<!-- used for running Windows commands --> 
+	<property name="comspec" location="${env.ComSpec}"/>
+	<property name="cdrive" location="${env.USERPROFILE}"/> 
+
+	<!-- Rhythmyx classpath  --> 
+	<path id="rx.class.path"> 
+		 <fileset dir="${lib}">
+		 	<include name="**.jar"/>
+		 </fileset>
+	</path>
+	
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+	</target>
+
+	<target name="clean" description="clean up">
+		<echo message="Removing build directory"/>
+		<delete dir="${bin}"/>
+		<mkdir dir="${bin}"/>
+	</target>
+
+	<target name="compile" description="compile the source ">
+
+		<!-- Create required output location -->
+		<mkdir dir="${bin}" />
+
+		<!-- Compile the java code from ${src} into ${bin} -->
+		<javac 
+			srcdir="${src}" 
+			destdir="${bin}" 
+			debug="true" 
+			target="1.5" 
+			source="1.5" 
+			classpathref="rx.class.path" 
+		>
+			<compilerarg value = "-Xlint:unchecked" />
+		</javac>
+		 <copy todir="${bin}">
+    		<fileset dir="${src}">
+      			<include name="**/*.xml"/>
+    			<include name="**/*.properties" />
+    			<include name="**/*.jpg" />
+    			<include name="**/*.gif" />
+    			<include name="**/*.png" />
+    		</fileset>
+  		</copy>
+	</target>
+		
+	<target name="javadoc" depends="compile">
+		<mkdir dir="apidoc"/>
+		<javadoc destdir="apidoc" private="true" use="yes" 
+		windowtitle="${ant.project.name}">
+			<packageset dir="${src}" defaultexcludes="yes">
+				<include name="gov/cancer/**"/>	
+			</packageset>
+			<classpath refid="rx.class.path"/>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<link href="http://java.sun.com/j2ee/1.4/docs/api/" />
+			<link href="http://static.springframework.org/spring/docs/2.0.x/api/" />
+			<link href="http://commons.apache.org/logging/apidocs/" />
+		</javadoc>
+	</target>
+
+	<target name="jarbuilder" depends="compile" description="Build the jar file">
+		<propertyfile file="${bin}/build.properties">
+			<entry key="build.number" value="${build.number}"/>
+			<entry key="build.date" type="date" pattern="EEEE MMM dd yyyy" value="now"/>
+    	</propertyfile>
+		<jar jarfile="${output}/${jarname}" basedir="${bin}">
+			<include name="gov/cancer/wcm/**"/>
+			<exclude name="log4j.properties" /> 
+			<include name="build.properties" /> 
+			<include name="readme.txt" />			
+		</jar>
+	</target>
+
+	<target name="installAndDeploy">		
+		
+		<!-- Install the extensions in Rhythmyx. -->
+		<java classname="com.percussion.util.PSExtensionInstallTool" fork="true">
+		    <arg value="${rhythmyx.home}" />
+			<arg value="${basedir}" />
+			<classpath>
+			    <fileset dir="${rhythmyx.rxapp.lib}">
+			    	<include name="rxserver.jar"/>
+			    	<include name="rxclient.jar"/> 
+			    	<include name="rxutils.jar" />
+			    	<include name="rxservices.jar" />
+			    	<include name="rxbusiness.jar" /> 
+			    	<include name="commons-lang*.jar"/> 
+			    	<include name="commons-jexl*.jar"/>
+			    	<include name="jcr*.jar" /> 
+			    	<include name="commons-logging*.jar" /> 
+			    	<include name="commons-collections*.jar" /> 
+			    	<include name="commons-httpclient*.jar" /> 
+				</fileset>
+			    <fileset dir="${rhythmyx.home}/AppServer/lib/endorsed" >
+				    <include name="xml-apis.jar" />
+			    </fileset>
+				<fileset dir="${rhythmyx.home}/AppServer/server/rx/lib">
+					<include name="javax.servlet.jar" /> 
+					<include name="commons-collections*.jar" />
+		    	</fileset>				
+			</classpath>			
+		</java>     
+
+		<!-- Delete log files. -->
+		<delete file="${rhythmyx.home}/AppServer/server/rx/log/server.log" verbose="true" failonerror="false" />
+		<delete file="${rhythmyx.home}/AppServer/server/rx/log/CancerGov.log" verbose="true" failonerror="false" />
+
+		<!-- Deploy the various components -->
+		<!-- Jar file -->
+		<copy file="${output}/${jarname}" todir="${rhythmyx.rxapp.lib}" verbose="true" />
+		<!-- Beans -->
+		<copy todir="${rhythmyx.rxapp.WEB-INF}" verbose="true" >
+			<fileset dir="Rhythmyx\AppServer\server\rx\deploy\rxapp.ear\rxapp.war\WEB-INF" />
+		</copy>
+		<!-- JSP files -->
+		<copy todir="${rhythmyx.rxapp}/user" verbose="true" >
+			<fileset dir="Rhythmyx\AppServer\server\rx\deploy\rxapp.ear\rxapp.war\user" />
+		</copy>
+		<!-- Ephox files -->
+		<copy todir="${rhythmyx.home}/rx_resources/ephox" verbose="true" >
+			<fileset dir="Rhythmyx\rx_resources\ephox" />
+		</copy>
+	</target>
+	
+	<!--
+		Alternate version of the installExtensions target.  This version attempts to
+		stop and restart the Rhythmyx server before copying the JAR file.
+		(NOTE: invokes the antCall task to avoid having the same code twice.)
+	-->
+	<target name="installAndDeploy-ALT" description="legacy build for local test">		
+		<echo>Stopping ${rhythmyx.service}</echo>
+		
+		<exec executable="net.exe" failonerror="false">
+			<arg line="stop ${rhythmyx.service}"/>
+			<env key="COMSPEC" path="${comspec}"/>
+		</exec>
+		<echo>waiting for shutdown...</echo>
+	    <sleep seconds="30" /> 
+
+		<antcall target="installAndDeploy" />
+
+		<echo>Restarting ${rhythmyx.service}</echo>
+		<exec executable="net.exe" failonerror="true">
+			<arg line="start ${rhythmyx.service}"/>
+			<env key="COMSPEC" path="${comspec}"/>
+		</exec>
+	</target>
+	
+	<target name="dist" depends="init, clean, javadoc" description="generate the distribution">
+		<buildnumber/>
+		<antcall target="jarbuilder"/>
+		<zip destfile="${distfile}">
+			<zipfileset dir="${output}" includes="${jarname}" prefix="${zipprefix}/output" />
+			<zipfileset dir="." includes="deploy.xml, Extensions.xml, install.bat" prefix="${zipprefix}" />
+		    <zipfileset dir="${bin}" includes="build.properties"  prefix="${zipprefix}" />
+			<zipfileset dir="Rhythmyx\AppServer\server\rx\deploy\rxapp.ear\rxapp.war\WEB-INF" prefix="${zipprefix}/WEB-INF" />
+			<zipfileset dir="${apidoc}" prefix="${zipprefix}/javadoc"/>
+		</zip>			
+	</target>	
+
+	<target name="build"
+		depends="jarbuilder,installAndDeploy,dist"/>
+</project>

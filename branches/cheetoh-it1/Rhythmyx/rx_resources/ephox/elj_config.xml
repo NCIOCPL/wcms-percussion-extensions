@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editlive>
+   <document>
+      <html>
+         <head>
+            <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+            <meta content="Percussion Rhythmyx" name="generator"/>
+         </head>
+         <body/>
+      </html>
+   </document>
+   <ephoxLicenses>
+      <license/>
+   </ephoxLicenses>
+   <spellCheck jar="../rx_resources/ephox/editlivejava/dictionaries/en_us_4_0.jar" showOnDownload="false" useNotModified="false" rxoverride="true"/>
+   <htmlFilter allowUnknownTags="true" encloseText="true" indentContent="false" logicalEmphasis="false" outputXHTML="true" outputXML="false" quoteMarks="false" removeFontTags="false" uppercaseAttributes="false" uppercaseTags="false" wrapLength="0" wrapCustomTagsInP="false"/>
+   <wysiwygEditor brOnEnter="false" showDocumentNavigator="false" showTableGridlines="true" showSectionGridlines="false" tabPlacement="bottom" disableInlineImageResizing="false" disableInlineTableResizing="false">
+      <!-- Define Custom Tags actions -->
+      <!--
+       <customTags>
+          <doubleClickActions>
+             <action.../>
+          </doubleClickActions>
+       </customTags>
+       -->
+      <!-- Define additional symbols for the symbol dialog here -->
+      <!--
+       <symbols></symbols>
+       -->
+   </wysiwygEditor>
+   <sourceEditor enabled="true" showBodyOnly="true"/>
+   <wordImport styleOption="user_prompt"/>
+   <htmlImport styleOption="merge_embedded_styles"/>
+   <mediaSettings>
+      <httpUpload base="" href=""/>
+      <images allowLocalImages="true" allowUserSpecified="true">
+         <imageList/>
+      </images>
+      <multimedia>
+         <types>
+            <type allowCustomParams="true" extension="swf" name="Macromedia Flash" type="application/x-shockwave-flash" urlParam="movie">
+               <param name="movie"/>
+               <param name="quality"/>
+               <param name="bgcolor"/>
+            </type>
+            <type allowCustomParams="true" extension="mov" name="QuickTime Movie" type="video/quicktime">
+               <param name="autohref"/>
+               <param name="autoplay"/>
+               <param name="bgcolor"/>
+               <param name="cache"/>
+               <param name="controller"/>
+               <param name="correction"/>
+               <param name="dontflattenwhensaving"/>
+               <param name="enablejavascript"/>
+               <param name="endtime"/>
+               <param name="fov"/>
+               <param name="height"/>
+               <param name="href"/>
+               <param name="kioskmode"/>
+               <param name="loop"/>
+               <param name="movieid"/>
+               <param name="moviename"/>
+               <param name="node"/>
+               <param name="pan"/>
+               <param name="playeveryframe"/>
+               <param name="qtsrcchokespeed"/>
+               <param name="scale"/>
+               <param name="starttime"/>
+               <param name="target"/>
+               <param name="targetcache"/>
+               <param name="tilt"/>
+               <param name="urlsubstitute"/>
+               <param name="volume"/>
+            </type>
+            <type allowCustomParams="true" extension="asf" name="Window Media" type="application/x-mplayer2" urlParam="fileName">
+               <param name="animationAtStart"/>
+               <param name="autoStart"/>
+               <param name="showControls"/>
+               <param name="clickToPlay"/>
+               <param name="transparentAtStart"/>
+            </type>
+            <type allowCustomParams="true" extension="asx" name="Window Media (Streaming)" type="application/x-mplayer2" urlParam="fileName">
+               <param name="animationAtStart"/>
+               <param name="autoStart"/>
+               <param name="showControls"/>
+               <param name="clickToPlay"/>
+               <param name="transparentAtStart"/>
+            </type>
+            <type allowCustomParams="true" extension="wav" name="WAV Audio" type="application/x-mplayer2"/>
+            <type allowCustomParams="true" extension="mp3" name="MP3 Audio" type="application/x-mplayer2"/>
+            <type allowCustomParams="true" extension="avi" name="AVI" type="application/x-mplayer2"/>
+         </types>
+      </multimedia>
+   </mediaSettings>
+   <hyperlinks>
+      <hyperlinkList/>
+      <mailtoList>
+         <mailtolink description="Ephox information" href="mailto:info@ephox.com"/>
+      </mailtoList>
+   </hyperlinks>
+   <menuBar showAboutMenu="true">
+      <menu name="ephox_editmenu">
+         <menuItem name="Undo"/>
+         <menuItem name="Redo"/>
+         <menuSeparator/>
+         <menuItem name="Cut"/>
+         <menuItem name="Copy"/>
+         <menuItem name="Paste"/>
+         <menuItem name="PasteSpecial"/>
+         <menuSeparator/>
+         <menuItem name="Select"/>
+         <menuItem name="SelectAll"/>
+         <menuSeparator/>
+         <menuItem name="Find"/>
+         <menuSeparator/>
+      </menu>
+      <menu name="ephox_viewmenu">
+         <menuItemGroup name="SourceView"/>
+         <menuSeparator/>
+         <menuItem name="Popout"/>
+         <menuSeparator/>
+         <menuItem name="showDocumentNavigator"/>
+         <menuSeparator/>
+         <menuItem name="ParagraphMarker"/>
+      </menu>
+      <menu name="ephox_insertmenu">
+         <menuItem name="InsTable"/>
+         <menuSeparator/>
+         <menuItem name="HLink"/>         
+         <customMenuItem action="raiseEvent" imageURL="../rx_resources/ephox/images/slink.gif" name="CMSLink" text="Insert Rhythmyx inline link" value="RxEphoxInlineLink"/>
+         <customMenuItem action="raiseEvent" imageURL="../rx_resources/ephox/images/image.gif" name="CMSImage" text="Insert Rhythmyx inline image" value="RxEphoxImageLink"/>
+         <customMenuItem action="raiseEvent" imageURL="../rx_resources/ephox/images/variant.gif" name="CMSVariant" text="Insert Rhythmyx Template" value="RxEphoxVariantLink"/>
+         <customMenuItem action="raiseEvent" imageURL="../rx_resources/ephox/images/insertBreak.gif" name="InsertPageBreak" text="Insert Page Break" value="RxEphoxInsertPageBreak"/>
+               
+         <menuSeparator/>
+         <menuItem name="bookmark"/>
+         <menuSeparator/>
+         <menuItem name="Symbol"/>
+         <menuItem name="HRule"/>
+         <menuSeparator/>
+         <menuItem name="DateTime"/>
+         <menuSeparator/>
+         <menuItem name="insertcomment"/>
+      </menu>
+      <menu name="ephox_formatmenu">
+         <submenu name="Style"/>
+         <submenu name="Face"/>
+         <submenu name="Size"/>
+         <menuSeparator/>
+         <menuItem name="Bold"/>
+         <menuItem name="Italic"/>
+         <menuItem name="Underline"/>
+         <menuSeparator/>
+         <menuItemGroup name="Align"/>
+         <menuSeparator/>
+         <menuItemGroup name="List"/>
+         <menuItem name="DecreaseIndent"/>
+         <menuItem name="IncreaseIndent"/>
+         <menuItem name="PropList"/>
+         <menuSeparator/>
+         <menuItem name="HighlightColor"/>
+         <menuItem name="Color"/>
+         <menuSeparator/>
+         <menuItemGroup name="Script"/>
+         <menuItem name="Strike"/>
+         <menuSeparator/>
+         <menuItem name="RemoveFormatting"/>
+         <menuItem name="FormatPainter"/>
+      </menu>
+      <menu name="ephox_toolsmenu">
+         <menuItem name="Spelling"/>
+         <menuItem name="BackgroundSpellChecking"/>
+         <menuSeparator/>
+         <menuItem name="Accessibility"/>
+         <menuSeparator/>
+         <menuItem name="WordCount"/>
+         <menuSeparator/>
+		 <customMenuItem action="raiseEvent" imageURL="../rx_resources/ephox/images/glossify.gif" name="Glossify" text="Glossify Text" value="cGovEphoxGlossify"/>
+      </menu>
+      <menu name="ephox_tablemenu">
+         <menuItem name="InsTable"/>
+         <menuItem name="InsRowCol"/>
+         <menuItem name="InsCell"/>
+         <menuSeparator/>
+         <menuItem name="DelRow"/>
+         <menuItem name="DelCol"/>
+         <menuItem name="DelCell"/>
+         <menuSeparator/>
+         <menuItem name="Split"/>
+         <menuItem name="Merge"/>
+         <menuSeparator/>
+         <menuItem name="PropCell"/>
+         <menuItem name="PropRow"/>
+         <menuItem name="PropCol"/>
+         <menuItem name="PropTable"/>
+         <menuSeparator/>
+         <menuItem name="Gridlines"/>
+      </menu>
+      <!-- Form Support -->
+      <!-- Uncomment for form menu to appear
+      <menu name="ephox_formmenu">
+         <menuItem name="InsForm"/>
+         <menuItem name="InsTextField"/>
+         <menuItem name="InsPasswordField"/>
+         <menuItem name="InsHiddenField"/>
+         <menuItem name="InsFileField"/>
+         <menuItem name="InsButtonField"/>
+         <menuItem name="InsSubmitField"/>
+         <menuItem name="InsResetField"/>
+         <menuItem name="InsCheckboxField"/>
+         <menuItem name="InsRadioField"/>
+         <menuItem name="InsTextAreaField"/>
+         <menuItem name="InsSelectField"/>
+         <menuItem name="InsImageField"/>
+      </menu>
+      -->
+   </menuBar>
+   <toolbars>
+      <toolbar name="Command">
+         <toolbarButton name="Cut"/>
+         <toolbarButton name="Copy"/>
+         <toolbarButton name="Paste"/>
+         <toolbarSeparator/>
+         <toolbarButton name="Find"/>
+         <toolbarButton name="WordCount"/>
+         <toolbarSeparator/>
+         <toolbarButton name="RemoveFormatting"/>
+         <toolbarButton name="FormatPainter"/>
+         <toolbarSeparator/>
+         <toolbarButton name="Undo"/>
+         <toolbarButton name="Redo"/>
+         <toolbarSeparator/>
+         <toolbarButton name="Spelling"/>
+         <toolbarButton name="BackgroundSpellChecking"/>
+         <customToolbarButton action="raiseEvent" imageURL="../rx_resources/ephox/images/glossify.gif" name="Glossify" text="Glossify Text" value="cGovEphoxGlossify"/>
+         <toolbarSeparator/>
+         <toolbarButton name="HLink"/>         
+         <customToolbarButton action="raiseEvent" imageURL="../rx_resources/ephox/images/slink.gif" name="CMSLink" text="Insert Rhythmyx inline link" value="RxEphoxInlineLink"/>
+         <customToolbarButton action="raiseEvent" imageURL="../rx_resources/ephox/images/image.gif" name="CMSImage"  text="Insert Rhythmyx inline image" value="RxEphoxImageLink"/>
+         <customToolbarButton action="raiseEvent" imageURL="../rx_resources/ephox/images/variant.gif" name="CMSVariant" text="Insert Rhythmyx Template" value="RxEphoxVariantLink"/>
+         <toolbarSeparator/>
+         <toolbarButton name="RemoveHyperlink"/>
+         <toolbarSeparator/>
+         <customToolbarButton action="raiseEvent" imageURL="../rx_resources/ephox/images/helpicon.gif" name="Help" text="Help" value="RxEphoxHelp"/>
+         <toolbarSeparator/>
+         <toolbarButton name="Bookmark"/>
+         <toolbarButton name="Symbol"/>
+         <toolbarButton name="HRule"/>
+         <toolbarSeparator/>
+         <toolbarButton name="InsTableWizard"/>
+         <toolbarButton name="InsRow"/>
+         <toolbarButton name="InsCol"/>
+         <toolbarButton name="DelRow"/>
+         <toolbarButton name="DelCol"/>
+         <toolbarButton name="Split"/>
+         <toolbarButton name="Merge"/>
+         <toolbarButton name="Gridlines"/>
+         <toolbarSeparator/>
+         <toolbarButton name="ParagraphMarker"/>         
+      </toolbar>
+      <toolbar name="Format">
+         <toolbarButton name="Popout"/>
+	     <toolbarButton name="Print"/>
+         <toolbarSeparator/>
+         <!-- 
+            Styles from any embeddedd or external stylesheets will also be automatically added to the Styles drop-down 
+            -->
+         <toolbarComboBox name="Style">
+            <comboBoxItem name="P" text="Normal"/>
+            <comboBoxItem name="H1" text="Heading 1"/>
+            <comboBoxItem name="H2" text="Heading 2"/>
+            <comboBoxItem name="H3" text="Heading 3"/>
+            <comboBoxItem name="H4" text="Heading 4"/>
+            <comboBoxItem name="H5" text="Heading 5"/>
+            <comboBoxItem name="H6" text="Heading 6"/>
+            <comboBoxItem name="PRE" text="Formatted"/>
+            <comboBoxItem name="ADDRESS" text="Address"/>
+         </toolbarComboBox>
+         <!-- 
+            You can remove the Font drop-down if you just want users to use Styles.
+            The following fonts are part of the Microsoft Core Web Fonts and are available on at least Mac OS X and Windows
+            To change the default font, change the embedded style sheet in the 'style' element above.
+            -->
+         <toolbarComboBox name="Face">
+            <comboBoxItem name="Arial" text="Arial"/>
+            <comboBoxItem name="Arial Black" text="Arial Black"/>
+            <comboBoxItem name="Arial Narrow" text="Arial Narrow"/>
+            <comboBoxItem name="Comic Sans MS" text="Comic Sans MS"/>
+            <comboBoxItem name="Courier New" text="Courier New"/>
+            <comboBoxItem name="Georgia" text="Georgia"/>
+            <comboBoxItem name="Impact" text="Impact"/>
+            <comboBoxItem name="Times New Roman" text="Times New Roman"/>
+            <comboBoxItem name="Trebuchet MS" text="Trebuchet MS"/>
+            <comboBoxItem name="Verdana" text="Verdana"/>
+         </toolbarComboBox>
+         <!-- 
+            Font Size drop-down 
+            -->
+         <toolbarComboBox name="Size">
+            <comboBoxItem name="1" text="8pt"/>
+            <comboBoxItem name="2" text="10pt"/>
+            <comboBoxItem name="3" text="12pt"/>
+            <comboBoxItem name="4" text="14pt"/>
+            <comboBoxItem name="5" text="18pt"/>
+            <comboBoxItem name="6" text="24pt"/>
+            <comboBoxItem name="7" text="36pt"/>
+         </toolbarComboBox>
+         <toolbarSeparator/>
+         <toolbarButton name="Bold"/>
+         <toolbarButton name="Italic"/>
+         <toolbarButton name="Underline"/>
+         <toolbarButton name="Strike"/>
+         <toolbarSeparator/>
+         <toolbarButtonGroup name="Align"/>
+         <toolbarSeparator/>
+         <toolbarButtonGroup name="List"/>
+         <toolbarButton name="DecreaseIndent"/>
+         <toolbarButton name="IncreaseIndent"/>
+         <toolbarSeparator/>
+         <toolbarButton name="HighlightColor"/>
+         <toolbarButton name="Color"/>
+         <toolbarSeparator/>
+         <toolbarButtonGroup name="Script"/>
+      </toolbar>
+   </toolbars>
+   <!-- 
+    Customize the EditLive! shortcut menu
+    -->
+   <shortcutMenu>
+      <shrtMenu>
+         <shrtMenuItem name="Undo"/>
+         <shrtMenuItem name="Redo"/>
+         <shrtMenuSeparator/>
+         <shrtMenuItem name="Cut"/>
+         <shrtMenuItem name="Copy"/>
+         <shrtMenuItem name="Paste"/>
+         <shrtMenuSeparator/>
+         <shrtMenuItem name="Select"/>
+         <shrtMenuSeparator/>
+         <shrtMenuItem name="PropList"/>
+         <shrtMenuItem name="PropHR"/>
+         <shrtMenuItem name="PropImage"/>
+         <shrtMenuSeparator/>
+         <shrtMenuItem name="Split"/>
+         <shrtMenuItem name="Merge"/>
+         <shrtMenuSeparator/>
+         <shrtMenuItem name="PropTable"/>
+         <shrtMenuItem name="PropRow"/>
+         <shrtMenuItem name="PropCol"/>
+         <shrtMenuItem name="PropCell"/>
+         <shrtMenuSeparator/>
+         <shrtMenuItem name="EditTag"/>
+         <customshrtMenuItem action="raiseEvent" imageURL="../rx_resources/ephox/images/insertBreak.gif" name="InsertPageBreak" text="Insert Page Break" value="RxEphoxInsertPageBreak"/>
+      </shrtMenu>
+   </shortcutMenu>
+</editlive>
