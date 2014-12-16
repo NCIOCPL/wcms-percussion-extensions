@@ -1,0 +1,2432 @@
+/* CSS file to implement preview functionality for Next Version of CancerGov */
+@charset "utf-8";
+/* CSS Document */
+
+/********************* BEGIN Font Declarations ******************************************/
+@font-face {
+	font-family: 'noto';
+	src: url('../font/NotoSans-Regular-webfont.eot');
+	src: url('../font/NotoSans-Regular-webfont.eot?#iefix') format('embedded-opentype'), url('../font/NotoSans-Regular-webfont.woff') format('woff'), url('../font/NotoSans-Regular-webfont.ttf') format('truetype'), url('../font/NotoSans-Regular-webfont.svg#noto_sansregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'noto';
+	src: url('../font/NotoSans-Bold-webfont.eot');
+	src: url('../font/NotoSans-Bold-webfont.eot?#iefix') format('embedded-opentype'), url('../font/NotoSans-Bold-webfont.woff') format('woff'), url('../font/NotoSans-Bold-webfont.ttf') format('truetype'), url('../font/NotoSans-Bold-webfont.svg#noto_sansbold') format('svg');
+	font-weight: bold;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'noto';
+	src: url('../font/NotoSans-BoldItalic-webfont.eot');
+	src: url('../font/NotoSans-BoldItalic-webfont.eot?#iefix') format('embedded-opentype'), url('../font/NotoSans-BoldItalic-webfont.woff') format('woff'), url('../font/NotoSans-BoldItalic-webfont.ttf') format('truetype'), url('../font/NotoSans-BoldItalic-webfont.svg#noto_sansbold_italic') format('svg');
+	font-weight: bold;
+	font-style: italic;
+}
+@font-face {
+	font-family: 'noto';
+	src: url('../font/NotoSans-Italic-webfont.eot');
+	src: url('../font/NotoSans-Italic-webfont.eot?#iefix') format('embedded-opentype'), url('../font/NotoSans-Italic-webfont.woff') format('woff'), url('../font/NotoSans-Italic-webfont.ttf') format('truetype'), url('../font/NotoSans-Italic-webfont.svg#noto_sansitalic') format('svg');
+	font-weight: normal;
+	font-style: italic;
+}
+/* Montserrat */
+@font-face {
+	font-family: 'Montserrat';
+	src: url('../font/montserrat_regular_macroman/Montserrat-Regular-webfont.eot');
+	src: url('../font/montserrat_regular_macroman/Montserrat-Regular-webfont.eot?iefix') format('eot'), url('../font/montserrat_regular_macroman/Montserrat-Regular-webfont.woff') format('woff'), url('../font/montserrat_regular_macroman/Montserrat-Regular-webfont.ttf') format('truetype'), url('../font/montserrat_regular_macroman/Montserrat-Regular-webfont.svg#webfont') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'Montserrat';
+	src: url('../font/montserrat_bold_macroman/Montserrat-Bold-webfont.eot');
+	src: url('../font/montserrat_bold_macroman/Montserrat-Bold-webfont.eot?iefix') format('eot'), url('../font/montserrat_bold_macroman/Montserrat-Bold-webfont.woff') format('woff'), url('../font/montserrat_bold_macroman/Montserrat-Bold-webfont.ttf') format('truetype'), url('../font/montserrat_bold_macroman/Montserrat-Bold-webfont.svg#webfont') format('svg');
+	font-weight: bold;
+	font-style: normal;
+}
+/********************* END Font Declarations ******************************************/
+
+
+/********************* BEGIN General Styles ******************************************/
+html {
+	font-size: 100%;
+}
+body {
+	font-size: 1em;
+	font-family: 'noto', Arial;
+	color:#2F2F2F;
+	line-height: 1.375em;
+	word-wrap: break-word; /* done to let long words that are bigger than container wrap within the word */
+}
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Montserrat', Arial;
+	margin-top: 0.5em;
+	color:#606060;
+}
+.section-nav {
+	font-family: 'Montserrat', Arial;
+}
+h1 {
+	font-size: 2em;
+	line-height: 1.1em;
+}
+h2 {
+	font-size: 1.75em;
+	line-height: 1.215em;
+}
+h3 {
+	font-size: 1.5em;
+	line-height: 1.25em;
+}
+h4 {
+	font-size: 1.25em;
+	line-height: 1.333em;
+}
+p {
+	margin: 0.5em 0;
+	line-height: 1.5em;
+	font-size: inherit;
+}
+.bcrumbs {
+	padding-top:1.25em;
+	font-size: 0.8em;
+}
+/* clearfix for clearing floated items */
+.clearfix:before, .clearfix:after {
+	content: " ";
+	display: table;
+}
+.clearfix:after {
+	clear: both;
+}
+.clearfix {
+	zoom: 1;
+} /* IE < 8 */
+.clearfloats {
+	clear:both;
+}
+/* begin images using the HTML5 figure and figcaption elements */
+/* add block level style to HTML5 elements, for IE */
+header, nav, article, footer, section, aside, figure, figcaption {
+	display:block;
+}
+figure {
+	margin-bottom: 10px;
+	overflow: hidden;
+}
+/* image right 25% width */
+figure.image-right-small {
+	float: right;
+	width: 25%;
+	margin: 0 0 1em 1em;
+}
+.image-right-small .article-image-enlarge {
+	position: absolute;
+	width: 150px;
+	top: 0px;
+	right: 0px;
+	color: #ffffff;
+	background: #403f3f url(../images/icons/enlarge.png) 90% 50% no-repeat;
+	padding: .3125em 0 .3125em 1.25em;
+	font-weight:bold;
+	opacity:0.9;
+}
+.image-right-small .article-image-enlarge:hover {
+	text-decoration: none;
+}
+/* image right 40% width */
+figure.image-right-medium {
+	float: right;
+	width: 40%;
+	margin: 0 0 1em 1em;
+}
+/* image left 25% width */
+figure.image-left-small {
+	float: left;
+	width: 25%;
+	margin: 0 1em 1em 0;
+}
+/* image left 40% width */
+figure.image-left-medium {
+	float: left;
+	width: 40%;
+	margin: 0 1em 1em 0;
+}
+/* image center 75% width */
+figure.image-center {
+	width: 75%;
+	margin: 0 auto 1em auto;
+}
+/* image center 100% width */
+figure.image-center-full {
+	width: 100%;
+	margin: 0 auto 1em auto;
+}
+/* contain image inside fig */
+figure img {
+	max-width: 100%;
+	/* remove white space under image */
+	display: block;
+}
+/* center images using the centered templates */
+figure.image-center img, figure.image-center-full img {
+	margin: 0 auto;
+}
+/********************* END General Styles ******************************************/
+
+
+/********************* BEGIN Header Styles ******************************************/
+header {
+	padding: 1em 0 0;
+	font-family: 'Montserrat', sans-serif;
+	background: #fcfcfa;
+}
+#nci-logo {
+	font-weight: bold;
+	line-height: 0.8;
+	background: url(../images/icons/NIH-red-logo.png) no-repeat;
+	font-size: 1.7em;
+	padding: 0 0 6px 0;
+}
+#nci-logo.columns {
+	padding-left: 0;
+	padding-right: 0;
+}
+#nci-logo a {
+	color: #bb0e3d;
+	padding-left: 3.5em;
+	display: block;
+}
+#nci-logo a span {
+	color: #5d5d5d;
+	font-size: 0.6em;
+}
+@media only screen and (min-width : 641px) and (max-width :1024px) {
+#nci-logo {
+	background: url(../images/icons/NIH-red-logo-tablet.png) no-repeat;
+	font-size: 1.5em;
+}
+}
+ @media only screen and (max-width :640px) {
+#nci-logo {
+	background: url(../images/icons/NIH-red-logo-smartphone.png) no-repeat;
+	font-size: 0.95em;
+}
+#nci-logo a span {
+	font-size: 0.75em;
+}
+}
+/********************* END Header Styles ******************************************/
+
+
+/********************* BEGIN Sticky Nav Styles ******************************************/
+/* these styles control behaviour on scroll for sticky nav using headroom.js */
+.slide--up {
+	display: none;
+}
+.slide--reset {
+	display: block;
+}
+/********************* END Sticky Nav Styles ******************************************/
+
+/********************* BEGIN Language Bar Styles ******************************************/
+.language-bar {
+	background: #fcfcfa;
+	padding: 0 0 0.2em;
+}
+.sitewide-language {
+	padding-right: 3em;
+}
+.sitewide-language a {
+	color: #186e88;
+}
+.sitewide-language ul {
+	float: right;
+	margin: 0;
+	padding: 0;
+	overflow: auto;
+	text-align: right;
+}
+.sitewide-language li {
+	float: left;
+	margin-left: 1em;
+	text-align: right;
+}
+/********************* END Language Bar Styles ******************************************/
+
+
+/********************* BEGIN Utility Styles ******************************************/
+.utility-background {
+	background: #2a71a5;
+}
+.utility {
+	color: white;
+	padding: 0 2em 0 0;
+	text-align: right;
+}
+.utility a {
+	color: white;
+}
+.utility span {
+	padding: 0.2em 1em;
+	display: inline-block;
+}
+#utility-dictionary {
+	position: relative;
+	background: url(../images/icons/white-arrow-down.png) no-repeat 100% 60%;
+}
+#utility-dictionary.active {
+	background: #f5f7f6;
+}
+#utility-dictionary.active a {
+	color: #2a73a8;
+}
+#utility-dropdown {
+	width: 20em;
+	display: none;
+	text-align: left;
+	color: #7f8084;
+	padding: 1em;
+	overflow: hidden;
+	background: #f5f7f6;
+	transition: height 0.5s ease-out 0s;
+	position: absolute;
+	top: 1.4em;
+	right: 0;
+	z-index: 10;
+}
+form.dictionary-dropdown {
+	margin: 0;
+}
+form.dictionary-dropdown input {
+	width: 19em;
+	display: inline;
+	margin-left: 2em;
+}
+form.dictionary-dropdown ul {
+	margin: 0;
+}
+form.dictionary-dropdown ul li {
+	display: inline;
+	margin-right: 0.3em;
+}
+/********************* END Utility Styles ******************************************/
+
+/********************* BEGIN Megamenus/Search Styles ******************************************/
+/* MegaMenu */
+#mega-nav .sub-nav-mega {
+	-webkit-box-shadow: 0px 11px 15.2px 0.8px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 0px 11px 15.2px 0.8px rgba(0, 0, 0, 0.4);
+	box-shadow: 0px 11px 15.2px 0.8px rgba(0, 0, 0, 0.4);
+	border-top: none;
+}
+/* Navigation/Search bar */
+.nav-search-bar {
+	background: rgb(54, 54, 54);/* Old Browsers */
+	background: -moz-linear-gradient(top, rgba(181,198,208,1) 0%, rgba(54,54,54,1) 0%, rgba(74,74,74,1) 100%);/* FF3.6+ */
+	background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(181,198,208,1)), color-stop(0%, rgba(54,54,54,1)), color-stop(100%, rgba(74,74,74,1)));/* Chrome,Safari4+  */
+	background: -webkit-linear-gradient(top, rgba(181,198,208,1) 0%, rgba(54,54,54,1) 0%, rgba(74,74,74,1) 100%);/* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(181,198,208,1) 0%, rgba(54,54,54,1) 0%, rgba(74,74,74,1) 100%);/* Opera 11.10+ */
+	background: -ms-linear-gradient(top, rgba(181,198,208,1) 0%, rgba(54,54,54,1) 0%, rgba(74,74,74,1) 100%);/* IE 10+ */
+	background: linear-gradient(to bottom, rgba(181,198,208,1) 0%, rgba(54,54,54,1) 0%, rgba(74,74,74,1) 100%);/* W3C */
+}
+/* off canvas navigation
+ * Source: http://codepen.io/scottb/details/javhr/ */
+#content {
+	clear: both;
+}
+a.open-panel, a.close-panel {
+	display: none;
+}
+script.nav-item {
+	display: none!important;
+}
+/* remove jQuery mobile styles */
+button.toggle {
+	margin: 0;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+@media only screen and (min-width: 1025px) {
+/* hide mobile nav */
+	#mobile-nav, .mobile-menu-bar {
+	display: none;
+}
+/* desktop left nav styles */
+/* remove default margin to butt menu up against container */
+#section-nav, #section-nav ul, #section-nav ul li {
+	margin-left: 0;
+}
+#section-nav li > div > a {
+	/* MUST be same as width of button + indentation (for elements on same level WITH children) */
+	padding-left: 28px;
+}
+#section-nav li li > div > a {
+	/* MUST be same as width of button + indentation (for elements on same level WITH children) */
+	padding-left: 45px;
+}
+#section-nav li li > div > .toggle {
+	padding-left: 40px;
+}
+#section-nav li li li > div > a {
+	/* MUST be same as width of button + indentation (for elements on same level WITH children) */
+	padding-left: 62px;
+}
+#section-nav li li li > div > .toggle {
+	padding-left: 57px;
+}
+#section-nav li li li li > div > a {
+	/* MUST be same as width of button + indentation (for elements on same level WITH children) */
+	padding-left: 79px;
+}
+#section-nav li li li li > div > .toggle {
+	padding-left: 74px;
+}
+/* See LARGE and X-LARGE styles for widths */
+
+/* left nav link styles */
+#section-nav li > div > a {
+	font-size: 0.875em;
+	line-height: 1.2;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	padding-right: 26px;
+}
+
+#section-nav > li > div > a {
+	/* making this link full width because we need this for it's top and bottom border. The preceding button is hidden so this will not cause display issues */
+	width: 95%;
+	border-top: 1px solid #d5d5d2;
+	border-bottom: 1px solid #d5d5d2;
+	font-size: 0.9375em;
+	font-weight: bold;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+#section-nav > li > div.current-page > a {
+	border-top: none;
+	border-bottom: none;
+}
+#section-nav > li > div > .toggle {
+	display: none;
+}
+/* toggle button */
+#section-nav .toggle {
+	height: 25px;
+	width: 25px;
+	min-height: 25px;
+	min-width: 25px;
+	/* margin: 1em 0 0 0; */
+}
+/* open/minus toggle with hover */
+	#section-nav .toggle[aria-expanded="true"] {
+	background: transparent url(../images/left-nav-open-close.png) 100% -72px no-repeat;
+}
+/* hover */
+	#section-nav .toggle[aria-expanded="true"]:hover {
+	background: transparent url(../images/left-nav-open-close.png) 100% -236px no-repeat;
+}
+/* closed/plus toggle with hover */
+	#section-nav .toggle[aria-expanded="false"] {
+	background: transparent url(../images/left-nav-open-close.png) 100% 10px no-repeat;
+}
+/* hover */
+	#section-nav .toggle[aria-expanded="false"]:hover {
+	background: transparent url(../images/left-nav-open-close.png) 100% -154px no-repeat;
+}
+#section-nav .current-page {
+	background: rgb(0, 155, 157) url(../images/left-nav-green-arrow.png) 100% 50% no-repeat;
+}
+/* Change open/close plus/minus buttons on highlighted current page elements because they require a different color */
+	/* open/minus toggle */
+	#section-nav .current-page > .toggle[aria-expanded="true"] {
+	background: transparent url(../images/left-nav-open-close-current.png) 90% -72px no-repeat;
+}
+/* closed/plus toggle */
+	#section-nav .current-page > .toggle[aria-expanded="false"] {
+	background: transparent url(../images/left-nav-open-close-current.png) 90% 10px no-repeat;
+}
+#section-nav .current-page > a {
+	color: #f2f2f2;
+	font-weight: bold;
+}
+}
+@media only screen and (max-width: 1024px) {
+/* hide desktop nav */
+	#mega-nav {
+	display: none;
+}
+#content {
+	padding-top: 0;
+}
+/* Move nav off screen, setup transitions */
+	nav#mobile-nav {
+	width: 80%;
+	position: absolute;
+	left: -80%;
+	top: 0;
+	height: 100%;
+	background-color: #E9E9E7;
+	background-image: -webkit-gradient( linear, left top, right top, color-stop(0.95, #E9E9E7), color-stop(1, #888886) );
+	background-image: -o-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: -moz-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: -webkit-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: -ms-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: linear-gradient(to right, #E9E9E7 95%, #888886 100%);
+}
+/* Display nav items vertically */
+	nav#mobile-nav ul.menu {
+	border-top: 1px solid #888;
+}
+nav#mobile-nav ul.menu li {
+	float: none;
+	width: 100%;
+	text-align: left;
+	padding: .5em 1em;
+	box-sizing: border-box;
+	border-top: 1px solid #888;
+}
+/* Reveal open/close buttons */
+		a.open-panel, a.close-panel {
+	display: inline;
+}
+.close-panel {
+	position: relative;
+	top: .5em;
+	left: 1em;
+}
+.openNav #page {
+	left: 0;
+	-webkit-transform: translate3d(80%, 0, 0);
+	-moz-transform: translate3d(80%, 0, 0);
+	-ms-transform: translate3d(80%, 0, 0);
+	-o-transform: translate3d(80%, 0, 0);
+	transform: translate3d(80%, 0, 0);
+	-webkit-transition: -webkit-transform 500ms ease;
+	-moz-transition: -moz-transform 500ms ease;
+	-o-transition: -o-transform 500ms ease;
+	transition: transform 500ms ease;
+}
+/* When the panel is closed, transition the page back to the left */
+  #page {
+	left: 0;
+	/* causes the mobile sticky nav to not appear
+		-webkit-transform: translate3d(0, 0, 0);
+		-moz-transform: translate3d(0, 0, 0);
+		-ms-transform: translate3d(0, 0, 0);
+		-o-transform: translate3d(0, 0, 0);
+		transform: translate3d(0, 0, 0); */
+		-webkit-transition: -webkit-transform 500ms ease;
+	-moz-transition: -moz-transform 500ms ease;
+	-o-transition: -o-transform 500ms ease;
+	transition: transform 500ms ease;
+}
+/* hide search on mobile */
+	.search {
+	display: none;
+}
+/* mobile menu */
+	nav#mobile-nav > li,  nav#mobile-nav > li > ul > li {
+	padding-left: 0;
+}
+nav#mobile-nav li a {
+	display: inline-block;
+	min-height: 1.5em;
+	width: 75%;
+	text-decoration: none;
+	padding-top: .6em;
+}
+nav#mobile-nav li > div > a {
+	width: 100%;
+}
+nav#mobile-nav li.has-children > div > a {
+	width: 75%;
+}
+.back-to-main, nav#mobile-nav li a {
+	font-size: 1.1em;
+	color: #606060;
+}
+nav#mobile-nav li {
+	border-top: 1px solid #898987;
+}
+/* list item spacing through the hierarchy */
+	nav#mobile-nav li > div > a,  nav#mobile-nav li li > div > a {
+	padding-left: 31px;
+	font-size: 1.17em;
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+nav#mobile-nav li li li > div > a {
+	padding-left: 44px;
+	font-size: 0.91em;
+	padding-top: 14px;
+	padding-bottom: 11px;
+}
+nav#mobile-nav li li li li > div > a {
+	padding-left: 62px;
+	font-size: 0.78em;
+	font-weight: bold;
+	padding-top: 12px;
+	padding-bottom: 15px;
+}
+/* remove padding on HOME link to appear as a level 0 item */
+	nav#mobile-nav .nav-menu > li > div > a {
+	padding-left: 17px;
+	color: #2F2F2F;
+	padding-top: 14px;
+}
+/* hide button for top-level */
+	nav#mobile-nav .nav-menu > li > div > button {
+	display: none;
+}
+#section-nav .highlight {
+	background-color: #bae0f6;
+}
+nav#mobile-nav .highlight > div {
+	background-color: #0498a1;
+	background-image: -webkit-gradient( linear, left top, right top, color-stop(0.95, #0498a1), color-stop(1, #888886) );
+	background-image: -o-linear-gradient(right, #0498a1 95%, #888886 100%);
+	background-image: -moz-linear-gradient(right, #0498a1 95%, #888886 100%);
+	background-image: -webkit-linear-gradient(right, #0498a1 95%, #888886 100%);
+	background-image: -ms-linear-gradient(right, #0498a1 95%, #888886 100%);
+	background-image: linear-gradient(to right, #0498a1 95%, #888886 100%);
+}
+nav#mobile-nav .highlight > div > a, #section-nav .highlight > div > a {
+	font-weight: bold;
+}
+#section-nav .highlight > div > a {
+	color: #2f2f2f;
+}
+nav#mobile-nav .nav-menu .highlight > div > a {
+	color: #fefefe;
+}
+/* remove background color of any child lists items of the highlighted */
+	nav#mobile-nav .highlight ul li {
+	background-color: #E9E9E7;
+	background-image: -webkit-gradient( linear, left top, right top, color-stop(0.95, #E9E9E7), color-stop(1, #888886) );
+	background-image: -o-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: -moz-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: -webkit-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: -ms-linear-gradient(right, #E9E9E7 95%, #888886 100%);
+	background-image: linear-gradient(to right, #E9E9E7 95%, #888886 100%);
+}
+#section-nav .highlight ul li {
+	background-color: #f5f5f3;
+}
+nav#mobile-nav .highlight ul li {
+	color: #2ba6cb;
+}
+#section-nav .highlight ul li a {
+	color: #0498a1;
+	font-size: .9em;
+	text-transform: uppercase;
+}
+#section-nav .highlight ul li li a {
+	color: #2f2f2f;
+	text-transform: none;
+	padding-left: 3em;
+}
+/* clicked link state */
+#section-nav li > div > a.active,
+nav#mobile-nav .nav-menu li > div > a.active {
+	/*background-color: #BB0E3C;
+		background-image: none;*/
+		color: #fff;
+}
+#section-nav li > div.active,
+nav#mobile-nav .nav-menu li > div.active {
+	background-color: #BB0E3C;
+	background-image: none;
+}
+/* remove margin from lists */
+	nav#mobile-nav ul {
+	margin: 0;
+	width: 100%;
+}
+.back-to-main {
+	margin: 0 0 10px 0;
+}
+/*
+	.parents {
+		color: red;
+		font-style: italic;
+	}
+	.active {
+		color: red;
+		font-weight: bold;
+	} */
+	.hidden-sibling {
+	display: none;
+}
+.level-0 > li.hidden-sibling {
+	display: block;
+}
+.hidden {
+	position:absolute;
+	left:-10000px;
+	top:auto;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+}
+button,  button:focus {
+	-webkit-tap-highlight-color: rgba(255, 255, 255, 0); /* for most devices */
+	-webkit-tap-highlight-color: transparent; /* for certain Android devices */
+	outline: none; /* to get rid of the outline *//* these styles have accessibility concerns (probably only an issue on larger displays):
+		 * http://outlinenone.com/ */
+	}
+/* hide level 3 and below menu items on mobile global nav */
+	/*#mobile-nav .level-3 {
+		display: none!important;
+	}
+	#mobile-nav .level-2 .toggle {
+		display: none;
+	}*/
+}
+/* Shared mobile and desktop menu styles */
+/* open/minus toggle */
+.toggle-opened, .toggle[aria-expanded="true"] {
+	background: transparent url(../images/mobile-menus-expand-collapse-buttons.png) 50% -55px no-repeat;
+}
+/* clicked open/minus toggle (only appears for a brief moment) */
+.toggle[aria-expanded="true"]:active {
+	background: transparent url(../images/mobile-menus-expand-collapse-buttons.png) 50% -175px no-repeat;
+}
+/* closed/plus toggle */
+.toggle-closed, .toggle[aria-expanded="false"] {
+	background: transparent url(../images/mobile-menus-expand-collapse-buttons.png) 50% 5px no-repeat;
+}
+/* clicked closed/plus toggle (only appears for a brief moment) */
+.toggle[aria-expanded="false"]:active {
+	background: transparent url(../images/mobile-menus-expand-collapse-buttons.png) 50% -115px no-repeat;
+}
+.collapsed, .toggle[aria-expanded="false"] + ul {
+	display: none;
+}
+.toggle {
+	display: inline-block;
+	/* what does this do?? Causing the button to display on the next line in Chrome on Androids
+	float: right;*/
+	width: 25%;
+	min-height: 40px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	vertical-align: top;
+	cursor: pointer;
+	margin: 5px 0 0 0;
+}
+/********************* END Megamenus/Search Styles ******************************************/
+
+
+/********************* BEGIN Section Nav Styles ******************************************/
+
+/* mobile styles */
+@media only screen and (max-width: 1024px) {
+/* container width */
+	.main-content .general-page-body-container .local-navigation {
+	padding-left: 5%;
+	padding-right: 5%;
+}
+#section-nav {
+	position: absolute;
+	background: #0498A2;
+	z-index: 3000;
+	display: none;
+	margin-left: 0;
+	/* allow for scrolling; required when sticky */
+		max-height: 300px;
+	overflow: auto;
+}
+.section-menu-button {
+	z-index: 2020;
+}
+#section-nav ul {
+	margin-left: 0px;
+}
+/* uppercase top level nav item */
+	#section-nav > li > div > a {
+	text-transform: uppercase;
+}
+#section-nav li li {
+	border-top: 1px solid #636363;
+}
+/* white text for level 2 items and below */
+	#section-nav li li a {
+	color: #fff;
+}
+#section-nav .js + li {
+	text-align: right;
+}
+#section-nav li a {
+	padding: 0.5em 18px;
+}
+#section-nav ul li li a {
+	padding: 0.5em 36px;
+}
+#section-nav li .has-children > div > a {
+	width: 80%;
+}
+.section-menu-button {
+	text-align: right;
+}
+#section-nav li {
+	text-align: left;
+	min-height: 2em;
+}
+.section-nav ul li {
+	position:relative;
+	list-style:none;
+	cursor:pointer;
+	padding: 0;
+	background:transparent;
+}
+.section-nav ul li ul {
+	left:0;
+	right:0;
+}
+.section-nav ul .clicker {
+	position:relative;
+	color:#FFF;
+	width: auto;
+	padding: 5px 20px 5px 10px;
+	font-size: 1em;
+	background: #0498A2 url(../images/section-menu-down-arrow.png) 100% 50% no-repeat;
+}
+.section-nav ul .clicker.open {
+	background: #0498A2 url(../images/section-menu-up-arrow.png) 100% 50% no-repeat;
+}
+/* hide the top level toggle button as it's always going to be expanded */
+	#section-nav > li > div > .toggle {
+	display: none;
+}
+/* Fallbacks */
+	.section-nav .no-js ul {
+	display:none;
+}
+.section-nav .no-js:hover ul {
+	display:block;
+}
+#section-nav > li {
+	padding-left: 0;
+}
+.section-nav li a {
+	display: inline-block;
+	min-height: 1.5em;
+	width: 85%;
+	text-decoration: none;
+	padding-top: .6em;
+}
+.back-to-main, .section-nav li a {
+	font-size: 1.3em;
+}
+.back-to-main {
+	margin: 0 0 10px 0;
+}
+.collapsed, .toggle[aria-expanded="false"] + ul {
+	display: none;
+}
+.toggle {
+	display: inline-block;
+	float: right;
+	width: 20%;
+	min-height: 47px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	vertical-align: top;
+	cursor: pointer;
+	margin: 0;
+}
+/* active nav item */
+	.section-nav ul .js {
+	background-color: #BAE0F5;
+}
+/* active nav item children, with a different background color and text color */
+	.section-nav ul .js ul {
+	background-color: #fff;
+}
+.section-nav ul .js ul a {
+	color: #0498a4;
+	font-size: 1em;
+	width: 75%;
+	padding: .7em 2.5% .7em 5%;
+}
+.section-nav ul .js > div > a {
+	font-weight: bold;
+}
+/* active nav item text color */
+	.section-nav ul .js > div > a {
+	color: #333;
+}
+.section-nav ul .js .js {
+	background-color: #fff;
+}
+.section-nav li li .js > div > a {
+	color: #333;
+}
+.section-nav li li .js {
+	background-color: #fff;
+}
+.section-nav ul .js ul li {
+	border: 0;
+}
+.section-nav ul .js ul a {
+	padding: .7em 2.5% .7em 7%;
+}
+.section-nav .level-0 > li.hidden-sibling {
+	display: block;
+}
+/* section nav grey page overlay - http://css-tricks.com/snippets/jquery/append-site-overlay-div/ */
+	#overlay {
+	opacity: 0.4;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	background-color: black;
+	width: 100%;
+	z-index: 999;
+}
+.hidden {
+	position:absolute;
+	left:-10000px;
+	top:auto;
+	width:1px;
+	height:1px;
+	overflow:hidden;
+}
+}
+.section-nav ul li a {
+	-webkit-transition: background-color 0.2s ease-in-out;
+	   -moz-transition: background-color 0.2s ease-in-out;
+	        transition: background-color 0.2s ease-in-out;
+	display: inline-block;
+	color:#2f2f2f;
+	text-decoration:none;
+	/* width of link without toggle (full width) */
+	width: 100%;
+	font-size: 1.3em;
+}
+.section-nav .toggle {
+	display: inline-block;
+	float: right;
+	width: 20%;
+	min-width: 41px;
+	height: 47px;
+	min-height: 47px;
+}
+
+/* Desktop left nav */
+@media only screen and (min-width: 1025px) {
+/* container width */
+	.general-page-body-container .local-navigation {
+	width: 21%;
+	margin-top: 1.5em;
+	padding-left: 0;
+	padding-right: 0;
+}
+/* hide section menu clicker on desktop */
+	.section-nav ul li a.clicker {
+	display: none;
+}
+.section-nav .toggle {
+	display: inline-block;
+	/* align button to left of nav item */
+		float: left;
+	width: 15%;
+	height: 100%;
+}
+}
+/********************* END Section Nav Styles ******************************************/
+
+
+/********************* BEGIN Footer Styles ******************************************/
+footer {
+	background: #123e57 url(../images/backgrounds/hexagon_molecular_structure_footer.png) no-repeat -30% 150px;
+	padding: 1em 0;
+}
+footer h2 {
+	color: white;
+	font-size: 1em;
+	font-weight: normal;
+}
+footer .footer-nci {
+	font-family: 'Montserrat', sans-serif;
+	font-size: 1.38em;
+}
+footer .footer-nci span {
+	font-size: 0.65em;
+}
+footer, footer a, footer a:hover {
+	color: white;
+}
+footer a:hover {
+	text-decoration: underline;
+}
+footer .row {
+	margin: 1em auto;
+	border: 0px solid yellow;
+}
+footer ul li a {
+	font-weight: 700;
+}
+footer .agencies a {
+	font-weight: bold;
+}
+footer ul.follow-us li {
+	float: left;
+	margin-right: 0.9em;
+}
+footer ul.follow-us li img:hover {
+	opacity: 0.9;
+}
+.agencies ul {
+	text-align: center;
+}
+.agencies ul li {
+	display: inline-block;
+	background: url(../images/backgrounds/agencies-divider.gif) center right no-repeat;
+	padding-right: 0.5em;
+	margin-right: 0.25em;
+}
+.agencies ul li.last {
+	background: none;
+	padding-right: 0;
+	margin-right: 0;
+}
+.tagline {
+	text-align: center;
+}
+/********************* END Footer Styles ******************************************/
+
+/********************* BEGIN Content Styles ******************************************/
+.main-content {
+	padding: 0;
+	background: #fcfcfa url(../images/backgrounds/hexagon_molecular_structure_body.png) no-repeat 110% 600px;
+}
+.main-content a {
+	color: #186e88;
+}
+a.definition, a.definition:visited, a.definition:active, a.definition:hover {
+	color: #333;
+	text-decoration: none;
+	border-bottom: thin dotted;
+}
+.general-page-body-container {
+	border-left: 1px solid #cfd0cb;
+	border-right: 1px solid #cfd0cb;
+	background: #fffffb;
+	box-shadow: 10px 0 10px -7px rgba(0, 0, 0, 0.5), -10px 0 10px -7px rgba(0, 0, 0, 0.5);
+	padding-bottom: 1.5em;
+}
+.section-nav {
+}
+.body-text {
+}
+.back-to-top {
+	position: fixed;
+	bottom: 1em;
+	right: 0.5em;
+	text-decoration: none;
+	color: #000000;
+	background: transparent url(../images/blue-arrow-up.png) no-repeat 50% 0;
+	font-weight: bold;
+	padding: 60px 15px 0 15px;
+	display: none;
+	/* place on top of all other elements */
+	z-index: 998;
+}
+.back-to-top:hover {
+	background: url(../images/red-arrow-up.png) no-repeat 50% 0;
+	color: #BD153C;
+}
+.back-to-top:visited {
+	background: transparent url(../images/blue-arrow-up.png) no-repeat 50% 0;
+	color: #000000;
+}
+/* Research Areas with Table of Contents */
+/*the -1em for right margin is due to the fact that it has to touch the edge whereas the container it is in has padding for the edge. */
+.featured-zone {
+	background-color: #009B9D;
+	padding: 0 0 1.25em 1.25em;
+	overflow: hidden; /*because in some pages content within box have floated elements */
+	margin-right: -1em;
+	padding: 1em;
+}
+.featured-zone, .featured-zone h1, .featured-zone h2, .featured-zone h3, .featured-zone h4, .featured-zone a {
+	color: white;
+}
+.toc-container {
+	padding-right: 0;
+	margin-right: -2em;
+	padding: 1em;
+}
+#my-toc {
+	background-color: #fff;
+	padding: 25px 0 30px 35px;
+	overflow: hidden;
+	padding-right: 0;
+}
+#my-toc h2 {
+	color: #606060;
+	margin: 0 0 10px;
+	font-size: 1.5em;
+}
+/* hide default TOC header */
+#my-toc h4 {
+	display: none;
+}
+#my-toc ul {
+	margin: 0 1em 0 1em;
+	list-style-type: disc;
+	color: #186e88;
+}
+#my-toc ul li {
+	padding-left: 0;
+	margin-left: 0;
+	line-height: 20px;
+	margin-bottom: 5px;
+}
+#my-toc ul a {
+	color: #186e88;
+	font-weight: bold;
+}
+/* BEGIN general content page styles */
+.body-text ul, .body-text ol {
+	margin-bottom: 1em;
+}
+.body-text ul li, .body-text ol li {
+	margin-bottom: 0.5em;
+	margin-left: 2em;
+}
+.body-text ul li {
+	list-style-type: disc;
+}
+.body-text ol li {
+	list-style-type: decimal;
+}
+ul.no-bullets {
+	padding:0;
+}
+ul.no-bullets li {
+	background: none;
+	list-style-type: none;
+	padding:0;
+}
+ul.no-bullets ul {
+	margin: 5px 0 8px 0;
+}
+.body-text ul.no-bullets li, .body-text ol.no-bullets li {
+	margin-bottom: 0.25em;
+	margin-left: 0;
+}
+ul.no-bullets ul li {
+	padding: 0 0 0 10px;
+	margin: 0 0 5px 0;
+}
+table.no-bullet-padding ul {
+	margin: 0;
+	padding: 0;
+}
+table.no-bullet-padding ul li {
+	margin: 0;
+	padding: 0 0 0 10px;
+}
+/*the -1em for right margin is due to the fact that it has to touch the edge whereas the container it is in has padding for the edge. */
+.key-facts, .key-points {
+	background: #d7f9fa;
+	float: right;
+	width: 40%;
+	padding: 0 1em;
+	margin: 0 -1em 1em 1em;
+}
+/* END general content page styles */
+
+.document-dates {
+	margin-top: 1.5em;
+}
+.syndication {
+	border-top: 1px solid black;
+}
+/* icon that goes with syndication image */
+.syndication-image {
+	margin: 0 0.7em 0.5em 0.5em;
+	float: left;
+}
+
+/* large screen styles for TOC */
+@media only screen and (min-width :641px) {
+#my-toc {
+	margin: 10px 0 0 10px;
+}
+}
+/* small screen styles for TOC
+@media only screen and (max-width : 640px) {
+	.toc-container {
+		padding: 30px 0px 20px 0px;
+	}
+	.TOC-nav-content,  .TOC-nav-area {
+		padding: 0;
+	}
+	.TOC-nav-area h1 {
+		background-color: #fff;
+		color: #606060;
+	}
+	#my-toc {
+		padding: 30px 20px 20px 20px;
+	}
+} */
+/* hide the TOC on small/medium screens. The accordion serves the same purpose */
+@media only screen and (max-width : 1024px) {
+.toc-container {
+	display: none;
+}
+}
+ @media only screen and (max-width :1024px) {
+.back-to-top {
+	display: none !important;
+}
+}
+/* mobile accordion */
+@media only screen and (max-width :1024px) {
+#accordion .ui-accordion-header {
+	font-size: .9em;
+	font-weight: bold;
+	border-left: 0;
+	border-right: 0;
+	border-top: 0;
+	border-radius: 0;
+	border-bottom: 1px solid #96aeb8;
+	background: #1D5E86;
+	color: #fff;
+	margin: 0;
+	padding: 10px 50px 10px 20px;
+}
+#accordion .ui-accordion-header:first-child {
+	border-top: 1px solid #96aeb8;
+}
+/* openend accordion */
+		#accordion .ui-accordion-header.ui-state-active {
+	background: #CCEEFA;
+	color: #2f2f2f;
+}
+#accordion .ui-widget-content {
+	border: 0;
+}
+#accordion .ui-accordion .ui-accordion-content {
+	padding: 10px 20px;
+}
+/* override icons to use our own */
+	#accordion .ui-icon {
+	width: 32px;
+	height: 32px;
+	background-image: url(../images/mobile-menus-expand-collapse-buttons-sm.png);
+	background-position: 0 0;
+	margin-top: -16px;
+	right: 15px;
+	left: auto;
+}
+#accordion .ui-state-active .ui-icon {
+	background-position: 0 -45px;
+}
+}
+/* hidden elements */
+.hidden {
+	position: absolute;
+	left: -10000px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+::-webkit-input-placeholder {
+ color: #fff;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+ color: #fff;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+ color: #fff;
+}
+
+:-ms-input-placeholder {
+ color: #fff;
+}
+/* feature zone at top of certain content pages */
+.content-feature-area {
+	background: #009b9d;
+	padding: 2em 0 2em 2em;
+}
+.content-feature-area-image {
+	float: left;
+	width: 45%;
+}
+.content-feature-area-on-this-page {
+	float: right;
+	background: white;
+	padding: 1em 2em;
+	width: 45%;
+}
+/********************* END Content Styles ******************************************/
+
+/********************* BEGIN Home Page Styles ******************************************/
+/* BEGIN Hero Section */
+.row .hero {
+	position: relative;
+	margin-bottom: 1em;
+	padding-left: 0;
+	padding-right: 0;
+	-webkit-box-shadow: 0px 11px 15.2px 0.8px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: 0px 11px 15.2px 0.8px rgba(0, 0, 0, 0.4);
+	box-shadow: 0px 11px 15.2px 0.8px rgba(0, 0, 0, 0.4);
+}
+.hero-text {
+	position: absolute;
+	top: 1em;
+	left: 2em;
+	color: white;
+	width: 25%;
+	font-size: 1.55em;
+	font-weight: bold;
+}
+.hero-text p {
+	line-height: 1.1;
+	top-margin: 0.7em;
+	font-weight: bold;
+}
+.hero-text a {
+	color: white;
+}
+.hero-text a:hover {
+	text-decoration: none;
+}
+.hero-call-to-action {
+	font-size: 0.9em;
+	background: url(../images/icons/hero-arrow.png) no-repeat center right;
+	display: inline-block;
+	padding-right: 1em;
+	-webkit-transition: padding-right 0.4s ease-in-out;
+	-moz-transition: padding-right 0.4s ease-in-out;
+	-ms-transition: padding-right 0.4s ease-in-out;
+	-o-transition: padding-right 0.4s ease-in-out;
+	transition: padding-right 0.4s ease-in-out;
+}
+.hero-call-to-action:hover {
+	padding-right: 1.5em;
+}
+/* END Hero Section */
+
+.content-bottom-slot {
+	background: #099;
+	/*margin-bottom: 1em;*/
+	padding: 1em 0;
+}
+/* BEGIN Featured Slick Carousel Row */
+.slick-dots {
+	text-align: center;
+}
+
+/* END Featured Slick Carousel Row */
+
+/* BEGIN CARDS GENERAL RULES */
+/* equal height cards for desktop, visually push a div to the bottom of it's container */
+.card-row .card a {
+	color:#2F2F2F;
+}
+.card {
+	padding-top: 1em;
+	background: white; /* for IE browsers that don't understnad rgba */
+	background: rgba(255, 255, 255, 0.8);
+}
+.card a:hover {
+	text-decoration: none;
+}
+.feature-primary h3:hover, .feature-secondary h3:hover, .multimedia h3 a:hover, .card-thumbnail h3 a:hover{
+	color: #BB0E3D;
+	text-decoration: none;
+}
+/* END CARDS GENERAL RULES */
+
+
+
+/* BEGIN FEAUTRE PRIMARY CARDS ROW */
+.feature-primary {
+	margin-bottom: 1em;
+}
+.feature-primary .card {
+	background: #178DA9;
+}
+.feature-primary .featured-text {
+	background: white;
+}
+.feature-primary a, .feature-primary h3 {
+	color: white;
+}
+.feature-primary .featured-text a {
+	color: #186e88;
+}
+.feature-primary .featured-text a:hover {
+	color: #BB0E3D;
+}
+.feature-primary .featured-text h3 {
+	color: #666;
+}
+.feature-primary h3 {
+	font-weight: normal;
+	color: white;
+	font-size: 1.375em;
+	line-height: 1.272;
+}
+ @media only screen and (max-width :1024px) {
+.feature-primary .card {
+	background: white;
+}
+.feature-primary a {
+	color: #2f2f2f;
+}
+.feature-primary h3 {
+	color: #076f88;
+}
+}
+/* END FEATURE PRIMARY CARDS ROW */
+
+
+/* BEGIN FEATURE SECONDARY CARDS ROW */
+.feature-secondary {
+	margin-bottom: 1em;
+}
+.feature-secondary .card {
+	background: white;
+}
+.feature-secondary h3 {
+	font-weight: normal;
+	color: #186e88;
+	font-size: 1.375em;
+	line-height: 1.272;
+}
+.feature-secondary p {
+	color: #2f2f2f;
+}
+/* END FEATURE SECONDARY CARDS ROW */
+
+
+/* BEGIN GUIDE CARDS ROW */
+.guide-card {
+	margin-bottom: 1em;
+}
+.guide-card h3 {
+	font-weight: normal;
+	color: #606060;
+	font-size: 1.375em;
+	line-height: 1.272;
+}
+.featured-card {
+	background: #dbf2f8;
+}
+.featured-card h3, .featured-card a {
+	color: bd153c;
+}
+a.arrow-link {
+	background: url(../images/icons/small-blue-circle-arrow.png) top right no-repeat;
+	padding-right: 1em;
+	width: 100%;
+	display: block;
+	color:#606060;
+}
+a.arrow-link-white {
+	background: url(../images/icons/small-off-cream-circle-arrow.png) top right no-repeat;
+	padding-right: 1em;
+	width: 100%;
+	display: block;
+	color:#606060;
+}
+a.arrow-link:hover, a.arrow-link-white:hover {
+	background: url(../images/icons/small-red-circle-arrow.png) top right no-repeat;
+	color: #bd153c;
+	text-decoration: none;
+}
+.card ul.cancer-types li {
+	background: none;
+	float: left;
+	padding-right: 0;
+	width: 2.5em;
+	height: 2.3em;
+}
+.card ul.cancer-types li a:hover {
+	color: #bb0e3d;
+}
+/* END GUIDE CARDS ROW */
+
+/* BEGIN THUMBNAIL CARDS ROW */
+.card-thumbnail {
+	background: white;
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+.card-thumbnail h3 {
+	font-weight: normal;
+}
+.card-thumbnail img {
+	margin-top:1em;
+}
+/* END THUMBNAIL CARDS ROW */
+
+
+/* BEGIN MULTIMEDIA ROW */
+.multimedia .card {
+	background: none;
+	opacity: 1;
+}
+.multimedia {
+	margin-bottom: 1em;
+}
+.multimedia h3 {
+	font-size: 1.375em;
+	font-weight: normal;
+	line-height: 1.272;
+}
+/* END MULIMEDIA ROW */
+
+
+
+/* BEGIN Director's Row */
+.directors-row {
+}
+.directors-row h3 {
+	color: white;
+}
+.infographic {
+	position: relative;
+	/* allows for appearance of equal height cards on home page */
+	background: white;
+}
+.infographic-enlarge {
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: white;
+}
+.infographic-enlarge a {
+	color: white;
+	padding: 1em 2em 1em 1em;
+	display: block;
+	background: #403f3f url(../images/icons/white-arrow-view-infographic.png) no-repeat 95% 50%;
+}
+.infographic-enlarge a:hover {
+	text-decoration: none;
+	background-color: #bb0e3d;
+}
+.infographic figcaption {
+	padding: 0.5em
+}
+.home-nci-director figcaption {
+	background: black;
+	color: white;
+	padding: 0.2em;
+}
+.home-director-stories {
+	background: white;
+	padding: 0.5em 0.5em 0.2em;
+	margin-top: -10px;
+}
+/* END Director's Row */
+
+
+/* search */
+.search form {
+	margin: 0;
+	height: 100%;
+}
+.search {
+	width: 23%;
+	float: right;
+	background-color: #636363;
+	height: 52px;
+}
+/* search box */
+.search #swKeyword {
+	background-color: #636363;
+	-webkit-appearance: none;
+	border: 0;
+	display: inline;
+	height: 100%;
+	font-family: 'Montserrat', sans-serif;
+	width: 89%;
+	padding-left: 7%;
+	font-size: .85em;
+	color: #fff;
+}
+/* placeholder text */
+#swKeyword::-webkit-input-placeholder {
+ color:#FFF;
+}
+#swKeyword::-moz-placeholder {
+ color:#FFF;
+ opacity: 1;
+}
+#swKeyword:-moz-placeholder {
+ color:#FFF;
+ opacity: 1;
+}
+/* styles for markup automatically added by jquery mobile */
+.search .ui-input-text {
+	height: 100%;
+	width: 90%;
+	display: inline;
+}
+/********************* END Home Page Styles ******************************************/
+
+
+/********************* BEGIN Cancer Type Home Page Styles ******************************************/
+.version {
+	float: right;
+	background: #008EB0 url(../images/icons/small-blue-circle-arrow.png) 98% no-repeat;
+	color: #ffffff;
+	padding: 0.625em 3.6em 0.625em 1.875em;
+}
+.version:hover {
+	background: #008EB0 url(../images/icons/small-red-circle-arrow.png) 98% no-repeat;
+}
+.version a {
+	color:#ffffff;
+}
+.version a:hover {
+	text-decoration: none;
+}
+/* image right 40% width */
+figure.image-right-medium {
+	float: right;
+	width: 40%;
+	margin: 0 0 1em 1em;
+}
+.image-right-medium {
+	position: relative;
+}
+.caption-container {
+	padding: .9375em;
+	line-height: 1.5em;
+	background-color:#F7F8F3;
+	font-size: 1em;
+}
+@media screen and (max-width: 40.0625em) {
+figure.image-right-medium,  figure.image-right-small {
+	width: 100%;
+	margin: 0 0 1em 0;
+}
+}
+.bgWhite {
+	background-color: #ffffff;
+}
+.related {
+	padding: 0 0 1.25em 0;
+}
+.relatedHeader {
+	width: 100%;
+	background-color: #5F58A5;
+	color: #ffffff;
+	padding: 0 1.875em;
+	overflow: auto;
+}
+.relatedHeader h4 {
+	color: #ffffff
+}
+.relatedContent {
+	width: 100%;
+	background-color: #008EB0;
+	color: #ffffff;
+	padding: .625em 1.875em;
+}
+.relatedContent ul li {
+	background: #008EB0 url(../images/icons/small-blue-circle-arrow.png) center right no-repeat;
+}
+.relatedContent ul li:hover {
+	background: #008EB0 url(../images/icons/small-red-circle-arrow.png) center right no-repeat;
+}
+.relatedContent ul li a {
+	color: #ffffff
+}
+.relatedContent ul li a:hover {
+	text-decoration:none;
+}
+.cthpTitle {
+	margin: 0;
+}
+.cthp-content-bottom-slot {
+	padding-bottom: 0;
+	margin-bottom: 0;
+	width: 100%;
+	overflow: auto;
+	background: #008EB0 url(../images/backgrounds/hexagon_molecular_structure_body.png) no-repeat 110% -100px;
+}
+.normal li {
+	background: url(../images/blue-list-dot.png) 0 7px no-repeat;
+	padding-left: .9375em;
+}
+.treatment, .research, .causes, .screening, .survival, .general, .genetics {
+	margin-bottom: 1.25em;
+}
+.treatment h3, .research h3, .causes h3, .screening h3, .survival h3, .general h3, .genetics h3 {
+	color: #ffffff;
+	padding: .7em 1em;
+	margin: 0;
+	text-transform: uppercase;
+}
+.treatment h3 {
+	background: #2ec799 url(../images/CTHP-green-waves.jpg) repeat-x;
+}
+.research h3 {
+	background: #0886d0 url(../images/CTHP-blue-gears.jpg) repeat-x;
+}
+.causes h3 {
+	background: #7f3796 url(../images/CTHP-purple-squares.jpg) repeat-x;
+}
+.screening h3 {
+	background: #aa3d65 url(../images/CTHP-pink-triangles.jpg) repeat;
+}
+.survival h3 {
+	background: #cf871a url(../images/CTHP-yellow-squares.jpg) repeat-x;
+}
+.general h3 {
+	background: #3c8c9c url(../images/CTHP-blue-octagons.jpg) repeat-x;
+}
+.genetics h3 {
+	background: #009095 url(../images/CTHP-blue-octagons.jpg) repeat-x;
+}
+.cardBody {
+	overflow: auto;
+	padding: .625em 1.875em;
+}
+.cardBody p {
+	font-size: 1em;
+}
+.cthpCard ul.moreInfo li {
+	background: url(../images/blue-list-dot.png) 0 7px no-repeat;
+	padding-left: .9375em;
+}
+.main-content a.viewAll {
+	color:#2f2f2f;
+}
+.main-content a.viewAll:hover {
+	text-decoration:none;
+}
+.guide h3 {
+	color: #ffffff;
+}
+.tp20 {
+	padding: 1.25em 0;
+}
+.bp20 {
+	padding-bottom: 1.25em;
+}
+.alphalist {
+	padding: 1.2em 0;
+	overflow: auto;
+}
+.alphalist li {
+	float: left;
+	font-size: 1.625em;
+	font-family: 'Montserrat', Arial;
+	padding-right: 1em;
+	color: #606060;
+}
+/* !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! BEGIN PAGE OPTIONS !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! */
+.add_this_btn, .cycleFont {
+	padding-right: 15px;
+}
+.page-options {
+	padding-top:20px;
+}
+.page-options ul {
+	float: right;
+}
+.page-options ul li {
+	float: left;
+}
+/* !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! END PAGE OPTIONS !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! */
+
+/* !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! BEGIN CAROUSEL !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! */
+	 .slick-slide .container {
+	background-repeat: repeat;
+	background-position: 0 0;
+	background-color: #fff;
+	position: relative;
+	height: 16.25em;
+	display: block;
+}
+
+.carousel-title{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+ .slick-slide .container:hover {
+	text-decoration: none;
+}
+ .spotlight-on-scientists  .slick-track, .spotlight-on-scientists  .slick-list {
+	height: 18em;
+}
+/* various patterned background images for slides */
+	  .blue-circles {
+	background-image: url(../images/blue-circles.jpg);
+}
+.purple-triangles {
+	background-image: url(../images/purple-triangles.jpg);
+}
+.blue-triangles {
+	background-image: url(../images/blue-triangles.jpg);
+}
+.green-plaid {
+	background-image: url(../images/green-plaid.jpg);
+}
+.site-name {
+	font-size: 1.7em;
+	font-family: Montserrat;
+	font-weight: bold;
+	color: white;
+	text-transform: uppercase;
+	font-weight: bold;
+	padding: 15px;
+	margin: 0;
+	line-height: normal;
+}
+.other-nci-sites .site-link {
+	display: block;
+	width: 100%;
+	background: #403e3f url(../images/icons/carousel-link-arrow.png) no-repeat 95% 50%;
+	padding: 20px;
+	margin: 0;
+	position: absolute;
+	bottom: 0;
+	color: #FFF;
+}
+.spotlight-on-scientists .site-link {
+	display: block;
+	width: 100%;
+	background: #403e3f url(../images/icons/carousel-link-arrow.png) no-repeat 95% 50%;
+	padding: 20px;
+	margin: 0;
+	position: absolute;
+	color: #FFF;
+}
+/*
+	  .other-nci-sites .site-link:after {
+		content: "?";
+		float: right;
+		color: #fff;
+		font-size: 1.7em;
+		font-weight: bold;
+	  }*/
+
+	  /* arrow navigation buttons */
+      .arrows-for-other-nci-sites {
+	text-align:right;
+	padding-right: 11px;
+}
+.arrows-for-other-nci-sites div {
+	display: inline;
+}
+.arrows-for-other-nci-sites button {
+	padding: 0;
+	border: 0;
+	height: 56px;
+	width: 56px;
+	background-color: transparent;
+	cursor: pointer;
+	display: inline;
+}
+/* !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!  END CAROUSEL STYLES !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! */
+/* !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!  BEGIN CONTENT-TEMPLATE STYLES      !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! */
+.hide {
+	display: none;
+}
+.shareBtn {
+	color: #186e88;
+	margin: 1.25em 0 0 2.4em;
+	padding-left: 1.875em;
+	background: url(../images/share_plus.png) no-repeat center left;
+}
+.shareBtnOpen {
+	color: #186e88;
+	margin: 1.25em 0 0 2.4em;
+	padding-left: 1.875em;
+	background: url(../images/share_minus.png) no-repeat center left;
+}
+.shareWindow {
+	background: url(../images/share_bg.png) no-repeat;
+	padding:1.2em 0 1.2em 1.2em;
+	z-index: 14;
+	position: absolute;
+	margin-left:-2.8125em;
+	width: 136px;
+	height: 62px;
+}
+.shareWindow a {
+	text-decoration: none;
+}
+.section-head {
+	float: left;
+	width: 80%;
+}
+.section-content {
+	float: left;
+	width: 100%;
+}
+.shareComponent {
+	float: left;
+	width: 20%;
+}
+ @media only screen and (max-width :1024px) {
+.shareBtn {
+	margin-top:0;
+}
+.shareComponent {
+	float:right;
+	width: initial;
+}
+.section-head {
+	float: none;
+	width: 100%;
+}
+figure.image-left-medium {
+	width: 100%
+}
+}
+
+
+
+/* !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!  END CONTENT-TEMPLATE STYLES        !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! */
+
+
+
+/* !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!  RESPONSIVE STYLES SECTION        !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-!-! */
+
+
+/* *************************************************************************/
+/* MOBILE + TABLET STYLES (SMALL AND MEDIUM) */
+/* *************************************************************************/
+@media only screen and (max-width :1024px) {
+header {
+	padding: 1em 0;
+}
+.language-bar {
+	background: #2a71a5;
+	color: white;
+}
+.sitewide-language a {
+	color: white;
+}
+/* begin mobile menu styles */
+		.nav-menu {
+	display: none;
+}
+.navigation {
+	width: 20%;
+	display: inline-block;
+}
+.mobile-menu-bar {
+	margin-top: 0.5em;
+}
+.nav-search-bar {
+	line-height: 0;
+}
+.nav-header, .nav-contact, .nav-dictionary, .nav-search {
+	float: left;
+	font-size: .8em;
+	color: #fff;
+	padding: 2em 0 0 0;
+	width: 24%;
+	text-align: center;
+}
+.nav-header {
+	background: transparent url(../images/icons/menu-icon.png) no-repeat center 0;
+}
+.nav-contact {
+	background: transparent url(../images/icons/phone-mobile.png) no-repeat center 0;
+}
+.nav-dictionary {
+	background: transparent url(../images/icons/dictionary-mobile.png) no-repeat center 0;
+}
+.nav-search {
+	background: transparent url(../images/icons/search-mobile.png) no-repeat center 0;
+}
+/* end mobile menu styles */
+
+	/* begin page options */
+
+		.cycleFont {
+	display: none;
+}
+.page-options {
+	padding-top:20px;
+}
+/* END page options */
+
+	/* begin carousel styles */
+	/* spacing */
+		 .slick-slide .container {
+	margin: 0 10px 0 0;
+}
+/* opacity on non-active slide items */
+		 .slick-slide,   .slick-slide .container {
+	opacity: .5;
+	background-color: black;
+}
+/* overwrite above styles for opacity and background-color */
+		 .slick-active,   .slick-active .container {
+	opacity: 1;
+	background-color: #fff;
+}
+.arrows-for-other-nci-sites .previous {
+	display: none;
+}
+.arrows-for-other-nci-sites .next {
+	position: absolute;
+	right: 20px;
+	z-index: 800;
+	top: 50%;
+}
+.arrows-for-other-nci-sites .next {
+	display: none;
+}
+/* begin carousel styles */
+	.main-content {
+	background: none;
+}
+.main-content {
+	background: #f7f8f3;
+}
+.content-bottom-slot {
+	background: #dceef8;
+}
+footer {
+	background-position: 120% 150px;
+}
+.footer-utility .columns {
+	width: 100%;
+}
+.agencies ul {
+	text-align: left;
+}
+.agencies ul li {
+	display: block;
+	background: none;
+	padding-right: 0;
+	margin-right: 0;
+}
+.hero-text {
+	position: absolute;
+	bottom: 0;
+	color: white;
+	background-color:rgba(51,102,153,0.5);
+	font-size: 1.2em;
+	font-weight: bold;
+	width: 100%;
+	padding: 0 0.8em;
+	left: 0;
+	top: auto;
+}
+.hero-text p {
+	line-height: 1;
+	margin: 0.2em;
+}
+.guide-card {
+	margin-bottom: 0;
+	margin-top: -35px;
+}
+.guide-card .card, .guide-card .featured-card {
+	background: #1d5e86;
+	padding: 0;
+	margin: 0;
+}
+.guide-card .card h3 {
+	color: white;
+	background: url(../images/icons/small-arrow.png) 95% center no-repeat;
+	border-bottom: 1px solid black;
+	padding: 0.3em 0.9375em;
+	margin: 0;
+}
+.guide-card .card h3.last {
+	border-bottom: none;
+}
+.feature-zone-image img {
+	display: block;
+	margin: 0 auto;
+}
+.featured-zone {
+	margin-right: 0;
+}
+.home-director-stories, .infographic {
+	background: none
+}
+.key-facts, .key-points {
+	width: 100%;
+	margin-left: 0;
+	margin-right: 0;
+	float: none;
+}
+.ui-accordion .ui-accordion-content {
+	padding: 0.5em .5em;
+}
+/* the portal pages needed these items to not hit the edge of screen */
+.content-top-slot h1, .content-bottom-slot h1, .content-top-slot h2, .content-bottom-slot h2, .content-top-slot h3, .content-bottom-slot h3, .page-options {
+	padding-left: 15px;
+}
+/* since these items are still in clomuns at tablet, this reverses previous move for these classes */
+.feature-primary h3,  .feature-primary p, .feature-secondary h3,  .feature-secondary p, .multimedia h3, .multimedia p, .other-sites-carousel h3 {
+	padding-left: 0;
+}
+
+
+
+}
+ @media only screen and (max-width :390px) {
+.nav-header, .nav-contact, .nav-dictionary, .nav-search {
+	font-size: .5em;
+	padding: 3.2em 0 0 0;
+}
+
+}
+
+
+/* *************************************************************************/
+/* DESKTOP + X-LARGE DISPLAYS (LARGE AND X-LARGE) */
+/* *************************************************************************/
+@media only screen and (min-width :1025px) {
+
+/* equal height cards for desktop, visually push a div to the bottom of it's container */
+.equalheight {
+	overflow: hidden;
+}
+.equalheight .push-to-bottom-desktop {
+	height: 100%;
+}
+
+.row.hero-slot {
+	max-width: 75em;
+}
+.row .gutter {
+	width: 31%;
+	margin-left: 3%;
+}
+.row .gutter:first-child {
+	width: 31%;
+	margin-left: 0;
+}
+/* MegaMenu styles for side exits */
+	nav .sub-nav-group-wrapper {
+	max-width: 70em;
+}
+nav .sub-nav-group-subwrapper {
+	max-width: 62.5em;
+	margin: 0 auto;
+}
+/*CAROUSEL STYLES*/
+	/* desktop arrows */
+		.arrows-for-other-nci-sites .next {
+	background: transparent url(../images/blue-arrow-right.png) no-repeat 0 0;
+}
+.arrows-for-other-nci-sites .next:hover {
+	background: transparent url(../images/red-arrow-right.png) no-repeat 0 0;
+}
+.arrows-for-other-nci-sites .previous {
+	background: transparent url(../images/blue-arrow-left.png) no-repeat 0 0;
+}
+.arrows-for-other-nci-sites .previous:hover {
+	background: transparent url(../images/red-arrow-left.png) no-repeat 0 0;
+}
+/* spacing */
+		 .slick-slide .container {
+	margin: 0 11px;
+}
+}
+
+
+/* *************************************************************************/
+/* DESKTOP STYLES (LARGE) */
+/* *************************************************************************/
+@media only screen and (min-width : 1025px) and (max-width :1440px) {
+	#section-nav li .has-children > div > a {
+		width: 169px;
+		padding-left: 5px;
+	}
+	#section-nav li li .has-children > div > a {
+		width: 152px;
+	}
+	#section-nav li li li .has-children > div > a {
+		width: 135px;
+	}
+}
+/* *************************************************************************/
+/* X-LARGE DISPLAY STYLES (EXTRA LARGE) */
+/* *************************************************************************/
+@media only screen and (min-width : 1441px) {
+.row, nav .sub-nav-group-wrapper {
+	max-width: 1200px;
+}
+/* MegaMenu styles for side exits */
+	nav .sub-nav-group-wrapper {
+	max-width: 90em;
+}
+nav .sub-nav-group-subwrapper {
+	max-width: 75em;
+	margin: 0 auto;
+}
+
+	/* XL styles for section-nav
+	 * NOTE: These can be removed when/if font icons are implemented
+	 */
+	#section-nav li .has-children > div > a {
+		width: 211px;
+		padding-left: 5px;
+	}
+	#section-nav li li .has-children > div > a {
+		width: 194px;
+	}
+	#section-nav li li li .has-children > div > a {
+		width: 177px;
+	}
+}
+/* *************************************************************************/
+/* TABLET STYLES (MEDIUM) */
+/* *************************************************************************/
+@media only screen and (min-width : 641px) and (max-width :1024px) {
+}
+/* *************************************************************************/
+/* MOBILE STYLES (SMALL) */
+/* *************************************************************************/
+@media only screen and (max-width :640px) {
+.hero-text {
+	font-size: 0.9em;
+}
+/* remove padding on language links to fit all on one line */
+	.sitewide-language {
+	padding-right: 0;
+}
+/* no gutter on left and right in mobile */
+	.card, .card-thumbnail div {
+	padding-right: 0;
+	padding-left: 0;
+}
+/* page options */
+	.page-options {
+	padding-top:0;
+}
+.page-options ul {
+	float: left;
+	margin-bottom: 0;
+}
+/* the portal pages needed these items to not hit the edge of screen on mobile only */
+.feature-primary h3,  .feature-primary p,  .feature-secondary h3,  .feature-secondary p, .multimedia h3, .multimedia p, .other-sites-carousel h3, .row.card-thumbnail h4, .row.card-thumbnail h3, .row.card-thumbnail p {
+	padding-left: 15px;
+}
+}
+
+
+
+
+
+/* *************************************************************************/
+/* We created this medium breakpoint so that items could stack on tablet devices */
+/* *************************************************************************/
+@media only screen and (min-width: 1025px) {
+.medium-1 {
+	position: relative;
+	width: 8.33333%;
+}
+.medium-2 {
+	position: relative;
+	width: 16.66667%;
+}
+.medium-3 {
+	position: relative;
+	width: 25%;
+}
+.medium-4 {
+	position: relative;
+	width: 33.33333%;
+}
+.medium-5 {
+	position: relative;
+	width: 41.66667%;
+}
+.medium-6 {
+	position: relative;
+	width: 50%;
+}
+.medium-7 {
+	position: relative;
+	width: 58.33333%;
+}
+.medium-8 {
+	position: relative;
+	width: 66.66667%;
+}
+.medium-9 {
+	position: relative;
+	width: 75%;
+}
+.medium-10 {
+	position: relative;
+	width: 83.33333%;
+}
+.medium-11 {
+	position: relative;
+	width: 91.66667%;
+}
+.medium-12 {
+	position: relative;
+	width: 100%;
+}
+.row .medium-offset-0 {
+	position: relative;
+	margin-left: 0%;
+}
+.row .medium-offset-1 {
+	position: relative;
+	margin-left: 8.33333%;
+}
+.row .medium-offset-2 {
+	position: relative;
+	margin-left: 16.66667%;
+}
+.row .medium-offset-3 {
+	position: relative;
+	margin-left: 25%;
+}
+.row .medium-offset-4 {
+	position: relative;
+	margin-left: 33.33333%;
+}
+.row .medium-offset-5 {
+	position: relative;
+	margin-left: 41.66667%;
+}
+.row .medium-offset-6 {
+	position: relative;
+	margin-left: 50%;
+}
+.row .medium-offset-7 {
+	position: relative;
+	margin-left: 58.33333%;
+}
+.row .medium-offset-8 {
+	position: relative;
+	margin-left: 66.66667%;
+}
+.row .medium-offset-9 {
+	position: relative;
+	margin-left: 75%;
+}
+.row .medium-offset-10 {
+	position: relative;
+	margin-left: 83.33333%;
+}
+.row .medium-offset-11 {
+	position: relative;
+	margin-left: 91.66667%;
+}
+}
+/* ---------------------------------            END  RESPONSIVE STYLES SECTION        --------------------------------------- */
+
+
+/*** Preview Specific Elements ***/
+
+/* Homepage and Landing Page feature cards */
+
+.feature-card {
+	background: #c8eef7;
+	border: 1px solid #178DA9;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.feature-card img {
+	max-width: 280px;
+}
+
+/* Homepage and Landing Page feature cards */
+.multimedia-feature-card {
+	background: #c8eef7;
+	border: 1px solid #178DA9;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.guide-card {
+	background: #c8eef7;
+	border: 1px solid #178DA9;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.thumbnail-card {
+	background: #c8eef7;
+	border: 1px solid #178DA9;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+fieldset.cde-slot {
+	margin-bottom: 20px;
+}
+
+fieldset.cde-slot legend{
+	font-size: 24px;
+}
+
+/* The styling of the Card Container wrapper */
+fieldset.sub-layout>h1,
+fieldset.sub-layout>h2,
+fieldset.sub-layout>h3 {
+	margin: 0 0 0 15px;	
+	font-size: 18px;
+}
+
+fieldset.sub-layout {
+	margin: 15px 0 0 0;
+	background-color: #faf0d9;
+}
+
+fieldset.sub-layout>legend {
+	font-size: 20px;
+	font-weight: bold;
+}
+
+/* The styling of the Card Container's slots */
+fieldset.sub-layout fieldset.slot {
+	margin-top: 10px;
+}
+
+fieldset.sub-layout fieldset.slot legend {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+fieldset.sub-layout fieldset.slot {
+	background-color: #ffffff;
+}
+
+/*** CTHP Elements ***/
+fieldset.cthp-cards-slot {
+	margin-bottom: 20px;
+	border: 2px solid #FFFFFF;
+}
+
+fieldset.cthp-cards-slot legend{
+	font-size: 24px;
+	color: #FFFFFF;
+}
+
+fieldset.cthp-cards-slot .equalheight {	
+	background: #c8eef7;
+	border: 1px solid #178DA9;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+

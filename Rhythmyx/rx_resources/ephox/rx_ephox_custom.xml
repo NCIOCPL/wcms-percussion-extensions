@@ -517,10 +517,10 @@ function cGovBuildCBDisplayString(data, termsArray) {
 		var language;
 		// Determine if we need to highlight the term
 		//Build the newterm string
-		if (cGovLanguage == "en")
-			language = "English";
-		else
+		if (cGovLanguage == "es")
 			language = "Spanish";
+		else
+			language = "English";
 		//alert(language);
 		data = firstPart + "<input type=checkbox name=terms value=" + cGovUniqueId + "><a __newterm=\"" + cGovUniqueId + "\" class=\"definition\" href=\"/Common/PopUps/popDefinition.aspx?id=" + tobj.docId + "&version=Patient&language=" + language + "\" onclick=\"javascript:popWindow('defbyid','" + tobj.docId + "&version=Patient&language=" + language + "'); return false;\">" + text + "</a>" + lastPart;
 	}

@@ -22,6 +22,7 @@
 
 		try {
 			int cid = Integer.parseInt(request.getParameter("sys_contentid"));
+			int ctid = Integer.parseInt(request.getParameter("sys_contenttypeid"));			
 			int fid = Integer.parseInt(request.getParameter("sys_folderid"));
 			String path = ViewURLHelper.getPath(cid);
 			String fPath = (ViewURLHelper.getPath(fid) + "/" + ViewURLHelper.getNode(fid).getName());
@@ -30,6 +31,7 @@
 			int context = Integer.parseInt(request.getParameter("loc_context"));
 			int mobileContext = Integer.parseInt(request.getParameter("loc_mobile_context"));
 			int[] mSites = ViewURLHelper.MOBILE_SITE_IDS;
+			int[] errorPages = ViewURLHelper.ERROR_PAGE_CONTENT_IDS;
 
 			// Check if this is a mobile site. If so, use mobile linking context
 			for (int i = 0; i < mSites.length; i++ ) {
@@ -43,7 +45,7 @@
 			String s = ViewURLHelper.getPublishedURL(sid, cid, filter, context);
 			if (path.equals(fPath)) {
 				url = s;
-			} 
+			}
 			else {
 				int i = StringUtils.ordinalIndexOf(fPath, "/", 4);
 				String prettyPath = fPath.substring(i);
@@ -51,6 +53,17 @@
 				url = prettyPath + "/" + prettyURL;
 			}
 			
+			// Check to see if this is an error page - output preformatted string if this
+			// is the case (error pages do not have a pretty URL)
+			for (int j = 0; j < errorPages.length; j++ ) {
+				if(ctid == errorPages[j]) {
+					String name = ViewURLHelper.getName(cid);
+					name = name.substring(0, name.indexOf('['));
+					url = ("/PublishedContent/ErrorMessages/" + name.replace(" ", "") + ".html");
+					ViewURLHelper.isCopyableURL = true;
+				}
+			}
+						
 			if (ViewURLHelper.isCopyableURL) {
 				out.println("Live Page URL: <p>");
 			}

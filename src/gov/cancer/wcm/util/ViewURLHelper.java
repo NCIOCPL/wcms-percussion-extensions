@@ -24,6 +24,7 @@ public class ViewURLHelper {
 	private static PSLocationUtils locUtils = new PSLocationUtils();	
 	public static boolean isCopyableURL = false;
 	public static int[] MOBILE_SITE_IDS = {465};
+	public static int[] ERROR_PAGE_CONTENT_IDS = {461, 2350};
 	
 	/*
 	 * Get GUID from content id:
@@ -48,6 +49,23 @@ public class ViewURLHelper {
 			e.printStackTrace();
 		}
 		return guid;
+	}
+	
+	/*
+	 * Get name of content item based on content id
+	 */
+	public static String getName(int cid) {
+		IPSCmsContentSummaries summ = PSCmsContentSummariesLocator.getObjectManager();
+		PSComponentSummary summary = null;
+		String name = "";
+		
+		try {
+			summary = summ.loadComponentSummary(cid);
+			name = summary.getName().toString();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		}
+		return name;		
 	}
 	
 	/*
@@ -161,7 +179,7 @@ public class ViewURLHelper {
 				String location = locUtils.generate(templateName, node, path, filter, sid, context);
 				url = location;
 			} catch (Exception e) {
-				message = ("<p>Error assembling URL.<p>" + e);
+				message = ("<p>This content does not have a live URL.");
 				e.printStackTrace();
 			}
 		} else {

@@ -464,6 +464,63 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 			}
 			
 			
+	@IPSJexlMethod(description = "Returns the slot names that are filled for the current item", params = {
+			@IPSJexlParam(name = "item", description = "The item whose slots are being found"),
+			@IPSJexlParam(name = "slotTypes", description = "The slot types to be excluded from the search"), 
+			@IPSJexlParam(name = "slotNames", description = "The names of slots to be excluded")})
+			public List<String> getItemSlots(IPSGuid item, List<String> slotTypes, List<String> slotNames  ) throws Exception{
+				
+				IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
+							
+				//the following if copied from PSORelationshipTools' getItemSlots method	
+				PSRelationshipFilter filter = new PSRelationshipFilter();
+				IPSContentWs cws = PSContentWsLocator.getContentWebservice();
+				PSLocator ownerLoc = gmgr.makeLocator(item);
+				filter.setOwner(ownerLoc);
+				List<String> slotnames = new ArrayList<String>();
+				for (PSAaRelationship rel : cws.loadContentRelations(filter,true)) {
+					//this checks the slot based on excluded slot types, and excluded slot names
+					//in addition to the normal call from the original method
+					
+					//code below to go into the if statement
+					
+					// && !slotTypes.contains(rel.getSlot().getAllowedRelationshipType()) && !slotNames.contains(rel.getSlotName())
+					
+					
+					if (!slotnames.contains(rel.getSlotName()) && !slotTypes.contains(rel.getSlot().getAllowedRelationshipType()) && !slotNames.contains(rel.getSlotName())) {
+						slotnames.add(rel.getSlotName());
+					}
+				}
+				return slotnames;
+			}
+			
+	
+	
+	
+	@IPSJexlMethod(description = "Returns slots of a specific Type", params = {
+			@IPSJexlParam(name = "item", description = "The item whose slots are being found"),
+			@IPSJexlParam(name = "slotType", description = "The type of slots to find for the item")})
+			public List<String> getItemSlotsByType(IPSGuid item, String slotType  ) throws Exception{
+				
+				IPSGuidManager gmgr = PSGuidManagerLocator.getGuidMgr();
+	
+				//the following if copied from PSORelationshipTools' getItemSlots method	
+				PSRelationshipFilter filter = new PSRelationshipFilter();
+				IPSContentWs cws = PSContentWsLocator.getContentWebservice();
+				PSLocator ownerLoc = gmgr.makeLocator(item);
+				filter.setOwner(ownerLoc);
+				List<String> slotnames = new ArrayList<String>();
+				for (PSAaRelationship rel : cws.loadContentRelations(filter,true)) {
+					//this checks the relationships for ONLY the slots of the passed in type
+					if (!slotnames.contains(rel.getSlotName()) && rel.getSlot().getAllowedRelationshipType().equals(slotType)) {
+						slotnames.add(rel.getSlotName());
+					}
+				}
+				return slotnames;
+			}
+			
+	
+			
 	@IPSJexlMethod(description = "Returns the default template name", params = {
 			@IPSJexlParam(name = "itemPath", description = "A percussion path to the item (i.e. //Sites/CancerGov/...) "),
 			@IPSJexlParam(name = "itemNode", description = "The Node of the item to find the default template for"),
