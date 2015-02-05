@@ -81,7 +81,7 @@ var cGovCurrentEditor = "";
 * The custom code in this file is stamped into the HTML output once per editor on the page, so the below snippet
 * will result in a different jQuery selector (and resulting editor name set) for each editor present.
 */
-$("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").mouseover(
+$("div#]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").mouseover(
 	cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[
 );
 
@@ -89,7 +89,7 @@ $("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").m
 * The mouseover event captures transitioning directly from the tabs to the editor - applets can't have
 * events attached, so a mouseover doesn't appear to be triggered in that case.
 */
-$("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").mouseout(
+$("div#]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").mouseout(
 	cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[
 );
 
@@ -97,7 +97,7 @@ $("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").m
 *	This selector fires events when elements under the containing div gain focus.
 *   This should account for tab navigation being used to select an editor.
 */
-$("div#ce_]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").focusin(
+$("div#]]><xsl:value-of select="$name"/><![CDATA[.editableEditLiveSection").focusin(
 	cGovCheckForEditor_]]><xsl:value-of select="$name"/><![CDATA[
 );
 
