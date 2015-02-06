@@ -137,7 +137,8 @@ function cGovEphoxGlossify()
 	cGovEditorName = cGovCurrentEditor;
 	cGovWebServiceURL = 'http://' + window.location.host + '/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/';
 	// Get the content from the editor using an existing function
-	cGovOriginalData = _editLiveInstance.getContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName));
+	//cGovOriginalData = _editLiveInstance.getContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName));
+	cGovOriginalData = _editLiveInstance.getContentForEditableSection(cGovEditorName);
 	// Get glossification info from web service and apply it
 	cGovEphoxDoGlossify(cGovOriginalData);
 }
@@ -343,7 +344,8 @@ function submitter(checkArray) {
 	finalText = cGovFixCRLF(rxFixCRs, finalText, "\r");
 	finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
 	//finish up by restoring text to editor
-	_editLiveInstance.setContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName), finalText);
+	// _editLiveInstance.setContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName), finalText);
+	_editLiveInstance.setContentForEditableSection(cGovEditorName, finalText);
 }
 
 /**
