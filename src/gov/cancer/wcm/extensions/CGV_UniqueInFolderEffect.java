@@ -190,13 +190,13 @@ public class CGV_UniqueInFolderEffect implements IPSEffect {
 				
 				if(CGV_FolderValidateUtils.isFolder(item)) {
 					log.trace("Item " + contentId + " is a folder");
+
+					// Get the proposed folder name.
 					String newName = getRequestFoldername(request);
 					
-					// OK, we have the folder name.  Now we need a method off
-					// valUtil to check whether it will conflict with any of the
-					// existing content items.
-					
-					result.setError("I don't know how to validate a folder yet.");
+					// Check whether the folder's name will conflict with the value of
+					// any of the existing content items 'fieldName' fields.
+					valUtil.validateIsFolderNameUnique(contentId, newName, fieldName, folderId, checkPaths, item, result);
 				} else {
 					log.trace("Item " + contentId + " is not a folder");
 					valUtil.doAttempt(contentId, fieldName, folderId, checkPaths, item, result);
