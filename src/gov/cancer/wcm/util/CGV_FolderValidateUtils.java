@@ -22,6 +22,7 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,6 +68,7 @@ public class CGV_FolderValidateUtils {
     private PSONodeCataloger nodeCataloger = null;
     private IPSSystemWs systemWs = null; 
     
+    
     /**
      * Do the actual effect attempt processing
      * @param contentId the contentId of the item
@@ -98,7 +100,7 @@ public class CGV_FolderValidateUtils {
     		result.setSuccess();
     	}
     	else {
-    		System.out.println("[doAttempt]got field");
+    		log.debug("[doAttempt]got field");
     		String fieldValue = null;
     		//we need to handle null field values
     		IPSFieldValue val = field.getValue();
@@ -576,6 +578,25 @@ public class CGV_FolderValidateUtils {
     	PSCoreItem item = items.get(0);
 		return item;
 	}
+
+    /*
+     * Examines a content item and determines whether it represents a folder.
+     */
+    public static boolean isFolder(PSCoreItem item) {
+    	if( item == null){
+    		log.error("isFolder requires that argument 'item' must not be null.");
+    		throw new NullArgumentException("item");
+    	}
+    	
+    	boolean isFolder;
+    	
+    	PSItemDefinition itemDef = item.getItemDefinition();
+		String typename = itemDef.getName();
+		
+		isFolder = typename.equals("Folder");
+
+    	return isFolder;
+    }
     
     /**
      * Returns a list of Strings containing all of the sites that a 
