@@ -22,6 +22,7 @@ import javax.jcr.query.QueryResult;
 import javax.jcr.query.Row;
 import javax.jcr.query.RowIterator;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,6 +68,7 @@ public class CGV_FolderValidateUtils {
     private PSONodeCataloger nodeCataloger = null;
     private IPSSystemWs systemWs = null; 
     
+    
     /**
      * Do the actual effect attempt processing
      * @param contentId the contentId of the item
@@ -98,13 +100,13 @@ public class CGV_FolderValidateUtils {
     		result.setSuccess();
     	}
     	else {
-    		System.out.println("[doAttempt]got field");
+    		log.debug("[doAttempt]got field");
     		String fieldValue = null;
     		//we need to handle null field values
     		IPSFieldValue val = field.getValue();
     		if (val != null)
 				fieldValue = val.getValueAsString();
-			System.out.println("[doAttempt]fieldValue = " + fieldValue);        
+    		log.debug("[doAttempt]fieldValue = " + fieldValue);        
 			String typeList = makeTypeList(fieldName);
 
 			boolean rvalue = true;
@@ -125,6 +127,40 @@ public class CGV_FolderValidateUtils {
 				result.setError("Pretty_URL_Name must be unique within folder");
 			}
     	}
+    }
+    
+
+    /*
+     * Checks whether a proposed folder name would duplicate the value specified field name in any
+     * of the content items in the same parent folder.
+     * 
+     * @param contentId the contentId of the item
+     * @param fieldName name of field to check
+     * @param folderId 
+     * @param checkPaths
+     * @param item
+     * @param result
+     * @throws Exception
+     */
+    public void validateIsFolderNameUnique(int contentId, String folderName, String fieldName, int folderId, String checkPaths, PSCoreItem item, PSEffectResult result)
+    	throws Exception {
+    		
+		log.debug("[validateIsFolderNameUnique]folderName = " + folderName);        
+		String typeList = makeTypeList(fieldName);
+
+		boolean rvalue = true;
+		if (folderId != 0) {
+			rvalue = isFieldValueUniqueInFolder(folderId, fieldName, folderName, typeList, checkPaths, contentId);
+		}
+
+		if (rvalue) {
+			log.debug("validateIsFolderNameUnique() - setting success");
+			result.setSuccess();
+		}
+		else {
+			log.debug("validateIsFolderNameUnique() - setting error");
+			result.setError(fieldName + " must be unique within folder");
+		}
     }
     
     /**
@@ -576,6 +612,25 @@ public class CGV_FolderValidateUtils {
     	PSCoreItem item = items.get(0);
 		return item;
 	}
+
+    /*
+     * Examines a content item and determines whether it represents a folder.
+     */
+    public static boolean isFolder(PSCoreItem item) {
+    	if( item == null){
+    		log.error("isFolder requires that argument 'item' must not be null.");
+    		throw new NullArgumentException("item");
+    	}
+    	
+    	boolean isFolder;
+    	
+    	PSItemDefinition itemDef = item.getItemDefinition();
+		String typename = itemDef.getName();
+		
+		isFolder = typename.equals("Folder");
+
+    	return isFolder;
+    }
     
     /**
      * Returns a list of Strings containing all of the sites that a 
