@@ -60,55 +60,6 @@
 						</entry>
 					</map>
 				</entry>
-				<entry key="//Sites/MobileCancerGov/">
-					<map>
-						<entry key="CancerGov Workflow">
-							<map>
-								<entry key="Staging (P)">
-								<list>
-									<value>CGov_Mobile_Preview_Now</value>									
-									<value>DB_CGov_Mobile_Staging_Now</value>
-								</list>
-								</entry>
-								<entry key="Staging (D)">
-								<list>
-									<value>CGov_Mobile_Preview_Now</value>									
-									<value>DB_CGov_Mobile_Staging_Now</value>
-								</list>
-								</entry>
-								<entry key="Public">
-								<list>
-
-									<value>CGov_Mobile_Preview_Now</value>	
-									<value>CGov_Mobile_Live_Publish_Now</value>
-									<value>DB_CGov_Mobile_Staging_Now</value>		
-									<value>DB_CGov_Mobile_Now</value>									
-								</list>
-								</entry>
-							</map>
-						</entry>
-						<entry key="CGV_Navon_Workflow">
-							<map>
-								<entry key="Staging (P)">
-								<list>
-									<value>CGov_Mobile_Preview_Now</value>	
-								</list>
-								</entry>
-								<entry key="Staging (D)">
-								<list>
-									<value>CGov_Mobile_Preview_Now</value>	
-								</list>
-								</entry>
-								<entry key="Public">
-								<list>
-									<value>CGov_Mobile_Preview_Now</value>	
-									<value>CGov_Mobile_Live_Publish_Now</value>
-								</list>
-								</entry>
-							</map>
-						</entry>
-					</map>
-				</entry>
 				<entry key="//Sites/TCGA/">
 					<map>
 						<entry key="CancerGov Workflow">

@@ -21,6 +21,20 @@
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCancerResearch</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloWebFont</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>			
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>gloUtilityImage</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
@@ -35,7 +49,21 @@
 					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
 				</bean>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvArticle</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>cgvBlogPost</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvTopicPage</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
