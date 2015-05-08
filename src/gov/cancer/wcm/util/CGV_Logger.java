@@ -15,4 +15,18 @@ public class CGV_Logger {
 	public static Logger getLogger(Class<?> theClass) {
 		return Logger.getLogger(theClass);		
 	}
+	
+	/**
+	 * Converts the StackTraceElement array into readable strings.
+	 * @param stackTraceElement - e.printStackTrace
+	 * @return concatenated string of trace results
+	 */
+	public String StackTraceToString(StackTraceElement[] stackTraceElement) {
+		String stackTraceString = "";
+		for(int i=0; i<stackTraceElement.length; i++)
+		{
+			stackTraceString += ("\n  " + stackTraceElement[i].toString());
+		}
+		return stackTraceString;
+	}
 }
