@@ -82,12 +82,16 @@
 				<select name="type" id="select">
 					<option>All</option>
 					<option>cgvAutoRSS</option>
+					<option>cgvArticle</option>
 					<option>cgvBanner</option>
 					<option>cgvBestBetsCategory</option>
+					<option>cgvBlogPost</option>
+					<option>cgvBlogSeries</option>
 					<option>cgvBooklet</option>
 					<option>cgvBookletPage</option>
 					<option>cgvCancerBulletin</option>
 					<option>cgvCancerBulletinPage</option>
+					<option>cgvCancerResearch</option>
 					<option>cgvCancerTypeHome</option>
 					<option>cgvClinicalTrialResult</option>
 					<option>cgvContentSearch</option>
@@ -96,6 +100,7 @@
 					<option>cgvDynamicList</option>
 					<option>cgvFactSheet</option>
 					<option>cgvFeaturedClinicalTrial</option>
+					<option>cgvInfographic</option>
 					<option>cgvManualRSS</option>
 					<option>cgvMicrositeIndex</option>
 					<option>cgvPowerPoint</option>
@@ -109,6 +114,7 @@
 					<option>cgvTopicSearch</option>
 					<option>cgvTopicSearchCategory</option>
 					<option>gloImage</option>
+					<option>gloUtilityImage</option>
 					<option>gloVideo</option>
 					<option>nciAppModulePage</option>
 					<option>nciAppWidget</option>
