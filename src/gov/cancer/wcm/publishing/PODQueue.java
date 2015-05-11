@@ -29,7 +29,6 @@ public class PODQueue {
 	public static Work take(){
 		log.trace("Entering take()");
 
-		EditionInfoHelper editionHelper = new EditionInfoHelper();
 		PODWork itemToPublish = null;
 		
 		try {
@@ -45,7 +44,25 @@ public class PODQueue {
 			itemToPublish = publishingQueue.take();
 			publishingQueue.put(itemToPublish);
 			log.trace("Found an item to publish: " + itemToPublish.getEdition());
-			
+
+			/*
+			 * PODPublisher.run() goes in a loop, calling PODQueue.take() and when it returns, 
+			 * it gets back a Work object which has a doWork() method. The secret sauce 
+			 * which makes PODQueue work is that it's a wrapper around a BlockingQueue<T>. 
+			 * The take() method on BlockingQueue<T> doesn't return until the queue has 
+			 * something in it. (This is how we create a thread that just runs in an infinite 
+			 * loop without spending 100% of the CPU time checking whether true is still 
+			 * true.) 
+			 * 
+			 * Our wrapper also exposes a take() method, and the first thing this 
+			 * take() method does is to create an EditionInfoHelper object, which is where 
+			 * all the logic lives for figuring out whether it's OK for a POD job to run. 
+			 * The EditionInfoHelper object is where the CGV_PublishingConfiguration bean 
+			 * is used. The fix for the immediate issue is to move the creation of the 
+			 * EditionInfoHelper object after the first take()/put() pair, but before the while
+			 * loop.
+			 */
+			EditionInfoHelper editionHelper = new EditionInfoHelper();
 
 			/*  Now that an item has been found, find the first that's eligible
 			 *  to be published. If the item is not eligible to publish, examine
