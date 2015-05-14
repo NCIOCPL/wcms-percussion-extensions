@@ -84,6 +84,11 @@ h4 {
 	font-size: 1.25em;
 	line-height: 1.333em;
 }
+h6 {
+	margin: 0.5em 0;
+	font-size: 1em;
+	line-height: 1em;
+}
 p {
 	margin: 0.5em 0;
 	line-height: 1.5em;
@@ -1140,7 +1145,7 @@ table.no-bullet-padding ul li {
 .key-facts, .key-points {
 	background: #d7f9fa;
 	float: right;
-	width: 40%;
+	width: 100%;
 	padding: 0 1em;
 	margin: 0 -1em 1em 1em;
 }
@@ -1668,35 +1673,35 @@ figure.image-right-medium,  figure.image-right-small {
 	background: url(../images/blue-list-dot.png) 0 7px no-repeat;
 	padding-left: .9375em;
 }
-.treatment, .research, .causes, .screening, .survival, .general, .genetics {
+.cthp-treatment, .cthp-research, .cthp-causes, .cthp-screening, .cthp-survival, .cthp-general, .cthp-genetics {
 	margin-bottom: 1.25em;
 }
-.treatment h3, .research h3, .causes h3, .screening h3, .survival h3, .general h3, .genetics h3 {
+.cthp-treatment h3, .cthp-research h3, .cthp-causes h3, .cthp-screening h3, .cthp-survival h3, .cthp-general h3, .cthp-genetics h3 {
 	color: #ffffff;
 	padding: .7em 1em;
 	margin: 0;
 	text-transform: uppercase;
 }
-.treatment h3 {
+.cthp-treatment h3 {
 	background: #2ec799 url(../images/CTHP-green-waves.jpg) repeat-x;
 }
-.research h3 {
+.cthp-research h3 {
 	background: #0886d0 url(../images/CTHP-blue-gears.jpg) repeat-x;
 }
-.causes h3 {
+.cthp-causes h3 {
 	background: #7f3796 url(../images/CTHP-purple-squares.jpg) repeat-x;
 }
-.screening h3 {
+.cthp-screening h3 {
 	background: #aa3d65 url(../images/CTHP-pink-triangles.jpg) repeat;
 }
-.survival h3 {
+.cthp-survival h3 {
 	background: #cf871a url(../images/CTHP-yellow-squares.jpg) repeat-x;
 }
-.general h3 {
+.cthp-general h3 {
 	background: #3c8c9c url(../images/CTHP-blue-octagons.jpg) repeat-x;
 }
-.genetics h3 {
-	background: #009095 url(../images/CTHP-blue-octagons.jpg) repeat-x;
+.cthp-genetics h3 {
+	background: #0b7992 url(../images/CTHP-blue-octagons.jpg) repeat-x;
 }
 .cardBody {
 	overflow: auto;
