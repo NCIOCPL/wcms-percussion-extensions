@@ -84,7 +84,7 @@ h4 {
 	font-size: 1.25em;
 	line-height: 1.333em;
 }
-h6 {
+h5, h6 {
 	margin: 0.5em 0;
 	font-size: 1em;
 	line-height: 1em;
@@ -2434,4 +2434,17 @@ fieldset.cthp-cards-slot .equalheight {
 	margin-bottom: 10px;
 }
 
+/* Topic page image styling */
+.landing-thumb-image {
+	width: 190px;
+	margin-top: 0.9375em;
+	display: inline-block;
+	vertical-align: top;
+}
 
+.landing-thumb-text {
+	width: 70%;
+	display: inline-block;
+	vertical-align: top;
+	padding-left: 1.25em;
+}
