@@ -879,6 +879,7 @@
 						</list>
 					</constructor-arg>
 				</bean>
+				<!-- // Commenting out bean to fix gloImage workflow issues - daquinohd 2015-06-02
 				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
 					<constructor-arg><value>Parent-Follow</value></constructor-arg>
 					<constructor-arg>
@@ -887,7 +888,7 @@
 							<ref bean="OtherWorkflowRelationshipWFTransitionStopCondition" />
 							<ref bean="TopTypeRelationshipWFTransitionStopCondition" />												
 							<ref bean="SharedRelationshipWFTransitionStopCondition" />
-							<!-- At this point we know we are going to transition the dependent, but can we? -->	
+							// At this point we know we are going to transition the dependent, but can we?
 							<ref bean="ContentTypeValidationRelationshipWFTransitionStopCondition" />		
 							<ref bean="OtherUserLockedRelationshipWFTransitionStopCondition" />
 							<ref bean="WFTransitionAvailableRelationshipWFTransitionStopCondition" />
@@ -895,6 +896,7 @@
 						</list>
 					</constructor-arg>
 				</bean>
+				-->
 				<bean class="gov.cancer.wcm.workflow.checks.RelationshipWFTransitionFollowCheck">
 					<constructor-arg><value>Pages</value></constructor-arg>
 					<constructor-arg>

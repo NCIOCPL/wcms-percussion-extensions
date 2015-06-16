@@ -17,10 +17,14 @@ import org.apache.commons.logging.LogFactory;
 import com.percussion.extension.IPSExtensionDef;
 import com.percussion.extension.PSExtensionException;
 
+import gov.cancer.wcm.util.CGV_Logger;
+
+
 public class PODPublisher implements Runnable{
 	private static final Log log = LogFactory.getLog(PODPublisher.class);
 	private static Thread t;
 	private static PODPublisher INSTANCE = null; 
+	private CGV_Logger cgvLog = new CGV_Logger();
 	
 	public static PODPublisher getInstance(){
 		log.debug("Starting the PODThread...");
@@ -51,19 +55,15 @@ public class PODPublisher implements Runnable{
 	@Override
 	public void run() {
 		log.debug("Start of run...");
-		
-			while(true){
-				try{
-					PODQueue.take().doWork();
-				}
-				catch(Throwable e){
-					log.error("Error processing POD job.");
-					log.error(e.getMessage());
-					log.error(e.getStackTrace());
-				}
-				
+		while(true){
+			try{
+				PODQueue.take().doWork();
 			}
-		
+			catch(Throwable e){
+				log.error("Error processing POD job.");
+				log.error(cgvLog.StackTraceToString(e.getStackTrace()));
+			}
+		}
 	}
 }
 

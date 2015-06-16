@@ -144,46 +144,13 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 
 
 	/**
-	 * Initialization function for the CGV_OnDemandPublishingService
-	 * @Author John Doyle
-	 * 
+	 * No arg constructor
 	 */
 	public CGV_OnDemandPublishService() {
-		log.debug("Initializing Publishing Service");
-		if(podPublisher == null)
-		{
-			podPublisher = PODPublisher.getInstance();
-		}
-		if (rps == null) {
-			rps = PSRxPublisherServiceLocator.getRxPublisherService();
-			gmgr = PSGuidManagerLocator.getGuidMgr();
-			cmgr = PSContentWsLocator.getContentWebservice();
-			pubSvc = PSPublisherServiceLocator.getPublisherService();
-			workflowService = PSWorkflowServiceLocator.getWorkflowService();
-			contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
-		}
-		if (valUtil == null) {
-			valUtil = new CGV_FolderValidateUtils();
-			if (valUtil.getContentManager() == null) valUtil.setContentManager(PSContentMgrLocator.getContentMgr());
-			if (valUtil.getContentWs() == null) valUtil.setContentWs(PSContentWsLocator.getContentWebservice());
-			if (valUtil.getGuidManager() == null) valUtil.setGuidManager(PSGuidManagerLocator.getGuidMgr());
-			if (valUtil.getNodeCataloger() == null) valUtil.setNodeCataloger(new PSONodeCataloger());
-			if (valUtil.getSystemWs() == null) valUtil.setSystemWs(PSSystemWsLocator.getSystemWebservice()); 
-		}
-		//Get a list of all editions in the system.
-		if(allEditions == null) {
-			allEditions = pubSvc.findAllEditions("");
-		}
-		if(treeAnalyzer == null)
-		{
-			treeAnalyzer = new TreeAnalyzer(gmgr,
-											cmgr,
-											contentSummariesService
-											);
-			
-		}
-		
-		log.debug("Completed Initialize Service");
+		/**
+		 * Initialization function for the CGV_OnDemandPublishingService has been moved 
+		 * to afterPropertiesSet()
+		 */
 	}
 
 	/**
@@ -324,22 +291,56 @@ public class CGV_OnDemandPublishService implements InitializingBean {
 			//put the PODWork item on the Queue.
 			PODQueue.put(workItem);
 		}
-		log.debug("Finished adding all items to the queue for this PoD");
-		
-		
+		log.debug("Finished adding all items to the queue for this PoD");	
 	}
-	
-	
-	
 	
 	
 	/**
+	 * Initialization function for the CGV_OnDemandPublishingService - the logic 
+	 * in this method has been moved out of the constructor to here.
+	 * daquinohd 05-11-2015
 	 * 
+	 * afterPropertiesSet() is an InitializingBean method invoked by a BeanFactory 
+	 * after it has set all bean properties supplied. Moving the logic into here 
+	 * could prevent future issues by waiting until the beans have finished 
+	 * initializing before reading the configuration information
+	 * @Author John Doyle
 	 */
 	public void afterPropertiesSet() throws Exception {
-		
+		log.debug("Initializing Publishing Service");
+		if(podPublisher == null)
+		{
+			podPublisher = PODPublisher.getInstance();
+		}
+		if (rps == null) {
+			rps = PSRxPublisherServiceLocator.getRxPublisherService();
+			gmgr = PSGuidManagerLocator.getGuidMgr();
+			cmgr = PSContentWsLocator.getContentWebservice();
+			pubSvc = PSPublisherServiceLocator.getPublisherService();
+			workflowService = PSWorkflowServiceLocator.getWorkflowService();
+			contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
+		}
+		if (valUtil == null) {
+			valUtil = new CGV_FolderValidateUtils();
+			if (valUtil.getContentManager() == null) valUtil.setContentManager(PSContentMgrLocator.getContentMgr());
+			if (valUtil.getContentWs() == null) valUtil.setContentWs(PSContentWsLocator.getContentWebservice());
+			if (valUtil.getGuidManager() == null) valUtil.setGuidManager(PSGuidManagerLocator.getGuidMgr());
+			if (valUtil.getNodeCataloger() == null) valUtil.setNodeCataloger(new PSONodeCataloger());
+			if (valUtil.getSystemWs() == null) valUtil.setSystemWs(PSSystemWsLocator.getSystemWebservice()); 
+		}
+		//Get a list of all editions in the system.
+		if(allEditions == null) {
+			allEditions = pubSvc.findAllEditions("");
+		}
+		if(treeAnalyzer == null)
+		{
+			treeAnalyzer = new TreeAnalyzer(gmgr,
+											cmgr,
+											contentSummariesService
+											);
+		}
+		log.debug("Completed Initialize Service");
 	}
-
 
 	
 	/**
