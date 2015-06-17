@@ -1,0 +1,24 @@
+[
+	{				
+		"config_css" : "../rx_resources/tinymce/tinymce1.css",	 
+		"plugins" : [
+			"advlist anchor autolink autosave charmap code contextmenu",
+			"directionality fullscreen glossifier hr link lists nonbreaking",
+			"pagebreak paste preview print rxinline save",
+			"searchreplace table visualblocks visualchars wordcount"
+		],
+		"valid_elements" : "*[*]",
+		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
+	},
+	{
+		"roles" : ["Admin"],
+		"config_css" : "../rx_resources/tinymce/tinymce1.css",
+		"plugins" : [
+			"advlist anchor autolink autosave charmap code contextmenu",
+			"directionality fullscreen glossifier hr link lists nonbreaking",
+			"pagebreak paste preview print rxinline save",
+			"searchreplace table visualblocks visualchars wordcount"
+		],
+		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
+	}
+]
