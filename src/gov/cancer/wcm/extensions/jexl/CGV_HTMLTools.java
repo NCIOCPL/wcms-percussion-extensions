@@ -152,5 +152,28 @@ public class CGV_HTMLTools extends PSJexlUtilBase implements IPSJexlExpression{
         //return false for isWhiteSpace.
         return (cleanElem.isEmpty() || cleanElem.getContent().isWhiteSpace());
     }    
+    
+    
+    public static String removePtags ( String a){ 
+        String result = a; 
+         
+        if(a.contains("<p")){ 
+             if(a.contains("</")){ 
+                  result = result.substring(result.indexOf(">")+1, result.lastIndexOf("<")); 
+             } 
+             else{ 
+                  result = result.substring(result.indexOf(">")+1, result.length()); 
+             } 
+        } 
+        else if(a.contains("</")){ 
+             result = result.substring(0, result.indexOf("<")); 
+        } 
+        else{ return a; } 
+         
+         
+    
+        return result; 
+   } 
+	
 
 }

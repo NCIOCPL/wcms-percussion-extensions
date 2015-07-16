@@ -225,8 +225,11 @@ public class TemplateUtils {
 	    return (IPSAssemblyTemplate)((Collection)resultTemplate).iterator().next();
 	
 		
-	
+	    
 		
 		
 	}
+	
+	
+	
 }
