@@ -84,19 +84,17 @@ function cGovEphoxDoGlossify(data) {
 
 		// Open request and set its headers
 		cGovReq.open("POST", cGovWebServiceURL, true);
-		cGovReq.setRequestHeader("Accept-Charset", "utf-8");
+		//cGovReq.setRequestHeader("Accept-Charset", "utf-8");
 		cGovReq.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
 		cGovReq.setRequestHeader("SOAPAction", cGovSoapMethod);
 		// Send the request
 		cGovReq.send(soapCommand);
 		/*
-		//var content = '<p>cancer can be a complication of hiv</p>'
 		var content = cGovMassagedData;
 
 		var source = '<?xml version=\"1.0\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:m=\"cancer.gov/glossproxy\"> <soapenv:Header/><soapenv:Body><m:glossify><m:fragment><![CDATA[' + content + ']]></m:fragment><m:dictionaries><m:string>Cancer.gov</m:string></m:dictionaries><m:languages><m:string>en</m:string></m:languages></m:glossify></soapenv:Body></soapenv:Envelope>'
 
-		// add soap action?
-		jQuery.ajax({url:'/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/',data:source,type:'POST',dataType:'xml',contentType:'text/xml; charset=utf-8'})
+		// add soap action?		jQuery.ajax({url:'/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/',data:source,type:'POST',dataType:'xml',contentType:'text/xml; charset=utf-8'})
 		*/
 		
 		return true;	
@@ -189,7 +187,7 @@ function cGovProcessReqChange() {
 		cGovCheckboxWindow.document.write('<input type="submit" value="Submit Changes">');
 		cGovCheckboxWindow.document.write('</form>\n</body>\n</html>');
 	}
-	else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
+	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
 }
 
 /**
@@ -573,26 +571,6 @@ function cGovAddUniqueID(data) {
 	var uniqueID = "<a __oldterm=\"" + cGovUniqueId + "\" " + data;
 	return uniqueID;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
