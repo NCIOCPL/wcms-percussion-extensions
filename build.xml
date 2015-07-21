@@ -167,6 +167,10 @@
 		<copy todir="${rhythmyx.home}/rx_resources/ephox" verbose="true" >
 			<fileset dir="Rhythmyx\rx_resources\ephox" />
 		</copy>
+		<!-- TinyMCE files -->
+		<copy todir="${rhythmyx.home}/rx_resources/tinymce" verbose="true" >
+			<fileset dir="Rhythmyx\rx_resources\tinymce" />
+		</copy>
 	</target>
 	
 	<!--
