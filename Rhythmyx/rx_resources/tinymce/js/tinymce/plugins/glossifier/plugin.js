@@ -9,8 +9,10 @@
  * Contributing: http://www.tinymce.com/contributing
  */
  
-/*global tinymce:true */
-
+/*********************************
+* Global variables               *
+**********************************/
+//global tinymce:true 
 var cGovReq;			//global request object
 var cGovOriginalData;	//data from editor window
 var cGovMassagedData;	//editor data after preprocessing
@@ -29,11 +31,15 @@ var cGovWSNameSpace = "cancer.gov/glossproxy";
 var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 var cGovIsEnglish = true;
 var cGovLanguage = 'en';
+var _glossifyEditor;
 
 
+
+/*********************************
+* CGov Percussion functions      *
+**********************************/
 /**
 * Send the glossification request to the web service
-*
 */
 function cGovEphoxDoGlossify(data) {
 	// Pre-process the string to encode cr and lf and flag previous glossify results
@@ -94,7 +100,7 @@ function cGovEphoxDoGlossify(data) {
 
 		var source = '<?xml version=\"1.0\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:m=\"cancer.gov/glossproxy\"> <soapenv:Header/><soapenv:Body><m:glossify><m:fragment><![CDATA[' + content + ']]></m:fragment><m:dictionaries><m:string>Cancer.gov</m:string></m:dictionaries><m:languages><m:string>en</m:string></m:languages></m:glossify></soapenv:Body></soapenv:Envelope>'
 
-		// add soap action?		jQuery.ajax({url:'/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/',data:source,type:'POST',dataType:'xml',contentType:'text/xml; charset=utf-8'})
+		// add soap action	jQuery.ajax({url:'/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/',data:source,type:'POST',dataType:'xml',contentType:'text/xml; charset=utf-8'})
 		*/
 		
 		return true;	
@@ -163,7 +169,7 @@ function cGovProcessReqChange() {
 		cGovCheckboxWindow.document.write('function returnChecks() {');
 		cGovCheckboxWindow.document.write('	var checkArray = [];');
 		cGovCheckboxWindow.document.write('	if (document.Glossify.terms != null) {');
-		cGovCheckboxWindow.document.write('		boxes = document.Glossify.terms.length;');
+		cGovCheckboxWindow.document.write('		var boxes = document.Glossify.terms.length;');
 		cGovCheckboxWindow.document.write('		if (boxes == null) {');
 		cGovCheckboxWindow.document.write('			if (document.Glossify.terms.checked) {');
 		cGovCheckboxWindow.document.write('				checkArray.push(document.Glossify.terms.value);');
@@ -211,7 +217,7 @@ function submitter(checkArray) {
 	finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
 	//finish up by restoring text to editor
 	// _editLiveInstance.setContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName), finalText);
-	_editLiveInstance.setContentForEditableSection(cGovEditorName, finalText);
+	_glossifyEditor.setContent(finalText);
 }
 
 /**
@@ -371,6 +377,7 @@ function cGovBuildTermsArray(terms) {
 *
 */
 function cGovBuildCBDisplayString(data, termsArray) {
+	cGovUniqueId = 0;
 	// Go through the terms array in reverse order, insert terms links into massaged data with unique ids
 	for (i=termsArray.length - 1;i>=0;i--) {
 		var tobj = termsArray[i];
@@ -574,67 +581,22 @@ function cGovAddUniqueID(data) {
 
 
 
-
-
-
+/************************************
+* Percussion plugin function for    *
+* TinyMCE. This is needed to call   *
+* the CGov functions & add button   *
+*************************************/
 tinymce.PluginManager.add('glossifier', function(editor) {
 	var settings = editor.settings;
 	//var allContent = editor.getContent();
     var allContent = '<b>cancer</b>';
 	
 	editor.addCommand('openGlossifier', function() {
-		
-	
-		/*
-		editor.windowManager.open({
-			title: 'Select items to glossify',
-			width : parseInt(editor.getParam("plugin_preview_width", "650"), 10),
-			height : parseInt(editor.getParam("plugin_preview_height", "500"), 10),
-			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
-			buttons: {
-				text: 'Close',
-				onclick: function() {
-					this.parent().parent().close();
-				}
-			},
-			onPostRender: function() {
-				var doc = this.getEl('body').firstChild.contentWindow.document, previewHtml, headHtml = '';
-
-				tinymce.each(editor.contentCSS, function(url) {
-					headHtml += '<link type="text/css" rel="stylesheet" href="' + editor.documentBaseURI.toAbsolute(url) + '">';
-				});
-
-				var bodyId = settings.body_id || 'tinymce';
-				if (bodyId.indexOf('=') != -1) {
-					bodyId = editor.getParam('body_id', '', 'hash');
-					bodyId = bodyId[editor.id] || bodyId;
-				}
-
-				var bodyClass = settings.body_class || '';
-				if (bodyClass.indexOf('=') != -1) {
-					bodyClass = editor.getParam('body_class', '', 'hash');
-					bodyClass = bodyClass[editor.id] || '';
-				}
-
-				previewHtml = (
-					'<!DOCTYPE html>' +
-					'<html>' +
-					'<head>' +
-						headHtml +
-					'</head>' +
-					'<body id="' + bodyId + '" class="mce-content-body ' + bodyClass + '">' +
-						editor.getContent() +
-					'</body>' +
-					'</html>'
-				);
-
-				doc.open();
-				doc.write(previewHtml);
-				doc.close();
-			}
-		});
-		*/    
+				
 		allContent = editor.getContent();
+		
+		// Set editor as global variable
+		_glossifyEditor = editor;
 
 		cGovEphoxDoGlossify(allContent);
 	});
