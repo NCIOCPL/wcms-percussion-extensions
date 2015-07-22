@@ -12,7 +12,6 @@
 /*********************************
 * Global variables               *
 **********************************/
-//global tinymce:true 
 var cGovReq;			//global request object
 var cGovOriginalData;	//data from editor window
 var cGovMassagedData;	//editor data after preprocessing
@@ -32,7 +31,7 @@ var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 var cGovIsEnglish = true;
 var cGovLanguage = 'en';
 var _glossifyEditor;
-
+// global tinymce = true
 
 
 /*********************************
@@ -377,7 +376,6 @@ function cGovBuildTermsArray(terms) {
 *
 */
 function cGovBuildCBDisplayString(data, termsArray) {
-	cGovUniqueId = 0;
 	// Go through the terms array in reverse order, insert terms links into massaged data with unique ids
 	for (i=termsArray.length - 1;i>=0;i--) {
 		var tobj = termsArray[i];
@@ -580,7 +578,6 @@ function cGovAddUniqueID(data) {
 }
 
 
-
 /************************************
 * Percussion plugin function for    *
 * TinyMCE. This is needed to call   *
@@ -594,6 +591,7 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 	editor.addCommand('openGlossifier', function() {
 				
 		allContent = editor.getContent();
+		cGovUniqueId = 0;
 		
 		// Set editor as global variable
 		_glossifyEditor = editor;
