@@ -40,7 +40,7 @@ var _glossifyEditor;
 /**
 * Send the glossification request to the web service
 */
-function cGovEphoxDoGlossify(data) {
+function cGovTinyMCEGlossify(data) {
 	// Pre-process the string to encode cr and lf and flag previous glossify results
 	cGovMassagedData = cGovPrepareStr(data);
 	// Wrap in CDATA so markup doesn't hose everything
@@ -82,7 +82,6 @@ function cGovEphoxDoGlossify(data) {
 		cGovStatusWindow.document.write('</' + 'script></head>');
 		cGovStatusWindow.document.write('<body><div><div style="border: 1px solid black; width:200px; height:10px;"><div id="progress" style="height:10px; width:0px; background-color:red;"/></div></div>');
 		cGovStatusWindow.document.write("<h2>Processing document, please wait.........</h2></body></html>");
-
 		
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
@@ -94,13 +93,6 @@ function cGovEphoxDoGlossify(data) {
 		cGovReq.setRequestHeader("SOAPAction", cGovSoapMethod);
 		// Send the request
 		cGovReq.send(soapCommand);
-		/*
-		var content = cGovMassagedData;
-
-		var source = '<?xml version=\"1.0\"?><soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:m=\"cancer.gov/glossproxy\"> <soapenv:Header/><soapenv:Body><m:glossify><m:fragment><![CDATA[' + content + ']]></m:fragment><m:dictionaries><m:string>Cancer.gov</m:string></m:dictionaries><m:languages><m:string>en</m:string></m:languages></m:glossify></soapenv:Body></soapenv:Envelope>'
-
-		// add soap action	jQuery.ajax({url:'/GlossifierProxy/services/GlossifierProxy.GlossifierSoap/',data:source,type:'POST',dataType:'xml',contentType:'text/xml; charset=utf-8'})
-		*/
 		
 		return true;	
 }
@@ -596,17 +588,17 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Set editor as global variable
 		_glossifyEditor = editor;
 
-		cGovEphoxDoGlossify(allContent);
+		cGovTinyMCEGlossify(allContent);
 	});
 
 	editor.addButton('glossifier', {
-		icon: 'glossifier" style="background-image:url(\'../rx_resources/ephox/images/glossify.gif\');"',
+		icon: 'glossifier" style="background-image:url(\'../rx_resources/tinymce/images/glossify.gif\');"',
 		title : 'Glossify',
 		cmd : 'openGlossifier'
 	});
 
 	editor.addMenuItem('glossifier', {
-		icon: 'glossifier" style="background-image:url(\'../rx_resources/ephox/images/glossify.gif\');"',
+		icon: 'glossifier" style="background-image:url(\'../rx_resources/tinymce/images/glossify.gif\');"',
 		text : 'Glossify',
 		cmd : 'openGlossifier',
 		context: 'view'
