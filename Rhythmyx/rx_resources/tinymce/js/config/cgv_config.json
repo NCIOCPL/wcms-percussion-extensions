@@ -1,6 +1,7 @@
 [
-	{				
-		"config_css" : "../rx_resources/tinymce/tinymce1.css",	 
+	{
+		"config_css" : "../rx_resources/tinymce/tinymce1.css",	
+		"langmap": {"es-us":"es","pt-br":"pt_BR","zh-cn":"zh_CN"},
 		"plugins" : [
 			"advlist anchor autolink autosave charmap code contextmenu",
 			"directionality fullscreen glossifier hr link lists nonbreaking",
@@ -13,6 +14,7 @@
 	{
 		"roles" : ["Admin"],
 		"config_css" : "../rx_resources/tinymce/tinymce1.css",
+		"langmap": {"es-us":"es","pt-br":"pt_BR","zh-cn":"zh_CN"},
 		"plugins" : [
 			"advlist anchor autolink autosave charmap code contextmenu",
 			"directionality fullscreen glossifier hr link lists nonbreaking",
