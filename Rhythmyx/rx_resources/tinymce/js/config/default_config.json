@@ -1,29 +1,26 @@
 [
-	{	
-			
-		"config_css": "../rx_resources/tinymce/tinymce1.css",	 
-		"plugins": [
-	        "advlist autolink lists link charmap print preview hr anchor pagebreak",
-	        "searchreplace wordcount visualblocks visualchars fullscreen",
-	        "insertdatetime media nonbreaking save table contextmenu directionality",
-	        "emoticons template paste textcolor",
-			 "noneditable rxinline"
-		    ],
-			"valid_elements": "*[*]"
-			
-		
+	{
+		"config_css" : "../rx_resources/tinymce/tinymce1.css",	
+		"langmap": {"es-us":"es","pt-br":"pt_BR","zh-cn":"zh_CN"},
+		"plugins" : [
+			"advlist anchor autolink autosave charmap code contextmenu",
+			"directionality fullscreen glossifier hr link lists nonbreaking",
+			"pagebreak paste preview print rxinline save",
+			"searchreplace table visualblocks visualchars wordcount"
+		],
+		"valid_elements" : "*[*]",
+		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
 	},
-	{	
-			"roles" : ["Admin"],
-			
-		"config_css": "../rx_resources/tinymce/tinymce1.css",		
-		"plugins": [
-	        "advlist autolink lists link charmap print preview hr anchor pagebreak",
-	        "searchreplace wordcount visualblocks visualchars code fullscreen",
-	        "insertdatetime media nonbreaking save table contextmenu directionality",
-	        "emoticons template paste textcolor",
-			 "noneditable rxinline"
-		    ]
-		
+	{
+		"roles" : ["Admin"],
+		"config_css" : "../rx_resources/tinymce/tinymce1.css",
+		"langmap": {"es-us":"es","pt-br":"pt_BR","zh-cn":"zh_CN"},
+		"plugins" : [
+			"advlist anchor autolink autosave charmap code contextmenu",
+			"directionality fullscreen glossifier hr link lists nonbreaking",
+			"pagebreak paste preview print rxinline save",
+			"searchreplace table visualblocks visualchars wordcount"
+		],
+		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
 	}
 ]

@@ -14,7 +14,7 @@
 		
 	},
 	{	
-		"roles" : ["Admin"],		
+		"roles" : ["Admin"],	
 		"config_css": "../rx_resources/tinymce/tinymce1.css",		
 		"plugins": [
 	        "advlist autolink lists link charmap print preview hr anchor pagebreak",
