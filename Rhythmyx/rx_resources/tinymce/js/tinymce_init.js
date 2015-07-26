@@ -74,6 +74,14 @@ function perc_tinymce_init(options)
 			css_path = css_path + "," + mergedOptions.control_css;
 			mergedOptions.content_css = css_path;
 		}
+		/* Hide toolbars if the content is not in draft or edit state
+		if(content.editable == false)
+		{
+			mergedOptions.menubar = false;
+			mergedOptions.toolbar = false;
+			mergedOptions.statusbar = false;
+		}
+		*/
 
 		tinyMCE.init(mergedOptions);
 	},
