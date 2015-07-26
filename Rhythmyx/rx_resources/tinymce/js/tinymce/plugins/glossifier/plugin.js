@@ -601,6 +601,6 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		icon: 'glossifier" style="background-image:url(\'../rx_resources/tinymce/images/glossify.gif\');"',
 		text : 'Glossify',
 		cmd : 'openGlossifier',
-		context: 'view'
+		context: 'tools'
 	});
 });
