@@ -75,6 +75,14 @@ function perc_tinymce_init(options)
 			mergedOptions.content_css = css_path;
 		}
 		
+		// Hacky fixes - need to set these in the options configs
+		/* Display only basic options for simple wysiwyg.*/
+		if(mergedOptions.perc_config.indexOf("cgv_simple") > -1)
+		{
+			mergedOptions.toolbar = "bold italic underline";
+			mergedOptions.menubar = false;
+			mergedOptions.statusbar = false;
+		}
 		/* Hide toolbars if the content is not in draft or edit state*/
 		if(mergedOptions.readonly == true)
 		{
