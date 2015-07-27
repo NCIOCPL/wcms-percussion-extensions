@@ -577,13 +577,24 @@ function cGovAddUniqueID(data) {
 *************************************/
 tinymce.PluginManager.add('glossifier', function(editor) {
 	var settings = editor.settings;
-	//var allContent = editor.getContent();
     var allContent = '<b>cancer</b>';
 	
 	editor.addCommand('openGlossifier', function() {
 				
 		allContent = editor.getContent();
+		
+		// Set unique ID for checked/unchecked terms
 		cGovUniqueId = 0;
+		
+		// Set glossifier to use locale of content item rather than Percussion locale
+		if(settings.language == 'es')
+		{
+			cGovLanguage = settings.language;
+		}
+		else
+		{
+			cGovLanguage = 'en';
+		}
 		
 		// Set editor as global variable
 		_glossifyEditor = editor;
