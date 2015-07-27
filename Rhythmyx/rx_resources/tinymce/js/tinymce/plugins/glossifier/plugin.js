@@ -29,7 +29,7 @@ var cGovSoapNameSpace = "http:?/?/?schemas.xmlsoap.org/?soap/?envelope/";
 var cGovWSNameSpace = "cancer.gov/glossproxy";
 var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 var cGovIsEnglish = true;
-var cGovLanguage = 'en';
+var cGovLanguage = document.documentElement.lang.split('-')[0];
 var _glossifyEditor;
 // global tinymce = true
 
