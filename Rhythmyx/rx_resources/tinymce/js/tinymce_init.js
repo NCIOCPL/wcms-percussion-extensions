@@ -31,7 +31,7 @@ function perc_tinymce_init(options)
 	"gecko_spellcheck" : true,
 	"toolbar_items_size" : "normal",
 
-	"toolbar": "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify |  bullist numlist outdent indent | link | print preview media | forecolor backcolor emoticons | rxinlinelink rxinlinetemplate rxinlineimage glossifier"
+	"toolbar": "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify |  bullist numlist outdent indent | link | print preview media | forecolor backcolor emoticons | rxinlinelink rxinlinetemplate rxinlineimage"
 
         }, options );
 
@@ -76,13 +76,6 @@ function perc_tinymce_init(options)
 		}
 		
 		// Hacky fixes - need to set these in the options configs
-		/* Display only basic options for simple wysiwyg.*/
-		if(mergedOptions.perc_config.indexOf("cgv_simple") > -1)
-		{
-			mergedOptions.toolbar = "bold italic underline";
-			mergedOptions.menubar = false;
-			mergedOptions.statusbar = false;
-		}
 		/* Hide toolbars if the content is not in draft or edit state*/
 		if(mergedOptions.readonly == true)
 		{
