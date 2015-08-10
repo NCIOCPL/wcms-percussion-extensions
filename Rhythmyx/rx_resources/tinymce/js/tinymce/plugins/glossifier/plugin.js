@@ -569,6 +569,14 @@ function cGovAddUniqueID(data) {
 	return uniqueID;
 }
 
+/**
+* Pass the correct Spanish characters to soap
+*
+*/
+function fixSpanish(editorContent, entity, character) {
+	var fixedSpanish = editorContent.split(entity).join(character);
+	return fixedSpanish;
+}
 
 /************************************
 * Percussion plugin function for    *
@@ -577,11 +585,27 @@ function cGovAddUniqueID(data) {
 *************************************/
 tinymce.PluginManager.add('glossifier', function(editor) {
 	var settings = editor.settings;
-    var allContent = '<b>cancer</b>';
+    var allContent = '';
 	
 	editor.addCommand('openGlossifier', function() {
-				
+		// Get editor content
 		allContent = editor.getContent();
+		
+		// Replace HTML entities with characters 
+		allContent = fixSpanish(allContent, "&Aacute;", "Á");
+		allContent = fixSpanish(allContent, "&aacute;", "á");
+		allContent = fixSpanish(allContent, "&Eacute;", "É");
+		allContent = fixSpanish(allContent, "&eacute;", "é");
+		allContent = fixSpanish(allContent, "&Iacute;", "Í");
+		allContent = fixSpanish(allContent, "&iacute;", "í");
+		allContent = fixSpanish(allContent, "&Oacute;", "Ó");
+		allContent = fixSpanish(allContent, "&oacute;", "ó");
+		allContent = fixSpanish(allContent, "&Uacute;", "Ú");
+		allContent = fixSpanish(allContent, "&uacute;", "ú");
+		allContent = fixSpanish(allContent, "&Yacute;", "Ý");
+		allContent = fixSpanish(allContent, "&yacute;", "ý");
+		allContent = fixSpanish(allContent, "&Ntilde;", "Ñ");
+		allContent = fixSpanish(allContent, "&ntilde;", "ñ");
 		
 		// Set unique ID for checked/unchecked terms
 		cGovUniqueId = 0;
