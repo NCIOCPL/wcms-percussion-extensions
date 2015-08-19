@@ -175,5 +175,13 @@ public class CGV_HTMLTools extends PSJexlUtilBase implements IPSJexlExpression{
         return result; 
    } 
 	
+    public static String replaceLocalLinks(String a){
+    	
+    	String toFind = "href=\"/";
+    	String result = a.replaceAll(toFind, "href=\"http://www.cancer.gov/");
+    	
+    	return result;
+    
+    }
 
 }
