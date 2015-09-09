@@ -175,6 +175,8 @@ public class CGV_HTMLTools extends PSJexlUtilBase implements IPSJexlExpression{
         return result; 
    } 
 	
+    //This is to replace all local links in the given string
+    //This will be updated to make the regex more robust
     public static String replaceLocalLinks(String a){
     	
     	String toFind = "href=\"/";
