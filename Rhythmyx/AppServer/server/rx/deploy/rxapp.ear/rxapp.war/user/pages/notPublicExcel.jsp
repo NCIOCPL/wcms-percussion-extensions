@@ -31,9 +31,12 @@
 	<h2>Starting Folder: <%=folder%></h2>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
+			<th>Content ID</th>
+			<th>Content Title</th>
 			<th>Content Type</th>
 			<th>Workflow State</th>
-			<th>Title</th>
+			<th>Item Path</th>
+			<th>Path to Content Item</th>
 			<th>Pretty URL</th>
 		</tr>
 <%
@@ -46,16 +49,19 @@
 		ResultSet rs = cstmt.executeQuery();
 		String lastType = "";
 		while (rs.next()) {
+			String id = rs.getString(1);
 			String type = rs.getString(2);
 			String displayType = type.equals(lastType) ? "" : type;
-			String state = rs.getString(5);
-			String title = rs.getString(4);
 			String url = rs.getString(3);
+			String path = rs.getString(4);
+			String title = rs.getString(5);
+			String state = rs.getString(6);
+			
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + displayType + "</td><td>" + state + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + displayType + "</td><td>" + state + "</td><td>" + path + "</td><td>" + path + "</td><td><a href=\"" + url + "\">" + url + "</a></td></tr>");
 			lastType = type;
 		}
 	}
