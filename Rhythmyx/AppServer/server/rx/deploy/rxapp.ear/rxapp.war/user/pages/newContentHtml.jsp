@@ -32,6 +32,7 @@
 	<p>Date Range: <%= request.getParameter("startDate") %> - <%= request.getParameter("endDate") %> </p>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
+			<th>Content ID</th>
 			<th>Content Type</th>
 			<th>Title</th>
 			<th>PrettyURL</th>
@@ -51,18 +52,19 @@
 		String lastType = "";
 		while (rs.next()) {
 			String type = rs.getString(3);
+			String id = rs.getString(1);
 			String displayType = type.equals(lastType) ? "" : type;
 			String title = rs.getString(2);
 			String url = rs.getString(4);
-			String created = rs.getString(5);
-			String modified = rs.getString(6);
+			String created = rs.getString(6);
+			String modified = rs.getString(7);
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
 			created = created.substring(0,10);
 			modified = modified.substring(0,10);
-			out.println("<tr><td>" + displayType + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + created + "</td><td>" + modified + "</td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + displayType + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + created + "</td><td>" + modified + "</td></tr>");
 			lastType = type;
 		}
 	}
