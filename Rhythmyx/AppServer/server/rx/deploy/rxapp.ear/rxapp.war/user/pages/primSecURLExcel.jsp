@@ -31,14 +31,12 @@
 	<h2>Starting Folder: <%=folder%></h2>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>Content ID</th>
 			<th>Title</th>
 			<th>Pretty URL</th>
 			<th>Secondary URL</th>
 			<th>Secondary URL 2</th>
 			<th>Secondary URL 3</th>
 			<th>Secondary URL 4</th>
-			<th>Item Path</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -50,19 +48,17 @@
 		cstmt.setString(3,null);
 		ResultSet rs = cstmt.executeQuery();
 		while (rs.next()) {
-			String id = rs.getString(1);
 			String title = rs.getString(2);
 			String url = rs.getString(3);
-			String path = rs.getString(4);
-			String sec1 = rs.getString(5);
-			String sec2 = rs.getString(6);
-			String sec3 = rs.getString(7);
-			String sec4 = rs.getString(8);
+			String sec1 = rs.getString(4);
+			String sec2 = rs.getString(5);
+			String sec3 = rs.getString(6);
+			String sec4 = rs.getString(7);
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + sec1 + "</td><td>" + sec2 + "</td><td>" + sec3 + "</td><td>" + sec4 + "</td><td>" + path + "</td></tr>");
+			out.println("<tr><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + sec1 + "</td><td>" + sec2 + "</td><td>" + sec3 + "</td><td>" + sec4 + "</td></tr>");
 		}
 	}
 	catch(Exception e) {

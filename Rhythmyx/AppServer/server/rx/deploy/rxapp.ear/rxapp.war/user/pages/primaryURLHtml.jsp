@@ -31,11 +31,9 @@
 	<input type="button" value="Print" onclick="window.print();" class="Print"> <input type="button" value="Close" onclick="window.close();" class="close"> <input type="button" value="Back" onclick="window.history.go(-1);" class="back"> </div>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>Content ID</th>
 			<th>Title</th>
 			<th>Pretty URL</th>
 			<th>Type</th>
-			<th>Item Path</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -49,14 +47,12 @@
 		while (rs.next()) {
 			String title = rs.getString(2);
 			String url = rs.getString(3);
-			String type = rs.getString(5);
-			String id = rs.getString(1);
-			String path = rs.getString(4);
+			String type = rs.getString(4);
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + type + "</td><td>" + path + "</td></tr>");
+			out.println("<tr><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + type + "</td></tr>");
 		}
 	}
 	catch(Exception e) {
