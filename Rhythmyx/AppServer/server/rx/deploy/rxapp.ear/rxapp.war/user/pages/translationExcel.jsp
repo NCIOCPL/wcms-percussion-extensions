@@ -35,7 +35,6 @@
 			<th>Content Title</th>
 			<th>Has a Translation Relationship With</th>
 			<th>Item Path</th>
-			<th>Path to Content Item</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -49,7 +48,7 @@
 			String title = rs.getString(2);
 			String path = rs.getString(4);
 			String relatedItem = rs.getString(9);
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + relatedItem + "</td><td>" + path + "</td><td>" + path + "</td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + relatedItem + "</td><td>" + path + "</td></tr>");
 		}
 	}
 	catch(Exception e) {

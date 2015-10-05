@@ -37,7 +37,6 @@
 			<th>Pretty URL</th>
 			<th>Content Type</th>
 			<th>Item Path</th>
-			<th>Path to Content Item</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -61,7 +60,7 @@
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + state + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + displayType + "</td><td>" + path + "</td><td>" + path + "</td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + state + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + displayType + "</td><td>" + path + "</td></tr>");
 			lastType = type;
 		}
 	}

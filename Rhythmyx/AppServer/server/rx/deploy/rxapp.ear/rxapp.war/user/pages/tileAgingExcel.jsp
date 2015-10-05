@@ -20,7 +20,6 @@
 			<th>Date Published to Live Site</th>
 			<th>Date Removed from Live Site</th>
 			<th>Item Path</th>
-			<th>Path to Content Item</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -49,7 +48,7 @@
 				removed = removed.substring(0,10);
 			else
 				removed = "";
-			out.println("<tr><td>" + id + "</td><td>" + displayTitle + "</td><td>" + where + "</td><td>" + published + "</td><td>" + removed + "</td><td>" + path + "</td><td>" + path + "</td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + displayTitle + "</td><td>" + where + "</td><td>" + published + "</td><td>" + removed + "</td><td>" + path + "</td></tr>");
 			lastTitle = title;
 		}
 	}

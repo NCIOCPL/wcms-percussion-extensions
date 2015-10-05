@@ -18,7 +18,6 @@
 			<th>Content Title</th>
 			<th>Parent</th>
 			<th>Item Path</th>
-			<th>Path to Content Item</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -51,9 +50,9 @@
 				parent = "";
 			String path = rs.getString(8);
 			if (isUrl)
-				out.println("<tr><td>" + id + "</td><td>" + displayType + "</td><td>" + displayTitle + "</td><td><a href=\"" + parent + "\">" + parent + "</a></td><td>" + path + "</td><td>" + path + "</td></tr>");
+				out.println("<tr><td>" + id + "</td><td>" + displayType + "</td><td>" + displayTitle + "</td><td><a href=\"" + parent + "\">" + parent + "</a></td><td>" + path + "</td></tr>");
 			else
-				out.println("<tr><td>" + id + "</td><td>" + displayType + "</td><td>" + displayTitle + "</td><td>" + parent + "</td><td>" + path + "</td><td>" + path + "</td></tr>");
+				out.println("<tr><td>" + id + "</td><td>" + displayType + "</td><td>" + displayTitle + "</td><td>" + parent + "</td><td>" + path + "</td></tr>");
 			lastType = type;
 			lastTitle = title;
 		}
