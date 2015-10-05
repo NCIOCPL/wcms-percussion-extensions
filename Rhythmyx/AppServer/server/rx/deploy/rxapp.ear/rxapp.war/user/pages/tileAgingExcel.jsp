@@ -14,10 +14,13 @@
 	<p>Date Range: <%= request.getParameter("startDate") %> - <%= request.getParameter("endDate") %> </p>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>Title</th>
+			<th>Content ID</th>
+			<th>Content Title</th>
 			<th>Where Published</th>
 			<th>Date Published to Live Site</th>
 			<th>Date Removed from Live Site</th>
+			<th>Item Path</th>
+			<th>Path to Content Item</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -34,17 +37,19 @@
 		ResultSet rs = cstmt.executeQuery();
 		String lastTitle = "";
 		while (rs.next()) {
+			String id = rs.getString(1);
 			String title = rs.getString(2);
 			String displayTitle = title.equals(lastTitle) ? "" : title;
 			String where = rs.getString(5);
-			String published = rs.getString(6);
-			String removed = rs.getString(7);
+			String path = rs.getString(6);
+			String published = rs.getString(7);
 			published = published.substring(0,10);
+			String removed = rs.getString(8);
 			if (removed != null)
 				removed = removed.substring(0,10);
 			else
 				removed = "";
-			out.println("<tr><td>" + displayTitle + "</td><td>" + where + "</td><td>" + published + "</td><td>" + removed + "</td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + displayTitle + "</td><td>" + where + "</td><td>" + published + "</td><td>" + removed + "</td><td>" + path + "</td><td>" + path + "</td></tr>");
 			lastTitle = title;
 		}
 	}
