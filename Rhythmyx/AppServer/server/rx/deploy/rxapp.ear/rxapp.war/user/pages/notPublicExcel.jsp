@@ -32,12 +32,12 @@
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
 			<th>Content ID</th>
-			<th>Content Title</th>
-			<th>Content Type</th>
+			<th>Title</th>
 			<th>Workflow State</th>
+			<th>Pretty URL</th>
+			<th>Content Type</th>
 			<th>Item Path</th>
 			<th>Path to Content Item</th>
-			<th>Pretty URL</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -61,7 +61,7 @@
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + displayType + "</td><td>" + state + "</td><td>" + path + "</td><td>" + path + "</td><td><a href=\"" + url + "\">" + url + "</a></td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + state + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + displayType + "</td><td>" + path + "</td><td>" + path + "</td></tr>");
 			lastType = type;
 		}
 	}
