@@ -13,9 +13,12 @@
 	<input type="button" value="Print" onclick="window.print();" class="Print"> <input type="button" value="Close" onclick="window.close();" class="close"> <input type="button" value="Back" onclick="window.history.go(-1);" class="back"> </div>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
+			<th>Content ID</th>
 			<th>Content Type</th>
-			<th>Title</th>
+			<th>Content Title</th>
 			<th>Parent</th>
+			<th>Item Path</th>
+			<th>Path to Content Item</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -32,6 +35,7 @@
 		String lastTitle = "";
 		while (rs.next()) {
 			boolean isUrl = false;
+			String id = rs.getString(1);
 			String type = rs.getString(2);
 			String displayType = type.equals(lastType) ? "" : type;
 			String title = rs.getString(3);
@@ -45,10 +49,11 @@
 			}
 			else
 				parent = "";
+			String path = rs.getString(8);
 			if (isUrl)
-				out.println("<tr><td>" + displayType + "</td><td>" + displayTitle + "</td><td><a href=\"" + parent + "\">" + parent + "</a></td></tr>");
+				out.println("<tr><td>" + id + "</td><td>" + displayType + "</td><td>" + displayTitle + "</td><td><a href=\"" + parent + "\">" + parent + "</a></td><td>" + path + "</td><td>" + path + "</td></tr>");
 			else
-				out.println("<tr><td>" + displayType + "</td><td>" + displayTitle + "</td><td>" + parent + "</td></tr>");
+				out.println("<tr><td>" + id + "</td><td>" + displayType + "</td><td>" + displayTitle + "</td><td>" + parent + "</td><td>" + path + "</td><td>" + path + "</td></tr>");
 			lastType = type;
 			lastTitle = title;
 		}
