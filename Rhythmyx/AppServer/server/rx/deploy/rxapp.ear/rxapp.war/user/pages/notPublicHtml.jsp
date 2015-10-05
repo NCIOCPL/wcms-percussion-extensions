@@ -31,10 +31,12 @@
 	<input type="button" value="Print" onclick="window.print();" class="Print"> <input type="button" value="Close" onclick="window.close();" class="close"> <input type="button" value="Back" onclick="window.history.go(-1);" class="back"> </div>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>Content Type</th>
+			<th>Content ID</th>
+			<th>Content Title</th>
 			<th>Workflow State</th>
-			<th>Title</th>
 			<th>Pretty URL</th>
+			<th>Content Type</th>
+			<th>Item Path</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -46,16 +48,19 @@
 		ResultSet rs = cstmt.executeQuery();
 		String lastType = "";
 		while (rs.next()) {
+			String id = rs.getString(1);
 			String type = rs.getString(2);
 			String displayType = type.equals(lastType) ? "" : type;
-			String state = rs.getString(5);
-			String title = rs.getString(4);
 			String url = rs.getString(3);
+			String path = rs.getString(4);
+			String title = rs.getString(5);
+			String state = rs.getString(6);
+
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + displayType + "</td><td>" + state + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + state + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + displayType + "</td><td>" + path + "</td></tr>");
 			lastType = type;
 		}
 	}
