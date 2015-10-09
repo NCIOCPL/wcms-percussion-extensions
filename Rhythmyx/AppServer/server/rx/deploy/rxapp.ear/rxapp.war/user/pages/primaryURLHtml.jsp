@@ -32,7 +32,7 @@
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
 			<th>Content ID</th>
-			<th>Title</th>
+			<th>Content Title</th>
 			<th>Pretty URL</th>
 			<th>Type</th>
 			<th>Item Path</th>
