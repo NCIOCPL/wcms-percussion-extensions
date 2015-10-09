@@ -53,8 +53,7 @@
 		while (rs.next()) {
 			String id = rs.getString(1);
 			String title = rs.getString(2);
-			String type = rs.getString(3);
-			String displayType = type.equals(lastType) ? "" : type;
+			String contentType = rs.getString(3);
 			String url = rs.getString(4);
 			String created = rs.getString(6);
 			String modified = rs.getString(7);
@@ -64,8 +63,7 @@
 				url = "";
 			created = created.substring(0,10);
 			modified = modified.substring(0,10);
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + displayType + "</td><td>" + created + "</td><td>" + modified + "</td></tr>");
-			lastType = type;
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + contentType + "</td><td>" + created + "</td><td>" + modified + "</td></tr>");
 		}
 	}
 	catch(Exception e) {

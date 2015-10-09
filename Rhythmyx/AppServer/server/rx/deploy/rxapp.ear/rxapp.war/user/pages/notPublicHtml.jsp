@@ -49,19 +49,17 @@
 		String lastType = "";
 		while (rs.next()) {
 			String id = rs.getString(1);
-			String type = rs.getString(2);
-			String displayType = type.equals(lastType) ? "" : type;
+			String contentType = rs.getString(2);
 			String url = rs.getString(3);
 			String path = rs.getString(4);
 			String title = rs.getString(5);
 			String state = rs.getString(6);
-
+			
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + state + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + displayType + "</td><td>" + path + "</td></tr>");
-			lastType = type;
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + state + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + contentType + "</td><td>" + path + "</td></tr>");
 		}
 	}
 	catch(Exception e) {
