@@ -31,8 +31,10 @@
 	<input type="button" value="Print" onclick="window.print();" class="Print"> <input type="button" value="Close" onclick="window.close();" class="close"> <input type="button" value="Back" onclick="window.history.go(-1);" class="back"> </div>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>This Page</th>
+			<th>Content ID</th>
+			<th>Content Title</th>
 			<th>Has a Translation Relationship With</th>
+			<th>Item Path</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -42,9 +44,11 @@
 		cstmt.setString(1,request.getParameter("sys_contentid"));
 		ResultSet rs = cstmt.executeQuery();
 		while (rs.next()) {
-			String thisun = rs.getString(2);
-			String thatun = rs.getString(8);
-			out.println("<tr><td>" + thisun + "</td><td>" + thatun + "</td></tr>");
+			String id = rs.getString(1);
+			String title = rs.getString(2);
+			String path = rs.getString(4);
+			String relatedItem = rs.getString(9);
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + relatedItem + "</td><td>" + path + "</td></tr>");
 		}
 	}
 	catch(Exception e) {

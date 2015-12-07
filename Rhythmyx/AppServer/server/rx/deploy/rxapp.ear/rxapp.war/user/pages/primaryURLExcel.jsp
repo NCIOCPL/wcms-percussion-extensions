@@ -31,9 +31,11 @@
 	<h2>Starting Folder: <%=folder%></h2>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>Title</th>
+			<th>Content ID</th>
+			<th>Content Title</th>
 			<th>Pretty URL</th>
 			<th>Type</th>
+			<th>Item Path</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -47,12 +49,14 @@
 		while (rs.next()) {
 			String title = rs.getString(2);
 			String url = rs.getString(3);
-			String type = rs.getString(4);
+			String type = rs.getString(5);
+			String id = rs.getString(1);
+			String path = rs.getString(4);
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + type + "</td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + type + "</td><td>" + path + "</td></tr>");
 		}
 	}
 	catch(Exception e) {

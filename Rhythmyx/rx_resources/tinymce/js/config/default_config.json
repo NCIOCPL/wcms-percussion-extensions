@@ -1,0 +1,28 @@
+[
+	{	
+			
+		"config_css": "../rx_resources/tinymce/tinymce1.css",	 
+		"plugins": [
+	        "advlist autolink lists link charmap print preview hr anchor pagebreak",
+	        "searchreplace wordcount visualblocks visualchars fullscreen",
+	        "insertdatetime media nonbreaking save table contextmenu directionality",
+	        "emoticons template paste textcolor",
+			 "noneditable rxinline"
+		    ],
+			"valid_elements": "*[*]"
+			
+		
+	},
+	{	
+		"roles" : ["Admin"],	
+		"config_css": "../rx_resources/tinymce/tinymce1.css",		
+		"plugins": [
+	        "advlist autolink lists link charmap print preview hr anchor pagebreak",
+	        "searchreplace wordcount visualblocks visualchars code fullscreen",
+	        "insertdatetime media nonbreaking save table contextmenu directionality",
+	        "emoticons template paste textcolor",
+			 "noneditable rxinline"
+		    ]
+		
+	}
+]

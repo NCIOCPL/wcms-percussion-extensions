@@ -1002,13 +1002,41 @@
 						</entry>						
 					</map>
 				</entry>
+				<entry key="Editing (D)">
+					<map>
+							<entry key="Staging (D)">
+							<list>
+								<value>Preview</value>
+							</list>
+						</entry>
+						<entry key="Review (P)">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>
+						<entry key="Public">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+								<value>Reapprove</value>
+							</list>
+						</entry>
+						<entry key="Staging (P)">
+							<list>
+								<value>Preview</value>
+							</list>
+						</entry>
+						<entry key="Review (P)">
+							<list>
+								<value>Preview</value>
+								<value>Resubmit for Review</value>
+							</list>
+						</entry>
+					</map>
+				</entry>
 				<entry key="Staging (D)">
 					<map>
-						<entry key="Draft">
-							<list>
-								<value>backToDraft</value>
-							</list>
-						</entry>					
 						<entry key="Review (D)">
 							<list>
 								<value>submitForReview</value>								
@@ -1020,9 +1048,9 @@
 								<value>Approve</value>
 							</list>
 						</entry>
-						<entry key="Editing">
+						<entry key="Editing (D)">
 							<list>
-								<value>backToDraft</value>
+								<value>backToEdit</value>
 							</list>
 						</entry>
 						<entry key="Review (P)">
@@ -1044,7 +1072,7 @@
 								<value>Approve</value>
 							</list>
 						</entry>
-						<entry key="Editing">
+						<entry key="Editing (D)">
 							<list>
 								<value>Disapprove</value>
 							</list>
@@ -1053,19 +1081,19 @@
 				</entry>
 				<entry key="Public">
 					<map>
-						<entry key="Draft">
+						<entry key="Editing (D)">
 							<list>
 								<value>Quick Edit</value>
 							</list>
 						</entry>					
-						<entry key="Editing">
+						<entry key="Editing (P)">
 							<list>
 								<value>Quick Edit</value>
 							</list>
 						</entry>
 					</map>
 				</entry>
-				<entry key="Editing">
+				<entry key="Editing (P)">
 					<map>
 						<entry key="Staging (D)">
 							<list>
@@ -1116,7 +1144,7 @@
 								<value>Reapprove</value>
 							</list>
 						</entry>
-						<entry key="Editing">
+						<entry key="Editing (P)">
 							<list>
 								<value>backToEdit</value>
 							</list>
@@ -1140,7 +1168,7 @@
 								<value>Reapprove</value>
 							</list>
 						</entry>
-						<entry key="Editing">
+						<entry key="Editing (P)">
 							<list>
 								<value>noApproval</value>
 							</list>
@@ -1201,7 +1229,10 @@
 			<entry key="Draft">
 				<value>1</value>
 			</entry>
-			<entry key="Editing">
+			<entry key="Editing (D)">
+				<value>1</value>
+			</entry>
+			<entry key="Editing (P)">
 				<value>1</value>
 			</entry>
 			<entry key="Staging (D)">
