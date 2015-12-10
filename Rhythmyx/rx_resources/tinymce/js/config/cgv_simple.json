@@ -11,6 +11,7 @@
 		"menubar": false,
 		"toolbar": "bold italic underline",
 		"statusbar": false,
+		"convert_urls" : false,
 		"valid_elements" : "*[*]",
 		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
 	},
@@ -27,6 +28,7 @@
 		"menubar": false,
 		"toolbar": "bold italic underline",
 		"statusbar": false,
+		"convert_urls" : false,
 		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
 	}
 ]

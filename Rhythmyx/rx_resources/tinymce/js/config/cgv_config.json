@@ -9,6 +9,7 @@
 			"searchreplace table visualblocks visualchars wordcount"
 		],
 		"toolbar": "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify |  bullist numlist outdent indent | link | print preview media | forecolor backcolor emoticons | rxinlinelink rxinlinetemplate rxinlineimage glossifier",
+		"convert_urls" : false,
 		"valid_elements" : "*[*]",
 		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
 	},
@@ -23,6 +24,7 @@
 			"searchreplace table visualblocks visualchars wordcount"
 		],
 		"toolbar": "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify |  bullist numlist outdent indent | link | print preview media | forecolor backcolor emoticons | rxinlinelink rxinlinetemplate rxinlineimage glossifier",
+		"convert_urls" : false,
 		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
 	}
 ]
