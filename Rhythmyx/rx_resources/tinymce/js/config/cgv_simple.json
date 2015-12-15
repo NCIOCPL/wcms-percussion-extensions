@@ -13,7 +13,7 @@
 		"statusbar": false,
 		"convert_urls" : false,
 		"valid_elements" : "*[*]",
-		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
+		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext|style|id]"
 	},
 	{
 		"roles" : ["Admin"],
@@ -29,6 +29,6 @@
 		"toolbar": "bold italic underline",
 		"statusbar": false,
 		"convert_urls" : false,
-		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext]"
+		"extended_valid_elements" : "div[sys_dependentvariantid|sys_dependentid|inlinetype|rxinlineslot|sys_siteid|sys_folderid|class|contenteditable|rxselectedtext|style|id]"
 	}
 ]
