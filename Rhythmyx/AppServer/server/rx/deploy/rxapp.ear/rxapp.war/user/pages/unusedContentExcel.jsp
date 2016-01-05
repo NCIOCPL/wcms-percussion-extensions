@@ -14,10 +14,11 @@
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
 			<th>Content Type</th>
+			<th>Content ID</th>
 			<th>Title</th>
+			<th>Item Path</th>
 			<th>Last Modified Date</th>
-			<th>Workflow State</th>
-		</tr>
+			<th>Workflow State</th>		</tr>
 <%
 	Connection conn = null;
 	try {
@@ -34,10 +35,12 @@
 			String type = rs.getString(3);
 			String displayType = type.equals(lastType) ? "" : type;
 			String title = rs.getString(2);
+			String contentid = rs.getString(1);
+			String path = rs.getString(5);
 			String modified = rs.getString(6);
 			modified = modified.substring(0,10);
 			String state = rs.getString(4);
-			out.println("<tr><td>" + displayType + "</td><td>" + title + "</td><td>" + modified + "</td><td>" + state + "</td></tr>");
+			out.println("<tr><td>" + displayType + "</td><td>" + contentid + "</td><td>" + title  + "</td><td>" + path  + "</td><td>" +    modified + "</td><td>" + state + "</td></tr>");
 			lastType = type;
 		}
 	}
