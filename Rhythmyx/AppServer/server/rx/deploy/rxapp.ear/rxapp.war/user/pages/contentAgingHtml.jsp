@@ -31,9 +31,11 @@
 	<input type="button" value="Print" onclick="window.print();" class="Print"> <input type="button" value="Close" onclick="window.close();" class="close"> <input type="button" value="Back" onclick="window.history.go(-1);" class="back"> </div>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
+			<th>Content ID</th>
 			<th>Content Type</th>
 			<th>Content Title</th>
 			<th>Primary Pretty URL</th>
+			<th>Item Path</th>
 			<th>Last Modified Date</th>
 			<th>Posted Date</th>
 			<th>Revised Date</th>
@@ -50,18 +52,20 @@
 		ResultSet rs = cstmt.executeQuery();
 		String lastType = "";
 		while (rs.next()) {
-			String type = rs.getString(1);
+			String contentid = rs.getString(1);
+			String type = rs.getString(2);
 			String displayType = type.equals(lastType) ? "" : type;
-			String title = rs.getString(2);
-			String url = rs.getString(3);
+			String title = rs.getString(3);
+			String url = rs.getString(4);
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			String modified = rs.getString(4);
-			String posted = rs.getString(5);
-			String revised = rs.getString(6);
-			String reviewed = rs.getString(7);
+			String path = rs.getString(5);	
+			String modified = rs.getString(6);
+			String posted = rs.getString(7);
+			String revised = rs.getString(8);
+			String reviewed = rs.getString(9);
 			if (modified != null)
 				modified = modified.substring(0,10);
 			else
@@ -78,7 +82,7 @@
 				reviewed = reviewed.substring(0,10);
 			else
 				reviewed = "";
-			out.println("<tr><td>" + displayType + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + modified + "</td><td>" + posted + "</td><td>" + revised + "</td><td>" + reviewed + "</td></tr>");
+			out.println("<tr><td>"  + contentid   + "</td><td>"  + displayType + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" +  path      + "</td><td>"  + modified + "</td><td>" + posted + "</td><td>" + revised + "</td><td>" + reviewed + "</td></tr>");
 			lastType = type;
 		}
 	}
