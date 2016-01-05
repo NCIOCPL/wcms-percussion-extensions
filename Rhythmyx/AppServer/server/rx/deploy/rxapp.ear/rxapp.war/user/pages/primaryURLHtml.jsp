@@ -36,6 +36,7 @@
 			<th>Pretty URL</th>
 			<th>Type</th>
 			<th>Item Path</th>
+			<th>Content State</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -52,11 +53,12 @@
 			String type = rs.getString(5);
 			String id = rs.getString(1);
 			String path = rs.getString(4);
+			String statename = rs.getString(6);
 			if (url != null)
 				url = url.replace("CancerGov", "http://www.cancer.gov");
 			else
 				url = "";
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + type + "</td><td>" + path + "</td></tr>");
+			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" + type + "</td><td>" + path  + "</td><td>" +   statename    + "</td></tr>");
 		}
 	}
 	catch(Exception e) {
