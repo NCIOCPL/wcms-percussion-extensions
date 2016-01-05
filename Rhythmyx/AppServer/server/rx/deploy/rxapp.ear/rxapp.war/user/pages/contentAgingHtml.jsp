@@ -31,8 +31,8 @@
 	<input type="button" value="Print" onclick="window.print();" class="Print"> <input type="button" value="Close" onclick="window.close();" class="close"> <input type="button" value="Back" onclick="window.history.go(-1);" class="back"> </div>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>Content ID</th>
 			<th>Content Type</th>
+			<th>Content ID</th>
 			<th>Content Title</th>
 			<th>Primary Pretty URL</th>
 			<th>Item Path</th>
@@ -82,7 +82,7 @@
 				reviewed = reviewed.substring(0,10);
 			else
 				reviewed = "";
-			out.println("<tr><td>"  + contentid   + "</td><td>"  + displayType + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" +  path      + "</td><td>"  + modified + "</td><td>" + posted + "</td><td>" + revised + "</td><td>" + reviewed + "</td></tr>");
+			out.println("<tr><td>"  +  displayType  + "</td><td>"  + contentid + "</td><td>" + title + "</td><td><a href=\"" + url + "\">" + url + "</a></td><td>" +  path      + "</td><td>"  + modified + "</td><td>" + posted + "</td><td>" + revised + "</td><td>" + reviewed + "</td></tr>");
 			lastType = type;
 		}
 	}
