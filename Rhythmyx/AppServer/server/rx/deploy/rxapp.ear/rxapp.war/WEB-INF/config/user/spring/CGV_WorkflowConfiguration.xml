@@ -413,6 +413,18 @@
 					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
 					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
 				</bean>
+				<!-- Sublayout Templates can be used by DOC sites, but mostly for CGov -->
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloSublayoutTemplateInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<!-- 
+						The sublayout gets published to a folder where the navons are not needed
+						so we do not care if they have a public revision or not.
+					 -->
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>				
 				<!--Types that should be published on Demand but are not top types -->
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>cgvBlogSeries</value></constructor-arg>
