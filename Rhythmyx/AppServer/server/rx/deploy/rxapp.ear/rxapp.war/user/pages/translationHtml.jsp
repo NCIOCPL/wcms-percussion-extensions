@@ -61,7 +61,15 @@
 			String spanishurl = rs.getString(11);
 			String spanishpath = rs.getString(12);
 			String spanishcontenttype = rs.getString(16);
-			out.println("<tr><td>" + englishid + "</td><td>" + englishtitle + "</td><td>" + englishurl + "</td><td>" + englishpath + "</td><td>"+ englishcontenttype  + "</td><td>" + spanishid + "</td><td>" + spanishtitle + "</td><td>" + spanishurl + "</td><td>" + spanishpath + "</td><td>"+  spanishcontenttype + "</td></tr>");
+			if (englishurl != null)
+				englishurl = englishurl.replace("CancerGov", "http://www.cancer.gov");
+			else
+				englishurl = "";
+			if (spanishurl != null)
+				spanishurl = spanishurl.replace("CancerGov", "http://www.cancer.gov");
+			else
+				spanishurl = "";
+			out.println("<tr><td>" + englishid + "</td><td>" + englishtitle + "</td><td><a href=\"" + englishurl + "\">" + englishurl + "</a></td><td>" + englishpath + "</td><td>"+ englishcontenttype  + "</td><td>" + spanishid + "</td><td>" + spanishtitle + "</td><td><a href=\"" + spanishurl + "\">" + spanishurl + "</a></td><td>" + spanishpath + "</td><td>"+  spanishcontenttype + "</td></tr>");
 		}
 	}
 	catch(Exception e) {
