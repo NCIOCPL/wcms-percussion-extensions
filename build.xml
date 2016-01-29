@@ -137,7 +137,6 @@
 			    	<include name="commons-logging*.jar" /> 
 			    	<include name="commons-collections*.jar" /> 
 			    	<include name="commons-httpclient*.jar" /> 
-			    	<include name="syndication-delivery-handler*.jar" /> 
 				</fileset>
 			    <fileset dir="${rhythmyx.home}/AppServer/lib/endorsed" >
 				    <include name="xml-apis.jar" />
