@@ -171,6 +171,12 @@
 		<copy todir="${rhythmyx.home}/rx_resources/tinymce" verbose="true" >
 			<fileset dir="Rhythmyx\rx_resources\tinymce" />
 		</copy>
+		<!-- Syndication Delivery Handler .jar -->
+		<copy todir="${rhythmyx.rxapp.lib}" verbose="true" >
+			<fileset dir="lib">
+				<include name="syndication-delivery-handler*.jar" /> 		
+			</fileset>
+		</copy>
 	</target>
 	
 	<!--
