@@ -12,9 +12,8 @@
 	<!-- This bean defines extra configuration information about content types in the system -->
 	<!-- If a content type is not defined in the map, then the Default config will be used -->
 	<!-- Constructor Arguments: 
-			1. The name of the content type
-			2. Is the content type a top type
-			3. Does the content type require that the parent navons have a public revision
+			Due to issues with documentation and code being out of sync, please see the constructor at  
+			src\gov\cancer\wcm\workflow\ContentTypeConfig.java
 			
 	-->
 	<bean id="ContentTypesConfig" class="gov.cancer.wcm.workflow.ContentTypesConfigCollection">
@@ -413,6 +412,14 @@
 					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
 					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
 				</bean>
+				<!-- Sublayout Templates can be used by DOC sites, but mostly for CGov -->
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>gloSublayoutTemplateInfo</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><ref bean="DefaultValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>				
 				<!--Types that should be published on Demand but are not top types -->
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>cgvBlogSeries</value></constructor-arg>
