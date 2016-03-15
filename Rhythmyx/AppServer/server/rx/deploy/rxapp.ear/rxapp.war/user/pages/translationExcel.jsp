@@ -31,10 +31,16 @@
 	<h2>Starting Folder: <%=folder%></h2>
 	<table cellspacing="2" cellpadding="0" border="1">
 		<tr>
-			<th>Content ID</th>
-			<th>Content Title</th>
-			<th>Has a Translation Relationship With</th>
-			<th>Item Path</th>
+			<th>English Content ID</th>
+			<th>English Content Title</th>
+			<th>English Pretty URL</th>
+			<th>English Item Path</th>
+			<th>English Content Type</th>
+			<th>Has a Translation Relationship With Content ID</th>
+			<th>Has a Translation Relationship With Content Title</th>
+			<th>Has a Translation Relationship With Pretty URL</th>
+			<th>Has a Translation Relationship With Item Path</th>
+			<th>Has a Translation Relationship With Content Type</th>
 		</tr>
 <%
 	Connection conn = null;
@@ -44,11 +50,26 @@
 		cstmt.setString(1,request.getParameter("sys_contentid"));
 		ResultSet rs = cstmt.executeQuery();
 		while (rs.next()) {
-			String id = rs.getString(1);
-			String title = rs.getString(2);
-			String path = rs.getString(4);
-			String relatedItem = rs.getString(9);
-			out.println("<tr><td>" + id + "</td><td>" + title + "</td><td>" + relatedItem + "</td><td>" + path + "</td></tr>");
+			String englishid = rs.getString(2);
+			String englishtitle = rs.getString(3);
+			String englishurl = rs.getString(4);
+			String englishpath = rs.getString(5);
+			String englishcontenttype = rs.getString(1);
+			String spanishid = rs.getString(9);
+			String spanishtitle = rs.getString(10);
+			String spanishurl = rs.getString(11);
+			String spanishpath = rs.getString(12);
+			String spanishcontenttype = rs.getString(16);
+			if (englishurl != null)
+				englishurl = englishurl.replace("CancerGov", "http://www.cancer.gov");
+			else
+				englishurl = "";
+			if (spanishurl != null)
+				spanishurl = spanishurl.replace("CancerGov", "http://www.cancer.gov");
+			else
+				spanishurl = "";
+			out.println("<tr><td>" + englishid + "</td><td>" + englishtitle + "</td><td><a href=\"" + englishurl + "\">" + englishurl + "</a></td><td>" + englishpath + "</td><td>"+ englishcontenttype  + "</td><td>" + spanishid + "</td><td>" + spanishtitle + "</td><td><a href=\"" + spanishurl + "\">" + spanishurl + "</a></td><td>" + spanishpath + "</td><td>"+  spanishcontenttype + "</td></tr>");
+
 		}
 	}
 	catch(Exception e) {
