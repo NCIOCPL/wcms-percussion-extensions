@@ -5,6 +5,7 @@
 package gov.cancer.wcm.publishing;
 import gov.cancer.wcm.util.CGV_TopTypeChecker;
 import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
+import gov.cancer.wcm.util.CGV_TypeNames;
 
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.services.content.data.PSItemSummary;
+
 
 
 public class TreeAnalyzer {
@@ -93,11 +95,23 @@ public class TreeAnalyzer {
 			//Check to see if the current content item is a top type
 			Boolean isTopType = ContentItemWFValidatorAndTransitioner.isTopType(contentTypeID.intValue());
 			Boolean isPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(contentTypeID.intValue());
-			//if the current item is not the item that was transitioned and it is a top type
-			if(!transitionItem && isTopType){
+			
+			String contentTypeName = null;
+		    try {
+		        contentTypeName = CGV_TypeNames.getTypeName(contentTypeID.intValue());
+		    } catch (Exception ex) {       
+		            String message = String.format("Failed to retrieve type name for contentTypeID = %d.", contentTypeID.intValue());
+		    }
+		    
+		    PublishingConfiguration pubConfig = PublishingConfigurationLocator.getPublishingConfiguration();
+		    boolean needsNextTopType = pubConfig.getNeedsNextTopType(contentTypeName);
+		    
+		    //if the current item is not the item that was transitioned and it is a top type
+			if(!transitionItem && isTopType && !needsNextTopType){
 				log.debug("getAncestorPublishableItems: I am not the item transitioned, and I am a top type");
 				//add the current item to the publishable items list and do NOT continue to recurse up the tree
-				ancestorPublishableItems.add(contentItemID);
+				if(isPublishable)
+					ancestorPublishableItems.add(contentItemID);
 			}
 			//if the current item is not a top type we want to keep searching for its parents
 			//Edge Conditions:

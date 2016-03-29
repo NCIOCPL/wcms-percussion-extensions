@@ -240,5 +240,10 @@
 	<!-- This bean defines publishing configuration object -->		
 	<bean id="CGV_PublishingConfiguration" class="gov.cancer.wcm.publishing.PublishingConfiguration">
 		<constructor-arg><ref bean="BlockingEditionConfig"/></constructor-arg>
+		<constructor-arg>
+			<list>
+				<value>cgvCustomLink</value>
+			</list>
+		</constructor-arg>
 	</bean>
 </beans>

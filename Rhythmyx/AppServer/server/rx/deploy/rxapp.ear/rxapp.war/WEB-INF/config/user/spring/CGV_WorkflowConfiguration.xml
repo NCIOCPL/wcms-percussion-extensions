@@ -20,6 +20,13 @@
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
+					<constructor-arg><value>cgvCustomLink</value></constructor-arg>
+					<constructor-arg><value>true</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+					<constructor-arg><ref bean="PublishableTypeValidators" /></constructor-arg>
+					<constructor-arg><ref bean="EmptyPropertyList" /></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.workflow.ContentTypeConfig">
 					<constructor-arg><value>cgvCancerResearch</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
 					<constructor-arg><value>true</value></constructor-arg>
