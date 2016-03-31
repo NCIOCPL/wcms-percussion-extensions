@@ -110,8 +110,9 @@ public class TreeAnalyzer {
 			if(!transitionItem && isTopType && !needsNextTopType){
 				log.debug("getAncestorPublishableItems: I am not the item transitioned, and I am a top type");
 				//add the current item to the publishable items list and do NOT continue to recurse up the tree
-				if(isPublishable)
+				if(isPublishable) {
 					ancestorPublishableItems.add(contentItemID);
+				}
 			}
 			//if the current item is not a top type we want to keep searching for its parents
 			//Edge Conditions:
@@ -159,7 +160,12 @@ public class TreeAnalyzer {
 						{
 							if(!ancestorPublishableItems.contains(parent))
 							{
-								ancestorPublishableItems.add(parent);
+								PSComponentSummary parentItemSummary = contentSummariesService.loadComponentSummary(parent);
+								Long parentContentTypeID = parentItemSummary.getContentTypeId();
+								Boolean isParentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(parentContentTypeID.intValue());
+								if(isParentPublishable) {
+									ancestorPublishableItems.add(parent);
+								}
 							}
 						}
 						
