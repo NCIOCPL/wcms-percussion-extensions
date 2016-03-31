@@ -243,6 +243,7 @@
 		<constructor-arg>
 			<list>
 				<value>cgvCustomLink</value>
+				<value>cgvLinkableMultimedia</value>
 				<value>gloImageTranslation</value>
 			</list>
 		</constructor-arg>
