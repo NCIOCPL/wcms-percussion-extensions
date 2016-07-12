@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.1.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<!-- This bean defines extra configuration information about the protocols currently used 
+	by the various CGV sites.  -->
+	<!-- Constructor Arguments: 
+			Due to issues with documentation and code being out of sync, please see the constructor at  
+			src\gov\cancer\wcm\util\SiteProtocolConfig.java
+			
+	-->
+	<bean id="SiteProtocolConfigs" class="gov.cancer.wcm.util.SiteProtocolConfigCollection">
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.util.SiteProtocolConfig">
+					<constructor-arg><value>305</value></constructor-arg>
+					<constructor-arg><value>CancerGov</value></constructor-arg>
+					<constructor-arg><value>cancer.gov</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.util.SiteProtocolConfig">
+					<constructor-arg><value>475</value></constructor-arg>
+					<constructor-arg><value>DCEG</value></constructor-arg>
+					<constructor-arg><value>dceg.cancer.gov</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.util.SiteProtocolConfig">
+					<constructor-arg><value>435</value></constructor-arg>
+					<constructor-arg><value>Imaging</value></constructor-arg>
+					<constructor-arg><value>imaging.cancer.gov</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.util.SiteProtocolConfig">
+					<constructor-arg><value>437</value></constructor-arg>
+					<constructor-arg><value>Proteomics</value></constructor-arg>
+					<constructor-arg><value>proteomics.cancer.gov</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.util.SiteProtocolConfig">
+					<constructor-arg><value>307</value></constructor-arg>
+					<constructor-arg><value>TCGA</value></constructor-arg>
+					<constructor-arg><value>cancergenome.nih.gov</value></constructor-arg>
+					<constructor-arg><value>false</value></constructor-arg>
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>	
+</beans>
