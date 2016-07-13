@@ -4,6 +4,7 @@ import java.util.List;
 
 public class SiteProtocolConfigCollection {
     private List<SiteProtocolConfig> siteProtocolConfigs;
+    private SiteProtocolConfig defaultConfig = null;
 
     /**
      * Gets the site protocol configuration for a given site ID, or return null
@@ -14,13 +15,16 @@ public class SiteProtocolConfigCollection {
      * @return the site protocol configuration, else null if name not found
      */
     public SiteProtocolConfig getProtocolFromSiteName(String siteName) {
+        SiteProtocolConfig retConfig = defaultConfig;
+        
         for (SiteProtocolConfig config : siteProtocolConfigs) {
             if (siteName.equals(config.getName())) {
-                return config;
+                retConfig = config;
+                break;
             }
         }
 
-        return null;
+        return retConfig;
     }
 
     /**
@@ -32,13 +36,16 @@ public class SiteProtocolConfigCollection {
      * @return the site protocol configuration, else null if name not found
      */
     public SiteProtocolConfig getProtocolConfigFromSiteId(int siteId) {
+        SiteProtocolConfig retConfig = defaultConfig;
+        
         for (SiteProtocolConfig config : siteProtocolConfigs) {
             if (siteId == config.getId()) {
-                return config;
+                retConfig = config;
+                break;
             }
         }
 
-        return null;
+        return retConfig;
     }
 
     /**
@@ -47,7 +54,8 @@ public class SiteProtocolConfigCollection {
      * @param defaultConfig
      */
     public SiteProtocolConfigCollection(
-            List<SiteProtocolConfig> siteProtocolConfigs) {
+            List<SiteProtocolConfig> siteProtocolConfigs, String defaultName) {
         this.siteProtocolConfigs = siteProtocolConfigs;
+        this.defaultConfig = getProtocolFromSiteName(defaultName);
     }
 }

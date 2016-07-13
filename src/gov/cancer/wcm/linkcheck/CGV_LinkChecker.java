@@ -3,6 +3,10 @@
  */
 package gov.cancer.wcm.linkcheck;
 
+import gov.cancer.wcm.util.SiteProtocolConfig;
+import gov.cancer.wcm.util.SiteProtocolConfigCollection;
+import gov.cancer.wcm.util.SiteProtocolConfigCollectionLocator;
+
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,7 +33,13 @@ public class CGV_LinkChecker {
 		try {
 			//if url lacks the host, add it (assume gancer.gov)
 			if (!(url.length() > 5 && url.substring(0,4).equalsIgnoreCase("http"))) {
-				url = "http://www.cancer.gov" + url;
+			    SiteProtocolConfigCollection configs = 
+		            SiteProtocolConfigCollectionLocator.getSiteProtocolConfigCollection();
+		        
+		        SiteProtocolConfig config = configs.getProtocolFromSiteName("CancerGov");
+		        String siteUrl = config.getUrl();
+			    
+				url = siteUrl + url;
 			}
 			URL u = new URL(url);
 			HttpURLConnection conn = null;

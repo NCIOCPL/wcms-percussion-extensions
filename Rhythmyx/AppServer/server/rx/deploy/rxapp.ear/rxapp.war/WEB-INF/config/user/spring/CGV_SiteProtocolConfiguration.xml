@@ -51,5 +51,6 @@
 				</bean>
 			</list>
 		</constructor-arg>
+		<constructor-arg><value>CancerGov</value></constructor-arg>
 	</bean>	
 </beans>
