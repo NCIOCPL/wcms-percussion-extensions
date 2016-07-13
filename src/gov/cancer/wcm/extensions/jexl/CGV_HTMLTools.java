@@ -186,7 +186,7 @@ public class CGV_HTMLTools extends PSJexlUtilBase implements IPSJexlExpression{
         SiteProtocolConfigCollection configs = 
             SiteProtocolConfigCollectionLocator.getSiteProtocolConfigCollection();
         
-        SiteProtocolConfig config = configs.getProtocolFromSiteName(siteName);
+        SiteProtocolConfig config = configs.getProtocolConfigFromSiteName("CancerGov");
         String href = config.getUrl();
     	
     	String toFind = "href=\"/";

@@ -14,7 +14,7 @@ public class SiteProtocolConfigCollection {
      *            the name of the site in Rhythmyx
      * @return the site protocol configuration, else null if name not found
      */
-    public SiteProtocolConfig getProtocolFromSiteName(String siteName) {
+    public SiteProtocolConfig getProtocolConfigFromSiteName(String siteName) {
         SiteProtocolConfig retConfig = defaultConfig;
         
         for (SiteProtocolConfig config : siteProtocolConfigs) {
@@ -56,6 +56,6 @@ public class SiteProtocolConfigCollection {
     public SiteProtocolConfigCollection(
             List<SiteProtocolConfig> siteProtocolConfigs, String defaultName) {
         this.siteProtocolConfigs = siteProtocolConfigs;
-        this.defaultConfig = getProtocolFromSiteName(defaultName);
+        this.defaultConfig = getProtocolConfigFromSiteName(defaultName);
     }
 }

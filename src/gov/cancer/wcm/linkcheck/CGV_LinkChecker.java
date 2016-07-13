@@ -36,7 +36,7 @@ public class CGV_LinkChecker {
 			    SiteProtocolConfigCollection configs = 
 		            SiteProtocolConfigCollectionLocator.getSiteProtocolConfigCollection();
 		        
-		        SiteProtocolConfig config = configs.getProtocolFromSiteName("CancerGov");
+		        SiteProtocolConfig config = configs.getProtocolConfigFromSiteName("CancerGov");
 		        String siteUrl = config.getUrl();
 			    
 				url = siteUrl + url;
