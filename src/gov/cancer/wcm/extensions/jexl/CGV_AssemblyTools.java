@@ -745,7 +745,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
 				IPSAssemblyItem aItem = aService.getCurrentAssemblyItem();
 				IPSFilterService fs = PSFilterServiceLocator.getFilterService();
-				HashMap localMap= new HashMap();
+				Map<String, String[]> localMap = new HashMap<String, String[]>();
 				
 				if(aItem == null){
 					if(this.assemItem==null){
