@@ -1,58 +1,24 @@
 package gov.cancer.wcm.extensions.jexl;
 
 import gov.cancer.wcm.util.TemplateUtils;
-import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
-import com.percussion.pso.jexl.PSOFolderTools;
 
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
-import java.io.File;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
 import javax.jcr.RepositoryException;
-import javax.jcr.UnsupportedRepositoryOperationException;
-import javax.jcr.Value;
-import javax.jcr.ValueFormatException;
-import javax.jcr.nodetype.ItemDefinition;
 import javax.jcr.nodetype.NoSuchNodeTypeException;
-import javax.jcr.query.InvalidQueryException;
-import javax.jcr.query.Query;
-import javax.jcr.query.QueryResult;
-import javax.jcr.query.Row;
-import javax.jcr.query.RowIterator;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 import com.percussion.cms.PSCmsException;
 import com.percussion.cms.objectstore.IPSFieldValue;
 import com.percussion.cms.objectstore.PSAaRelationship;
-import com.percussion.cms.objectstore.PSComponentSummary;
-import com.percussion.cms.objectstore.PSContentType;
-import com.percussion.cms.objectstore.PSContentTypeSet;
 import com.percussion.cms.objectstore.PSCoreItem;
 import com.percussion.cms.objectstore.PSInvalidContentTypeException;
-import com.percussion.cms.objectstore.PSItemDefSummary;
 import com.percussion.cms.objectstore.PSItemDefinition;
 import com.percussion.cms.objectstore.PSItemField;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
@@ -62,20 +28,18 @@ import com.percussion.design.objectstore.PSControlRef;
 import com.percussion.design.objectstore.PSField;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationship;
-import com.percussion.design.objectstore.PSRelationshipPropertyData;
 import com.percussion.extension.IPSJexlExpression;
 import com.percussion.extension.IPSJexlMethod;
 import com.percussion.extension.IPSJexlParam;
-import com.percussion.extension.PSExtensionProcessingException;
 import com.percussion.extension.PSJexlUtilBase;
 import com.percussion.pso.finder.PSOReverseSlotContentFinder;
 import com.percussion.pso.jexl.PSONavTools;
-import com.percussion.pso.jexl.PSORelationshipTools;
+import com.percussion.pso.jexl.PSOObjectFinder;
 import com.percussion.pso.jexl.PSOQueryTools;
 import com.percussion.pso.jexl.PSOSlotTools;
-import com.percussion.pso.jexl.PSOObjectFinder;
 import com.percussion.pso.utils.PSONodeCataloger;
 import com.percussion.pso.utils.PSOSlotContents;
+import com.percussion.pso.utils.PSOSlotRelations;
 import com.percussion.security.PSSecurityToken;
 import com.percussion.services.PSMissingBeanConfigurationException;
 import com.percussion.services.assembly.IPSAssemblyItem;
@@ -84,14 +48,10 @@ import com.percussion.services.assembly.IPSAssemblyTemplate;
 import com.percussion.services.assembly.IPSTemplateSlot;
 import com.percussion.services.assembly.PSAssemblyException;
 import com.percussion.services.assembly.PSAssemblyServiceLocator;
-import com.percussion.services.assembly.data.PSAssemblyWorkItem;
 import com.percussion.services.assembly.jexl.PSLocationUtils;
-import com.percussion.services.catalog.PSTypeEnum;
 import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.contentmgr.IPSContentMgr;
-import com.percussion.services.contentmgr.IPSContentTypeMgr;
 import com.percussion.services.contentmgr.IPSNode;
-import com.percussion.services.contentmgr.IPSNodeDefinition;
 import com.percussion.services.contentmgr.PSContentMgrLocator;
 import com.percussion.services.error.PSNotFoundException;
 import com.percussion.services.filter.IPSFilterService;
@@ -99,17 +59,12 @@ import com.percussion.services.filter.IPSItemFilter;
 import com.percussion.services.filter.PSFilterServiceLocator;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.guidmgr.PSGuidManagerLocator;
-import com.percussion.services.guidmgr.data.PSGuid;
-import com.percussion.services.legacy.IPSCmsContentSummaries;
-import com.percussion.services.legacy.PSCmsContentSummariesLocator;
 import com.percussion.services.sitemgr.IPSPublishingContext;
 import com.percussion.services.sitemgr.IPSSite;
 import com.percussion.services.sitemgr.IPSSiteManager;
 import com.percussion.services.sitemgr.PSSiteManagerLocator;
-import com.percussion.services.workflow.data.PSState;
 import com.percussion.util.IPSHtmlParameters;
 import com.percussion.utils.guid.IPSGuid;
-import com.percussion.pso.utils.PSOSlotRelations;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.PSErrorResultsException;
 import com.percussion.webservices.content.IPSContentWs;
@@ -790,7 +745,7 @@ public class CGV_AssemblyTools extends PSJexlUtilBase implements IPSJexlExpressi
 				IPSSiteManager siteManager = PSSiteManagerLocator.getSiteManager();
 				IPSAssemblyItem aItem = aService.getCurrentAssemblyItem();
 				IPSFilterService fs = PSFilterServiceLocator.getFilterService();
-				HashMap localMap= new HashMap();
+				Map<String, String[]> localMap = new HashMap<String, String[]>();
 				
 				if(aItem == null){
 					if(this.assemItem==null){

@@ -15,7 +15,7 @@
 		<tr>
 			<th>Content Type</th>
 			<th>Content ID</th>
-			<th>Title</th>
+			<th>Content Title</th>
 			<th>Item Path</th>
 			<th>Last Modified Date</th>
 			<th>Workflow State</th>

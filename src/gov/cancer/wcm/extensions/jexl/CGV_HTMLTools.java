@@ -1,5 +1,9 @@
 package gov.cancer.wcm.extensions.jexl;
 
+import gov.cancer.wcm.util.SiteProtocolConfig;
+import gov.cancer.wcm.util.SiteProtocolConfigCollection;
+import gov.cancer.wcm.util.SiteProtocolConfigCollectionLocator;
+
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -178,9 +182,15 @@ public class CGV_HTMLTools extends PSJexlUtilBase implements IPSJexlExpression{
     //This is to replace all local links in the given string
     //This will be updated to make the regex more robust
     public static String replaceLocalLinks(String a){
+        
+        SiteProtocolConfigCollection configs = 
+            SiteProtocolConfigCollectionLocator.getSiteProtocolConfigCollection();
+        
+        SiteProtocolConfig config = configs.getProtocolConfigFromSiteName("CancerGov");
+        String href = config.getUrl();
     	
     	String toFind = "href=\"/";
-    	String result = a.replaceAll(toFind, "href=\"http://www.cancer.gov/");
+    	String result = a.replaceAll(toFind, "href=\"" + href + "/");
     	
     	return result;
     
