@@ -174,13 +174,13 @@ public class TreeAnalyzer {
 					
 					// TEST: find dependent items
 					List<PSItemSummary> dependentItems = findEligibleDependentItems(contentItemSummary);
-					for(PSItemSummary dependent : dependentItems) {						
+					for(PSItemSummary dependent : dependentItems) {	
 						//get the dependent item content ID
 						int dependentContentID = dependent.getContentTypeId();
 						Boolean isDependentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(dependentContentID);
 						
 						if(isDependentPublishable) {
-							log.debug("Found publishable dependent item: " + dependent.toString());
+							log.debug("Found publishable dependent item of type " + dependent.getContentTypeName() + ": " + dependent.toString());
 						}
 					}
 					
