@@ -173,9 +173,15 @@ public class TreeAnalyzer {
 					}
 					
 					// TEST: find dependent items
-					List<PSItemSummary> ancestorDependentItems = findEligibleDependentItems(contentItemSummary);
-					for(PSItemSummary ancestor : ancestorDependentItems) {
-						log.debug("Found dependent item: " + ancestor.toString());
+					List<PSItemSummary> dependentItems = findEligibleDependentItems(contentItemSummary);
+					for(PSItemSummary dependent : dependentItems) {						
+						//get the dependent item content ID
+						int dependentContentID = dependent.getGUID().getUUID();
+						Boolean isDependentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(dependentContentID);
+						
+						if(isDependentPublishable) {
+							log.debug("Found publishable dependent item: " + dependent.toString());
+						}
 					}
 					
 				}
