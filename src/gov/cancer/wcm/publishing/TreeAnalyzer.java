@@ -176,8 +176,8 @@ public class TreeAnalyzer {
 					List<PSItemSummary> dependentItems = findEligibleDependentItems(contentItemSummary);
 					for(PSItemSummary dependent : dependentItems) {						
 						//get the dependent item content ID
-						Integer dependentContentID = dependent.getGUID().getUUID();
-						Boolean isDependentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(dependentContentID.intValue());
+						int dependentContentID = dependent.getContentTypeId();
+						Boolean isDependentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(dependentContentID);
 						
 						if(isDependentPublishable) {
 							log.debug("Found publishable dependent item: " + dependent.toString());
