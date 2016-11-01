@@ -135,7 +135,10 @@ public class TreeAnalyzer {
 				try{
 					List<PSItemSummary> relatedItems = findEligibleParentItems(contentItemSummary);
 					try {
-						relatedItems.addAll(findEligibleDependentItems(contentItemSummary));
+						// add the eligible dependent items, but only if this is the transition item
+						if(transitionItem) {
+							relatedItems.addAll(findEligibleDependentItems(contentItemSummary));
+						}
 					} catch (PSInvalidContentTypeException e) {
 						log.error("Could not find content type for item: " + contentItemSummary.toString(), e);
 					}
