@@ -323,10 +323,13 @@ public class TreeAnalyzer {
 		itemFilter.limitToEditOrCurrentOwnerRevision(true);
 
 		// Load the list of dependent items.
-		List<PSItemSummary> dependentItems = cmgr.findDependents(contentItemGUID, itemFilter, false);
-		if(log.isDebugEnabled()){
-			for(PSItemSummary item : dependentItems){
-				log.debug("Found dependent item: " + item.getGUID().getUUID());
+		List<PSItemSummary> dependentItems = new ArrayList<PSItemSummary>();
+		for(PSItemSummary item : cmgr.findDependents(contentItemGUID, itemFilter, false)){
+			if(item.getContentTypeName().equals("cgvBlogSeries")) {
+				if(log.isDebugEnabled()){
+					log.debug("Found dependent item: " + item.toString());
+				}
+				dependentItems.add(item);
 			}
 		}
 
