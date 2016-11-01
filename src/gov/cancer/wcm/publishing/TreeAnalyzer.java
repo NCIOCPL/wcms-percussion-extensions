@@ -3,11 +3,6 @@
  * should be included in a Publish On Demand job.
  */
 package gov.cancer.wcm.publishing;
-import gov.cancer.wcm.util.CGV_TopTypeChecker;
-import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
-import gov.cancer.wcm.util.CGV_TypeNames;
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,16 +13,19 @@ import org.apache.commons.logging.LogFactory;
 import com.percussion.cms.objectstore.PSAaRelationship;
 import com.percussion.cms.objectstore.PSComponentSummary;
 import com.percussion.cms.objectstore.PSInvalidContentTypeException;
+import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationshipConfig;
+import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
-import com.percussion.cms.objectstore.PSRelationshipFilter;
-import com.percussion.content.PSContentConversionException;
-import com.percussion.services.content.data.PSItemSummary;
+
+import gov.cancer.wcm.util.CGV_TopTypeChecker;
+import gov.cancer.wcm.util.CGV_TypeNames;
+import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 
 
@@ -133,15 +131,20 @@ public class TreeAnalyzer {
 					ancestorPublishableItems.add(contentItemID);
 				}
 				
-				//find all of my parent items of our current contentItem
+				//find all of my related items of our current contentItem
 				try{
-					List<PSItemSummary> ancestorParentItems = findEligibleParentItems(contentItemSummary);
-					for(PSItemSummary ancestor : ancestorParentItems) {
+					List<PSItemSummary> relatedItems = findEligibleParentItems(contentItemSummary);
+					try {
+						relatedItems.addAll(findEligibleDependentItems(contentItemSummary));
+					} catch (PSInvalidContentTypeException e) {
+						log.error("Could not find content type for item: " + contentItemSummary.toString(), e);
+					}
+					for(PSItemSummary relatedItem : relatedItems) {
 				
 						Boolean isAncestorNavon = false;
 						Integer ancestorContentID = 0;
 						//get the parent item content ID and check if it is a navon
-						ancestorContentID = ancestor.getGUID().getUUID();
+						ancestorContentID = relatedItem.getGUID().getUUID();
 						isAncestorNavon = isNavon(contentTypeID);
 						
 						// Recurse to find all of the publishable parent items from this parent.
@@ -172,25 +175,7 @@ public class TreeAnalyzer {
 							}
 						}
 						
-					}
-					
-					try {
-						// TEST: find dependent items
-						List<PSItemSummary> dependentItems = findEligibleDependentItems(contentItemSummary);
-						for(PSItemSummary dependent : dependentItems) {	
-							//get the dependent item content ID
-							int dependentContentID = dependent.getContentTypeId();
-							Boolean isDependentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(dependentContentID);
-							
-							if(isDependentPublishable) {
-								log.debug("Found publishable dependent item of type " + dependent.getContentTypeName() + ": " + dependent.toString());
-							}
-						}
-					}
-					catch (PSInvalidContentTypeException e) {
-						log.error("Failed to find content type for given item.", e);
-					}
-					
+					}					
 				}
 				// Log the error, but otherwise swallow it and return without
 				// adding anything to the list of content items.
