@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.percussion.cms.objectstore.PSAaRelationship;
 import com.percussion.cms.objectstore.PSComponentSummary;
+import com.percussion.cms.objectstore.PSInvalidContentTypeException;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationshipConfig;
 import com.percussion.services.guidmgr.IPSGuidManager;
@@ -25,6 +26,7 @@ import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
 import com.percussion.cms.objectstore.PSRelationshipFilter;
+import com.percussion.content.PSContentConversionException;
 import com.percussion.services.content.data.PSItemSummary;
 
 
@@ -172,16 +174,21 @@ public class TreeAnalyzer {
 						
 					}
 					
-					// TEST: find dependent items
-					List<PSItemSummary> dependentItems = findEligibleDependentItems(contentItemSummary);
-					for(PSItemSummary dependent : dependentItems) {	
-						//get the dependent item content ID
-						int dependentContentID = dependent.getContentTypeId();
-						Boolean isDependentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(dependentContentID);
-						
-						if(isDependentPublishable) {
-							log.debug("Found publishable dependent item of type " + dependent.getContentTypeName() + ": " + dependent.toString());
+					try {
+						// TEST: find dependent items
+						List<PSItemSummary> dependentItems = findEligibleDependentItems(contentItemSummary);
+						for(PSItemSummary dependent : dependentItems) {	
+							//get the dependent item content ID
+							int dependentContentID = dependent.getContentTypeId();
+							Boolean isDependentPublishable = ContentItemWFValidatorAndTransitioner.isPublishable(dependentContentID);
+							
+							if(isDependentPublishable) {
+								log.debug("Found publishable dependent item of type " + dependent.getContentTypeName() + ": " + dependent.toString());
+							}
 						}
+					}
+					catch (PSInvalidContentTypeException e) {
+						log.error("Failed to find content type for given item.", e);
 					}
 					
 				}
@@ -302,11 +309,21 @@ public class TreeAnalyzer {
 	 * @param itemSummary
 	 * @return a list of PSItemSummary objects for the dependent content items.
 	 * @throws PSErrorException 
+	 * @throws PSInvalidContentTypeException 
 	 */
 	private List<PSItemSummary> findEligibleDependentItems(PSComponentSummary itemSummary)
-		throws PSErrorException {
+		throws PSErrorException, PSInvalidContentTypeException {
 		if(log.isTraceEnabled()){
 			log.trace("Enter findEligibleDependentItems with itemSummary = " + itemSummary.toString());
+		}
+		
+		List<PSItemSummary> dependentItems = new ArrayList<PSItemSummary>();
+		
+		long contentTypeId = itemSummary.getContentTypeId();
+		String contentType = CGV_TypeNames.getTypeName(contentTypeId);
+		
+		if(!contentType.equals("cgvBlogPost")) {
+			return dependentItems;
 		}
 
 		PSLocator itemLocator = new PSLocator(itemSummary.getContentId());
@@ -323,7 +340,6 @@ public class TreeAnalyzer {
 		itemFilter.limitToEditOrCurrentOwnerRevision(true);
 
 		// Load the list of dependent items.
-		List<PSItemSummary> dependentItems = new ArrayList<PSItemSummary>();
 		for(PSItemSummary item : cmgr.findDependents(contentItemGUID, itemFilter, false)){
 			if(item.getContentTypeName().equals("cgvBlogSeries")) {
 				if(log.isDebugEnabled()){
