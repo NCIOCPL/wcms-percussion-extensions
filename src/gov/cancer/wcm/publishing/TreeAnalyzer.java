@@ -305,14 +305,22 @@ public class TreeAnalyzer {
 			log.trace("Enter findEligibleDependentItems with itemSummary = " + itemSummary.toString());
 		}
 		
+		// retrieve the publishing configuration
+		PublishingConfiguration pubConfig = PublishingConfigurationLocator.getPublishingConfiguration();
+		
+		// list of dependent items to return
 		List<PSItemSummary> dependentItems = new ArrayList<PSItemSummary>();
 		
+		// check if the current item's content type has dependents
 		long contentTypeId = itemSummary.getContentTypeId();
 		String contentType = CGV_TypeNames.getTypeName(contentTypeId);
-		
-		if(!contentType.equals("cgvBlogPost")) {
+		if(!pubConfig.hasDependentPodType(contentType)) {
+			// no dependent type, return
 			return dependentItems;
 		}
+		
+		// retrieve the dependent type
+		String dependentType = pubConfig.getDependentPodType(contentType);
 
 		PSLocator itemLocator = new PSLocator(itemSummary.getContentId());
 		IPSGuid contentItemGUID = gmgr.makeGuid(itemLocator);
@@ -329,7 +337,8 @@ public class TreeAnalyzer {
 
 		// Load the list of dependent items.
 		for(PSItemSummary item : cmgr.findDependents(contentItemGUID, itemFilter, false)){
-			if(item.getContentTypeName().equals("cgvBlogSeries")) {
+			// only publish dependents of the matching type
+			if(item.getContentTypeName().equals(dependentType)) {
 				if(log.isDebugEnabled()){
 					log.debug("Found dependent item: " + item.toString());
 				}

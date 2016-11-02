@@ -247,5 +247,10 @@
 				<value>gloImageTranslation</value>
 			</list>
 		</constructor-arg>
+		<constructor-arg>
+			<map>
+				<entry key="cgvBlogPost" value="cgvBlogSeries" />
+			</map>
+		</constructor-arg>
 	</bean>
 </beans>
