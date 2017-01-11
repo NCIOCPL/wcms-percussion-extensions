@@ -3,11 +3,6 @@
  * should be included in a Publish On Demand job.
  */
 package gov.cancer.wcm.publishing;
-import gov.cancer.wcm.util.CGV_TopTypeChecker;
-import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
-import gov.cancer.wcm.util.CGV_TypeNames;
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,15 +12,20 @@ import org.apache.commons.logging.LogFactory;
 
 import com.percussion.cms.objectstore.PSAaRelationship;
 import com.percussion.cms.objectstore.PSComponentSummary;
+import com.percussion.cms.objectstore.PSInvalidContentTypeException;
+import com.percussion.cms.objectstore.PSRelationshipFilter;
 import com.percussion.design.objectstore.PSLocator;
 import com.percussion.design.objectstore.PSRelationshipConfig;
+import com.percussion.services.content.data.PSItemSummary;
 import com.percussion.services.guidmgr.IPSGuidManager;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.utils.guid.IPSGuid;
 import com.percussion.webservices.PSErrorException;
 import com.percussion.webservices.content.IPSContentWs;
-import com.percussion.cms.objectstore.PSRelationshipFilter;
-import com.percussion.services.content.data.PSItemSummary;
+
+import gov.cancer.wcm.util.CGV_TopTypeChecker;
+import gov.cancer.wcm.util.CGV_TypeNames;
+import gov.cancer.wcm.workflow.ContentItemWFValidatorAndTransitioner;
 
 
 
@@ -62,7 +62,7 @@ public class TreeAnalyzer {
 	 * @param foundItems Contains the set of all content ID discovered so far.  Used to prevent runaway recursion.
 	 * @return
 	 */
-	private List<Integer> getAncestorPublishableItemsHelper(int contentItemID, 
+	private List<Integer> getRelatedPublishableItemsHelper(int contentItemID, 
 			boolean isNavon,
 			boolean transitionItem,
 			HashSet<Integer> foundItems){
@@ -101,6 +101,7 @@ public class TreeAnalyzer {
 		        contentTypeName = CGV_TypeNames.getTypeName(contentTypeID.intValue());
 		    } catch (Exception ex) {       
 		            String message = String.format("Failed to retrieve type name for contentTypeID = %d.", contentTypeID.intValue());
+		            log.warn(message, ex);
 		    }
 		    
 		    PublishingConfiguration pubConfig = PublishingConfigurationLocator.getPublishingConfiguration();
@@ -130,15 +131,23 @@ public class TreeAnalyzer {
 					ancestorPublishableItems.add(contentItemID);
 				}
 				
-				//find all of my parent items of our current contentItem
+				//find all of my related items of our current contentItem
 				try{
-					List<PSItemSummary> ancestorParentItems = findEligibleParentItems(contentItemSummary);
-					for(PSItemSummary ancestor : ancestorParentItems) {
+					List<PSItemSummary> relatedItems = findEligibleParentItems(contentItemSummary);
+					try {
+						// add the eligible dependent items, but only if this is the transition item
+						if(transitionItem) {
+							relatedItems.addAll(findEligibleDependentItems(contentItemSummary));
+						}
+					} catch (PSInvalidContentTypeException e) {
+						log.error("Could not find content type for item: " + contentItemSummary.toString(), e);
+					}
+					for(PSItemSummary relatedItem : relatedItems) {
 				
 						Boolean isAncestorNavon = false;
 						Integer ancestorContentID = 0;
 						//get the parent item content ID and check if it is a navon
-						ancestorContentID = ancestor.getGUID().getUUID();
+						ancestorContentID = relatedItem.getGUID().getUUID();
 						isAncestorNavon = isNavon(contentTypeID);
 						
 						// Recurse to find all of the publishable parent items from this parent.
@@ -149,7 +158,7 @@ public class TreeAnalyzer {
 						// but this should handle any edge case we've overlooked (e.g. top type not configured as such).
 						if(!foundItems.contains(ancestorContentID)){
 							foundItems.add(ancestorContentID);
-							parentPublishableItems = getAncestorPublishableItemsHelper(ancestorContentID, isAncestorNavon, false, foundItems);
+							parentPublishableItems = getRelatedPublishableItemsHelper(ancestorContentID, isAncestorNavon, false, foundItems);
 						} else {
 							log.debug("Content item " + ancestorContentID + " was not previously found. Not checking again.");
 						}
@@ -169,7 +178,7 @@ public class TreeAnalyzer {
 							}
 						}
 						
-					}
+					}					
 				}
 				// Log the error, but otherwise swallow it and return without
 				// adding anything to the list of content items.
@@ -283,6 +292,67 @@ public class TreeAnalyzer {
 		return parentItems;
 	}
 	
+	/**
+	 * Finds the content items which are dependents to the item described in itemSummary.
+	 * @param itemSummary
+	 * @return a list of PSItemSummary objects for the dependent content items.
+	 * @throws PSErrorException 
+	 * @throws PSInvalidContentTypeException 
+	 */
+	private List<PSItemSummary> findEligibleDependentItems(PSComponentSummary itemSummary)
+		throws PSErrorException, PSInvalidContentTypeException {
+		if(log.isTraceEnabled()){
+			log.trace("Enter findEligibleDependentItems with itemSummary = " + itemSummary.toString());
+		}
+		
+		// retrieve the publishing configuration
+		PublishingConfiguration pubConfig = PublishingConfigurationLocator.getPublishingConfiguration();
+		
+		// list of dependent items to return
+		List<PSItemSummary> dependentItems = new ArrayList<PSItemSummary>();
+		
+		// check if the current item's content type has dependents
+		long contentTypeId = itemSummary.getContentTypeId();
+		String contentType = CGV_TypeNames.getTypeName(contentTypeId);
+		if(!pubConfig.hasDependentPodType(contentType)) {
+			// no dependent type, return
+			return dependentItems;
+		}
+		
+		// retrieve the dependent type
+		String dependentType = pubConfig.getDependentPodType(contentType);
+
+		PSLocator itemLocator = new PSLocator(itemSummary.getContentId());
+		IPSGuid contentItemGUID = gmgr.makeGuid(itemLocator);
+
+		// Set up item filter.
+		PSRelationshipFilter itemFilter = new PSRelationshipFilter();
+		
+		// Only the relationships where this item is the dependent. 
+		itemFilter.setOwner(itemLocator);
+		// We're only interested in active assembly relationships.
+		itemFilter.setCategory(PSRelationshipConfig.CATEGORY_ACTIVE_ASSEMBLY);
+		// Only bring back items which link from their most recent revision.
+		itemFilter.limitToEditOrCurrentOwnerRevision(true);
+
+		// Load the list of dependent items.
+		for(PSItemSummary item : cmgr.findDependents(contentItemGUID, itemFilter, false)){
+			// only publish dependents of the matching type
+			if(item.getContentTypeName().equals(dependentType)) {
+				if(log.isDebugEnabled()){
+					log.debug("Found dependent item: " + item.toString());
+				}
+				dependentItems.add(item);
+			}
+		}
+
+		if(log.isDebugEnabled()){
+			log.debug("Returning " + dependentItems.size() + " eligible dependent items.");
+		}
+		log.trace("Exit findEligibleDependentItems");
+		return dependentItems;
+	}
+	
 	
 	/**
 	 * getAncestorPublishableItems entry function
@@ -302,13 +372,37 @@ public class TreeAnalyzer {
 
 		// The current content item is already known, add it to the list of known items.
 		foundItems.add(contentItemID);
-		publishableItems = getAncestorPublishableItemsHelper(contentItemID, isNavon, transitionItem, foundItems);
+		publishableItems = getRelatedPublishableItemsHelper(contentItemID, isNavon, transitionItem, foundItems);
 		
 		return publishableItems;
 		
 		
 	}
 	
+	/**
+	 * getDependentPublishableItems entry function
+	 * @author youngdr
+	 * @calls getDependentPublishableItemsHelper - Recursive function to find all dependents
+	 * of the current item being transitioned through the workflow using Publish on Demand.
+	 */
+	public List<Integer> getDependentPublishableItems(int contentItemID, 
+									boolean isNavon,
+									boolean transitionItem) {
+		
+		log.debug("getDependentPublishableItems: current content item is: " + contentItemID);
+		
+		List<Integer> publishableItems = new ArrayList<Integer>();
+		
+		HashSet<Integer> foundItems = new HashSet<Integer>();
+
+		// The current content item is already known, add it to the list of known items.
+		foundItems.add(contentItemID);
+		publishableItems = getRelatedPublishableItemsHelper(contentItemID, isNavon, transitionItem, foundItems);
+		
+		return publishableItems;
+		
+		
+	}
 
 	/**
 	 * Returns if an item is a navon or not.
