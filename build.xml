@@ -73,8 +73,8 @@
 			srcdir="${src}" 
 			destdir="${bin}" 
 			debug="true" 
-			target="1.5" 
-			source="1.5" 
+			target="1.8" 
+			source="1.8" 
 			classpathref="rx.class.path" 
 		>
 			<compilerarg value = "-Xlint:unchecked" />

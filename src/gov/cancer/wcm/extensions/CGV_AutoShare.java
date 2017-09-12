@@ -318,7 +318,6 @@ public class CGV_AutoShare extends PSBaseServiceLocator implements IPSEffect, In
 		
 	}
 
-	@Override
 	public void recover(Object[] arg0, IPSRequestContext arg1,
 			IPSExecutionContext arg2, PSExtensionProcessingException arg3,
 			PSEffectResult result) throws PSExtensionProcessingException {
