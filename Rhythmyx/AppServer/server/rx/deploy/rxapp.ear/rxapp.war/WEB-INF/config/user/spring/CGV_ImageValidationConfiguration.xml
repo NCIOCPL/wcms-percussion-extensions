@@ -10,6 +10,6 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     
     
-    <bean id="CGV_ImageItemValidator" class="gov.cancer.wcm.images.ImageValidationConfiguration">
+    <bean id="CGV_ImageValidationConfiguration" class="gov.cancer.wcm.images.ImageValidationConfiguration">
 	</bean>
 </beans>

@@ -10,6 +10,7 @@ import com.percussion.server.IPSRequestContext;
 import com.percussion.util.IPSHtmlParameters;
 
 import gov.cancer.wcm.images.ImageValidationConfiguration;
+import gov.cancer.wcm.images.ImageValidationConfigurationLocator;
 
 public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	private static Log log = LogFactory.getLog(CGV_ImageItemValidator.class);
@@ -19,7 +20,7 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	 * This initializes some of the different services
 	 */
 	static {
-		//validatorConfig = ImageValidationConfigurationLocator.getImageValidationConfiguration();
+		validatorConfig = ImageValidationConfigurationLocator.getImageValidationConfiguration();
 	}
 	
 	/**
@@ -38,12 +39,12 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	      IPSRequestContext req, Object[] params) throws Exception
 	{
 		log.debug("In validateDocs for ImageItemValidator");
-		/*if(validatorConfig != null){
+		if(validatorConfig != null){
 			log.debug("Successfully loaded Validator Config");
 		}
 		else {
 			log.debug("Validator Config loading broken");
-		}*/
+		}
 		
 	    String contentid = req.getParameter(IPSHtmlParameters.SYS_CONTENTID);
 	    Validate.notEmpty(contentid);
