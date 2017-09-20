@@ -1,14 +1,14 @@
 package gov.cancer.wcm.images;
 
 public abstract class Constraint {
-	private int fieldName;
+	protected String fieldName;
 	
 	/*
-	 * Retrieves the constraint width.
+	 * Retrieves the constraint fieldName.
 	 */
-	public int getFieldName(){
+	public String getFieldName(){
 		return fieldName;
 	}
 	
-	abstract boolean isConstrained();
+	abstract boolean isConstrained(String data);
 }

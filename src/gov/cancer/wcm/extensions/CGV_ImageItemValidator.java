@@ -4,8 +4,12 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.util.*;
 
 import com.percussion.pso.validation.PSOAbstractItemValidationExit;
+import com.percussion.pso.validation.PSOItemXMLSupport;
 import com.percussion.server.IPSRequestContext;
 import com.percussion.util.IPSHtmlParameters;
 
@@ -15,6 +19,8 @@ import gov.cancer.wcm.images.ImageValidationConfigurationLocator;
 public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	private static Log log = LogFactory.getLog(CGV_ImageItemValidator.class);
 	private static ImageValidationConfiguration validatorConfig = null;
+	private static String[] imageTypes = new String[] {"img1", "img2", "img3", "img4", "img5"};
+    private static String[] imageFields = new String[] {"width", "height", "size"};
 		
 	/*
 	 * This initializes some of the different services
@@ -52,6 +58,8 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    Validate.notEmpty(transitionid);
 	    String states = params[0].toString();
 	    
+	    HashMap<String, String> fieldValues = getFieldValuesFromDocument(imageTypes, imageFields, inputDoc);
+	    
 	    if(super.matchDestinationState(contentid, transitionid, states))
     	{
 	    	log.debug("ImageItemValidator - Testing if transition of item is allowed, valid state for test");
@@ -59,5 +67,26 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    else {
 	    	log.debug("ImageItemValidator - Exclusion flag detected");
 	    }
+	}
+	
+	private HashMap<String, String> getFieldValuesFromDocument(String[] imageNames, String[] imageFields, Document inputDoc)
+	{
+		HashMap<String, String> fieldValues = new HashMap<String, String>();
+		
+		for(String name : imageNames) {
+			for(String field : imageFields) {
+				String fieldName = name + "_" + field;
+				Element fieldElem = super.getFieldElement(inputDoc, fieldName);
+				if(fieldElem != null) {
+					String fieldVal = super.getFieldValue(fieldElem);
+					if(fieldVal != null) {
+						log.debug("Adding [" + fieldName + ", " + fieldVal + "] to fieldValues");
+						fieldValues.put(fieldName, super.getFieldValue(fieldElem));
+					}
+				}
+			}
+		}
+		
+		return fieldValues;
 	}
 }
