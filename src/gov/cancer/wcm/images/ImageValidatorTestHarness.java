@@ -11,13 +11,14 @@ public class ImageValidatorTestHarness {
 		// Get CT Validator
 		ImageCTValidator ctValidator = getImageCTValidator();
 		
-		
 		// Get data - getTestData()
 		HashMap<String, String> fieldData = getTestData();
 		
 		// CT Validator - validate item
-		boolean validated = ctValidator.validateItems(fieldData);
-		System.out.println("Test items validated: " + validated);
+		ArrayList<String> validationErrors = ctValidator.validateItems(fieldData);
+		for(String item : validationErrors) {
+			System.out.println(item);
+		}
 	}
 
 	private static HashMap<String, String> getTestData() {

@@ -10,5 +10,9 @@ public abstract class Constraint {
 		return fieldName;
 	}
 	
-	abstract boolean isConstrained(String data);
+	/*
+	 * Abstract method for isConstrained, which defines how to determine
+	 * validation for a passed-in value from a field on an image.
+	 */
+	abstract String isConstrained(String data, String imageFieldName);
 }

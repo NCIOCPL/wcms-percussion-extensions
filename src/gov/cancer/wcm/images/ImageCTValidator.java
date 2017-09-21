@@ -1,8 +1,6 @@
 package gov.cancer.wcm.images;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ImageCTValidator {
 	private String contentTypeName;
@@ -48,27 +46,33 @@ public class ImageCTValidator {
 		}
 	}
 	
-	public void getFieldsToValidate() {
-		// returns all individual items to validate? i.e. [ img1, width ] ?
-	}
-	
-	public boolean validateItems(HashMap<String, String> fieldsToValidate) {
-		boolean itemsAreValid = false;
+	/*
+	 * Using the list of image field validators, determine which fields
+	 * need to be validated for this CT Validator.
+	 */
+	public ArrayList<String> getFieldsToValidate() {
+		ArrayList<String> fieldsToValidate = new ArrayList<String>();
 		
-		for(Map.Entry<String, String> entry : fieldsToValidate.entrySet()) {
-			// passed in values from getFieldsToValidate()
-			String[] parts = entry.getKey().split("_");
-			String itemImageName = parts[0];
-			String itemField = parts[1];
-			String itemValue = entry.getValue();
-			
-			for(Map.Entry<String, ImageFieldValidator> validator : imageFieldValidators.entrySet()) {
-				if(validator.getKey().equals(itemImageName)) {
-					itemsAreValid = validator.getValue().isFieldValid(itemField, itemValue);
-				}
+		for(String key : this.imageFieldValidators.keySet()) {
+			for(Constraint constraint : this.imageFieldValidators.get(key).getConstraints()) {
+				fieldsToValidate.add(key + "_" + constraint.fieldName);
 			}
 		}
 		
-		return itemsAreValid;
+		return fieldsToValidate;
+	}
+	
+	/*
+	 * Given a hashmap of image content item data to validate, determine
+	 * if the content item fields are within the defined constraints.
+	 */
+	public ArrayList<String> validateItems(HashMap<String, String> dataToValidate) {
+		ArrayList<String> validationErrors = new ArrayList<String>();
+		
+		for(String key : this.imageFieldValidators.keySet()) {
+			validationErrors.addAll(this.imageFieldValidators.get(key).validateField(dataToValidate));			
+		}
+		
+		return validationErrors;
 	}
 }

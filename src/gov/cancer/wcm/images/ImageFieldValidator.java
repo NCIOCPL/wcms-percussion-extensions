@@ -2,10 +2,12 @@ package gov.cancer.wcm.images;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ImageFieldValidator {
 	private String imageFieldName;
-	private ArrayList<Constraint> constraints = new ArrayList<Constraint>();
+	private List<Constraint> constraints = new ArrayList<Constraint>();
+	private List<String> fileTypes = new ArrayList<String>();
 	
 	/*
 	 * Retrieves the image field name.
@@ -17,24 +19,48 @@ public class ImageFieldValidator {
 	/*
 	 * Retrieves the constraints
 	 */
-	public ArrayList<Constraint> getConstraints(){
+	public List<Constraint> getConstraints(){
 		return constraints;
 	}
 	
+	/*
+	 * Retrieves the allowed file types
+	 */
+	public List<String> getFileTypes(){
+		return fileTypes;
+	}
+	
+	/*
+	 * Constructs an instance of ImageFieldValidator using a fieldName and a list of constraints.
+	 * Constraints may be empty, but must never be null.
+	 */
 	public ImageFieldValidator(String fieldName, ArrayList<Constraint> imageConstraints){
 		imageFieldName = fieldName;
 		constraints = imageConstraints;
 	}
 	
-	public boolean isFieldValid(String dataField, String dataValue) {
-		boolean isValid = false;
+	/*
+	 * Given a hashmap of image content item data to validate, determine
+	 * if the content item fields are within the defined constraints.
+	 */
+	public List<String> validateField(HashMap<String, String> dataToValidate) {
+		ArrayList<String> validationErrors = new ArrayList<String>();
 		
-		for(Constraint constraint : constraints) {
-			if(dataField.equals(constraint.fieldName)) {
-				isValid = constraint.isConstrained(dataValue);
+		for(Constraint constraint : this.constraints) {
+			String fullFieldName = "";
+			
+			if(constraint.getFieldName() != null) {
+				fullFieldName = this.imageFieldName + "_" + constraint.getFieldName();
+			}
+			else {
+				fullFieldName = this.imageFieldName;
+			}
+			
+			if(dataToValidate.containsKey(fullFieldName)) {
+				validationErrors.add(constraint.isConstrained(dataToValidate.get(fullFieldName), this.imageFieldName));
 			}
 		}
 		
-		return isValid;
+		return validationErrors;
 	}
 }

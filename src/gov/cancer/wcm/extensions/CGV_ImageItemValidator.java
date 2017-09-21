@@ -58,6 +58,13 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    Validate.notEmpty(transitionid);
 	    String states = params[0].toString();
 	    
+	    // Get CTValidator for item (given content type name)
+	    // CTValidator ctValidator = new CTValidator();
+	    
+	    // Get fields to validate from CTValidator
+	    //ArrayList<String> validationFields = CTValidator.getFieldsToValidate();
+	    
+	    // Get field values to validate for each field from item
 	    HashMap<String, String> fieldValues = getFieldValuesFromDocument(imageTypes, imageFields, inputDoc);
 	    
 	    if(super.matchDestinationState(contentid, transitionid, states))
