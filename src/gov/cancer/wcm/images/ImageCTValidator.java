@@ -56,6 +56,7 @@ public class ImageCTValidator {
 		boolean itemsAreValid = false;
 		
 		for(Map.Entry<String, String> entry : fieldsToValidate.entrySet()) {
+			// passed in values from getFieldsToValidate()
 			String[] parts = entry.getKey().split("_");
 			String itemImageName = parts[0];
 			String itemField = parts[1];

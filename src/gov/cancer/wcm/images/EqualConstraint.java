@@ -13,13 +13,19 @@ public class EqualConstraint extends Constraint {
 	}
 	
 	boolean isConstrained(String data) {
-		int dataVal = Integer.parseInt(data);
-		int constraintVal = Integer.parseInt(value);
-		
-		if(dataVal == constraintVal) {
-			return true;
+		try {
+			int dataVal = Integer.parseInt(data);
+			int constraintVal = Integer.parseInt(value);
+			
+			if(dataVal == constraintVal) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
-		else {
+		catch (NumberFormatException e) {
+			// Add error logging here
 			return false;
 		}
 	}	

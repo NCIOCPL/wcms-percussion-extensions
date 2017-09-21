@@ -19,14 +19,20 @@ public class BetweenConstraint extends Constraint {
 	}
 	
 	boolean isConstrained(String data) {
-		int dataVal = Integer.parseInt(data);
-		int constraintMinVal = Integer.parseInt(minValue);
-		int constraintMaxVal = Integer.parseInt(maxValue);
-		
-		if(dataVal >= constraintMinVal && dataVal <= constraintMaxVal) {
-			return true;
+		try {
+			int dataVal = Integer.parseInt(data);
+			int constraintMinVal = Integer.parseInt(minValue);
+			int constraintMaxVal = Integer.parseInt(maxValue);
+			
+			if(dataVal >= constraintMinVal && dataVal <= constraintMaxVal) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
-		else {
+		catch (NumberFormatException e) {
+			// Add error logging here
 			return false;
 		}
 	}
