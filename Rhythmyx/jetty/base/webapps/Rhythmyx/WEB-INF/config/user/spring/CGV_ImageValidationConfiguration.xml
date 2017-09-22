@@ -10,6 +10,122 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     
     
+	<bean id="articleImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
+		<constructor-arg><value>img1</value></constructor-arg>
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.images.BetweenConstraint">
+					<constructor-arg><value>width</value></constructor-arg>
+					<constructor-arg><value>600</value></constructor-arg>
+					<constructor-arg><value>900</value></constructor-arg>
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<!-- 
+	<bean id="socialMediaImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
+		<constructor-arg><value>img6</value></constructor-arg>
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+					<constructor-arg><value>width</value></constructor-arg>
+					<constructor-arg><value>600</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+ 					<constructor-arg><value>height</value></constructor-arg>
+					<constructor-arg><value>315</value></constructor-arg>
+				</bean>          
+			</list>
+		</constructor-arg>
+	</bean>
+	-->
+	
+	<bean id="featureCardImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
+		<constructor-arg><value>img4</value></constructor-arg>
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+					<constructor-arg><value>width</value></constructor-arg>
+					<constructor-arg><value>425</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+ 					<constructor-arg><value>height</value></constructor-arg>
+					<constructor-arg><value>319</value></constructor-arg>
+				</bean>          
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="panoramicImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
+		<constructor-arg><value>img5</value></constructor-arg>
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+					<constructor-arg><value>width</value></constructor-arg>
+					<constructor-arg><value>785</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+ 					<constructor-arg><value>height</value></constructor-arg>
+					<constructor-arg><value>441</value></constructor-arg>
+				</bean>          
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="thumbnailImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
+		<constructor-arg><value>img2</value></constructor-arg>
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+					<constructor-arg><value>width</value></constructor-arg>
+					<constructor-arg><value>230</value></constructor-arg>
+				</bean>
+				<bean class="gov.cancer.wcm.images.ExactConstraint">
+ 					<constructor-arg><value>height</value></constructor-arg>
+					<constructor-arg><value>173</value></constructor-arg>
+				</bean>          
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="enlargeImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
+		<constructor-arg><value>img3</value></constructor-arg>
+		<constructor-arg>
+			<list>
+				<bean class="gov.cancer.wcm.images.BetweenConstraint">
+					<constructor-arg><value>size</value></constructor-arg>
+					<constructor-arg><value>1</value></constructor-arg>
+					<constructor-arg><value>100000</value></constructor-arg>
+				</bean>       
+			</list>
+		</constructor-arg>
+	</bean>
+
+  <bean id="gloImageValidator" class="gov.cancer.wcm.images.ImageCTValidator">
+     <constructor-arg><value>gloImage</value></constructor-arg>
+     <constructor-arg>
+         <list>
+            <ref bean="articleImageFieldValidator" />
+            <!--  <ref bean="socialMediaImageFieldValidator" /> -->
+            <ref bean="featureCardImageFieldValidator" />
+            <ref bean="panoramicImageFieldValidator" />
+            <ref bean="thumbnailImageFieldValidator" />
+            <ref bean="enlargeImageFieldValidator" />
+         </list>
+     </constructor-arg>
+  </bean>
+    
+     
+    
+    
     <bean id="CGV_ImageValidationConfiguration" class="gov.cancer.wcm.images.ImageValidationConfiguration">
+    
+    	<constructor-arg>
+    		<list>
+    			<ref bean="gloImageValidator" />
+    		</list>
+    	</constructor-arg>
+    
 	</bean>
 </beans>

@@ -1,6 +1,6 @@
 package gov.cancer.wcm.images;
 
-public class EqualConstraint extends Constraint {
+public class ExactConstraint extends Constraint {
 	private String value;
 	
 	/*
@@ -14,7 +14,7 @@ public class EqualConstraint extends Constraint {
 	 * Constructs an instance of EqualConstraint using an exact value.
 	 * Value must never be null.
 	 */
-	public EqualConstraint(String fName, String val) {
+	public ExactConstraint(String fName, String val) {
 		fieldName = fName;
 		value = val;
 	}

@@ -60,8 +60,8 @@ public class ImageValidatorTestHarness {
 	}
 	
 	private static ArrayList<Constraint> getImg2Constraints() {
-		EqualConstraint eqlConstraint = new EqualConstraint("width", "425");
-		EqualConstraint eqlConstraint1 = new EqualConstraint("height", "319");
+		ExactConstraint eqlConstraint = new ExactConstraint("width", "425");
+		ExactConstraint eqlConstraint1 = new ExactConstraint("height", "319");
 		
 		ArrayList<Constraint> testConstraints = new ArrayList<Constraint>();
 		testConstraints.add(eqlConstraint);
