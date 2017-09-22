@@ -11,22 +11,26 @@ import java.util.*;
 import com.percussion.pso.validation.PSOAbstractItemValidationExit;
 import com.percussion.pso.validation.PSOItemXMLSupport;
 import com.percussion.server.IPSRequestContext;
+import com.percussion.services.legacy.IPSCmsContentSummaries;
+import com.percussion.services.legacy.PSCmsContentSummariesLocator;
 import com.percussion.util.IPSHtmlParameters;
+import com.percussion.cms.objectstore.PSComponentSummary;
 
-import gov.cancer.wcm.images.ImageValidationConfiguration;
-import gov.cancer.wcm.images.ImageValidationConfigurationLocator;
+import gov.cancer.wcm.util.CGV_TypeNames;
+import gov.cancer.wcm.images.*;
+
 
 public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	private static Log log = LogFactory.getLog(CGV_ImageItemValidator.class);
 	private static ImageValidationConfiguration validatorConfig = null;
-	private static String[] imageTypes = new String[] {"img1", "img2", "img3", "img4", "img5"};
-    private static String[] imageFields = new String[] {"width", "height", "size"};
+	private static IPSCmsContentSummaries contentSummariesService;
 		
 	/*
 	 * This initializes some of the different services
 	 */
 	static {
 		validatorConfig = ImageValidationConfigurationLocator.getImageValidationConfiguration();
+		contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 	}
 	
 	/**
@@ -43,29 +47,59 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	@Override
 	protected void validateDocs(Document inputDoc, Document errorDoc,
 	      IPSRequestContext req, Object[] params) throws Exception
-	{
-		log.debug("In validateDocs for ImageItemValidator");
-		if(validatorConfig != null){
-			log.debug("Successfully loaded Validator Config");
-		}
-		else {
-			log.debug("Validator Config loading broken");
-		}
-		
+	{	
 	    String contentid = req.getParameter(IPSHtmlParameters.SYS_CONTENTID);
 	    Validate.notEmpty(contentid);
 	    String transitionid = req.getParameter(IPSHtmlParameters.SYS_TRANSITIONID);
 	    Validate.notEmpty(transitionid);
 	    String states = params[0].toString();
 	    
-	    // Get CTValidator for item (given content type name)
-	    // CTValidator ctValidator = new CTValidator();
+	    contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
+
+	    int id = Integer.parseInt(contentid);		
+
+	    //Get information about the content item this lets us get the GUID
+	    //and allows us to get the content Type Name
+	    PSComponentSummary contentItemSummary = contentSummariesService.loadComponentSummary(id);
+
+	    long contentTypeID = contentItemSummary.getContentTypeId();
+	    String contentTypeName;
+
+	    try {
+	    	contentTypeName = CGV_TypeNames.getTypeName(contentTypeID);
+	    } catch (Exception ex) {		
+	    	String message = String.format("Failed to retrieve type name for contentTypeID = %d.", contentTypeID);
+	    	throw new Exception();
+	    }
+	    
+	    if(validatorConfig != null) {
+	    	if(validatorConfig.hasImageCTValidator(contentTypeName)) {
+	    		ImageCTValidator imgValidator = validatorConfig.getImageCTValidator(contentTypeName);
+	    		
+	    		ArrayList<String> fieldsToValidate = imgValidator.getFieldsToValidate();
+	    		
+	    		if(!fieldsToValidate.isEmpty()) {
+	    			log.debug("Fields to validate from " + imgValidator.getContentTypeName() + "CT validator: ");
+	    			for(String field : fieldsToValidate) {
+	    				log.debug(field);
+	    			}
+	    			
+	    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgValidator);
+	    		}
+	    	}
+	    	else {
+	    		log.debug("Unable to find ImageCTValidator for: " + contentTypeName);
+	    	}
+	    }
+	    else {
+	    	log.debug("Error getting ImageItemValidator config.");
+	    }
 	    
 	    // Get fields to validate from CTValidator
 	    //ArrayList<String> validationFields = CTValidator.getFieldsToValidate();
 	    
 	    // Get field values to validate for each field from item
-	    HashMap<String, String> fieldValues = getFieldValuesFromDocument(imageTypes, imageFields, inputDoc);
+	    //HashMap<String, String> fieldValues = getFieldValuesFromDocument(imageTypes, imageFields, inputDoc);
 	    
 	    if(super.matchDestinationState(contentid, transitionid, states))
     	{
@@ -76,23 +110,21 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    }
 	}
 	
-	private HashMap<String, String> getFieldValuesFromDocument(String[] imageNames, String[] imageFields, Document inputDoc)
+	private HashMap<String, String> getFieldValuesFromDocument(ArrayList<String> imageFields, Document inputDoc, ImageCTValidator ctValidator)
 	{
 		HashMap<String, String> fieldValues = new HashMap<String, String>();
 		
-		for(String name : imageNames) {
-			for(String field : imageFields) {
-				String fieldName = name + "_" + field;
-				Element fieldElem = super.getFieldElement(inputDoc, fieldName);
-				if(fieldElem != null) {
-					String fieldVal = super.getFieldValue(fieldElem);
-					if(fieldVal != null) {
-						log.debug("Adding [" + fieldName + ", " + fieldVal + "] to fieldValues");
-						fieldValues.put(fieldName, super.getFieldValue(fieldElem));
-					}
-					else {
-						fieldValues.put(fieldName, null);
-					}
+		for(String field : imageFields) {
+			Element fieldElem = super.getFieldElement(inputDoc, field);
+			if(fieldElem != null) {
+				String fieldVal = super.getFieldValue(fieldElem);
+				if(fieldVal != null) {
+					log.debug("Adding [" + field + ", " + fieldVal + "] to fieldValues");
+					fieldValues.put(field, super.getFieldValue(fieldElem));
+				}
+				else {
+					log.debug("Adding [" + field + ", null] to fieldValues");
+					fieldValues.put(field, null);
 				}
 			}
 		}

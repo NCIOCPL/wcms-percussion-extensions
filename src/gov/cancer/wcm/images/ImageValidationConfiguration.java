@@ -15,6 +15,19 @@ public class ImageValidationConfiguration {
 		return imageCTValidators;
 	}
 	
+	/*
+	 * Returns true if the image validation configuration contains an image CT validator
+	 * for a specific content type.
+	 */
+	public boolean hasImageCTValidator(String contentTypeName) {
+		for(ImageCTValidator ctValidator : imageCTValidators) {
+			if(ctValidator.getContentTypeName().equals(contentTypeName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/* 
 	 * Returns ImageCTValidator for a specific content type name.
 	 */
@@ -22,9 +35,6 @@ public class ImageValidationConfiguration {
 		for(ImageCTValidator ctValidator : imageCTValidators) { 
 			if(ctValidator.getContentTypeName().equals(contentTypeName)) {
 				return ctValidator;
-			}
-			else {
-				return null;
 			}
 		}
 		return null;

@@ -48,7 +48,7 @@ public class ImageCTValidator {
 	
 	/*
 	 * Using the list of image field validators, determine which fields
-	 * need to be validated for this CT Validator.
+	 * are validated by this CT Validator.
 	 */
 	public ArrayList<String> getFieldsToValidate() {
 		ArrayList<String> fieldsToValidate = new ArrayList<String>();
@@ -70,7 +70,7 @@ public class ImageCTValidator {
 		ArrayList<String> validationErrors = new ArrayList<String>();
 		
 		for(String key : this.imageFieldValidators.keySet()) {
-			validationErrors.addAll(this.imageFieldValidators.get(key).validateField(dataToValidate));			
+			validationErrors.addAll(this.imageFieldValidators.get(key).validateField(dataToValidate));	
 		}
 		
 		return validationErrors;
