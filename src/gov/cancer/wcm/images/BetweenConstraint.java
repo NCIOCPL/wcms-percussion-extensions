@@ -32,24 +32,29 @@ public class BetweenConstraint extends Constraint {
 	 * Given a value for a field on an image content item, determine
 	 * if the value is within the defined constraints.
 	 */
-	String isConstrained(String data, String imageFieldName) {
-		try {
-			int dataVal = Integer.parseInt(data);
-			int constraintMinVal = Integer.parseInt(minValue);
-			int constraintMaxVal = Integer.parseInt(maxValue);
-			
-			if(dataVal >= constraintMinVal && dataVal <= constraintMaxVal) {
-				return "Validated " + imageFieldName + "_" + this.getFieldName();
-			}
-			else {
-				return "Error: " + imageFieldName + "_" + this.getFieldName() + " has value " + data 
-						+ "which is not between constraint values [" + this.getMinValue()
-						+ ", " + this.getMaxValue() + "].";
-			}
+	ImageValidationError isConstrained(String data, String imageFieldName) {
+		if(data == null) {
+			return null;
 		}
-		catch (NumberFormatException e) {
-			// Add error logging here
-			return "Error: " + imageFieldName + "_" + this.getFieldName() + " has an invalid value.";
+		else {
+			try {
+				int dataVal = Integer.parseInt(data);
+				int constraintMinVal = Integer.parseInt(minValue);
+				int constraintMaxVal = Integer.parseInt(maxValue);
+					
+				if(dataVal >= constraintMinVal && dataVal <= constraintMaxVal) {
+					return null;
+				}
+				else {
+					return new ImageValidationError(imageFieldName, "Error: " + imageFieldName + "_" + this.getFieldName() + " has value " + data 
+							+ "which is not between constraint values [" + this.getMinValue()
+							+ ", " + this.getMaxValue() + "].");
+				}
+			}
+			catch (NumberFormatException e) {
+				// Add error logging here
+				return new ImageValidationError(imageFieldName, "Error: " + imageFieldName + "_" + this.getFieldName() + " has an invalid value.");
+			}
 		}
 	}
 }

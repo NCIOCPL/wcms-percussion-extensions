@@ -15,9 +15,9 @@ public class ImageValidatorTestHarness {
 		HashMap<String, String> fieldData = getTestData();
 		
 		// CT Validator - validate item
-		ArrayList<String> validationErrors = ctValidator.validateItems(fieldData);
-		for(String item : validationErrors) {
-			System.out.println(item);
+		ArrayList<ImageValidationError> validationErrors = ctValidator.validateItems(fieldData);
+		for(ImageValidationError item : validationErrors) {
+			System.out.println(item.getErrorMessage());
 		}
 	}
 
@@ -26,8 +26,10 @@ public class ImageValidatorTestHarness {
 		
 		testData.put("img1_width", "650");
 		testData.put("img1_height", "650");
-		testData.put("img2_width", "425");
-		testData.put("img2_height", "319");
+		testData.put("img2_width", "230");
+		testData.put("img2_height", "173");
+		testData.put("img4_width", "400");
+		testData.put("img4_height", "300");
 		
 		return testData;
 	}
@@ -41,6 +43,7 @@ public class ImageValidatorTestHarness {
 	private static ArrayList<ImageFieldValidator> getImageFieldValidators() {
 		ImageFieldValidator img1Validator = new ImageFieldValidator("img1", getImg1Constraints());
 		ImageFieldValidator img2Validator = new ImageFieldValidator("img2", getImg2Constraints());
+		ImageFieldValidator img4Validator = new ImageFieldValidator("img4", getImg4Constraints());
 		
 		ArrayList<ImageFieldValidator> testImageFieldValidators = new ArrayList<ImageFieldValidator>();
 		testImageFieldValidators.add(img1Validator);
@@ -60,6 +63,17 @@ public class ImageValidatorTestHarness {
 	}
 	
 	private static ArrayList<Constraint> getImg2Constraints() {
+		ExactConstraint eqlConstraint = new ExactConstraint("width", "230");
+		ExactConstraint eqlConstraint1 = new ExactConstraint("height", "173");
+		
+		ArrayList<Constraint> testConstraints = new ArrayList<Constraint>();
+		testConstraints.add(eqlConstraint);
+		testConstraints.add(eqlConstraint1);
+		
+		return testConstraints;
+	}
+	
+	private static ArrayList<Constraint> getImg4Constraints() {
 		ExactConstraint eqlConstraint = new ExactConstraint("width", "425");
 		ExactConstraint eqlConstraint1 = new ExactConstraint("height", "319");
 		

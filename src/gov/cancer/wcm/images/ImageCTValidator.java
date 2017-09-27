@@ -16,7 +16,7 @@ public class ImageCTValidator {
 	/*
 	 * Returns true if the image CT validator contains an image field validator.
 	 */
-	public Boolean hasValidator(String fieldValidatorName){
+	public Boolean hasImageFieldValidator(String fieldValidatorName){
 		return imageFieldValidators.containsKey(fieldValidatorName);
 	}
 
@@ -24,7 +24,7 @@ public class ImageCTValidator {
 	 * Retrieves the image field validator named fieldValidatorName.
 	 * Returns null if fieldValidatorName does not exist.
 	 */
-	public ImageFieldValidator getFieldValidator(String fieldValidatorName){
+	public ImageFieldValidator getImageFieldValidator(String fieldValidatorName){
 		if(imageFieldValidators.containsKey(fieldValidatorName)){
 			return imageFieldValidators.get(fieldValidatorName);
 		}
@@ -63,14 +63,32 @@ public class ImageCTValidator {
 	}
 	
 	/*
+	 * Using the list of image field validators, determine which fields
+	 * are constrained by this CT Validator.
+	 */
+	public ArrayList<String> getConstraintFields() {
+		ArrayList<String> constraintFields = new ArrayList<String>();
+		
+		for(String key : this.imageFieldValidators.keySet()) {
+			for(Constraint constraint : this.imageFieldValidators.get(key).getConstraints()) {
+				constraintFields.add("_" + constraint.fieldName);
+			}
+		}
+		
+		return constraintFields;
+	}
+	
+	/*
 	 * Given a hashmap of image content item data to validate, determine
 	 * if the content item fields are within the defined constraints.
 	 */
-	public ArrayList<String> validateItems(HashMap<String, String> dataToValidate) {
-		ArrayList<String> validationErrors = new ArrayList<String>();
+	public ArrayList<ImageValidationError> validateItems(HashMap<String, String> dataToValidate) {
+		ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
 		
 		for(String key : this.imageFieldValidators.keySet()) {
-			validationErrors.addAll(this.imageFieldValidators.get(key).validateField(dataToValidate));	
+			if(!this.imageFieldValidators.get(key).validateField(dataToValidate).isEmpty()) {
+				validationErrors.addAll(this.imageFieldValidators.get(key).validateField(dataToValidate));	
+			}
 		}
 		
 		return validationErrors;

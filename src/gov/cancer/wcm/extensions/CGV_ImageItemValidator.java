@@ -72,6 +72,7 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    	throw new Exception();
 	    }
 	    
+	    ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
 	    if(validatorConfig != null) {
 	    	if(validatorConfig.hasImageCTValidator(contentTypeName)) {
 	    		ImageCTValidator imgValidator = validatorConfig.getImageCTValidator(contentTypeName);
@@ -85,6 +86,11 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    			}
 	    			
 	    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgValidator);
+	    			
+	    			if(!imageData.isEmpty()) {
+	    				validationErrors = imgValidator.validateItems(imageData);
+	    			}
+	    			
 	    		}
 	    	}
 	    	else {

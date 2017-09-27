@@ -43,8 +43,8 @@ public class ImageFieldValidator {
 	 * Given a hashmap of image content item data to validate, determine
 	 * if the content item fields are within the defined constraints.
 	 */
-	public List<String> validateField(HashMap<String, String> dataToValidate) {
-		ArrayList<String> validationErrors = new ArrayList<String>();
+	public List<ImageValidationError> validateField(HashMap<String, String> dataToValidate) {
+		ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
 		
 		for(Constraint constraint : this.constraints) {
 			String fullFieldName = "";
@@ -57,7 +57,9 @@ public class ImageFieldValidator {
 			}
 			
 			if(dataToValidate.containsKey(fullFieldName)) {
-				validationErrors.add(constraint.isConstrained(dataToValidate.get(fullFieldName), this.imageFieldName));
+				if(constraint.isConstrained(dataToValidate.get(fullFieldName), this.imageFieldName) != null) {
+					validationErrors.add(constraint.isConstrained(dataToValidate.get(fullFieldName), this.imageFieldName));
+				}
 			}
 		}
 		
