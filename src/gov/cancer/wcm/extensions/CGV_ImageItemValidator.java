@@ -14,6 +14,7 @@ import com.percussion.server.IPSRequestContext;
 import com.percussion.services.legacy.IPSCmsContentSummaries;
 import com.percussion.services.legacy.PSCmsContentSummariesLocator;
 import com.percussion.util.IPSHtmlParameters;
+import com.percussion.util.PSItemErrorDoc;
 import com.percussion.cms.objectstore.PSComponentSummary;
 
 import gov.cancer.wcm.util.CGV_TypeNames;
@@ -92,6 +93,15 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    				
 	    				for(ImageValidationError err : validationErrors) {
 	    					log.debug(err.getFieldName() + ": " + err.getErrorMessage());
+	    				}
+	    				
+	    				if(!validationErrors.isEmpty()) {
+	    					for(ImageValidationError err : validationErrors) {
+	    						Element field = super.getFieldElement(inputDoc, err.getFieldName());
+	    						String label = super.getFieldLabel(field);
+	    						PSItemErrorDoc.addError(errorDoc, err.getFieldName(), label, err.getErrorMessage(), new Object[]{field});
+	    						continue;
+	    					}
 	    				}
 	    				
 	    				/*
