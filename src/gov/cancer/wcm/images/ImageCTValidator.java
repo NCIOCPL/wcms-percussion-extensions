@@ -87,7 +87,7 @@ public class ImageCTValidator {
 		
 		for(String key : this.imageFieldValidators.keySet()) {
 			if(!this.imageFieldValidators.get(key).validateField(dataToValidate).isEmpty()) {
-				validationErrors.addAll(this.imageFieldValidators.get(key).validateField(dataToValidate));	
+				validationErrors.addAll(this.imageFieldValidators.get(key).validateField(dataToValidate));
 			}
 		}
 		

@@ -6,6 +6,8 @@ import java.util.HashMap;
 
 public class ImageFieldValidator {
 	private String imageFieldName;
+	private String imageFieldDisplayName;
+	private String errorMessage;
 	private List<Constraint> constraints = new ArrayList<Constraint>();
 	private List<String> fileTypes = new ArrayList<String>();
 	
@@ -14,6 +16,20 @@ public class ImageFieldValidator {
 	 */
 	public String getImageFieldName(){
 		return imageFieldName;
+	}
+	
+	/*
+	 * Retrieves the image field name.
+	 */
+	public String getImageFieldDisplayName(){
+		return imageFieldDisplayName;
+	}
+	
+	/*
+	 * Retrieves the error message for this image field.
+	 */
+	public String getErrorMessage(){
+		return errorMessage;
 	}
 	
 	/*
@@ -34,8 +50,10 @@ public class ImageFieldValidator {
 	 * Constructs an instance of ImageFieldValidator using a fieldName and a list of constraints.
 	 * Constraints may be empty, but must never be null.
 	 */
-	public ImageFieldValidator(String fieldName, ArrayList<Constraint> imageConstraints){
+	public ImageFieldValidator(String fieldName, String fieldDisplayName, String errMsg, ArrayList<Constraint> imageConstraints){
 		imageFieldName = fieldName;
+		imageFieldDisplayName = fieldDisplayName;
+		errorMessage = errMsg;
 		constraints = imageConstraints;
 	}
 	
@@ -43,7 +61,7 @@ public class ImageFieldValidator {
 	 * Given a hashmap of image content item data to validate, determine
 	 * if the content item fields are within the defined constraints.
 	 */
-	public List<ImageValidationError> validateField(HashMap<String, String> dataToValidate) {
+	public ArrayList<ImageValidationError> validateField(HashMap<String, String> dataToValidate) {
 		ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
 		
 		for(Constraint constraint : this.constraints) {
@@ -57,8 +75,8 @@ public class ImageFieldValidator {
 			}
 			
 			if(dataToValidate.containsKey(fullFieldName)) {
-				if(constraint.isConstrained(dataToValidate.get(fullFieldName), this.imageFieldName) != null) {
-					validationErrors.add(constraint.isConstrained(dataToValidate.get(fullFieldName), this.imageFieldName));
+				if(constraint.isConstrained(dataToValidate.get(fullFieldName), fullFieldName, this.imageFieldDisplayName,this.errorMessage) != null) {
+					validationErrors.add(constraint.isConstrained(dataToValidate.get(fullFieldName), fullFieldName, this.imageFieldDisplayName, this.errorMessage));
 				}
 			}
 		}

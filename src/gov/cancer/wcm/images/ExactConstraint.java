@@ -23,7 +23,7 @@ public class ExactConstraint extends Constraint {
 	 * Given a value for a field on an image content item, determine
 	 * if the value is within the defined constraints.
 	 */
-	ImageValidationError isConstrained(String data, String imageFieldName) {
+	ImageValidationError isConstrained(String data, String fullFieldName, String fieldDisplayName, String errorMessage) {
 		if(data == null) {
 			return null;
 		}
@@ -36,13 +36,12 @@ public class ExactConstraint extends Constraint {
 					return null;
 				}
 				else {
-					return new ImageValidationError(imageFieldName, "Error: " + imageFieldName + "_" + this.getFieldName() + " has value " + data 
-							+ "which does not equal constraint value " + this.getValue() + ".");
+					return new ImageValidationError(fullFieldName, String.format(errorMessage, this.getFieldName(), this.getValue()));
 				}
 			}
 			catch (NumberFormatException e) {
 				// Add error logging here
-				return new ImageValidationError(imageFieldName, "Error: " + imageFieldName + "_" + this.getFieldName() + " has an invalid value.");
+				return new ImageValidationError(fullFieldName, fieldDisplayName + this.getFieldName() + " has an invalid value.");
 			}
 		}
 	}	

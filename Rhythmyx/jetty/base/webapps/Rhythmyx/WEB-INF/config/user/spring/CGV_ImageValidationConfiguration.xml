@@ -12,6 +12,8 @@
     
 	<bean id="articleImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img1</value></constructor-arg>
+		<constructor-arg><value>Article Image</value></constructor-arg>
+		<constructor-arg><value>Article Image %s must be at least %s px but cannot exceed %s px.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.BetweenConstraint">
@@ -23,9 +25,10 @@
 		</constructor-arg>
 	</bean>
 	
-	<!-- 
 	<bean id="socialMediaImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img6</value></constructor-arg>
+		<constructor-arg><value>Social Media Image</value></constructor-arg>
+		<constructor-arg><value>Social Media Image %s must be %s px.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.ExactConstraint">
@@ -39,15 +42,17 @@
 			</list>
 		</constructor-arg>
 	</bean>
-	-->
 	
 	<bean id="featureCardImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img4</value></constructor-arg>
+		<constructor-arg><value>Feature Card Image</value></constructor-arg>
+		<constructor-arg><value>Feature Card Image %s must be %s px.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.ExactConstraint">
 					<constructor-arg><value>width</value></constructor-arg>
 					<constructor-arg><value>425</value></constructor-arg>
+					
 				</bean>
 				<bean class="gov.cancer.wcm.images.ExactConstraint">
  					<constructor-arg><value>height</value></constructor-arg>
@@ -59,6 +64,8 @@
 	
 	<bean id="panoramicImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img5</value></constructor-arg>
+		<constructor-arg><value>Panoramic Image</value></constructor-arg>
+		<constructor-arg><value>Panoramic Image %s must be %s px.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.ExactConstraint">
@@ -75,6 +82,8 @@
 	
 	<bean id="thumbnailImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img2</value></constructor-arg>
+		<constructor-arg><value>Thumbnail Image</value></constructor-arg>
+		<constructor-arg><value>Thumbnail Image %s must be %s px.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.ExactConstraint">
@@ -91,6 +100,8 @@
 	
 	<bean id="enlargeImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img3</value></constructor-arg>
+		<constructor-arg><value>Enlarge Image</value></constructor-arg>
+		<constructor-arg><value>Enlarge Image %s must be at least %s B but cannot exceed %s MB.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.BetweenConstraint">
@@ -107,7 +118,7 @@
      <constructor-arg>
          <list>
             <ref bean="articleImageFieldValidator" />
-            <!--  <ref bean="socialMediaImageFieldValidator" /> -->
+            <ref bean="socialMediaImageFieldValidator" />
             <ref bean="featureCardImageFieldValidator" />
             <ref bean="panoramicImageFieldValidator" />
             <ref bean="thumbnailImageFieldValidator" />

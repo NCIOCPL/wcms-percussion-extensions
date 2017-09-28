@@ -75,20 +75,43 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
 	    if(validatorConfig != null) {
 	    	if(validatorConfig.hasImageCTValidator(contentTypeName)) {
-	    		ImageCTValidator imgValidator = validatorConfig.getImageCTValidator(contentTypeName);
+	    		ImageCTValidator imgCTValidator = validatorConfig.getImageCTValidator(contentTypeName);
 	    		
-	    		ArrayList<String> fieldsToValidate = imgValidator.getFieldsToValidate();
+	    		ArrayList<String> fieldsToValidate = imgCTValidator.getFieldsToValidate();
 	    		
 	    		if(!fieldsToValidate.isEmpty()) {
-	    			log.debug("Fields to validate from " + imgValidator.getContentTypeName() + "CT validator: ");
+	    			log.debug("Fields to validate from " + imgCTValidator.getContentTypeName() + "CT validator: ");
 	    			for(String field : fieldsToValidate) {
 	    				log.debug(field);
 	    			}
 	    			
-	    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgValidator);
+	    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgCTValidator);
 	    			
 	    			if(!imageData.isEmpty()) {
-	    				validationErrors = imgValidator.validateItems(imageData);
+	    				validationErrors = imgCTValidator.validateItems(imageData);
+	    				
+	    				for(ImageValidationError err : validationErrors) {
+	    					log.debug(err.getFieldName() + ": " + err.getErrorMessage());
+	    				}
+	    				
+	    				/*
+	    				ArrayList<ImageValidationError> errors = new ArrayList<ImageValidationError>();
+	    				ArrayList<String> constraintFields = imgCTValidator.getConstraintFields();
+	    				
+	    				for(String cons : constraintFields) {
+	    					log.debug("Constraint field: " + constr);
+	    				}
+	    				
+	    				for(ImageValidationError err : validationErrors) {
+	    					for(String constraint : constraintFields) {
+	    						log.debug("Checking if " + err.getFieldName() + " contains " + constraint);
+	    						if(err.getFieldName().contains(constraint)) {
+	    							String errorFieldName = err.getFieldName().replace(constraint, "");
+	    							log.debug("Replacing error for " + err.getFieldName() + " with " + errorFieldName);
+	    							errors.add(new ImageValidationError(errorFieldName, err.getErrorMessage()));
+	    						}
+	    					}
+	    				}*/
 	    			}
 	    			
 	    		}

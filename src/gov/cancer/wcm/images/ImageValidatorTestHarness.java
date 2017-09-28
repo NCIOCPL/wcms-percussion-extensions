@@ -41,13 +41,14 @@ public class ImageValidatorTestHarness {
 	}
 	
 	private static ArrayList<ImageFieldValidator> getImageFieldValidators() {
-		ImageFieldValidator img1Validator = new ImageFieldValidator("img1", getImg1Constraints());
-		ImageFieldValidator img2Validator = new ImageFieldValidator("img2", getImg2Constraints());
-		ImageFieldValidator img4Validator = new ImageFieldValidator("img4", getImg4Constraints());
+		ImageFieldValidator img1Validator = new ImageFieldValidator("img1", "Article Image", "", getImg1Constraints());
+		ImageFieldValidator img2Validator = new ImageFieldValidator("img2", "Thumbnail Image", "", getImg2Constraints());
+		ImageFieldValidator img4Validator = new ImageFieldValidator("img4", "Feature Card Image", "", getImg4Constraints());
 		
 		ArrayList<ImageFieldValidator> testImageFieldValidators = new ArrayList<ImageFieldValidator>();
 		testImageFieldValidators.add(img1Validator);
 		testImageFieldValidators.add(img2Validator);
+		testImageFieldValidators.add(img4Validator);
 		
 		return testImageFieldValidators;
 	}
