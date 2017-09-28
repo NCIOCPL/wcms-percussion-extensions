@@ -42,7 +42,10 @@ public class ImageCTValidator {
 		// Convert image field validators list to a map for faster lookups.
 		for(ImageFieldValidator validator : imgValidators){
 			String key = validator.getImageFieldName();
-			imageFieldValidators.put(key, validator);
+			
+			if(!imageFieldValidators.containsKey(key)) {
+				imageFieldValidators.put(key, validator);
+			}
 		}
 	}
 	
@@ -55,7 +58,9 @@ public class ImageCTValidator {
 		
 		for(String key : this.imageFieldValidators.keySet()) {
 			for(Constraint constraint : this.imageFieldValidators.get(key).getConstraints()) {
-				fieldsToValidate.add(key + "_" + constraint.fieldName);
+				if(!fieldsToValidate.contains(key + "_" + constraint.fieldName)) {
+					fieldsToValidate.add(key + "_" + constraint.fieldName);
+				}
 			}
 		}
 		
@@ -65,7 +70,7 @@ public class ImageCTValidator {
 	/*
 	 * Using the list of image field validators, determine which fields
 	 * are constrained by this CT Validator.
-	 */
+	 
 	public ArrayList<String> getConstraintFields() {
 		ArrayList<String> constraintFields = new ArrayList<String>();
 		
@@ -76,7 +81,7 @@ public class ImageCTValidator {
 		}
 		
 		return constraintFields;
-	}
+	}*/
 	
 	/*
 	 * Given a hashmap of image content item data to validate, determine

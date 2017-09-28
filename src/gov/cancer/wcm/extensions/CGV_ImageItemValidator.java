@@ -149,11 +149,15 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 				String fieldVal = super.getFieldValue(fieldElem);
 				if(fieldVal != null) {
 					log.debug("Adding [" + field + ", " + fieldVal + "] to fieldValues");
-					fieldValues.put(field, super.getFieldValue(fieldElem));
+					if(!fieldValues.containsKey(field)) {
+						fieldValues.put(field, super.getFieldValue(fieldElem));
+					}
 				}
 				else {
 					log.debug("Adding [" + field + ", null] to fieldValues");
-					fieldValues.put(field, null);
+					if(!fieldValues.containsKey(field)) {
+						fieldValues.put(field, null);
+					}
 				}
 			}
 		}
