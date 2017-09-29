@@ -16,6 +16,9 @@ import com.percussion.services.legacy.PSCmsContentSummariesLocator;
 import com.percussion.util.IPSHtmlParameters;
 import com.percussion.util.PSItemErrorDoc;
 import com.percussion.cms.objectstore.PSComponentSummary;
+import com.percussion.pso.workflow.IPSOWorkflowInfoFinder;
+import com.percussion.pso.workflow.PSOWorkflowInfoFinder;
+import com.percussion.services.workflow.data.PSState;
 
 import gov.cancer.wcm.util.CGV_TypeNames;
 import gov.cancer.wcm.images.*;
@@ -25,13 +28,15 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	private static Log log = LogFactory.getLog(CGV_ImageItemValidator.class);
 	private static ImageValidationConfiguration validatorConfig = null;
 	private static IPSCmsContentSummaries contentSummariesService;
-		
+	private static IPSOWorkflowInfoFinder finder = null;	
+	
 	/*
 	 * This initializes some of the different services
 	 */
 	static {
 		validatorConfig = ImageValidationConfigurationLocator.getImageValidationConfiguration();
 		contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
+		finder = new PSOWorkflowInfoFinder();
 	}
 	
 	/**
@@ -54,8 +59,6 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    String transitionid = req.getParameter(IPSHtmlParameters.SYS_TRANSITIONID);
 	    Validate.notEmpty(transitionid);
 	    String states = params[0].toString();
-	    
-	    contentSummariesService = PSCmsContentSummariesLocator.getObjectManager();
 
 	    int id = Integer.parseInt(contentid);		
 
@@ -73,79 +76,73 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    	throw new Exception();
 	    }
 	    
-	    ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
-	    if(validatorConfig != null) {
-	    	if(validatorConfig.hasImageCTValidator(contentTypeName)) {
-	    		ImageCTValidator imgCTValidator = validatorConfig.getImageCTValidator(contentTypeName);
-	    		
-	    		ArrayList<String> fieldsToValidate = imgCTValidator.getFieldsToValidate();
-	    		
-	    		if(!fieldsToValidate.isEmpty()) {
-	    			log.debug("Fields to validate from " + imgCTValidator.getContentTypeName() + "CT validator: ");
-	    			for(String field : fieldsToValidate) {
-	    				log.debug(field);
-	    			}
-	    			
-	    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgCTValidator);
-	    			
-	    			if(!imageData.isEmpty()) {
-	    				validationErrors = imgCTValidator.validateItems(imageData);
-	    				
-	    				for(ImageValidationError err : validationErrors) {
-	    					log.debug(err.getFieldName() + ": " + err.getErrorMessage());
-	    				}
-	    				
-	    				if(!validationErrors.isEmpty()) {
-	    					for(ImageValidationError err : validationErrors) {
-	    						Element field = super.getFieldElement(inputDoc, err.getFieldName());
-	    						String label = super.getFieldLabel(field);
-	    						PSItemErrorDoc.addError(errorDoc, err.getFieldName(), label, err.getErrorMessage(), new Object[]{field});
-	    						continue;
-	    					}
-	    				}
-	    				
-	    				/*
-	    				ArrayList<ImageValidationError> errors = new ArrayList<ImageValidationError>();
-	    				ArrayList<String> constraintFields = imgCTValidator.getConstraintFields();
-	    				
-	    				for(String cons : constraintFields) {
-	    					log.debug("Constraint field: " + constr);
-	    				}
-	    				
-	    				for(ImageValidationError err : validationErrors) {
-	    					for(String constraint : constraintFields) {
-	    						log.debug("Checking if " + err.getFieldName() + " contains " + constraint);
-	    						if(err.getFieldName().contains(constraint)) {
-	    							String errorFieldName = err.getFieldName().replace(constraint, "");
-	    							log.debug("Replacing error for " + err.getFieldName() + " with " + errorFieldName);
-	    							errors.add(new ImageValidationError(errorFieldName, err.getErrorMessage()));
-	    						}
-	    					}
-	    				}*/
-	    			}
-	    			
-	    		}
-	    	}
-	    	else {
-	    		log.debug("Unable to find ImageCTValidator for: " + contentTypeName);
-	    	}
-	    }
-	    else {
-	    	log.debug("Error getting ImageItemValidator config.");
-	    }
-	    
-	    // Get fields to validate from CTValidator
-	    //ArrayList<String> validationFields = CTValidator.getFieldsToValidate();
-	    
-	    // Get field values to validate for each field from item
-	    //HashMap<String, String> fieldValues = getFieldValuesFromDocument(imageTypes, imageFields, inputDoc);
-	    
 	    if(super.matchDestinationState(contentid, transitionid, states))
     	{
-	    	log.debug("ImageItemValidator - Testing if transition of item is allowed, valid state for test");
+	    	ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
+		    if(validatorConfig != null) {
+		    	if(validatorConfig.hasImageCTValidator(contentTypeName)) {
+		    		ImageCTValidator imgCTValidator = validatorConfig.getImageCTValidator(contentTypeName);
+		    		
+		    		ArrayList<String> fieldsToValidate = imgCTValidator.getFieldsToValidate();
+		    		
+		    		if(!fieldsToValidate.isEmpty()) {
+		    			log.debug("Fields to validate from " + imgCTValidator.getContentTypeName() + "CT validator: ");
+		    			for(String field : fieldsToValidate) {
+		    				log.debug(field);
+		    			}
+		    			
+		    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgCTValidator);
+		    			
+		    			if(!imageData.isEmpty()) {
+		    				validationErrors = imgCTValidator.validateItems(imageData);
+		    				
+		    				for(ImageValidationError err : validationErrors) {
+		    					log.debug(err.getFieldName() + ": " + err.getErrorMessage());
+		    				}
+		    				
+		    				if(!validationErrors.isEmpty()) {
+		    					for(ImageValidationError err : validationErrors) {
+		    						Element field = super.getFieldElement(inputDoc, err.getFieldName());
+		    						String label = super.getFieldLabel(field);
+		    						PSItemErrorDoc.addError(errorDoc, err.getFieldName(), label, err.getErrorMessage(), new Object[]{field});
+		    						continue;
+		    					}
+		    				}
+		    				
+		    				/*
+		    				ArrayList<ImageValidationError> errors = new ArrayList<ImageValidationError>();
+		    				ArrayList<String> constraintFields = imgCTValidator.getConstraintFields();
+		    				
+		    				for(String cons : constraintFields) {
+		    					log.debug("Constraint field: " + constr);
+		    				}
+		    				
+		    				for(ImageValidationError err : validationErrors) {
+		    					for(String constraint : constraintFields) {
+		    						log.debug("Checking if " + err.getFieldName() + " contains " + constraint);
+		    						if(err.getFieldName().contains(constraint)) {
+		    							String errorFieldName = err.getFieldName().replace(constraint, "");
+		    							log.debug("Replacing error for " + err.getFieldName() + " with " + errorFieldName);
+		    							errors.add(new ImageValidationError(errorFieldName, err.getErrorMessage()));
+		    						}
+		    					}
+		    				}*/
+		    			}
+		    			
+		    		}
+		    	}
+		    	else {
+		    		log.debug("Unable to find ImageCTValidator for: " + contentTypeName);
+		    	}
+		    }
+		    else {
+		    	log.debug("Error getting ImageItemValidator config.");
+		    }
+	    	
+	    	log.debug("ImageItemValidator - Correct destination state");
     	}
 	    else {
-	    	log.debug("ImageItemValidator - Exclusion flag detected");
+	    	log.debug("ImageItemValidator - Incorrect destination state - must be Staging (D) or Staging (P)");
 	    }
 	}
 	
@@ -158,13 +155,13 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 			if(fieldElem != null) {
 				String fieldVal = super.getFieldValue(fieldElem);
 				if(fieldVal != null) {
-					log.debug("Adding [" + field + ", " + fieldVal + "] to fieldValues");
+					log.debug("Adding [" + field + ", " + fieldVal + "] to field values from document");
 					if(!fieldValues.containsKey(field)) {
 						fieldValues.put(field, super.getFieldValue(fieldElem));
 					}
 				}
 				else {
-					log.debug("Adding [" + field + ", null] to fieldValues");
+					log.debug("Adding [" + field + ", null] to field values from document");
 					if(!fieldValues.containsKey(field)) {
 						fieldValues.put(field, null);
 					}
