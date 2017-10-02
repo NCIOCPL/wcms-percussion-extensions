@@ -25,6 +25,7 @@ public class ExactConstraint extends Constraint {
 	 */
 	ImageValidationError isConstrained(String data, String fullFieldName, String fieldDisplayName, String errorMessage) {
 		if(data == null) {
+			// If the data is null for this field, it hasn't been set on the content item and cannot be validated
 			return null;
 		}
 		else {
@@ -33,9 +34,11 @@ public class ExactConstraint extends Constraint {
 				int constraintVal = Integer.parseInt(value);
 				
 				if(dataVal == constraintVal) {
+					// Don't return an error if the value matches the constraints
 					return null;
 				}
 				else {
+					// Return an error if the value does not match the constraints
 					return new ImageValidationError(fullFieldName, String.format(errorMessage, this.getFieldName(), this.getValue()));
 				}
 			}

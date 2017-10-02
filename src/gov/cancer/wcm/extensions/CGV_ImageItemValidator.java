@@ -76,13 +76,17 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 	    	throw new Exception();
 	    }
 	    
+	    // If transitioning to Staging (D), validate the image size according to constraints.
 	    if(super.matchDestinationState(contentid, transitionid, states))
     	{
 	    	ArrayList<ImageValidationError> validationErrors = new ArrayList<ImageValidationError>();
-		    if(validatorConfig != null) {
+		    
+	    	if(validatorConfig != null) {
 		    	if(validatorConfig.hasImageCTValidator(contentTypeName)) {
+		    		// Use CT Validator for specified image content type
 		    		ImageCTValidator imgCTValidator = validatorConfig.getImageCTValidator(contentTypeName);
 		    		
+		    		// Get fields to validate that are specifically for this image content type
 		    		ArrayList<String> fieldsToValidate = imgCTValidator.getFieldsToValidate();
 		    		
 		    		if(!fieldsToValidate.isEmpty()) {
@@ -91,9 +95,11 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		    				log.debug(field);
 		    			}
 		    			
+		    			// Get values of fields on image content item
 		    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgCTValidator);
 		    			
 		    			if(!imageData.isEmpty()) {
+		    				// Validate all data from the image content item
 		    				validationErrors = imgCTValidator.validateItems(imageData);
 		    				
 		    				for(ImageValidationError err : validationErrors) {
@@ -102,33 +108,14 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		    				
 		    				if(!validationErrors.isEmpty()) {
 		    					for(ImageValidationError err : validationErrors) {
+		    						// Add each validation error to display table on error message in Content Explorer
 		    						Element field = super.getFieldElement(inputDoc, err.getFieldName());
 		    						String label = super.getFieldLabel(field);
 		    						PSItemErrorDoc.addError(errorDoc, err.getFieldName(), label, err.getErrorMessage(), new Object[]{field});
 		    						continue;
 		    					}
 		    				}
-		    				
-		    				/*
-		    				ArrayList<ImageValidationError> errors = new ArrayList<ImageValidationError>();
-		    				ArrayList<String> constraintFields = imgCTValidator.getConstraintFields();
-		    				
-		    				for(String cons : constraintFields) {
-		    					log.debug("Constraint field: " + constr);
-		    				}
-		    				
-		    				for(ImageValidationError err : validationErrors) {
-		    					for(String constraint : constraintFields) {
-		    						log.debug("Checking if " + err.getFieldName() + " contains " + constraint);
-		    						if(err.getFieldName().contains(constraint)) {
-		    							String errorFieldName = err.getFieldName().replace(constraint, "");
-		    							log.debug("Replacing error for " + err.getFieldName() + " with " + errorFieldName);
-		    							errors.add(new ImageValidationError(errorFieldName, err.getErrorMessage()));
-		    						}
-		    					}
-		    				}*/
 		    			}
-		    			
 		    		}
 		    	}
 		    	else {
@@ -151,18 +138,21 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		HashMap<String, String> fieldValues = new HashMap<String, String>();
 		
 		for(String field : imageFields) {
+			// Get element for each individual field specified by the image CT validator
 			Element fieldElem = super.getFieldElement(inputDoc, field);
 			if(fieldElem != null) {
 				String fieldVal = super.getFieldValue(fieldElem);
 				if(fieldVal != null) {
 					log.debug("Adding [" + field + ", " + fieldVal + "] to field values from document");
 					if(!fieldValues.containsKey(field)) {
+						// If field hasn't been added yet, add field and value to map
 						fieldValues.put(field, super.getFieldValue(fieldElem));
 					}
 				}
 				else {
 					log.debug("Adding [" + field + ", null] to field values from document");
 					if(!fieldValues.containsKey(field)) {
+						// If field hasn't been added yet, add field and null to map
 						fieldValues.put(field, null);
 					}
 				}

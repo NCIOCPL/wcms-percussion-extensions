@@ -34,6 +34,7 @@ public class BetweenConstraint extends Constraint {
 	 */
 	ImageValidationError isConstrained(String data, String fullFieldName, String fieldDisplayName, String errorMessage) {
 		if(data == null) {
+			// If the data is null for this field, it hasn't been set on the content item and cannot be validated
 			return null;
 		}
 		else {
@@ -43,9 +44,11 @@ public class BetweenConstraint extends Constraint {
 				int constraintMaxVal = Integer.parseInt(maxValue);
 					
 				if(dataVal >= constraintMinVal && dataVal <= constraintMaxVal) {
+					// Don't return an error if the value is between the constraints
 					return null;
 				}
 				else {
+					// Return an error if the value is not between the constraints
 					return new ImageValidationError(fullFieldName, String.format(errorMessage, this.getFieldName(), this.getMinValue(), this.getMaxValue()));
 				}
 			}

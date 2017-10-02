@@ -68,14 +68,17 @@ public class ImageFieldValidator {
 			String fullFieldName = "";
 			
 			if(constraint.getFieldName() != null) {
+				// There is a field name associated with this image field constraint
 				fullFieldName = this.imageFieldName + "_" + constraint.getFieldName();
 			}
 			else {
+				// The image field itself is being validated
 				fullFieldName = this.imageFieldName;
 			}
 			
 			if(dataToValidate.containsKey(fullFieldName)) {
 				if(constraint.isConstrained(dataToValidate.get(fullFieldName), fullFieldName, this.imageFieldDisplayName,this.errorMessage) != null) {
+					// Validate the values against the constraints and add any potential errors to the list
 					validationErrors.add(constraint.isConstrained(dataToValidate.get(fullFieldName), fullFieldName, this.imageFieldDisplayName, this.errorMessage));
 				}
 			}
