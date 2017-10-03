@@ -90,21 +90,12 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		    		ArrayList<String> fieldsToValidate = imgCTValidator.getFieldsToValidate();
 		    		
 		    		if(!fieldsToValidate.isEmpty()) {
-		    			log.debug("Fields to validate from " + imgCTValidator.getContentTypeName() + "CT validator: ");
-		    			for(String field : fieldsToValidate) {
-		    				log.debug(field);
-		    			}
-		    			
 		    			// Get values of fields on image content item
 		    			HashMap<String, String> imageData = getFieldValuesFromDocument(fieldsToValidate, inputDoc, imgCTValidator);
 		    			
 		    			if(!imageData.isEmpty()) {
 		    				// Validate all data from the image content item
 		    				validationErrors = imgCTValidator.validateItems(imageData);
-		    				
-		    				for(ImageValidationError err : validationErrors) {
-		    					log.debug(err.getFieldName() + ": " + err.getErrorMessage());
-		    				}
 		    				
 		    				if(!validationErrors.isEmpty()) {
 		    					for(ImageValidationError err : validationErrors) {
@@ -125,12 +116,7 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		    else {
 		    	log.debug("Error getting ImageItemValidator config.");
 		    }
-	    	
-	    	log.debug("ImageItemValidator - Correct destination state");
     	}
-	    else {
-	    	log.debug("ImageItemValidator - Incorrect destination state - must be Staging (D) or Staging (P)");
-	    }
 	}
 	
 	private HashMap<String, String> getFieldValuesFromDocument(ArrayList<String> imageFields, Document inputDoc, ImageCTValidator ctValidator)
@@ -143,14 +129,12 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 			if(fieldElem != null) {
 				String fieldVal = super.getFieldValue(fieldElem);
 				if(fieldVal != null) {
-					log.debug("Adding [" + field + ", " + fieldVal + "] to field values from document");
 					if(!fieldValues.containsKey(field)) {
 						// If field hasn't been added yet, add field and value to map
 						fieldValues.put(field, super.getFieldValue(fieldElem));
 					}
 				}
 				else {
-					log.debug("Adding [" + field + ", null] to field values from document");
 					if(!fieldValues.containsKey(field)) {
 						// If field hasn't been added yet, add field and null to map
 						fieldValues.put(field, null);

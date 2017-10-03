@@ -39,7 +39,12 @@ public class ExactConstraint extends Constraint {
 				}
 				else {
 					// Return an error if the value does not match the constraints
-					return new ImageValidationError(fullFieldName, String.format(errorMessage, this.getFieldName(), this.getValue()));
+					if(errorMessage.contains("%s")) {
+						return new ImageValidationError(fullFieldName, String.format(errorMessage, this.getFieldName(), this.getValue()));
+					}
+					else {
+						return new ImageValidationError(fullFieldName, errorMessage);
+					}
 				}
 			}
 			catch (NumberFormatException e) {

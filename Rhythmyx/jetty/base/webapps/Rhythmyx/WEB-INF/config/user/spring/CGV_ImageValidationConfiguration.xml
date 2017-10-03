@@ -101,13 +101,13 @@
 	<bean id="enlargeImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img3</value></constructor-arg>
 		<constructor-arg><value>Enlarge Image</value></constructor-arg>
-		<constructor-arg><value>Enlarge Image %s must be at least %s B but cannot exceed %s MB.</value></constructor-arg>
+		<constructor-arg><value>Enlarge Image file size cannot exceed 1 MB.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.BetweenConstraint">
 					<constructor-arg><value>size</value></constructor-arg>
 					<constructor-arg><value>1</value></constructor-arg>
-					<constructor-arg><value>100000</value></constructor-arg>
+					<constructor-arg><value>1000000</value></constructor-arg>
 				</bean>       
 			</list>
 		</constructor-arg>

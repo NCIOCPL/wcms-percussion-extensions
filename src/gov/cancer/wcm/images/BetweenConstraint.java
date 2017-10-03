@@ -49,7 +49,12 @@ public class BetweenConstraint extends Constraint {
 				}
 				else {
 					// Return an error if the value is not between the constraints
-					return new ImageValidationError(fullFieldName, String.format(errorMessage, this.getFieldName(), this.getMinValue(), this.getMaxValue()));
+					if(errorMessage.contains("%s")) {
+						return new ImageValidationError(fullFieldName, String.format(errorMessage, this.getFieldName(), this.getMinValue(), this.getMaxValue()));
+					}
+					else {
+						return new ImageValidationError(fullFieldName, errorMessage);
+					}
 				}
 			}
 			catch (NumberFormatException e) {
