@@ -42,7 +42,5 @@ public class ImageValidationConfiguration {
 	
 	public ImageValidationConfiguration(List<ImageCTValidator> imgCTValidators) {
 		imageCTValidators = imgCTValidators;
-		
-		log.debug("Creating new instance of ImageValidationConfiguration");
 	}
 }
