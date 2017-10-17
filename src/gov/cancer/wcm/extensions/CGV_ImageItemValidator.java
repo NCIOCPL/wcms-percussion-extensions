@@ -103,7 +103,6 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		    						Element field = super.getFieldElement(inputDoc, err.getFieldName());
 		    						String label = super.getFieldLabel(field);
 		    						PSItemErrorDoc.addError(errorDoc, err.getFieldName(), label, err.getErrorMessage(), new Object[]{field});
-		    						continue;
 		    					}
 		    				}
 		    			}
@@ -114,7 +113,7 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		    	}
 		    }
 		    else {
-		    	log.debug("Error getting ImageItemValidator config.");
+		    	log.debug("Error getting ImageItemValidator config");
 		    }
     	}
 	}
