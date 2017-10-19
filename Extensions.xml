@@ -70,7 +70,7 @@
       <PSXExtensionParamDef id="0">
          <name>DestinationStates</name>
          <dataType>java.lang.String</dataType>
-         <description>test</description>
+         <description>Validator fires when going to these states (comma-separated list)</description>
       </PSXExtensionParamDef>
       <suppliedResources/>
    </Extension>    
