@@ -102,7 +102,7 @@ public class CGV_ImageItemValidator extends PSOAbstractItemValidationExit {
 		    						// Add each validation error to display table on error message in Content Explorer
 		    						Element field = super.getFieldElement(inputDoc, err.getFieldName());
 		    						String label = super.getFieldLabel(field);
-		    						PSItemErrorDoc.addError(errorDoc, err.getFieldName(), label, err.getErrorMessage(), new Object[]{field});
+		    						PSItemErrorDoc.addError(errorDoc, err.getFieldName(), "-", err.getErrorMessage(), new Object[]{field});
 		    					}
 		    				}
 		    			}
