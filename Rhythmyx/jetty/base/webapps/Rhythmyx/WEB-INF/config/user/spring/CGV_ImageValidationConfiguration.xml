@@ -13,12 +13,12 @@
 	<bean id="articleImageFieldValidator" class="gov.cancer.wcm.images.ImageFieldValidator">
 		<constructor-arg><value>img1</value></constructor-arg>
 		<constructor-arg><value>Article Image</value></constructor-arg>
-		<constructor-arg><value>Article Image %s must be at least %s px but cannot exceed %s px.</value></constructor-arg>
+		<constructor-arg><value>Article Image width cannot exceed 900px.</value></constructor-arg>
 		<constructor-arg>
 			<list>
 				<bean class="gov.cancer.wcm.images.BetweenConstraint">
 					<constructor-arg><value>width</value></constructor-arg>
-					<constructor-arg><value>600</value></constructor-arg>
+					<constructor-arg><value>1</value></constructor-arg>
 					<constructor-arg><value>900</value></constructor-arg>
 				</bean>
 			</list>
