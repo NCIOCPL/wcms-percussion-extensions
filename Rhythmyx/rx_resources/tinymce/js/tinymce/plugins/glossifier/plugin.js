@@ -153,9 +153,15 @@ function cGovProcessReqChange() {
 		
 		// Set up HTML window with javascript and checkboxed text
 		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
+		
+		console.log("== debug cGovCheckboxWindow ==");
+		console.log(cGovCheckboxWindow);
+		console.log("== end debug cGovCheckboxWindow ==");
+		
 		cGovCheckboxWindow.document.write('<html><head>');
 		cGovCheckboxWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
 		cGovCheckboxWindow.document.write('</head>');
+		cGovCheckboxWindow.document.write('<p>debug me</p>');		
 		cGovCheckboxWindow.document.write('<script language="Javascript">');
 		cGovCheckboxWindow.document.write('function returnChecks() {');
 		cGovCheckboxWindow.document.write('	var checkArray = [];');
@@ -610,6 +616,10 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Set unique ID for checked/unchecked terms
 		cGovUniqueId = 0;
 		
+		console.log("== i hate your face ==");
+		console.log(editor.getContent());
+		console.log("== end debug editor.getContent() ==");
+		
 		// Set glossifier to use locale of content item rather than Percussion locale
 		if(settings.language == 'es')
 		{
@@ -622,6 +632,12 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		
 		// Set editor as global variable
 		_glossifyEditor = editor;
+		
+		console.log("== debug allContent ==");
+		console.log(allContent);
+		console.log("== end debug allContent ==");
+
+		
 
 		cGovTinyMCEGlossify(allContent);
 	});
