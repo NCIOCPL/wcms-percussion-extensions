@@ -90,7 +90,7 @@ function cGovTinyMCEGlossify(data) {
 				'<div style="border: 1px solid black; width:200px; height:10px;">' +
 				  '<div id="progress" style="height:10px; width:0px; background-color:red;"/></div>' +
 				'</div>' +
-				'<h2>Processing document, please wait..........</h2>' +
+				'<h2>Processing document, please wait...</h2>' +
 			  '</body>' +
 			'</html>'
 		);		
@@ -173,12 +173,38 @@ function cGovProcessReqChange() {
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
 
 		var checkboxHtml = (
-			'<!DOCTYPE html>' +
-			'<html>' +
-			  '<body>' +
-				'<div>hello, world</div>' +
-			  '</body>' +
-			'</html>'
+				  '<!DOCTYPE html>' +
+				  '<html><head>' + 
+				  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' + 
+				  '</head>' + 
+				  '<script language="Javascript">' + 
+				  'function returnChecks() {' + 
+				  '	var checkArray = [];' + 
+				  '	if (document.Glossify.terms != null) {' + 
+				  '		var boxes = document.Glossify.terms.length;' + 
+				  '		if (boxes == null) {' + 
+				  '			if (document.Glossify.terms.checked) {' + 
+				  '				checkArray.push(document.Glossify.terms.value);' + 
+				  '			}' + 
+				  '		}' + 
+				  '		else {' + 
+				  '			for (i=0;i<boxes;i++) {' + 
+				  '				if (document.Glossify.terms[i].checked) {' + 
+				  '					checkArray.push(document.Glossify.terms[i].value);' + 
+				  '				}' + 
+				  '			}' + 
+				  '		}' + 
+				  '	}' + 
+				  'window.opener.submitter(checkArray);' + 
+				  'window.close();' + 
+				  '}' +
+				  '</script>' + 
+				  '<body>' +
+				  '<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">' +
+				  '<hr>' + cGovMassagedData + '<hr>' +
+				  '<input type="submit" value="Submit Changes">' +
+				  '</body>' +
+				  '</html>'
 		);
 		
 		/** Overwrite 'loading...' html with checkboxes **/
