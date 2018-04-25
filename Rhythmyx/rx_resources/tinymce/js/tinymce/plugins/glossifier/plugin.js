@@ -83,6 +83,11 @@ function cGovTinyMCEGlossify(data) {
 		cGovStatusWindow.document.write('<body><div><div style="border: 1px solid black; width:200px; height:10px;"><div id="progress" style="height:10px; width:0px; background-color:red;"/></div></div>');
 		cGovStatusWindow.document.write("<h2>Processing document, please wait.........</h2></body></html>");
 		
+		console.log("== debug XML http request 1 ==");		
+		console.log(cGovReq.readyState);
+		console.log(cGovReq.status);
+		console.log("== end debug XML http request 1 ==");		
+
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
 
@@ -130,6 +135,12 @@ function getElementsByTagNameNS(parent, namespace, alias, tagname) {
 *
 */
 function cGovProcessReqChange() {
+	console.log("== debug XML http request 2 ==");		
+	console.log(cGovReq.readyState);
+	console.log(cGovReq.status);
+	console.log("== end debug XML http request 2 ==");		
+
+
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
 //alert("got response, text:\n" + cGovReq.responseText);
 		cGovStatusWindow.close();
