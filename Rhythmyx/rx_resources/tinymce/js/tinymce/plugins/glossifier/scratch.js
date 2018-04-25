@@ -40,7 +40,7 @@ var _glossifyEditor;
 /**
 * Send the glossification request to the web service
 */
-function cGovTinyMCEGlossify(data) {
+function cGovTinyMCEGlossify(data, el) {
 	// Pre-process the string to encode cr and lf and flag previous glossify results
 	cGovMassagedData = cGovPrepareStr(data);
 	// Wrap in CDATA so markup doesn't hose everything
@@ -65,34 +65,51 @@ function cGovTinyMCEGlossify(data) {
 		"</soapenv:Envelope>";
 		cGovReq = new XMLHttpRequest();
 
-		//Display status window
-		cGovStatusWindow = window.open("","","height=480,width=640");
-		cGovStatusWindow.document.write('<html><head><title>GlossifyDocumentPrep</title>');
-		cGovStatusWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
-		cGovStatusWindow.document.write('<script language="javascript" type="text/javascript">');
-		cGovStatusWindow.document.write("var prg_width = 200;");
-		cGovStatusWindow.document.write("function progress() {");
-        cGovStatusWindow.document.write("var node = document.getElementById('progress');");
-        cGovStatusWindow.document.write("var w = node.style.width.match(/\\d+/);");
-		cGovStatusWindow.document.write("if (w == prg_width)");
-        cGovStatusWindow.document.write("w = 0;");
-		cGovStatusWindow.document.write("node.style.width = parseInt(w) + 5 + 'px';");
-        cGovStatusWindow.document.write("}");
-        cGovStatusWindow.document.write("setInterval(progress, 250);");		
-		cGovStatusWindow.document.write('</' + 'script></head>');
-		cGovStatusWindow.document.write('<body><div><div style="border: 1px solid black; width:200px; height:10px;"><div id="progress" style="height:10px; width:0px; background-color:red;"/></div></div>');
-		cGovStatusWindow.document.write("<h2>Processing document, please wait.........</h2></body></html>");
+		var loadingHtml = (
+			'<!DOCTYPE html>' +
+			'<html>' +
+			  '<head>' +
+				'<title>GlossifyDocumentPrep</title>' +
+				'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
+				'<script language="javascript" type="text/javascript">' +
+				  'var prg_width = 200;' +
+				  'function progress() {' +
+					'var node = document.getElementById("progress");' +
+					'var w = node.style.width.match(/\\d+/);' +
+					'if (w == prg_width) {' +
+						'w = 0;' +
+					'}' +
+					'node.style.width = parseInt(w) + 5 + "px";' +
+				  '}' +
+				  'setInterval(progress, 250);' +
+				'</script>' +
+			  '</head>' +
+			  '<body>' +
+				'<div>' +
+				'<div style="border: 1px solid black; width:200px; height:10px;">' +
+				  '<div id="progress" style="height:10px; width:0px; background-color:red;"/></div>' +
+				'</div>' +
+				'<h2>Processing document, please wait.... &hearts; &hearts; ....</h2>' +
+			  '</body>' +
+			'</html>'
+		);		
+		/** draw html into body **/
+		el.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);		
+		
+		
+		
+
 		
 		// Do this on completion of asynchronous call
-		cGovReq.onreadystatechange = cGovProcessReqChange;
+///		cGovReq.onreadystatechange = cGovProcessReqChange;
 
 		// Open request and set its headers
-		cGovReq.open("POST", cGovWebServiceURL, true);
+///		cGovReq.open("POST", cGovWebServiceURL, true);
 		//cGovReq.setRequestHeader("Accept-Charset", "utf-8");
-		cGovReq.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
-		cGovReq.setRequestHeader("SOAPAction", cGovSoapMethod);
+///		cGovReq.setRequestHeader("Content-Type", "text/xml; charset=utf-8");
+///		cGovReq.setRequestHeader("SOAPAction", cGovSoapMethod);
 		// Send the request
-		cGovReq.send(soapCommand);
+///		cGovReq.send(soapCommand);
 		
 		return true;	
 }
@@ -601,8 +618,12 @@ function fixSpanish(editorContent, entity, character) {
 
 tinymce.PluginManager.add('glossifier', function(editor) {
 	var settings = editor.settings;
+	var allContent;
 
 	editor.addCommand('openGlossifier', function() {
+
+		allContent = editor.getContent();
+
 		editor.windowManager.open({
 			title: 'glossifier',
 			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
@@ -662,9 +683,9 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					'</html>'
 				);
 
-
-				// Custom HTML 1
-				loadingHtml = (
+				
+				// Custom HTML 2
+				checkBoxHtml = (
 					'<!DOCTYPE html>' +
 					'<html>' +
 					  '<head>' +
@@ -693,9 +714,8 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					'</html>'
 				);
 				
-				/** draw html into body **/
-				//this.getEl('body').firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(previewHtml);
-				this.getEl('body').firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);
+				// Fire off legacy glossifier
+				cGovTinyMCEGlossify(allContent, this.getEl('body'));
 
 			}
 		});
