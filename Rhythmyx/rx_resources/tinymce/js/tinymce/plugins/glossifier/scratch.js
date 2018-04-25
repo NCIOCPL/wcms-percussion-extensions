@@ -643,7 +643,7 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		allContent = editor.getContent();
 
 		editor.windowManager.open({
-			title: 'Glossify Document',
+			title: 'Glossifier tool',
 			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
 			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
 			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
@@ -673,24 +673,11 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					bodyClass = editor.getParam('body_class', '', 'hash');
 					bodyClass = bodyClass[editor.id] || '';
 				}
-
-				/** we can probably remove this
-				var dirAttr = editor.settings.directionality ? ' dir="' + editor.settings.directionality + '"' : '';
-
-				previewHtml = (
-					'<!DOCTYPE html>' +
-					'<html>' +
-					'<head>' +
-						headHtml +
-					'</head>' +
-					'<body id="' + bodyId + '" class="mce-content-body ' + bodyClass + '"' + dirAttr + '>' +
-						editor.getContent() +
-					'</body>' +
-					'</html>'
-				);
-				**/
 				
 				// Fire off legacy glossifier
+				/// TODO: close window upon clicking 'submit'
+				/// TODO: to set the editor value, do "editor.setContent(my_glossified_string);"
+				/// TODO: make sure spanish works
 				myElement = this.getEl('body');
 				cGovTinyMCEGlossify(allContent);
 
