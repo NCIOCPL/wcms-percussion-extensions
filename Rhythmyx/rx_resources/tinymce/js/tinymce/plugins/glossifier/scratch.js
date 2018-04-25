@@ -172,11 +172,22 @@ function cGovProcessReqChange() {
 		var termsArray = cGovBuildTermsArray(terms);
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
 
+		var preventClicksOnLinksScript = (
+			'<script>' +
+				'document.addEventListener && document.addEventListener("click", function(e) {' +
+					'for (var elm = e.target; elm; elm = elm.parentNode) {' +
+						'if (elm.nodeName === "A") {' +
+							'e.preventDefault();' +
+						'}' +
+					'}' +
+				'}, false);' +
+			'</script> '
+		);		
+		
 		var checkboxHtml = (
 				  '<!DOCTYPE html>' +
 				  '<html><head>' + 
 				  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' + 
-				  '</head>' + 
 				  '<script language="Javascript">' + 
 				  'function returnChecks() {' + 
 				  '	var checkArray = [];' + 
@@ -198,7 +209,8 @@ function cGovProcessReqChange() {
 				  'window.opener.submitter(checkArray);' + 
 				  'window.close();' + 
 				  '}' +
-				  '</script>' + 
+				  '</script>' + preventClicksOnLinksScript +
+				  '</head>' + 
 				  '<body>' +
 				  '<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">' +
 				  '<hr>' + cGovMassagedData + '<hr>' +
@@ -661,18 +673,7 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					bodyClass = bodyClass[editor.id] || '';
 				}
 
-				var preventClicksOnLinksScript = (
-					'<script>' +
-						'document.addEventListener && document.addEventListener("click", function(e) {' +
-							'for (var elm = e.target; elm; elm = elm.parentNode) {' +
-								'if (elm.nodeName === "A") {' +
-									'e.preventDefault();' +
-								'}' +
-							'}' +
-						'}, false);' +
-					'</script> '
-				);
-
+				/** we can probably remove this
 				var dirAttr = editor.settings.directionality ? ' dir="' + editor.settings.directionality + '"' : '';
 
 				previewHtml = (
@@ -683,13 +684,10 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					'</head>' +
 					'<body id="' + bodyId + '" class="mce-content-body ' + bodyClass + '"' + dirAttr + '>' +
 						editor.getContent() +
-						preventClicksOnLinksScript +
 					'</body>' +
 					'</html>'
 				);
-
-				
-
+				**/
 				
 				// Fire off legacy glossifier
 				myElement = this.getEl('body');
