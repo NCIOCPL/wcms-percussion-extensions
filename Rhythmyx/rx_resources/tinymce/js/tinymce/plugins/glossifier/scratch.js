@@ -213,6 +213,7 @@ function cGovProcessReqChange() {
 				  '</head>' + 
 				  '<body>' +
 				  '<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">' +
+				  '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
 				  '<hr>' + cGovMassagedData + '<hr>' +
 				  '<input type="submit" value="Submit Changes">' +
 				  '</body>' +
