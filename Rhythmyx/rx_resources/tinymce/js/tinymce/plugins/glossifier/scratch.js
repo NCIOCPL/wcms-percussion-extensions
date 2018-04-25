@@ -11,14 +11,14 @@
 /*global tinymce:true */
 
 tinymce.PluginManager.add('glossifier', function(editor) {
-	var settings = editor.settings, sandbox = !tinymce.Env.ie;
+	var settings = editor.settings;
 
 	editor.addCommand('openGlossifier', function() {
 		editor.windowManager.open({
 			title: 'glossifier',
 			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
 			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
-			html: '<iframe src="javascript:\'\'" frameborder="0"' + (sandbox ? ' sandbox="allow-scripts"' : '') + '></iframe>',
+			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
 			buttons: {
 				text: 'Close',
 				onclick: function() {
@@ -26,7 +26,7 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 				}
 			},
 			onPostRender: function() {
-				var previewHtml, headHtml = '';
+				var previewHtml, loadingHtml, headHtml = '';
 
 				headHtml += '<base href="' + editor.documentBaseURI.getURI() + '">';
 
@@ -73,17 +73,41 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					'</html>'
 				);
 
-				if (!sandbox) {
-					// IE 6-11 doesn't support data uris on iframes
-					// so I guess they will have to be less secure since we can't sandbox on those
-					// TODO: Use sandbox if future versions of IE supports iframes with data: uris.
-					var doc = this.getEl('body').firstChild.contentWindow.document;
-					doc.open();
-					doc.write(previewHtml);
-					doc.close();
-				} else {
-					this.getEl('body').firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(previewHtml);
-				}
+
+				// Custom HTML 1
+				loadingHtml = (
+					'<!DOCTYPE html>' +
+					'<html>' +
+					  '<head>' +
+						'<title>GlossifyDocumentPrep</title>' +
+						'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
+						'<script language="javascript" type="text/javascript">' +
+						  'var prg_width = 200;' +
+						  'function progress() {' +
+							'var node = document.getElementById("progress");' +
+							'var w = node.style.width.match(/\\d+/);' +
+							'if (w == prg_width) {' +
+								'w = 0;' +
+							'}' +
+							'node.style.width = parseInt(w) + 5 + "px";' +
+						  '}' +
+						  'setInterval(progress, 250);' +
+						'</script>' +
+					  '</head>' +
+					  '<body>' +
+						'<div>' +
+						'<div style="border: 1px solid black; width:200px; height:10px;">' +
+						  '<div id="progress" style="height:10px; width:0px; background-color:red;"/></div>' +
+						'</div>' +
+						'<h2>Processing document, please wait.........</h2>' +
+					  '</body>' +
+					'</html>'
+				);
+				
+				/** draw html into body **/
+				//this.getEl('body').firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(previewHtml);
+				this.getEl('body').firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);
+
 			}
 		});
 	});
