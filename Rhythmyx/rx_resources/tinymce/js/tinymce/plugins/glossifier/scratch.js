@@ -643,7 +643,7 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		allContent = editor.getContent();
 
 		editor.windowManager.open({
-			title: 'glossifier',
+			title: 'Glossify Document',
 			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
 			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
 			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
