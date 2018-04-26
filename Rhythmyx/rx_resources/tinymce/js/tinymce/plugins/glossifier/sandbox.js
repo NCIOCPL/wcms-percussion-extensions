@@ -21,26 +21,14 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					text: 'Submit changes', 
 					onclick: function() {
 						this.parent().parent().close();
+                        editor.setContent('<b>i hate your face</b>');                        						
 				}},
 				{
 					text: 'Close',
 					onclick: function() {
-						this.parent().parent().close();
+                        this.parent().parent().close();
 				}}
-			],
-			onSubmit: function(e) {
-				// We get a lovely "Wrong document" error in IE 11 if we
-				// don't move the focus to the editor before creating an undo
-				// transation since it tries to make a bookmark for the current selection
-				editor.focus();
-
-				editor.undoManager.transact(function() {
-					editor.setContent(e.data.code);
-				});
-
-				editor.selection.setCursorLocation();
-				editor.nodeChanged();
-			}
+			]
 		});
 
 		// Gecko has a major performance issue with textarea
