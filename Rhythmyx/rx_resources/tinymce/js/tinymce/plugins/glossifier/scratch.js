@@ -96,14 +96,11 @@ function cGovTinyMCEGlossify(data) {
 		);		
 		
 		/** draw html into body **/
-		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);		
+		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);
 		
-		
-		
-		console.log("== debug XML http request 1 ==");		
-		console.log(cGovReq.readyState);
-		console.log(cGovReq.status);
-		console.log("== end debug XML http request 1 ==");		
+		console.log("== Debug myelement.firstChild 1 ==");
+		console.log(myElement.firstChild);
+		console.log("== End debug myelement.firstChild 1 ==");
 		
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
@@ -152,12 +149,6 @@ function getElementsByTagNameNS(parent, namespace, alias, tagname) {
 *
 */
 function cGovProcessReqChange() {
-	console.log("== debug XML http request 2 ==");		
-	console.log(myElement);
-	console.log(cGovReq.readyState);
-	console.log(cGovReq.status);
-	console.log("== end debug XML http request 2 ==");		
-	
 
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
 		
@@ -221,7 +212,11 @@ function cGovProcessReqChange() {
 		);
 		
 		/** Overwrite 'loading...' html with checkboxes **/
-		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(checkboxHtml);		
+		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(checkboxHtml);
+
+		console.log("== Debug myelement.firstChild 2 ==");
+		console.log(myElement.firstChild);
+		console.log("== End debug myelement.firstChild 2 ==");
 		
 	}
 	
