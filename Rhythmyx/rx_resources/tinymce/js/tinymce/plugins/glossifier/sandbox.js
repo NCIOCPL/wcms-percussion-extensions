@@ -18,11 +18,15 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
 			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
 			buttons: [{
+					text: 'Submit changes', 
+					onclick: function() {
+						this.parent().parent().close();
+				}},
+				{
 					text: 'Close',
 					onclick: function() {
 						this.parent().parent().close();
-			}},
-					{text: 'Close2', onclick: 'close'}
+				}}
 			],
 			onSubmit: function(e) {
 				// We get a lovely "Wrong document" error in IE 11 if we
