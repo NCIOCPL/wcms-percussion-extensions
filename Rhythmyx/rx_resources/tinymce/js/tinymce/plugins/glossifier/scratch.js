@@ -197,6 +197,9 @@ function cGovProcessReqChange() {
 				  '			}' + 
 				  '		}' + 
 				  '	}' + 
+				  'console.log("== Debug document ==");' + 
+				  'console.log(document);' + 
+				  'console.log("== End debug document ==");' + 
 				  'window.opener.submitter(checkArray);' + 
 				  'window.close();' + 
 				  '}' +
