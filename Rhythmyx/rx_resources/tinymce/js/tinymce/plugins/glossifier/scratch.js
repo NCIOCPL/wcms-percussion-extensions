@@ -200,6 +200,9 @@ function cGovProcessReqChange() {
 				  'console.log("== Debug document ==");' + 
 				  'console.log(document);' + 
 				  'console.log("== End debug document ==");' + 
+				  'console.log("== Debug checkarray ==");' + 
+				  'console.log(checkArray);' + 
+				  'console.log("== End debug checkarray ==");' + 
 				  'window.opener.submitter(checkArray);' + 
 				  'window.close();' + 
 				  '}' +
@@ -645,12 +648,19 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
 			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
 			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
-			buttons: {
-				text: 'Close',
-				onclick: function() {
-					this.parent().parent().close();
-				}
-			},
+			buttons: [{
+					//TODO: hide this on loading screen
+					text: 'Submit changes', 
+					onclick: function() {
+						this.parent().parent().close();
+                        editor.setContent('<p>NSCLC is any type of epithelial lung cancer other than small cell lung cancer (SCLC).</p>');                        						
+				}},
+				{
+					text: 'Close',
+					onclick: function() {
+                        this.parent().parent().close();
+				}}
+			],
 			onPostRender: function() {
 				var previewHtml, loadingHtml, headHtml = '';
 
