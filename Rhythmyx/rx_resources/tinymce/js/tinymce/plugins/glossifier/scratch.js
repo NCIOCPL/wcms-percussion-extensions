@@ -15,7 +15,7 @@
 var cGovReq;			//global request object
 var cGovOriginalData;	//data from editor window
 var cGovMassagedData;	//editor data after preprocessing
-var cGovUniqueId;		//id unique within this page
+var cGovUniqueId = 0;		//id unique within this page
 var cGovEditorName;		//name of editor
 var cGovStatusWindow;	//window for status display
 var cGovCheckboxWindow	//window for term checkboxes
@@ -163,6 +163,8 @@ function cGovProcessReqChange() {
 		var termsArray = cGovBuildTermsArray(terms);
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
 
+		
+		
 		var preventClicksOnLinksScript = (
 			'<script>' +
 				'document.addEventListener && document.addEventListener("click", function(e) {' +
@@ -220,9 +222,9 @@ function cGovProcessReqChange() {
 		/** Overwrite 'loading...' html with checkboxes **/
 		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(checkboxHtml);
 
-		console.log("== Debug myelement.firstChild 2 ==");
-		console.log(myElement.firstChild);
-		console.log("== End debug myelement.firstChild 2 ==");
+		console.log("== Debug massagedData on load ==");
+		console.log(cGovMassagedData);
+		console.log("== End massagedData on load ==");
 		
 	}
 	
