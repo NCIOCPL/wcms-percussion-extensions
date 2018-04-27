@@ -213,9 +213,14 @@ function cGovProcessReqChange() {
 *
 */
 function submitter(checkArray) {
-//TODO: delete dictionary preview URL once we add it
-//	if (!cGovCheckboxWindow.closed)
-//		cGovCheckboxWindow.close();
+	//TODO: delete dictionary preview URL once we add it
+	//	if (!cGovCheckboxWindow.closed)
+	//		cGovCheckboxWindow.close();
+	console.log('=== Debug submitter massagedData & checkArray ===');
+	console.log(cGovMassagedData);
+	console.log(checkArray);
+	console.log('=== End debug submitter massagedData & checkArray ===');
+	
 	var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
 	var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
 	var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
