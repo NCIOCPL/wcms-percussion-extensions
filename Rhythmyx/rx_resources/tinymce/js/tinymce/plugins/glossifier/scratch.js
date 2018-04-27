@@ -199,9 +199,6 @@ function cGovProcessReqChange() {
 				  '			}' + 
 				  '		}' + 
 				  '	}' + 
-				  'console.log("== Debug document ==");' + 
-				  'console.log(document);' + 
-				  'console.log("== End debug document ==");' + 
 				  'console.log("== Debug checkarray ==");' + 
 				  'console.log(checkArray);' + 
 				  'console.log("== End debug checkarray ==");' + 
@@ -222,9 +219,16 @@ function cGovProcessReqChange() {
 		/** Overwrite 'loading...' html with checkboxes **/
 		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(checkboxHtml);
 
-		console.log("== Debug massagedData on load ==");
-		console.log(cGovMassagedData);
-		console.log("== End massagedData on load ==");
+		var doc = new DOMParser().parseFromString(cGovMassagedData, 'text/html');
+		
+		var inputElements = doc.querySelectorAll("input");
+		console.log("== Debug our new collection ==");
+		console.log(doc);
+		console.log(inputElements);
+		console.log("== End debug our new collection ==");
+		
+		
+		var newArray = [];
 		
 	}
 	
