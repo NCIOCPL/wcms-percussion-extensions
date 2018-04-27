@@ -195,7 +195,7 @@ function cGovProcessReqChange() {
 		cGovCheckboxWindow.document.write('console.log(checkArray);');
 		cGovCheckboxWindow.document.write('console.log("=== End debug checkarray ===");');
 		cGovCheckboxWindow.document.write('window.opener.submitter(checkArray);');
-		cGovCheckboxWindow.document.write('window.close();');
+		//cGovCheckboxWindow.document.write('window.close();');
 		cGovCheckboxWindow.document.write('}\n</' + 'script>');
 		cGovCheckboxWindow.document.write('<body>');
 		cGovCheckboxWindow.document.write('<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">');
