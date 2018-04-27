@@ -191,6 +191,9 @@ function cGovProcessReqChange() {
 		cGovCheckboxWindow.document.write('			}');
 		cGovCheckboxWindow.document.write('		}');
 		cGovCheckboxWindow.document.write('	}');
+		cGovCheckboxWindow.document.write('console.log("=== Debug checkarray ===");');
+		cGovCheckboxWindow.document.write('console.log(checkArray);');
+		cGovCheckboxWindow.document.write('console.log("=== End debug checkarray ===");');
 		cGovCheckboxWindow.document.write('window.opener.submitter(checkArray);');
 		cGovCheckboxWindow.document.write('window.close();');
 		cGovCheckboxWindow.document.write('}\n</' + 'script>');
