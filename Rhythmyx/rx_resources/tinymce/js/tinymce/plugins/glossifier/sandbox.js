@@ -239,7 +239,7 @@ function testSubmit() {
 	//TODO: delete dictionary preview URL once we add it
 	//	if (!cGovCheckboxWindow.closed)
 	//		cGovCheckboxWindow.close();
-		checkArray = [ 3, 2 ];		  
+		checkArray = [ 1, 2 ];		  
 		alert(cGovMassagedData);
 		
 		var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
