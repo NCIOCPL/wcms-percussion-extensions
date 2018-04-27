@@ -83,11 +83,6 @@ function cGovTinyMCEGlossify(data) {
 		cGovStatusWindow.document.write('<body><div><div style="border: 1px solid black; width:200px; height:10px;"><div id="progress" style="height:10px; width:0px; background-color:red;"/></div></div>');
 		cGovStatusWindow.document.write("<h2>Processing document, please wait.........</h2></body></html>");
 		
-		console.log("== debug XML http request 1 ==");		
-		console.log(cGovReq.readyState);
-		console.log(cGovReq.status);
-		console.log("== end debug XML http request 1 ==");		
-
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
 
@@ -135,12 +130,6 @@ function getElementsByTagNameNS(parent, namespace, alias, tagname) {
 *
 */
 function cGovProcessReqChange() {
-	console.log("== debug XML http request 2 ==");		
-	console.log(cGovReq.readyState);
-	console.log(cGovReq.status);
-	console.log("== end debug XML http request 2 ==");		
-
-
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
 //alert("got response, text:\n" + cGovReq.responseText);
 		cGovStatusWindow.close();
@@ -164,15 +153,9 @@ function cGovProcessReqChange() {
 		
 		// Set up HTML window with javascript and checkboxed text
 		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
-		
-		console.log("== debug cGovCheckboxWindow ==");
-		console.log(cGovCheckboxWindow);
-		console.log("== end debug cGovCheckboxWindow ==");
-		
 		cGovCheckboxWindow.document.write('<html><head>');
 		cGovCheckboxWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
 		cGovCheckboxWindow.document.write('</head>');
-		cGovCheckboxWindow.document.write('<p>debug me</p>');		
 		cGovCheckboxWindow.document.write('<script language="Javascript">');
 		cGovCheckboxWindow.document.write('function returnChecks() {');
 		cGovCheckboxWindow.document.write('	var checkArray = [];');
@@ -191,9 +174,6 @@ function cGovProcessReqChange() {
 		cGovCheckboxWindow.document.write('			}');
 		cGovCheckboxWindow.document.write('		}');
 		cGovCheckboxWindow.document.write('	}');
-		cGovCheckboxWindow.document.write('console.log("=== Debug checkarray ===");');
-		cGovCheckboxWindow.document.write('console.log(checkArray);');
-		cGovCheckboxWindow.document.write('console.log("=== End debug checkarray ===");');
 		cGovCheckboxWindow.document.write('window.opener.submitter(checkArray);');
 		cGovCheckboxWindow.document.write('window.close();');
 		cGovCheckboxWindow.document.write('}\n</' + 'script>');
@@ -630,10 +610,6 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Set unique ID for checked/unchecked terms
 		cGovUniqueId = 0;
 		
-		console.log("== i hate your face ==");
-		console.log(editor.getContent());
-		console.log("== end debug editor.getContent() ==");
-		
 		// Set glossifier to use locale of content item rather than Percussion locale
 		if(settings.language == 'es')
 		{
@@ -646,12 +622,6 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		
 		// Set editor as global variable
 		_glossifyEditor = editor;
-		
-		console.log("== debug allContent ==");
-		console.log(allContent);
-		console.log("== end debug allContent ==");
-
-		
 
 		cGovTinyMCEGlossify(allContent);
 	});
