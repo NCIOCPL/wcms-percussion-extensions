@@ -240,7 +240,7 @@ function testSubmit() {
 	//	if (!cGovCheckboxWindow.closed)
 	//		cGovCheckboxWindow.close();
 		checkArray = [ 3, 2 ];		  
-		cGovMassagedData = '<p><input type=checkbox name=terms value=5><a __newterm="5" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000045333&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000045333&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">cancer</font></a> <input type=checkbox name=terms value=4><a __newterm="4" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000535555&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000535555&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">ipilimumab</font></a> <input type=checkbox name=terms value=3><a __newterm="3" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000767747&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000767747&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">nivolumab</font></a> <input type=checkbox name=terms value=2><a __newterm="2" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000045134&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000045134&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">kaposi sarcoma</font></a></p>'
+		alert(cGovMassagedData);
 		
 		var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
 		var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
