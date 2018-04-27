@@ -32,6 +32,7 @@ var cGovIsEnglish = true;
 var cGovLanguage = document.documentElement.lang.split('-')[0];
 var _glossifyEditor;
 var myElement;
+var myCheckArray;
 // global tinymce = true
 
 
@@ -181,37 +182,10 @@ function cGovProcessReqChange() {
 				  '<!DOCTYPE html>' +
 				  '<html><head>' + 
 				  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' + 
-				  '<script language="Javascript">' + 
-				  'function returnChecks() {' + 
-				  '	var checkArray = [];' + 
-				  '	if (document.Glossify.terms != null) {' + 
-				  '		var boxes = document.Glossify.terms.length;' + 
-				  '		if (boxes == null) {' + 
-				  '			if (document.Glossify.terms.checked) {' + 
-				  '				checkArray.push(document.Glossify.terms.value);' + 
-				  '			}' + 
-				  '		}' + 
-				  '		else {' + 
-				  '			for (i=0;i<boxes;i++) {' + 
-				  '				if (document.Glossify.terms[i].checked) {' + 
-				  '					checkArray.push(document.Glossify.terms[i].value);' + 
-				  '				}' + 
-				  '			}' + 
-				  '		}' + 
-				  '	}' + 
-				  'console.log("== Debug checkarray ==");' + 
-				  'console.log(checkArray);' + 
-				  'console.log("== End debug checkarray ==");' + 
-				  'window.opener.submitter(checkArray);' + 
-				  'window.close();' + 
-				  '}' +
-				  '</script>' + preventClicksOnLinksScript +
 				  '</head>' + 
 				  '<body>' +
-				  '<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">' +
 				  '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
 				  '<hr>' + cGovMassagedData + '<hr>' +
-				  '<input type="submit" value="Submit Changes">' +
 				  '</body>' +
 				  '</html>'
 		);
@@ -219,22 +193,48 @@ function cGovProcessReqChange() {
 		/** Overwrite 'loading...' html with checkboxes **/
 		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(checkboxHtml);
 
-		var doc = new DOMParser().parseFromString(cGovMassagedData, 'text/html');
-		
+		var doc = new DOMParser().parseFromString(cGovMassagedData, 'text/html');		
 		var inputElements = doc.querySelectorAll("input");
+		
+		
 		console.log("== Debug our new collection ==");
 		console.log(doc);
 		console.log(inputElements);
+		console.log(myCheckArray);
+		myCheckArray = setCheckArray(inputElements);
+		console.log(myCheckArray);
 		console.log("== End debug our new collection ==");
 		
 		
-		var newArray = [];
 		
 	}
 	
 	
 }
 
+function setCheckArray(inputElements) {
+	// TODO: pick up checked items
+	var checkArray = [];
+	if (inputElements != null) {
+		var boxes = inputElements.length;
+		if (boxes == null) {
+			if (inputElements.checked) {
+				checkArray.push(inputElements.value);
+			}
+		} 
+		else {
+			for (i = 0; i < boxes; i++) {
+				console.log('== each element '  + inputElements[i]);				
+				console.log(inputElements[i]);				
+				if (inputElements[i].checked) {
+					checkArray.push(inputElements[i].value);
+				}
+			}
+		}
+	}
+	return checkArray;
+}
+				  
 /**
 * Callback called when popup window is submitted
 * Gets array of checked checkbox values, modifies the text to go into the editor
