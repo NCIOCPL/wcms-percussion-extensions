@@ -234,7 +234,29 @@ function setCheckArray(inputElements) {
 	}
 	return checkArray;
 }
-				  
+		
+function testSubmit() {
+	//TODO: delete dictionary preview URL once we add it
+	//	if (!cGovCheckboxWindow.closed)
+	//		cGovCheckboxWindow.close();
+		checkArray = [ 3, 2 ];		  
+		cGovMassagedData = '<p><input type=checkbox name=terms value=5><a __newterm="5" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000045333&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000045333&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">cancer</font></a> <input type=checkbox name=terms value=4><a __newterm="4" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000535555&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000535555&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">ipilimumab</font></a> <input type=checkbox name=terms value=3><a __newterm="3" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000767747&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000767747&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">nivolumab</font></a> <input type=checkbox name=terms value=2><a __newterm="2" class="definition" href="/Common/PopUps/popDefinition.aspx?id=CDR0000045134&version=Patient&language=English" onclick="javascript:popWindow("defbyid","CDR0000045134&version=Patient&language=English"); return false;"><font __type="glossifyTemp" style="background-color: #ffff00;">kaposi sarcoma</font></a></p>'
+		
+		var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
+		var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
+		var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
+		var rxFixCRs = new RegExp(cGovCRConst);
+		var rxFixLFs = new RegExp(cGovLFConst);
+		var finalText = cGovStripCheckboxes(rxCheckBox, cGovMassagedData);
+		finalText = cGovFixFinalLinks(rxFixLinks, finalText, checkArray);
+		finalText = cGovKillFonts(rxKillFonts, finalText);
+		finalText = cGovFixCRLF(rxFixCRs, finalText, "\r");
+		finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
+		//finish up by restoring text to editor
+
+		return finalText;
+	}
+
 /**
 * Callback called when popup window is submitted
 * Gets array of checked checkbox values, modifies the text to go into the editor
@@ -658,8 +680,10 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					//TODO: hide this on loading screen
 					text: 'Submit changes', 
 					onclick: function() {
-						this.parent().parent().close();
-                        editor.setContent('<p>NSCLC is any type of epithelial lung cancer other than small cell lung cancer (SCLC).</p>');                        						
+				
+						var myCont = testSubmit();
+						alert(myCont);	
+                        editor.setContent(myCont);					
 				}},
 				{
 					text: 'Close',
