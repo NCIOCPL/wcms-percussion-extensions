@@ -240,7 +240,7 @@ function testSubmit() {
 	//	if (!cGovCheckboxWindow.closed)
 	//		cGovCheckboxWindow.close();
 		checkArray = [ 1, 2 ];		  
-		alert(cGovMassagedData);
+		//alert(cGovMassagedData);
 		
 		var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
 		var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
@@ -679,11 +679,11 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 			buttons: [{
 					//TODO: hide this on loading screen
 					text: 'Submit changes', 
-					onclick: function() {
-				
+					onclick: function() {				
 						var myCont = testSubmit();
 						alert(myCont);	
                         editor.setContent(myCont);					
+                        this.parent().parent().close();						
 				}},
 				{
 					text: 'Close',
