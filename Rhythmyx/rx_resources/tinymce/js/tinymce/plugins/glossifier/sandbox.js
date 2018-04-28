@@ -235,11 +235,12 @@ function setCheckArray(inputElements) {
 	return checkArray;
 }
 		
-function testSubmit() {
+function testSubmit(checkedTerms) {
 	//TODO: delete dictionary preview URL once we add it
+	//TODO: clean up checkArray names
 	//	if (!cGovCheckboxWindow.closed)
 	//		cGovCheckboxWindow.close();
-		checkArray = [ 1, 2 ];		  
+		checkArray = checkedTerms;	  
 		//alert(cGovMassagedData);
 		
 		var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
@@ -679,12 +680,17 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 			buttons: [{
 					//TODO: hide this on loading screen
 					text: 'Submit changes', 
-					onclick: function() {			
+					onclick: function() {
+						
 						// IMPORTANT: find the vanilla JS for this: 
-						/// $('#glossIframe').contents().find('input:checked')
+						var waffle = $('#glossIframe').contents().find('input[name="terms"]' + ':checked');
 						// holy jeez.
-						var myCont = testSubmit();
-						console.log(myElement);
+						console.log(waffle);
+
+						// Get our waffle data values and pass them into an array (muffin)
+						var muffin = [ 1, 2, 3 ];	
+						
+						var myCont = testSubmit(muffin);
                         editor.setContent(myCont);					
                         //this.parent().parent().close();						
 				}},
