@@ -675,11 +675,14 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 			title: 'Glossifier tool',
 			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
 			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
-			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
+			html: '<iframe id="glossIframe" src="javascript:\'\'" frameborder="0"></iframe>',
 			buttons: [{
 					//TODO: hide this on loading screen
 					text: 'Submit changes', 
-					onclick: function() {				
+					onclick: function() {			
+						// IMPORTANT: find the vanilla JS for this: 
+						/// $('#glossIframe').contents().find('input:checked')
+						// holy jeez.
 						var myCont = testSubmit();
 						console.log(myElement);
                         editor.setContent(myCont);					
