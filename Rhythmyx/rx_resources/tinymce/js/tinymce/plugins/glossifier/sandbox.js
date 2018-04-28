@@ -681,14 +681,21 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					//TODO: hide this on loading screen
 					text: 'Submit changes', 
 					onclick: function() {
-						
-						// IMPORTANT: find the vanilla JS for this: 
-						var waffle = $('#glossIframe').contents().find('input[name="terms"]' + ':checked');
-						// holy jeez.
-						console.log(waffle);
 
 						// Get our waffle data values and pass them into an array (muffin)
-						var muffin = [ 1, 2, 3 ];	
+						var muffin = [ ];
+					
+						// IMPORTANT: find the vanilla JS for this: 
+						var waffle = $('#glossIframe').contents().find('input[name="terms"]' + ':checked');
+						
+						// Build the array
+						// TODO: remove breakfast names
+						waffle.each(function() {
+							$this = $(this)
+							muffin.push($this.attr("value"));
+						});
+						//console.log(muffin);
+
 						
 						var myCont = testSubmit(muffin);
                         editor.setContent(myCont);					
