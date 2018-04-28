@@ -99,9 +99,9 @@ function cGovTinyMCEGlossify(data) {
 		/** draw html into body **/
 		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);
 		
-		console.log("== Debug myelement.firstChild 1 ==");
-		console.log(myElement.firstChild);
-		console.log("== End debug myelement.firstChild 1 ==");
+		//console.log("== Debug myelement.firstChild 1 ==");
+		//console.log(myElement.firstChild);
+		//console.log("== End debug myelement.firstChild 1 ==");
 		
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
@@ -197,13 +197,13 @@ function cGovProcessReqChange() {
 		var inputElements = doc.querySelectorAll("input");
 		
 		
-		console.log("== Debug our new collection ==");
-		console.log(doc);
-		console.log(inputElements);
-		console.log(myCheckArray);
+		//console.log("== Debug our new collection ==");
+		//console.log(doc);
+		//console.log(inputElements);
+		//console.log(myCheckArray);
 		myCheckArray = setCheckArray(inputElements);
-		console.log(myCheckArray);
-		console.log("== End debug our new collection ==");
+		//console.log(myCheckArray);
+		//console.log("== End debug our new collection ==");
 		
 		
 		
@@ -224,8 +224,8 @@ function setCheckArray(inputElements) {
 		} 
 		else {
 			for (i = 0; i < boxes; i++) {
-				console.log('== each element '  + inputElements[i]);				
-				console.log(inputElements[i]);				
+				//console.log('== each element '  + inputElements[i]);				
+				//console.log(inputElements[i]);				
 				if (inputElements[i].checked) {
 					checkArray.push(inputElements[i].value);
 				}
@@ -681,9 +681,9 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 					text: 'Submit changes', 
 					onclick: function() {				
 						var myCont = testSubmit();
-						alert(myCont);	
+						console.log(myElement);
                         editor.setContent(myCont);					
-                        this.parent().parent().close();						
+                        //this.parent().parent().close();						
 				}},
 				{
 					text: 'Close',
