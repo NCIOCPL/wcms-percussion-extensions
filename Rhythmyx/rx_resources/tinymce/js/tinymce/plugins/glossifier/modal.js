@@ -167,8 +167,12 @@ function cGovProcessReqChange() {
 		   '<div id="checkbox-html">' +
 			  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
 			  '<script language="Javascript">' +
-				 'function returnChecks() {' +
+			  
+				 '$( \'input[name="terms"]\' ).change(function() {' +
+				    'returnChecks()' +
+				 '});' +
 
+				 'function returnChecks() {' +
 					'/*var checkArray = [];' +
 					'if (document.Glossify.terms != null) {' +
 						'var boxes = document.Glossify.terms.length;' +
@@ -185,9 +189,7 @@ function cGovProcessReqChange() {
 							'}' +
 						'}' +
 					'}*/' +
-				 'doMore();' +
-				 '$("#checkbox-html").remove();' +
-				 '$("#massaged").attr("data-content","data-content val");' +
+				 	'doMore();' +
 				 '}' +
 				 
 				'function doMore() {' +
@@ -197,7 +199,7 @@ function cGovProcessReqChange() {
 							'$this = $(this);' +
 							'myCheckArr.push($this.attr("value"));' +
 						'});' +
-
+					'$("#massaged-data").attr("data-checked-array", myCheckArr);' +					
 					"alert(myCheckArr);" +
 				 '}' +	 
 				 
@@ -207,7 +209,7 @@ function cGovProcessReqChange() {
 				 '<hr>' +
 				 cGovMassagedData +
 				 '<hr>' +
-				 '<button type="button" onclick="returnChecks()" value="Submit Changes">Submit Changes</button>' +
+				 '<button name="gloss-sumbit" type="button" value="Submit Changes">Submit Changes</button>' +
 			  '</div>' +
 		   '</div>'
 		);
@@ -667,6 +669,19 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		
 		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
+
+		/**
+		TODO: retrieve data attribute		
+		TODO: close modal windows on submit
+		TODO: update _glossifyEditor on submit
+		TODO: styling
+		TODO: util function to remove duplicate modal
+		*/
+		/*
+			'//$("#checkbox-html").remove();' +
+			'//$("#checkbox-html").remove();' +
+			'<button name="gloss-sumbit" type="button" value="Submit Changes">Submit Changes</button>' +
+		*/
 	});
 
 	editor.addButton('glossifier', {
