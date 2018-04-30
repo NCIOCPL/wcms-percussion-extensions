@@ -86,7 +86,7 @@ function cGovTinyMCEGlossify(data) {
 				'<div style="border: 1px solid black; width:200px; height:10px;">' +
 				  '<div id="progress" style="height:10px; width:0px; background-color:red;"/></div>' +
 				'</div>' +
-				'<h2>Processing document, please wait...&spades;....</h2>' +
+				'<h2>Processing document, please wait........</h2>' +
 			'</div>'
 		);
 
@@ -163,42 +163,47 @@ function cGovProcessReqChange() {
 //alert("cGovMassagedData:\n" + cGovMassagedData);
 		
 		var checkBoxHtml = (
-			'<html><head>' + 
-			'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' + 
-			'</head>' + 
-			'<script language="Javascript">' + 
-			'function returnChecks() {' + 
-			'	var checkArray = [];' + 
-			'	if (document.Glossify.terms != null) {' + 
-			'		var boxes = document.Glossify.terms.length;' + 
-			'		if (boxes == null) {' + 
-			'			if (document.Glossify.terms.checked) {' + 
-			'				checkArray.push(document.Glossify.terms.value);' + 
-			'			}' + 
-			'		}' + 
-			'		else {' + 
-			'			for (i=0;i<boxes;i++) {' + 
-			'				if (document.Glossify.terms[i].checked) {' + 
-			'					checkArray.push(document.Glossify.terms[i].value);' + 
-			'				}' + 
-			'			}' + 
-			'		}' + 
-			'	}' + 
-			'window.opener.submitter(checkArray);' + 
-			'window.close();' + 
-			'}\n</' + 'script>' + 
-			'<body>' + 
-			'<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">' + 
-			'<h2>Please check/uncheck the word(s) you want glossified</h2>' + 
-			'<hr>\n' + cGovMassagedData + '<hr>\n' + 
-			'<input type="submit" value="Submit Changes">' + 
-			'</form>\n</body>\n</html>'
-		);	
+		   '<div id="massaged" style="display:inline;">Data element - you should not see this.</div>' + 
+		   '<div id="checkBoxHtml">' +
+			  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
+			  '<script language="Javascript">' +
+				 'function returnChecks() {' +
 
-		var cht = "<p>htllo</p>";
+					'/*var checkArray = [];' +
+					'if (document.Glossify.terms != null) {' +
+						'var boxes = document.Glossify.terms.length;' +
+						'if (boxes == null) {' +
+							'if (document.Glossify.terms.checked) {' +
+								'checkArray.push(document.Glossify.terms.value);' +
+							'}' +
+						'}' +
+						'else {' +
+							'for (i=0;i<boxes;i++) {' +
+								'if (document.Glossify.terms[i].checked) {' +
+									'checkArray.push(document.Glossify.terms[i].value);' +
+								'}' +
+							'}' +
+						'}' +
+					'}*/' +
+			
+				 '$("#checkBoxHtml").remove();' +
+				 '$("#massaged").attr("data-content","data-content val");' +
+				 '}' +
+			  '</script>' +
+			  '<div name="Glossify" id="Glossify">' +
+				 '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
+				 '<hr>' +
+				 cGovMassagedData +
+				 '<hr>' +
+				 '<button type="button" onclick="returnChecks()" value="Submit Changes">Submit Changes</button>' +
+			  '</div>' +
+		   '</div>'
+		);
 		
-		$body.append(cht);
+		$('#loadingHtml').remove();
+		$body.append(checkBoxHtml);
 
+		_glossifyEditor.setContent('foo');
 		
 		// Set up HTML window with javascript and checkboxed text
 		//var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
