@@ -185,10 +185,22 @@ function cGovProcessReqChange() {
 							'}' +
 						'}' +
 					'}*/' +
-			
+				 'doMore();' +
 				 '$("#checkbox-html").remove();' +
 				 '$("#massaged").attr("data-content","data-content val");' +
 				 '}' +
+				 
+				'function doMore() {' +
+					'var myCheckArr = [];' +
+					'var checkedItem = $(\'#Glossify\').contents().find(\'input[name="terms"]\' + \':checked\');' +
+						'checkedItem.each(function() {' +
+							'$this = $(this);' +
+							'myCheckArr.push($this.attr("value"));' +
+						'});' +
+
+					"alert(myCheckArr);" +
+				 '}' +	 
+				 
 			  '</script>' +
 			  '<div name="Glossify" id="Glossify">' +
 				 '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
@@ -203,7 +215,7 @@ function cGovProcessReqChange() {
 		$('#loading-html').remove();
 		$body.append(checkBoxHtml);
 
-		_glossifyEditor.setContent('foo');
+		_glossifyEditor.setContent('<hr/>breast cancer<hr/>');
 		
 		// Set up HTML window with javascript and checkboxed text
 		//var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
