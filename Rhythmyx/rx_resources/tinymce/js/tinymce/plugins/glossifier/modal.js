@@ -30,6 +30,7 @@ var cGovWSNameSpace = "cancer.gov/glossproxy";
 var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 var cGovIsEnglish = true;
 var cGovLanguage = document.documentElement.lang.split('-')[0];
+var $body = jQuery('body');
 var _glossifyEditor;
 // global tinymce = true
 
@@ -66,10 +67,7 @@ function cGovTinyMCEGlossify(data) {
 		cGovReq = new XMLHttpRequest();
 		
 		var loadingHtml = (
-			'<!DOCTYPE html>' +
-			'<html>' +
-			  '<head>' +
-				'<title>GlossifyDocumentPrep</title>' +
+			'<div id="loadingHtml">' +
 				'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
 				'<script language="javascript" type="text/javascript">' +
 				  'var prg_width = 200;' +
@@ -83,20 +81,17 @@ function cGovTinyMCEGlossify(data) {
 				  '}' +
 				  'setInterval(progress, 250);' +
 				'</script>' +
-			  '</head>' +
-			  '<body>' +
+				'<h1>GlossifyDocumentPrep</h1>' +
 				'<div>' +
 				'<div style="border: 1px solid black; width:200px; height:10px;">' +
 				  '<div id="progress" style="height:10px; width:0px; background-color:red;"/></div>' +
 				'</div>' +
-				'<h2>Processing document, please wait...&hearts;&ntilde;</h2>' +
-			  '</body>' +
-			'</html>'
-		);				
+				'<h2>Processing document, please wait...&spades;....</h2>' +
+			'</div>'
+		);
 
 		//Display status window
-		cGovStatusWindow = window.open("","","height=480,width=640");
-		cGovStatusWindow.document.write(loadingHtml);
+		$body.append(loadingHtml);
 
 		
 		// Do this on completion of asynchronous call
@@ -148,7 +143,7 @@ function getElementsByTagNameNS(parent, namespace, alias, tagname) {
 function cGovProcessReqChange() {
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
 //alert("got response, text:\n" + cGovReq.responseText);
-		cGovStatusWindow.close();
+		//cGovStatusWindow.close();
 		
 		//Web service transaction has completed, parse the response
 		var env = getElementsByTagNameNS(cGovReq.responseXML, cGovSoapNameSpace, cGovSoapPrefix, "Envelope");
@@ -167,7 +162,7 @@ function cGovProcessReqChange() {
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
 //alert("cGovMassagedData:\n" + cGovMassagedData);
 		
-		var checkHtml = (
+		var checkBoxHtml = (
 			'<html><head>' + 
 			'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' + 
 			'</head>' + 
@@ -198,11 +193,16 @@ function cGovProcessReqChange() {
 			'<hr>\n' + cGovMassagedData + '<hr>\n' + 
 			'<input type="submit" value="Submit Changes">' + 
 			'</form>\n</body>\n</html>'
-		);		
+		);	
+
+		var cht = "<p>htllo</p>";
+		
+		$body.append(cht);
+
 		
 		// Set up HTML window with javascript and checkboxed text
-		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
-		cGovCheckboxWindow.document.write(checkHtml);
+		//var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
+		//cGovCheckboxWindow.document.write(checkHtml);
 
 	}
 	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
