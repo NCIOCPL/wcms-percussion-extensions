@@ -67,7 +67,7 @@ function cGovTinyMCEGlossify(data) {
 		cGovReq = new XMLHttpRequest();
 		
 		var loadingHtml = (
-			'<div id="loadingHtml">' +
+			'<div id="loading-html">' +
 				'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
 				'<script language="javascript" type="text/javascript">' +
 				  'var prg_width = 200;' +
@@ -163,8 +163,8 @@ function cGovProcessReqChange() {
 //alert("cGovMassagedData:\n" + cGovMassagedData);
 		
 		var checkBoxHtml = (
-		   '<div id="massaged" style="display:inline;">Data element - you should not see this.</div>' + 
-		   '<div id="checkBoxHtml">' +
+		   '<div id="massaged-data" style="display:inline;">Data element - you should not see this.</div>' + 
+		   '<div id="checkbox-html">' +
 			  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
 			  '<script language="Javascript">' +
 				 'function returnChecks() {' +
@@ -186,7 +186,7 @@ function cGovProcessReqChange() {
 						'}' +
 					'}*/' +
 			
-				 '$("#checkBoxHtml").remove();' +
+				 '$("#checkbox-html").remove();' +
 				 '$("#massaged").attr("data-content","data-content val");' +
 				 '}' +
 			  '</script>' +
@@ -200,7 +200,7 @@ function cGovProcessReqChange() {
 		   '</div>'
 		);
 		
-		$('#loadingHtml').remove();
+		$('#loading-html').remove();
 		$body.append(checkBoxHtml);
 
 		_glossifyEditor.setContent('foo');
@@ -650,6 +650,10 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Set editor as global variable
 		_glossifyEditor = editor;
 
+		// Close any straggling glossifier windows
+		$('#checkbox-html, #loading-html, #massaged-data').remove();
+		
+		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
 	});
 
