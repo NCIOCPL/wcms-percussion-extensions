@@ -35,7 +35,6 @@ var _glossifyEditor;
 // global tinymce = true
 
 /**
-TODO: handle "node is null" console error
 TODO: make checked/highlighted item fonts consistent (diff between this and current)
 TODO: clean up load page styling
 TODO: make wrappers consistent on load and checkbox views 
@@ -45,6 +44,7 @@ TODO: close modal on 'esc'
 TODO: clean up Spanish tool
 TODO: rearrange methods
 */
+
 /*********************************
 * CGov Percussion functions      *
 **********************************/
@@ -74,7 +74,7 @@ function cGovTinyMCEGlossify(data) {
 			"</m:glossify>" +
 		"</soapenv:Body>" +
 		"</soapenv:Envelope>";
-		cGovReq = new XMLHttpRequest();
+		cGovReq = new XMLHttpRequest(); 
 		
 		var loadingHtml = (
 			'<div id="loading-html" class="gloss-modal">' +
@@ -83,21 +83,22 @@ function cGovTinyMCEGlossify(data) {
 				  'var prg_width = 200;' +
 				  'function progress() {' +
 					'var node = document.getElementById("progress");' +
-					'var w = node.style.width.match(/\\d+/);' +
-					'if (w == prg_width) {' +
+					'if(node != null) {' +
+					  'var w = node.style.width.match(/\\d+/);' +
+					  'if (w == prg_width) {' +
 						'w = 0;' +
-					'}' +
-					'node.style.width = parseInt(w) + 5 + "px";' +
+					  '}' +
+					  'node.style.width = parseInt(w) + 5 + "px";' +					
+					'}' +					
 				  '}' +
 				  'setInterval(progress, 250);' +
 				'</script>' +
-				'<h1>GlossifyDocumentPrep</h1>' +
 				'<div class="gloss-modal-content">' +
 					'<button type="button" class="gloss-close">X</button>' +				
 					'<div class="border-box" >' +
 					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
 					'</div>' +   
-					'<h2>Processing document, please wait......;..</h2>' +
+					'<h2>Processing document, please wait........</h2>' +
 				'</div>' +
 			'</div>'
 		);

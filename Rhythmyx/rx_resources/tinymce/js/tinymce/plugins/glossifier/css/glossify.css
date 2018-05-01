@@ -38,7 +38,8 @@ h2 {
     padding: 20px;
     border: 1px solid #888;
     overflow: scroll;
-	width: 67%;
+	width: 60%;
+	height: 500px;
 }
 
 #loading-html .gloss-modal-content {
@@ -50,4 +51,8 @@ h2 {
 /* Checkedarray data element - should not be visible */
 #massaged-data {
 	display: none;
+}
+
+button.gloss-close {
+	float: right;
 }
