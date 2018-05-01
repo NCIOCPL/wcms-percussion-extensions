@@ -68,7 +68,7 @@ function cGovTinyMCEGlossify(data) {
 		
 		var loadingHtml = (
 			'<div id="loading-html" class="gloss-modal">' +
-				'<link href="../rx_resources/tinymce/stylesheets/glossify-cust.css" rel="stylesheet" />' +
+			    '<link href="../rx_resources/tinymce/js/tinymce/plugins/glossifier/css/glossify.css" rel="stylesheet" />' +
 				'<script language="javascript" type="text/javascript">' +
 				  'var prg_width = 200;' +
 				  'function progress() {' +
@@ -166,7 +166,7 @@ function cGovProcessReqChange() {
 		var checkBoxHtml = (
 		   '<div id="massaged-data">Data element - you should not see this.</div>' + 
 		   '<div id="checkbox-html" class="gloss-modal">' +
-			  '<link href="../rx_resources/tinymce/stylesheets/glossify-cust.css" rel="stylesheet" />' +
+			  '<link href="../rx_resources/tinymce/js/tinymce/plugins/glossifier/css/glossify.css" rel="stylesheet" />' +
 			  '<script language="Javascript">' +
 			  
 				 '$( \'input[name="terms"]\' ).change(function() {' +

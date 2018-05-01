@@ -1,0 +1,1 @@
+/**** pull doc.write js into here */
