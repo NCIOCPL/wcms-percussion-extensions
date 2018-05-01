@@ -217,7 +217,7 @@ function cGovProcessReqChange() {
 		$('#loading-html').remove();
 		$body.append(checkBoxHtml);
 
-		_glossifyEditor.setContent('<hr/>breast cancer<hr/>');
+		//_glossifyEditor.setContent('<hr/>breast cancer<hr/>');
 		
 		// Set up HTML window with javascript and checkboxed text
 		//var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
@@ -670,6 +670,18 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
 
+		
+		$( document ).ready(function() {
+			alert('document ready: ' + $( '[name="gloss-sumbit"]' ).length);
+			$( '[name="gloss-sumbit"]' ).click(function() {
+				alert('clicked submit');
+				//submitter([1,2,4]);
+				//_glossifyEditor.setContent('<hr/>breast cancer<hr/>');
+			});
+		});
+
+
+		
 		/**
 		TODO: retrieve data attribute		
 		TODO: close modal windows on submit
