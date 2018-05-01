@@ -32,6 +32,7 @@ var cGovIsEnglish = true;
 var cGovLanguage = document.documentElement.lang.split('-')[0];
 var _glossifyEditor;
 var myElement;
+var myCheckArray;
 // global tinymce = true
 
 
@@ -98,9 +99,9 @@ function cGovTinyMCEGlossify(data) {
 		/** draw html into body **/
 		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);
 		
-		console.log("== Debug myelement.firstChild 1 ==");
-		console.log(myElement.firstChild);
-		console.log("== End debug myelement.firstChild 1 ==");
+		//console.log("== Debug myelement.firstChild 1 ==");
+		//console.log(myElement.firstChild);
+		//console.log("== End debug myelement.firstChild 1 ==");
 		
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
@@ -181,37 +182,10 @@ function cGovProcessReqChange() {
 				  '<!DOCTYPE html>' +
 				  '<html><head>' + 
 				  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' + 
-				  '<script language="Javascript">' + 
-				  'function returnChecks() {' + 
-				  '	var checkArray = [];' + 
-				  '	if (document.Glossify.terms != null) {' + 
-				  '		var boxes = document.Glossify.terms.length;' + 
-				  '		if (boxes == null) {' + 
-				  '			if (document.Glossify.terms.checked) {' + 
-				  '				checkArray.push(document.Glossify.terms.value);' + 
-				  '			}' + 
-				  '		}' + 
-				  '		else {' + 
-				  '			for (i=0;i<boxes;i++) {' + 
-				  '				if (document.Glossify.terms[i].checked) {' + 
-				  '					checkArray.push(document.Glossify.terms[i].value);' + 
-				  '				}' + 
-				  '			}' + 
-				  '		}' + 
-				  '	}' + 
-				  'console.log("== Debug checkarray ==");' + 
-				  'console.log(checkArray);' + 
-				  'console.log("== End debug checkarray ==");' + 
-				  'window.opener.submitter(checkArray);' + 
-				  'window.close();' + 
-				  '}' +
-				  '</script>' + preventClicksOnLinksScript +
 				  '</head>' + 
 				  '<body>' +
-				  '<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">' +
 				  '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
 				  '<hr>' + cGovMassagedData + '<hr>' +
-				  '<input type="submit" value="Submit Changes">' +
 				  '</body>' +
 				  '</html>'
 		);
@@ -219,21 +193,70 @@ function cGovProcessReqChange() {
 		/** Overwrite 'loading...' html with checkboxes **/
 		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(checkboxHtml);
 
-		var doc = new DOMParser().parseFromString(cGovMassagedData, 'text/html');
-		
+		var doc = new DOMParser().parseFromString(cGovMassagedData, 'text/html');		
 		var inputElements = doc.querySelectorAll("input");
-		console.log("== Debug our new collection ==");
-		console.log(doc);
-		console.log(inputElements);
-		console.log("== End debug our new collection ==");
 		
 		
-		var newArray = [];
+		//console.log("== Debug our new collection ==");
+		//console.log(doc);
+		//console.log(inputElements);
+		//console.log(myCheckArray);
+		myCheckArray = setCheckArray(inputElements);
+		//console.log(myCheckArray);
+		//console.log("== End debug our new collection ==");
+		
+		
 		
 	}
 	
 	
 }
+
+function setCheckArray(inputElements) {
+	// TODO: pick up checked items
+	var checkArray = [];
+	if (inputElements != null) {
+		var boxes = inputElements.length;
+		if (boxes == null) {
+			if (inputElements.checked) {
+				checkArray.push(inputElements.value);
+			}
+		} 
+		else {
+			for (i = 0; i < boxes; i++) {
+				//console.log('== each element '  + inputElements[i]);				
+				//console.log(inputElements[i]);				
+				if (inputElements[i].checked) {
+					checkArray.push(inputElements[i].value);
+				}
+			}
+		}
+	}
+	return checkArray;
+}
+		
+function testSubmit(checkedTerms) {
+	//TODO: delete dictionary preview URL once we add it
+	//TODO: clean up checkArray names
+	//	if (!cGovCheckboxWindow.closed)
+	//		cGovCheckboxWindow.close();
+		checkArray = checkedTerms;	  
+		//alert(cGovMassagedData);
+		
+		var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
+		var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
+		var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
+		var rxFixCRs = new RegExp(cGovCRConst);
+		var rxFixLFs = new RegExp(cGovLFConst);
+		var finalText = cGovStripCheckboxes(rxCheckBox, cGovMassagedData);
+		finalText = cGovFixFinalLinks(rxFixLinks, finalText, checkArray);
+		finalText = cGovKillFonts(rxKillFonts, finalText);
+		finalText = cGovFixCRLF(rxFixCRs, finalText, "\r");
+		finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
+		//finish up by restoring text to editor
+
+		return finalText;
+	}
 
 /**
 * Callback called when popup window is submitted
@@ -653,13 +676,30 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 			title: 'Glossifier tool',
 			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
 			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
-			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
+			html: '<iframe id="glossIframe" src="javascript:\'\'" frameborder="0"></iframe>',
 			buttons: [{
 					//TODO: hide this on loading screen
 					text: 'Submit changes', 
 					onclick: function() {
-						this.parent().parent().close();
-                        editor.setContent('<p>NSCLC is any type of epithelial lung cancer other than small cell lung cancer (SCLC).</p>');                        						
+
+						// Get our waffle data values and pass them into an array (muffin)
+						var muffin = [ ];
+					
+						// IMPORTANT: find the vanilla JS for this: 
+						var waffle = $('#glossIframe').contents().find('input[name="terms"]' + ':checked');
+						
+						// Build the array
+						// TODO: remove breakfast names
+						waffle.each(function() {
+							$this = $(this)
+							muffin.push($this.attr("value"));
+						});
+						//console.log(muffin);
+
+						
+						var myCont = testSubmit(muffin);
+                        editor.setContent(myCont);					
+                        //this.parent().parent().close();						
 				}},
 				{
 					text: 'Close',
