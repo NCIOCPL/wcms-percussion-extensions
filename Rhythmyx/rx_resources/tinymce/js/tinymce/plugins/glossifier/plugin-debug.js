@@ -15,7 +15,7 @@
 var cGovReq;			//global request object
 var cGovOriginalData;	//data from editor window
 var cGovMassagedData;	//editor data after preprocessing
-var cGovUniqueId = 0;		//id unique within this page
+var cGovUniqueId;		//id unique within this page
 var cGovEditorName;		//name of editor
 var cGovStatusWindow;	//window for status display
 var cGovCheckboxWindow	//window for term checkboxes
@@ -31,7 +31,6 @@ var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 var cGovIsEnglish = true;
 var cGovLanguage = document.documentElement.lang.split('-')[0];
 var _glossifyEditor;
-var myElement;
 // global tinymce = true
 
 
@@ -66,42 +65,29 @@ function cGovTinyMCEGlossify(data) {
 		"</soapenv:Envelope>";
 		cGovReq = new XMLHttpRequest();
 
-		var loadingHtml = (
-			'<!DOCTYPE html>' +
-			'<html>' +
-			  '<head>' +
-				'<title>GlossifyDocumentPrep</title>' +
-				'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
-				'<script language="javascript" type="text/javascript">' +
-				  'var prg_width = 200;' +
-				  'function progress() {' +
-					'var node = document.getElementById("progress");' +
-					'var w = node.style.width.match(/\\d+/);' +
-					'if (w == prg_width) {' +
-						'w = 0;' +
-					'}' +
-					'node.style.width = parseInt(w) + 5 + "px";' +
-				  '}' +
-				  'setInterval(progress, 250);' +
-				'</script>' +
-			  '</head>' +
-			  '<body>' +
-				'<div>' +
-				'<div style="border: 1px solid black; width:200px; height:10px;">' +
-				  '<div id="progress" style="height:10px; width:0px; background-color:red;"/></div>' +
-				'</div>' +
-				'<h2>Processing document, please wait...</h2>' +
-			  '</body>' +
-			'</html>'
-		);		
+		//Display status window
+		cGovStatusWindow = window.open("","","height=480,width=640");
+		cGovStatusWindow.document.write('<html><head><title>GlossifyDocumentPrep</title>');
+		cGovStatusWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
+		cGovStatusWindow.document.write('<script language="javascript" type="text/javascript">');
+		cGovStatusWindow.document.write("var prg_width = 200;");
+		cGovStatusWindow.document.write("function progress() {");
+        cGovStatusWindow.document.write("var node = document.getElementById('progress');");
+        cGovStatusWindow.document.write("var w = node.style.width.match(/\\d+/);");
+		cGovStatusWindow.document.write("if (w == prg_width)");
+        cGovStatusWindow.document.write("w = 0;");
+		cGovStatusWindow.document.write("node.style.width = parseInt(w) + 5 + 'px';");
+        cGovStatusWindow.document.write("}");
+        cGovStatusWindow.document.write("setInterval(progress, 250);");		
+		cGovStatusWindow.document.write('</' + 'script></head>');
+		cGovStatusWindow.document.write('<body><div><div style="border: 1px solid black; width:200px; height:10px;"><div id="progress" style="height:10px; width:0px; background-color:red;"/></div></div>');
+		cGovStatusWindow.document.write("<h2>Processing document, please wait.........</h2></body></html>");
 		
-		/** draw html into body **/
-		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(loadingHtml);
-		
-		console.log("== Debug myelement.firstChild 1 ==");
-		console.log(myElement.firstChild);
-		console.log("== End debug myelement.firstChild 1 ==");
-		
+		console.log("== debug XML http request 1 ==");		
+		console.log(cGovReq.readyState);
+		console.log(cGovReq.status);
+		console.log("== end debug XML http request 1 ==");		
+
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
 
@@ -149,90 +135,76 @@ function getElementsByTagNameNS(parent, namespace, alias, tagname) {
 *
 */
 function cGovProcessReqChange() {
+	console.log("== debug XML http request 2 ==");		
+	console.log(cGovReq.readyState);
+	console.log(cGovReq.status);
+	console.log("== end debug XML http request 2 ==");		
+
 
 	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
+//alert("got response, text:\n" + cGovReq.responseText);
+		cGovStatusWindow.close();
 		
 		//Web service transaction has completed, parse the response
 		var env = getElementsByTagNameNS(cGovReq.responseXML, cGovSoapNameSpace, cGovSoapPrefix, "Envelope");
+//alert("got env");
 		var body = getElementsByTagNameNS(env[0], cGovSoapNameSpace, cGovSoapPrefix, "Body");
+//alert("got body");
 		var resp = getElementsByTagNameNS(body[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResponse");
+//alert("got glossifyResponse");
 		var glossifyResult = getElementsByTagNameNS(resp[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResult");
+//alert("got glossifyResult");
 		var terms = getElementsByTagNameNS(glossifyResult[0], cGovWSNameSpace, cGovElementPrefix, "Term");
+//alert("got term");
 
 		// Put the terms values into an array
 		var termsArray = cGovBuildTermsArray(terms);
 		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
-
+//alert("cGovMassagedData:\n" + cGovMassagedData);
 		
+		// Set up HTML window with javascript and checkboxed text
+		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
 		
-		var preventClicksOnLinksScript = (
-			'<script>' +
-				'document.addEventListener && document.addEventListener("click", function(e) {' +
-					'for (var elm = e.target; elm; elm = elm.parentNode) {' +
-						'if (elm.nodeName === "A") {' +
-							'e.preventDefault();' +
-						'}' +
-					'}' +
-				'}, false);' +
-			'</script> '
-		);		
+		console.log("== debug cGovCheckboxWindow ==");
+		console.log(cGovCheckboxWindow);
+		console.log("== end debug cGovCheckboxWindow ==");
 		
-		var checkboxHtml = (
-				  '<!DOCTYPE html>' +
-				  '<html><head>' + 
-				  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' + 
-				  '<script language="Javascript">' + 
-				  'function returnChecks() {' + 
-				  '	var checkArray = [];' + 
-				  '	if (document.Glossify.terms != null) {' + 
-				  '		var boxes = document.Glossify.terms.length;' + 
-				  '		if (boxes == null) {' + 
-				  '			if (document.Glossify.terms.checked) {' + 
-				  '				checkArray.push(document.Glossify.terms.value);' + 
-				  '			}' + 
-				  '		}' + 
-				  '		else {' + 
-				  '			for (i=0;i<boxes;i++) {' + 
-				  '				if (document.Glossify.terms[i].checked) {' + 
-				  '					checkArray.push(document.Glossify.terms[i].value);' + 
-				  '				}' + 
-				  '			}' + 
-				  '		}' + 
-				  '	}' + 
-				  'console.log("== Debug checkarray ==");' + 
-				  'console.log(checkArray);' + 
-				  'console.log("== End debug checkarray ==");' + 
-				  'window.opener.submitter(checkArray);' + 
-				  'window.close();' + 
-				  '}' +
-				  '</script>' + preventClicksOnLinksScript +
-				  '</head>' + 
-				  '<body>' +
-				  '<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">' +
-				  '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
-				  '<hr>' + cGovMassagedData + '<hr>' +
-				  '<input type="submit" value="Submit Changes">' +
-				  '</body>' +
-				  '</html>'
-		);
-		
-		/** Overwrite 'loading...' html with checkboxes **/
-		myElement.firstChild.src = 'data:text/html;charset=utf-8,' + encodeURIComponent(checkboxHtml);
-
-		var doc = new DOMParser().parseFromString(cGovMassagedData, 'text/html');
-		
-		var inputElements = doc.querySelectorAll("input");
-		console.log("== Debug our new collection ==");
-		console.log(doc);
-		console.log(inputElements);
-		console.log("== End debug our new collection ==");
-		
-		
-		var newArray = [];
-		
+		cGovCheckboxWindow.document.write('<html><head>');
+		cGovCheckboxWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
+		cGovCheckboxWindow.document.write('</head>');
+		cGovCheckboxWindow.document.write('<p>debug me</p>');		
+		cGovCheckboxWindow.document.write('<script language="Javascript">');
+		cGovCheckboxWindow.document.write('function returnChecks() {');
+		cGovCheckboxWindow.document.write('	var checkArray = [];');
+		cGovCheckboxWindow.document.write('	if (document.Glossify.terms != null) {');
+		cGovCheckboxWindow.document.write('		var boxes = document.Glossify.terms.length;');
+		cGovCheckboxWindow.document.write('		if (boxes == null) {');
+		cGovCheckboxWindow.document.write('			if (document.Glossify.terms.checked) {');
+		cGovCheckboxWindow.document.write('				checkArray.push(document.Glossify.terms.value);');
+		cGovCheckboxWindow.document.write('			}');
+		cGovCheckboxWindow.document.write('		}');
+		cGovCheckboxWindow.document.write('		else {');
+		cGovCheckboxWindow.document.write('			for (i=0;i<boxes;i++) {');
+		cGovCheckboxWindow.document.write('				if (document.Glossify.terms[i].checked) {');
+		cGovCheckboxWindow.document.write('					checkArray.push(document.Glossify.terms[i].value);');
+		cGovCheckboxWindow.document.write('				}');
+		cGovCheckboxWindow.document.write('			}');
+		cGovCheckboxWindow.document.write('		}');
+		cGovCheckboxWindow.document.write('	}');
+		cGovCheckboxWindow.document.write('console.log("=== Debug checkarray ===");');
+		cGovCheckboxWindow.document.write('console.log(checkArray);');
+		cGovCheckboxWindow.document.write('console.log("=== End debug checkarray ===");');
+		cGovCheckboxWindow.document.write('window.opener.submitter(checkArray);');
+		//cGovCheckboxWindow.document.write('window.close();');
+		cGovCheckboxWindow.document.write('}\n</' + 'script>');
+		cGovCheckboxWindow.document.write('<body>');
+		cGovCheckboxWindow.document.write('<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">');
+		cGovCheckboxWindow.document.write('<h2>Please check/uncheck the word(s) you want glossified</h2>');
+		cGovCheckboxWindow.document.write('<hr>\n' + cGovMassagedData + '<hr>\n');
+		cGovCheckboxWindow.document.write('<input type="submit" value="Submit Changes">');
+		cGovCheckboxWindow.document.write('</form>\n</body>\n</html>');
 	}
-	
-	
+	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
 }
 
 /**
@@ -241,9 +213,14 @@ function cGovProcessReqChange() {
 *
 */
 function submitter(checkArray) {
-//TODO: delete dictionary preview URL once we add it
-//	if (!cGovCheckboxWindow.closed)
-//		cGovCheckboxWindow.close();
+	//TODO: delete dictionary preview URL once we add it
+	//	if (!cGovCheckboxWindow.closed)
+	//		cGovCheckboxWindow.close();
+	console.log('=== Debug submitter massagedData & checkArray ===');
+	console.log(cGovMassagedData);
+	console.log(checkArray);
+	console.log('=== End debug submitter massagedData & checkArray ===');
+	
 	var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
 	var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
 	var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
@@ -626,77 +603,62 @@ function fixSpanish(editorContent, entity, character) {
 	return fixedSpanish;
 }
 
-
-
-
-/**
- * plugin.js
- *
- * Released under LGPL License.
- * Copyright (c) 1999-2015 Ephox Corp. All rights reserved
- *
- * License: http://www.tinymce.com/license
- * Contributing: http://www.tinymce.com/contributing
- */
-
-/*global tinymce:true */
-
+/************************************
+* Percussion plugin function for    *
+* TinyMCE. This is needed to call   *
+* the CGov functions & add button   *
+*************************************/
 tinymce.PluginManager.add('glossifier', function(editor) {
 	var settings = editor.settings;
-	var allContent;
-
+    var allContent = '';
+	
 	editor.addCommand('openGlossifier', function() {
-
+		// Get editor content
 		allContent = editor.getContent();
+		
+		// Replace HTML entities with characters 
+		allContent = fixSpanish(allContent, "&Aacute;", "Á");
+		allContent = fixSpanish(allContent, "&aacute;", "á");
+		allContent = fixSpanish(allContent, "&Eacute;", "É");
+		allContent = fixSpanish(allContent, "&eacute;", "é");
+		allContent = fixSpanish(allContent, "&Iacute;", "Í");
+		allContent = fixSpanish(allContent, "&iacute;", "í");
+		allContent = fixSpanish(allContent, "&Oacute;", "Ó");
+		allContent = fixSpanish(allContent, "&oacute;", "ó");
+		allContent = fixSpanish(allContent, "&Uacute;", "Ú");
+		allContent = fixSpanish(allContent, "&uacute;", "ú");
+		allContent = fixSpanish(allContent, "&Yacute;", "Ý");
+		allContent = fixSpanish(allContent, "&yacute;", "ý");
+		allContent = fixSpanish(allContent, "&Ntilde;", "Ñ");
+		allContent = fixSpanish(allContent, "&ntilde;", "ñ");
+		
+		// Set unique ID for checked/unchecked terms
+		cGovUniqueId = 0;
+		
+		console.log("== i hate your face ==");
+		console.log(editor.getContent());
+		console.log("== end debug editor.getContent() ==");
+		
+		// Set glossifier to use locale of content item rather than Percussion locale
+		if(settings.language == 'es')
+		{
+			cGovLanguage = settings.language;
+		}
+		else
+		{
+			cGovLanguage = 'en';
+		}
+		
+		// Set editor as global variable
+		_glossifyEditor = editor;
+		
+		console.log("== debug allContent ==");
+		console.log(allContent);
+		console.log("== end debug allContent ==");
 
-		editor.windowManager.open({
-			title: 'Glossifier tool',
-			width: parseInt(editor.getParam("plugin_preview_width", "650"), 10),
-			height: parseInt(editor.getParam("plugin_preview_height", "500"), 10),
-			html: '<iframe src="javascript:\'\'" frameborder="0"></iframe>',
-			buttons: [{
-					//TODO: hide this on loading screen
-					text: 'Submit changes', 
-					onclick: function() {
-						this.parent().parent().close();
-                        editor.setContent('<p>NSCLC is any type of epithelial lung cancer other than small cell lung cancer (SCLC).</p>');                        						
-				}},
-				{
-					text: 'Close',
-					onclick: function() {
-                        this.parent().parent().close();
-				}}
-			],
-			onPostRender: function() {
-				var previewHtml, loadingHtml, headHtml = '';
+		
 
-				headHtml += '<base href="' + editor.documentBaseURI.getURI() + '">';
-
-				tinymce.each(editor.contentCSS, function(url) {
-					headHtml += '<link type="text/css" rel="stylesheet" href="' + editor.documentBaseURI.toAbsolute(url) + '">';
-				});
-
-				var bodyId = settings.body_id || 'tinymce';
-				if (bodyId.indexOf('=') != -1) {
-					bodyId = editor.getParam('body_id', '', 'hash');
-					bodyId = bodyId[editor.id] || bodyId;
-				}
-
-				var bodyClass = settings.body_class || '';
-				if (bodyClass.indexOf('=') != -1) {
-					bodyClass = editor.getParam('body_class', '', 'hash');
-					bodyClass = bodyClass[editor.id] || '';
-				}
-				
-				// Fire off legacy glossifier
-				/// TODO: close window upon clicking 'submit'
-				/// TODO: to set the editor value, do "editor.setContent(my_glossified_string);"
-				/// TODO: make sure spanish works
-				myElement = this.getEl('body');
-				cGovTinyMCEGlossify(allContent);
-
-			}
-		});
+		cGovTinyMCEGlossify(allContent);
 	});
 
 	editor.addButton('glossifier', {
