@@ -68,7 +68,7 @@ function cGovTinyMCEGlossify(data) {
 		
 		var loadingHtml = (
 			'<div id="loading-html">' +
-				'<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
+				'<link href="../rx_resources/tinymce/stylesheets/glossify-cust.css" rel="stylesheet" />' +
 				'<script language="javascript" type="text/javascript">' +
 				  'var prg_width = 200;' +
 				  'function progress() {' +
@@ -165,7 +165,7 @@ function cGovProcessReqChange() {
 		var checkBoxHtml = (
 		   '<div id="massaged-data" style="display:inline;">Data element - you should not see this.</div>' + 
 		   '<div id="checkbox-html">' +
-			  '<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>' +
+			  '<link href="../rx_resources/tinymce/stylesheets/glossify-cust.css" rel="stylesheet" />' +
 			  '<script language="Javascript">' +
 			  
 				 '$( \'input[name="terms"]\' ).change(function() {' +
@@ -184,7 +184,6 @@ function cGovProcessReqChange() {
 							'myCheckArr.push($this.attr("value"));' +
 						'});' +
 					'$("#massaged-data").attr("data-checked-array", myCheckArr);' +					
-					"alert(myCheckArr);" +
 				 '}' +	 
 				 
 			  '</script>' +
@@ -675,14 +674,8 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		
 		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
-
-		
-
-
-
 		
 		/**
-		TODO: retrieve data attribute		
 		TODO: close modal windows on submit
 		TODO: update _glossifyEditor on submit
 		TODO: styling
