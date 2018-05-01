@@ -67,7 +67,7 @@ function cGovTinyMCEGlossify(data) {
 		cGovReq = new XMLHttpRequest();
 		
 		var loadingHtml = (
-			'<div id="loading-html">' +
+			'<div id="loading-html" class="gloss-modal">' +
 				'<link href="../rx_resources/tinymce/stylesheets/glossify-cust.css" rel="stylesheet" />' +
 				'<script language="javascript" type="text/javascript">' +
 				  'var prg_width = 200;' +
@@ -82,11 +82,12 @@ function cGovTinyMCEGlossify(data) {
 				  'setInterval(progress, 250);' +
 				'</script>' +
 				'<h1>GlossifyDocumentPrep</h1>' +
-				'<div>' +
-				'<div style="border: 1px solid black; width:200px; height:10px;">' +
-				  '<div id="progress" style="height:10px; width:0px; background-color:red;"/></div>' +
+				'<div class="gloss-modal-content">' +
+					'<div class="border-box" >' +
+					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
+					'</div>' +   
+					'<h2>Processing document, please wait........</h2>' +
 				'</div>' +
-				'<h2>Processing document, please wait........</h2>' +
 			'</div>'
 		);
 
@@ -163,8 +164,8 @@ function cGovProcessReqChange() {
 //alert("cGovMassagedData:\n" + cGovMassagedData);
 		
 		var checkBoxHtml = (
-		   '<div id="massaged-data" style="display:inline;">Data element - you should not see this.</div>' + 
-		   '<div id="checkbox-html">' +
+		   '<div id="massaged-data">Data element - you should not see this.</div>' + 
+		   '<div id="checkbox-html" class="gloss-modal">' +
 			  '<link href="../rx_resources/tinymce/stylesheets/glossify-cust.css" rel="stylesheet" />' +
 			  '<script language="Javascript">' +
 			  
@@ -187,7 +188,7 @@ function cGovProcessReqChange() {
 				 '}' +	 
 				 
 			  '</script>' +
-			  '<div name="Glossify" id="Glossify">' +
+			  '<div name="Glossify" id="Glossify" class="gloss-modal-content">' +
 				 '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
 				 '<hr>' +
 				 cGovMassagedData +

@@ -6,9 +6,21 @@ h2 {
 	line-height: 14px
 }
 
+/* Loading progress bar */
+#loading-html #progress {
+    background-color:red;    
+    width:0px; 
+    height:10px; 
+}
+#loading-html .border-box {
+    border: 1px solid black; 
+    width:200px; 
+    height:10px;
+}
+
 /* The Modal (background) */
 .gloss-modal {
-    display: none; /* Hidden by default */
+    /* display: none; Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
     left: 0;
@@ -27,4 +39,9 @@ h2 {
     padding: 20px;
     border: 1px solid #888;
     width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* Checkedarray data element - should not be visible */
+#massaged-data {
+	display: none;
 }
