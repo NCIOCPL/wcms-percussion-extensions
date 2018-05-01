@@ -173,22 +173,6 @@ function cGovProcessReqChange() {
 				 '});' +
 
 				 'function returnChecks() {' +
-					'/*var checkArray = [];' +
-					'if (document.Glossify.terms != null) {' +
-						'var boxes = document.Glossify.terms.length;' +
-						'if (boxes == null) {' +
-							'if (document.Glossify.terms.checked) {' +
-								'checkArray.push(document.Glossify.terms.value);' +
-							'}' +
-						'}' +
-						'else {' +
-							'for (i=0;i<boxes;i++) {' +
-								'if (document.Glossify.terms[i].checked) {' +
-									'checkArray.push(document.Glossify.terms[i].value);' +
-								'}' +
-							'}' +
-						'}' +
-					'}*/' +
 				 	'doMore();' +
 				 '}' +
 				 
@@ -218,8 +202,10 @@ function cGovProcessReqChange() {
 		$body.append(checkBoxHtml);
 		
 		$( '[name="gloss-sumbit"]' ).click(function() {
+			var ca = $("#massaged-data").attr("data-checked-array");			
+			var bca = buildCheckArray(ca);
 			//alert('clicked submit');
-			submitter([1,2,4]);
+			submitter(bca);
 			//_glossifyEditor.setContent('<hr/>breast cancer<hr/>');
 		});
 		
@@ -234,6 +220,18 @@ function cGovProcessReqChange() {
 	}
 	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
 }
+
+/**
+* Callback called when popup window is submitted
+* Gets array of checked checkbox values, modifies the text to go into the editor
+*
+*/
+function buildCheckArray(checkedItems) {
+	var checkArr = checkedItems.split(',');
+	// TODO: remove non-ints
+	return checkArr;
+}
+	
 
 /**
 * Callback called when popup window is submitted
