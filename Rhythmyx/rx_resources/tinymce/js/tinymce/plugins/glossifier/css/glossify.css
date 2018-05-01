@@ -48,6 +48,15 @@ h2 {
 	overflow: auto;
 }
 
+#loading-html .border-box {
+	margin: auto;
+	margin-top: 45px;
+}
+
+#loading-html h2 {
+	text-align: center;
+}
+
 /* Checkedarray data element - should not be visible */
 #massaged-data {
 	display: none;
@@ -55,4 +64,6 @@ h2 {
 
 button.gloss-close {
 	float: right;
+	margin-top: -20px;
+	margin-right: -20px;
 }
