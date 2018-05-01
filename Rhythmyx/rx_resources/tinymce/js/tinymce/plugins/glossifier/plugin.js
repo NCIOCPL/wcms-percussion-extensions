@@ -34,6 +34,17 @@ var $body = jQuery('body');
 var _glossifyEditor;
 // global tinymce = true
 
+/**
+TODO: close modal windows on submit - they only close when checks are changed for some reason
+TODO: make checked/highlighted item fonts consistent (diff between this and current)
+TODO: clean up load page styling
+TODO: make wrappers consistent on load and checkbox views 
+TODO: style exit button
+TODO: prevent clicks on links
+TODO: close modal on 'esc'
+TODO: clean up Spanish tool
+TODO: rearrange methods
+*/
 
 /*********************************
 * CGov Percussion functions      *
@@ -85,7 +96,7 @@ function cGovTinyMCEGlossify(data) {
 				'<div class="gloss-modal-content">' +
 					'<button type="button" class="gloss-close">X</button>' +				
 					'<div class="border-box" >' +
-					'<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
+					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
 					'</div>' +   
 					'<h2>Processing document, please wait........</h2>' +
 				'</div>' +
@@ -681,12 +692,7 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
 		
-		/**
-		TODO: close modal windows on submit - they only close when checks are changed for some reason
-		TODO: styling
-		TODO: prevent clicks on links
-		TODO: close modal on 'esc'
-		*/
+
 	});
 
 	editor.addButton('glossifier', {
