@@ -11,6 +11,10 @@ h2 {
 	font-weight: bold; 
 	line-height: 14px
 }
+#Glossify a {
+	font-size: inherit;
+	font-family: inherit;
+}
 
 /* Loading progress bar */
 #loading-html #progress {

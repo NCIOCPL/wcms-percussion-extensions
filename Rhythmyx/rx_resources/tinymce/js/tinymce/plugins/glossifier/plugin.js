@@ -35,16 +35,11 @@ var _glossifyEditor;
 // global tinymce = true
 
 /**
-TODO: make checked/highlighted item fonts consistent (diff between this and current)
-TODO: clean up load page styling
-TODO: make wrappers consistent on load and checkbox views 
-TODO: style exit button
 TODO: prevent clicks on links
 TODO: close modal on 'esc'
 TODO: clean up Spanish tool
 TODO: rearrange methods
 */
-
 /*********************************
 * CGov Percussion functions      *
 **********************************/
