@@ -1,3 +1,9 @@
+h1 {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 20px;
+	margin: 0px;	
+	padding: 0px 15px 9px 0px;
+}
 h2 {
 	color: #333366; 
 	font-family: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; 
@@ -50,7 +56,7 @@ h2 {
 
 #loading-html .border-box {
 	margin: auto;
-	margin-top: 45px;
+	margin-top: 45px; 
 }
 
 #loading-html h2 {
@@ -66,4 +72,15 @@ button.gloss-close {
 	float: right;
 	margin-top: -20px;
 	margin-right: -20px;
+	padding: 5px 10px;
+	border: 0px;
+	background-color: white;
 }
+button.gloss-close:before {
+	content: "X";
+	font-size: 16px;
+}
+button.gloss-close:hover {
+	color: #adadad;
+}
+

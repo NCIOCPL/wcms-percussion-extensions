@@ -94,7 +94,7 @@ function cGovTinyMCEGlossify(data) {
 				  'setInterval(progress, 250);' +
 				'</script>' +
 				'<div class="gloss-modal-content">' +
-					'<button type="button" class="gloss-close">X</button>' +				
+					'<button type="button" class="gloss-close" />' +				
 					'<div class="border-box" >' +
 					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
 					'</div>' +   
@@ -105,6 +105,7 @@ function cGovTinyMCEGlossify(data) {
 
 		//Display status window
 		$body.append(loadingHtml);
+		$('.gloss-modal-content').draggable();
 		$( '.gloss-close' ).click(function() {
 			closeGlossifier();
 		});
@@ -199,7 +200,8 @@ function cGovProcessReqChange() {
 				 
 			  '</script>' +
 			  '<div name="Glossify" id="Glossify" class="gloss-modal-content">' +
-				 '<button type="button" class="gloss-close">X</button>' +
+				 '<button type="button" class="gloss-close" />' +
+				 '<h1>Glossifier tool</h1>' +
 				 '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
 				 '<hr>' +
 				 cGovMassagedData +
@@ -212,6 +214,7 @@ function cGovProcessReqChange() {
 		// Close the loading screen and add the checkbox screen
 		$('#loading-html').remove();
 		$body.append(checkBoxHtml);
+		$('#Glossify').draggable();
 
 		// Close glossifier on exit button
 		$( '.gloss-close' ).click(function() {
