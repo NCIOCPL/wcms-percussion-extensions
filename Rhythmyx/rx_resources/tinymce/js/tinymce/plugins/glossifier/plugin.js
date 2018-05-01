@@ -85,7 +85,7 @@ function cGovTinyMCEGlossify(data) {
 				'<div class="gloss-modal-content">' +
 					'<button type="button" class="gloss-close">X</button>' +				
 					'<div class="border-box" >' +
-					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
+					'<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
 					'</div>' +   
 					'<h2>Processing document, please wait........</h2>' +
 				'</div>' +
@@ -95,10 +95,8 @@ function cGovTinyMCEGlossify(data) {
 		//Display status window
 		$body.append(loadingHtml);
 		$( '.gloss-close' ).click(function() {
-			$('#checkbox-html, #loading-html, #massaged-data').remove();
-		});		
-
-		
+			closeGlossifier();
+		});
 		
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
@@ -200,6 +198,7 @@ function cGovProcessReqChange() {
 		   '</div>'
 		);
 		
+		// Close the loading screen and add the checkbox screen
 		$('#loading-html').remove();
 		$body.append(checkBoxHtml);
 		
@@ -207,11 +206,11 @@ function cGovProcessReqChange() {
 			var ca = $("#massaged-data").attr("data-checked-array");			
 			var bca = buildCheckArray(ca);
 			submitContent(bca);
-			$('#checkbox-html, #loading-html, #massaged-data').remove();			
+			closeGlossifier();
 		});
 		
 		$( '.gloss-close' ).click(function() {
-			$('#checkbox-html, #loading-html, #massaged-data').remove();
+			closeGlossifier();
 		});		
 
 
@@ -220,8 +219,7 @@ function cGovProcessReqChange() {
 }
 
 /**
-* Callback called when popup window is submitted
-* Gets array of checked checkbox values, modifies the text to go into the editor
+* Builds array of checked item values (ints)
 *
 */
 function buildCheckArray(checkedItems) {
@@ -229,7 +227,6 @@ function buildCheckArray(checkedItems) {
 	// TODO: remove non-ints
 	return checkArr;
 }
-	
 
 /**
 * Callback called when popup window is submitted
@@ -250,6 +247,20 @@ function submitContent(checkArray) {
 	// Finish up by restoring text to editor
 	_glossifyEditor.setContent(finalText);
 }
+
+/**
+* Close any open glossier windows and stop the 
+* cGovReq HTTP XML request if still running
+*
+*/
+function closeGlossifier() {
+	if(cGovReq) {
+		cGovReq.abort();
+	}
+	$('#checkbox-html, #loading-html, #massaged-data').remove();
+}
+	
+
 
 /**
 * Strip checkbox markup from the final text
@@ -665,26 +676,16 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		_glossifyEditor = editor;
 
 		// Close any straggling glossifier windows
-		$('#checkbox-html, #loading-html, #massaged-data').remove();
+		closeGlossifier();
 		
 		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
-
-
 		
 		/**
-		TODO: close modal windows on submit
-		TODO: add exit button
-		TODO: close modal on 'esc'
+		TODO: close modal windows on submit - they only close when checks are changed for some reason
 		TODO: styling
-		TODO: util function to remove duplicate modal
 		TODO: prevent clicks on links
-		*/
-
-		/*
-			'//$("#checkbox-html").remove();' +
-			'//$("#checkbox-html").remove();' +
-			'<button name="gloss-sumbit" type="button" value="Submit Changes">Submit Changes</button>' +
+		TODO: close modal on 'esc'
 		*/
 	});
 
