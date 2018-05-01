@@ -35,7 +35,7 @@ var _glossifyEditor;
 // global tinymce = true
 
 /**
-TODO: close modal windows on submit - they only close when checks are changed for some reason
+TODO: handle "node is null" console error
 TODO: make checked/highlighted item fonts consistent (diff between this and current)
 TODO: clean up load page styling
 TODO: make wrappers consistent on load and checkbox views 
@@ -45,7 +45,6 @@ TODO: close modal on 'esc'
 TODO: clean up Spanish tool
 TODO: rearrange methods
 */
-
 /*********************************
 * CGov Percussion functions      *
 **********************************/
@@ -98,7 +97,7 @@ function cGovTinyMCEGlossify(data) {
 					'<div class="border-box" >' +
 					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
 					'</div>' +   
-					'<h2>Processing document, please wait........</h2>' +
+					'<h2>Processing document, please wait......;..</h2>' +
 				'</div>' +
 			'</div>'
 		);
@@ -212,19 +211,18 @@ function cGovProcessReqChange() {
 		// Close the loading screen and add the checkbox screen
 		$('#loading-html').remove();
 		$body.append(checkBoxHtml);
-		
-		$( '[name="gloss-sumbit"]' ).click(function() {
-			var ca = $("#massaged-data").attr("data-checked-array");			
-			var bca = buildCheckArray(ca);
-			submitContent(bca);
-			closeGlossifier();
-		});
-		
+
+		// Close glossifier on exit button
 		$( '.gloss-close' ).click(function() {
 			closeGlossifier();
 		});		
-
-
+		
+		// Push modified content back to editor window and close glossifier  
+		$( '[name="gloss-sumbit"]' ).click(function() {
+			var checkedItemsString = buildCheckArray($("#massaged-data").attr("data-checked-array"));
+			submitContent(checkedItemsString);
+			closeGlossifier();
+		});
 	}
 	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
 }
@@ -234,9 +232,13 @@ function cGovProcessReqChange() {
 *
 */
 function buildCheckArray(checkedItems) {
-	var checkArr = checkedItems.split(',');
-	// TODO: remove non-ints
-	return checkArr;
+	if(typeof(checkedItems) === 'undefined') {
+		closeGlossifier();
+	} 
+	else { 
+		var checkArr = checkedItems.split(',');
+		return checkArr;
+	}
 }
 
 /**
