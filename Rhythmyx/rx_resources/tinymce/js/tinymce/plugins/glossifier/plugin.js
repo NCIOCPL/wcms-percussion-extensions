@@ -83,6 +83,7 @@ function cGovTinyMCEGlossify(data) {
 				'</script>' +
 				'<h1>GlossifyDocumentPrep</h1>' +
 				'<div class="gloss-modal-content">' +
+					'<button type="button" class="gloss-close">X</button>' +				
 					'<div class="border-box" >' +
 					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
 					'</div>' +   
@@ -93,7 +94,11 @@ function cGovTinyMCEGlossify(data) {
 
 		//Display status window
 		$body.append(loadingHtml);
+		$( '.gloss-close' ).click(function() {
+			$('#checkbox-html, #loading-html, #massaged-data').remove();
+		});		
 
+		
 		
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
@@ -174,10 +179,6 @@ function cGovProcessReqChange() {
 				 '});' +
 
 				 'function returnChecks() {' +
-				 	'doMore();' +
-				 '}' +
-				 
-				'function doMore() {' +
 					'var myCheckArr = [];' +
 					'var checkedItem = $(\'#Glossify\').contents().find(\'input[name="terms"]\' + \':checked\');' +
 						'checkedItem.each(function() {' +
@@ -185,10 +186,11 @@ function cGovProcessReqChange() {
 							'myCheckArr.push($this.attr("value"));' +
 						'});' +
 					'$("#massaged-data").attr("data-checked-array", myCheckArr);' +					
-				 '}' +	 
+				 '}' +
 				 
 			  '</script>' +
 			  '<div name="Glossify" id="Glossify" class="gloss-modal-content">' +
+				 '<button type="button" class="gloss-close">X</button>' +
 				 '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
 				 '<hr>' +
 				 cGovMassagedData +
@@ -204,18 +206,14 @@ function cGovProcessReqChange() {
 		$( '[name="gloss-sumbit"]' ).click(function() {
 			var ca = $("#massaged-data").attr("data-checked-array");			
 			var bca = buildCheckArray(ca);
-			//alert('clicked submit');
-			submitter(bca);
-			//_glossifyEditor.setContent('<hr/>breast cancer<hr/>');
+			submitContent(bca);
+			$('#checkbox-html, #loading-html, #massaged-data').remove();			
 		});
 		
-		
+		$( '.gloss-close' ).click(function() {
+			$('#checkbox-html, #loading-html, #massaged-data').remove();
+		});		
 
-		//_glossifyEditor.setContent('<hr/>breast cancer<hr/>');
-		
-		// Set up HTML window with javascript and checkboxed text
-		//var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
-		//cGovCheckboxWindow.document.write(checkHtml);
 
 	}
 	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
@@ -238,10 +236,7 @@ function buildCheckArray(checkedItems) {
 * Gets array of checked checkbox values, modifies the text to go into the editor
 *
 */
-function submitter(checkArray) {
-//TODO: delete dictionary preview URL once we add it
-//	if (!cGovCheckboxWindow.closed)
-//		cGovCheckboxWindow.close();
+function submitContent(checkArray) {
 	var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
 	var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
 	var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
@@ -252,8 +247,7 @@ function submitter(checkArray) {
 	finalText = cGovKillFonts(rxKillFonts, finalText);
 	finalText = cGovFixCRLF(rxFixCRs, finalText, "\r");
 	finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
-	//finish up by restoring text to editor
-	// _editLiveInstance.setContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName), finalText);
+	// Finish up by restoring text to editor
 	_glossifyEditor.setContent(finalText);
 }
 
@@ -675,13 +669,18 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		
 		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
+
+
 		
 		/**
 		TODO: close modal windows on submit
-		TODO: update _glossifyEditor on submit
+		TODO: add exit button
+		TODO: close modal on 'esc'
 		TODO: styling
 		TODO: util function to remove duplicate modal
+		TODO: prevent clicks on links
 		*/
+
 		/*
 			'//$("#checkbox-html").remove();' +
 			'//$("#checkbox-html").remove();' +
