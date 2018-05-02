@@ -34,10 +34,6 @@ var $body = jQuery('body');
 var _glossifyEditor;
 // global tinymce = true
 
-/**
-TODO: clean up Spanish tool
-TODO: rearrange methods
-*/
 /*********************************
 * CGov Percussion functions      *
 **********************************/
@@ -118,34 +114,6 @@ function cGovTinyMCEGlossify(data) {
 }
 
 /**
-* Class containing values of each Term returned from the service
-*
-*/
-function termObject() {
-	this.start = 0;
-	this.length = 0;
-	this.docId = "";
-	this.dictionary = "";
-	this.language = "";
-	this.first = true;
-}
-
-/**
-* Attempts to retrieve elements in a namespace, using a variety of browser-specific methods
-*
-*/
-function getElementsByTagNameNS(parent, namespace, alias, tagname) {
-	elements = parent.getElementsByTagName(alias + ":" + tagname);
-	if(elements.length == 0){
-		elements = parent.getElementsByTagName(tagname);
-	}
-	if(elements.length == 0){
-		elements = parent.getElementsByTagNameNS(namespace, tagname);
-	}
-	return elements;
-}
-
-/**
 * Completion callback
 *
 */
@@ -204,38 +172,29 @@ function cGovProcessReqChange() {
 		   '</div>'
 		);
 		
-		// Close the loading screen and add the checkbox screen
+		// Close the loading screen, add the checkbox screen,
+		// and set click events
 		$('#loading-html').remove();
 		$body.append(checkBoxHtml);
 		$('#Glossify').draggable();
-
-		// Close glossifier on exit button
-		$( '.gloss-close' ).click(function() {
-			closeGlossifier();
-		});		
-		
-		// Push modified content back to editor window and close glossifier  
-		$( '[name="gloss-sumbit"]' ).click(function() {
-			var checkedItemsString = buildCheckArray($("#massaged-data").attr("data-checked-array"));
-			submitContent(checkedItemsString);
-			closeGlossifier();
-		});
+		setClickEvents();
 	}
 	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
 }
 
-/**
-* Builds array of checked item values (ints)
-*
-*/
-function buildCheckArray(checkedItems) {
-	if(typeof(checkedItems) === 'undefined') {
+
+function setClickEvents() {
+	// Close glossifier on exit button click
+	$( '.gloss-close' ).click(function() {
 		closeGlossifier();
-	} 
-	else { 
-		var checkArr = checkedItems.split(',');
-		return checkArr;
-	}
+	});		
+	
+	// Push modified content back to editor window and close glossifier  
+	$( '[name="gloss-sumbit"]' ).click(function() {
+		var checkedItemsString = buildCheckArray($("#massaged-data").attr("data-checked-array"));
+		submitContent(checkedItemsString);
+		closeGlossifier();
+	});	
 }
 
 /**
@@ -257,6 +216,50 @@ function submitContent(checkArray) {
 	// Finish up by restoring text to editor
 	_glossifyEditor.setContent(finalText);
 }
+
+/**
+* Class containing values of each Term returned from the service
+*
+*/
+function termObject() {
+	this.start = 0;
+	this.length = 0;
+	this.docId = "";
+	this.dictionary = "";
+	this.language = "";
+	this.first = true;
+}
+
+/**
+* Attempts to retrieve elements in a namespace, using a variety of browser-specific methods
+*
+*/
+function getElementsByTagNameNS(parent, namespace, alias, tagname) {
+	elements = parent.getElementsByTagName(alias + ":" + tagname);
+	if(elements.length == 0){
+		elements = parent.getElementsByTagName(tagname);
+	}
+	if(elements.length == 0){
+		elements = parent.getElementsByTagNameNS(namespace, tagname);
+	}
+	return elements;
+}
+
+/**
+* Builds array of checked item values (ints)
+*
+*/
+function buildCheckArray(checkedItems) {
+	if(typeof(checkedItems) === 'undefined') {
+		closeGlossifier();
+	} 
+	else { 
+		var checkArr = checkedItems.split(',');
+		return checkArr;
+	}
+}
+
+
 
 /**
 * Close any open glossier windows and stop the 
@@ -690,7 +693,6 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Do all of the glossification magic
 		cGovTinyMCEGlossify(allContent);
 		
-
 	});
 
 	editor.addButton('glossifier', {
