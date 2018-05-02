@@ -86,9 +86,9 @@ function cGovTinyMCEGlossify(data) {
 					'<button type="button" class="gloss-close" />' +				
 					'<div class="border-box" >' +
 					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
-					'</div>' +   
-					'<h2>Processing document, please wait........</h2>' +
-				'</div>' +
+					   '</div>' +
+					   '<h2>Processing document, please wait........</h2>' +
+				   '</div>' +
 			'</div>'
 		);
 
@@ -637,8 +637,22 @@ function cGovAddUniqueID(data) {
 * Pass the correct Spanish characters to soap
 *
 */
-function fixSpanish(editorContent, entity, character) {
-	var fixedSpanish = editorContent.split(entity).join(character);
+function fixSpanish(editorContent) {
+	var fixedSpanish = editorContent;
+	fixedSpanish = fixedSpanish.split('&Aacute;').join('Á');
+	fixedSpanish = fixedSpanish.split('&aacute;').join('á');
+	fixedSpanish = fixedSpanish.split('&Eacute;').join('É');
+	fixedSpanish = fixedSpanish.split('&eacute;').join('é');
+	fixedSpanish = fixedSpanish.split('&Iacute;').join('Í');
+	fixedSpanish = fixedSpanish.split('&iacute;').join('í');
+	fixedSpanish = fixedSpanish.split('&Oacute;').join('Ó');
+	fixedSpanish = fixedSpanish.split('&oacute;').join('ó');
+	fixedSpanish = fixedSpanish.split('&Uacute;').join('Ú');
+	fixedSpanish = fixedSpanish.split('&uacute;').join('ú');
+	fixedSpanish = fixedSpanish.split('&Yacute;').join('Ý');
+	fixedSpanish = fixedSpanish.split('&yacute;').join('ý');
+	fixedSpanish = fixedSpanish.split('&Ntilde;').join('Ñ');
+	fixedSpanish = fixedSpanish.split('&ntilde;').join('ñ');	
 	return fixedSpanish;
 }
 
@@ -656,31 +670,15 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		allContent = editor.getContent();
 		
         // Replace HTML entities with characters 
-		allContent = fixSpanish(allContent, "&Aacute;", "Á");
-		allContent = fixSpanish(allContent, "&aacute;", "á");
-		allContent = fixSpanish(allContent, "&Eacute;", "É");
-		allContent = fixSpanish(allContent, "&eacute;", "é");
-		allContent = fixSpanish(allContent, "&Iacute;", "Í");
-		allContent = fixSpanish(allContent, "&iacute;", "í");
-		allContent = fixSpanish(allContent, "&Oacute;", "Ó");
-		allContent = fixSpanish(allContent, "&oacute;", "ó");
-		allContent = fixSpanish(allContent, "&Uacute;", "Ú");
-		allContent = fixSpanish(allContent, "&uacute;", "ú");
-		allContent = fixSpanish(allContent, "&Yacute;", "Ý");
-		allContent = fixSpanish(allContent, "&yacute;", "ý");
-		allContent = fixSpanish(allContent, "&Ntilde;", "Ñ");
-		allContent = fixSpanish(allContent, "&ntilde;", "ñ");
+		allContent = fixSpanish(allContent);
 		
 		// Set unique ID for checked/unchecked terms
 		cGovUniqueId = 0;
 		
 		// Set glossifier to use locale of content item rather than Percussion locale
-		if(settings.language == 'es')
-		{
+		if(settings.language == 'es') {
 			cGovLanguage = settings.language;
-		}
-		else
-		{
+		} else {
 			cGovLanguage = 'en';
 		}
 		
@@ -691,8 +689,7 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		closeGlossifier();
 		
 		// Do all of the glossification magic
-		cGovTinyMCEGlossify(allContent);
-		
+		cGovTinyMCEGlossify(allContent);		
 	});
 
 	editor.addButton('glossifier', {
