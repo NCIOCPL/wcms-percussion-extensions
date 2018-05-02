@@ -81,8 +81,8 @@ button.gloss-close {
 	background-color: white;
 }
 button.gloss-close:before {
-	content: "X";
-	font-size: 16px;
+	content: "\00d7"; 
+	font-size: 28px;
 }
 button.gloss-close:hover {
 	color: #adadad;

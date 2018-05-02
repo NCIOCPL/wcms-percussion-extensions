@@ -35,8 +35,6 @@ var _glossifyEditor;
 // global tinymce = true
 
 /**
-TODO: prevent clicks on links
-TODO: close modal on 'esc'
 TODO: clean up Spanish tool
 TODO: rearrange methods
 */
@@ -655,7 +653,6 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		allContent = editor.getContent();
 		
         // Replace HTML entities with characters 
-        // TODO: clean this up and test on English
 		allContent = fixSpanish(allContent, "&Aacute;", "Á");
 		allContent = fixSpanish(allContent, "&aacute;", "á");
 		allContent = fixSpanish(allContent, "&Eacute;", "É");
