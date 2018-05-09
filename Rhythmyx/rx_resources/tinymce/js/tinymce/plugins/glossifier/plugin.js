@@ -7,6 +7,8 @@
  *
  * License: http://www.tinymce.com/license
  * Contributing: http://www.tinymce.com/contributing
+ * 
+ * Last updated by daquinohd 2018-05-02
  */
  
 /*********************************
@@ -30,12 +32,12 @@ var cGovWSNameSpace = "cancer.gov/glossproxy";
 var cGovSoapMethod = "cancer.gov/glossproxy/glossify";
 var cGovIsEnglish = true;
 var cGovLanguage = document.documentElement.lang.split('-')[0];
+var $body = jQuery('body');
 var _glossifyEditor;
-// global tinymce = true
 
 
 /*********************************
-* CGov Percussion functions      *
+* Main CGov Percussion functions *
 **********************************/
 /**
 * Send the glossification request to the web service
@@ -63,25 +65,41 @@ function cGovTinyMCEGlossify(data) {
 			"</m:glossify>" +
 		"</soapenv:Body>" +
 		"</soapenv:Envelope>";
-		cGovReq = new XMLHttpRequest();
+		cGovReq = new XMLHttpRequest(); 
+		
+		var loadingHtml = (
+			'<div id="loading-html" class="gloss-modal">' +
+			    '<link href="../rx_resources/tinymce/js/tinymce/plugins/glossifier/css/glossify.css" rel="stylesheet" />' +
+				'<script language="javascript" type="text/javascript">' +
+				  'var prg_width = 200;' +
+				  'function progress() {' +
+					'var node = document.getElementById("progress");' +
+					'if(node != null) {' +
+					  'var w = node.style.width.match(/\\d+/);' +
+					  'if (w == prg_width) {' +
+						'w = 0;' +
+					  '}' +
+					  'node.style.width = parseInt(w) + 5 + "px";' +					
+					'}' +					
+				  '}' +
+				  'setInterval(progress, 250);' +
+				'</script>' +
+				'<div class="gloss-modal-content">' +
+					'<button type="button" class="gloss-close" />' +				
+					'<div class="border-box" >' +
+					   '<div id="progress" style="background-color:red;width:0px;height:10px;"/>' +
+					   '</div>' +
+					   '<h2>Processing document, please wait........</h2>' +
+				   '</div>' +
+			'</div>'
+		);
 
 		//Display status window
-		cGovStatusWindow = window.open("","","height=480,width=640");
-		cGovStatusWindow.document.write('<html><head><title>GlossifyDocumentPrep</title>');
-		cGovStatusWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
-		cGovStatusWindow.document.write('<script language="javascript" type="text/javascript">');
-		cGovStatusWindow.document.write("var prg_width = 200;");
-		cGovStatusWindow.document.write("function progress() {");
-        cGovStatusWindow.document.write("var node = document.getElementById('progress');");
-        cGovStatusWindow.document.write("var w = node.style.width.match(/\\d+/);");
-		cGovStatusWindow.document.write("if (w == prg_width)");
-        cGovStatusWindow.document.write("w = 0;");
-		cGovStatusWindow.document.write("node.style.width = parseInt(w) + 5 + 'px';");
-        cGovStatusWindow.document.write("}");
-        cGovStatusWindow.document.write("setInterval(progress, 250);");		
-		cGovStatusWindow.document.write('</' + 'script></head>');
-		cGovStatusWindow.document.write('<body><div><div style="border: 1px solid black; width:200px; height:10px;"><div id="progress" style="height:10px; width:0px; background-color:red;"/></div></div>');
-		cGovStatusWindow.document.write("<h2>Processing document, please wait.........</h2></body></html>");
+		$body.append(loadingHtml);
+		$('.gloss-modal-content').draggable();
+		$( '.gloss-close' ).click(function() {
+			closeGlossifier();
+		});
 		
 		// Do this on completion of asynchronous call
 		cGovReq.onreadystatechange = cGovProcessReqChange;
@@ -98,8 +116,117 @@ function cGovTinyMCEGlossify(data) {
 }
 
 /**
+* Completion callback
+* Once the HTTP request is in the ready state, draw the resulting checkbox HTML
+* and initialize events
+*/
+function cGovProcessReqChange() {
+	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
+		//alert("got response, text:\n" + cGovReq.responseText);
+		//cGovStatusWindow.close();
+		
+		//Web service transaction has completed, parse the response
+		var env = getElementsByTagNameNS(cGovReq.responseXML, cGovSoapNameSpace, cGovSoapPrefix, "Envelope");
+		//alert("got env");
+		var body = getElementsByTagNameNS(env[0], cGovSoapNameSpace, cGovSoapPrefix, "Body");
+		//alert("got body");
+		var resp = getElementsByTagNameNS(body[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResponse");
+		//alert("got glossifyResponse");
+		var glossifyResult = getElementsByTagNameNS(resp[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResult");
+		//alert("got glossifyResult");
+		var terms = getElementsByTagNameNS(glossifyResult[0], cGovWSNameSpace, cGovElementPrefix, "Term");
+		//alert("got term");
+
+		// Put the terms values into an array
+		var termsArray = cGovBuildTermsArray(terms);
+		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
+		//alert("cGovMassagedData:\n" + cGovMassagedData);
+		
+		var checkBoxHtml = (
+		   '<div id="massaged-data">Data element - you should not see this.</div>' + 
+		   '<div id="checkbox-html" class="gloss-modal">' +
+			  '<link href="../rx_resources/tinymce/js/tinymce/plugins/glossifier/css/glossify.css" rel="stylesheet" />' +
+			  '<script language="Javascript">' +
+			  
+				 '$( \'input[name="terms"]\' ).change(function() {' +
+				    'returnChecks()' +
+				 '});' +
+
+				 'function returnChecks() {' +
+					'var myCheckArr = [];' +
+					'var checkedItem = $(\'#Glossify\').contents().find(\'input[name="terms"]\' + \':checked\');' +
+						'checkedItem.each(function() {' +
+							'$this = $(this);' +
+							'myCheckArr.push($this.attr("value"));' +
+						'});' +
+					'$("#massaged-data").attr("data-checked-array", myCheckArr);' +					
+				 '}' +
+				 
+			  '</script>' +
+			  '<div name="Glossify" id="Glossify" class="gloss-modal-content">' +
+				 '<button type="button" class="gloss-close" />' +
+				 '<h1>Glossifier tool</h1>' +
+				 '<h2>Please check/uncheck the word(s) you want glossified</h2>' +
+				 '<hr>' +
+				 cGovMassagedData +
+				 '<hr>' +
+				 '<button name="gloss-sumbit" type="button" value="Submit Changes">Submit Changes</button>' +
+			  '</div>' +
+		   '</div>'
+		);
+		
+		// Close the loading screen, add the checkbox screen,
+		// and set click events
+		$('#loading-html').remove();
+		$body.append(checkBoxHtml);
+		$('#Glossify').draggable();
+		setClickEvents();
+	}
+	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
+}
+
+/** 
+* Set behavior for button clicks
+*/
+function setClickEvents() {
+	// Close glossifier on exit button click
+	$( '.gloss-close' ).click(function() {
+		closeGlossifier();
+	});		
+	
+	// Push modified content back to editor window and close glossifier  
+	$( '[name="gloss-sumbit"]' ).click(function() {
+		var checkedItemsString = buildCheckArray($("#massaged-data").attr("data-checked-array"));
+		submitContent(checkedItemsString);
+		closeGlossifier();
+	});	
+}
+
+/**
+* Callback called when popup window is submitted
+* Gets array of checked checkbox values, modifies the text to go into the editor
+*/
+function submitContent(checkArray) {
+	var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
+	var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
+	var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
+	var rxFixCRs = new RegExp(cGovCRConst);
+	var rxFixLFs = new RegExp(cGovLFConst);
+	var finalText = cGovStripCheckboxes(rxCheckBox, cGovMassagedData);
+	finalText = cGovFixFinalLinks(rxFixLinks, finalText, checkArray);
+	finalText = cGovKillFonts(rxKillFonts, finalText);
+	finalText = cGovFixCRLF(rxFixCRs, finalText, "\r");
+	finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
+	// Finish up by restoring text to editor
+	_glossifyEditor.setContent(finalText);
+}
+
+
+/************************************
+* CGov Percussion utility functions *
+*************************************/
+/**
 * Class containing values of each Term returned from the service
-*
 */
 function termObject() {
 	this.start = 0;
@@ -112,7 +239,6 @@ function termObject() {
 
 /**
 * Attempts to retrieve elements in a namespace, using a variety of browser-specific methods
-*
 */
 function getElementsByTagNameNS(parent, namespace, alias, tagname) {
 	elements = parent.getElementsByTagName(alias + ":" + tagname);
@@ -126,94 +252,31 @@ function getElementsByTagNameNS(parent, namespace, alias, tagname) {
 }
 
 /**
-* Completion callback
-*
+* Builds array of checked item values (ints)
 */
-function cGovProcessReqChange() {
-	if (cGovReq.readyState == 4 && cGovReq.status == 200) {
-//alert("got response, text:\n" + cGovReq.responseText);
-		cGovStatusWindow.close();
-		
-		//Web service transaction has completed, parse the response
-		var env = getElementsByTagNameNS(cGovReq.responseXML, cGovSoapNameSpace, cGovSoapPrefix, "Envelope");
-//alert("got env");
-		var body = getElementsByTagNameNS(env[0], cGovSoapNameSpace, cGovSoapPrefix, "Body");
-//alert("got body");
-		var resp = getElementsByTagNameNS(body[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResponse");
-//alert("got glossifyResponse");
-		var glossifyResult = getElementsByTagNameNS(resp[0], cGovWSNameSpace, cGovElementPrefix, "glossifyResult");
-//alert("got glossifyResult");
-		var terms = getElementsByTagNameNS(glossifyResult[0], cGovWSNameSpace, cGovElementPrefix, "Term");
-//alert("got term");
-
-		// Put the terms values into an array
-		var termsArray = cGovBuildTermsArray(terms);
-		cGovMassagedData = cGovBuildCBDisplayString(cGovMassagedData, termsArray);
-//alert("cGovMassagedData:\n" + cGovMassagedData);
-		
-		// Set up HTML window with javascript and checkboxed text
-		var cGovCheckboxWindow=window.open("","","height=480,width=640,scrollbars=1");
-		cGovCheckboxWindow.document.write('<html><head>');
-		cGovCheckboxWindow.document.write('<style type="text/css">H2 {COLOR: #333366; FONT-FAMILY: Trebuchet MS, Tahoma, Verdana, Arial, sans-serif; FONT-SIZE: 12px; FONT-WEIGHT: bold; LINE-HEIGHT: 14px}</style>');
-		cGovCheckboxWindow.document.write('</head>');
-		cGovCheckboxWindow.document.write('<script language="Javascript">');
-		cGovCheckboxWindow.document.write('function returnChecks() {');
-		cGovCheckboxWindow.document.write('	var checkArray = [];');
-		cGovCheckboxWindow.document.write('	if (document.Glossify.terms != null) {');
-		cGovCheckboxWindow.document.write('		var boxes = document.Glossify.terms.length;');
-		cGovCheckboxWindow.document.write('		if (boxes == null) {');
-		cGovCheckboxWindow.document.write('			if (document.Glossify.terms.checked) {');
-		cGovCheckboxWindow.document.write('				checkArray.push(document.Glossify.terms.value);');
-		cGovCheckboxWindow.document.write('			}');
-		cGovCheckboxWindow.document.write('		}');
-		cGovCheckboxWindow.document.write('		else {');
-		cGovCheckboxWindow.document.write('			for (i=0;i<boxes;i++) {');
-		cGovCheckboxWindow.document.write('				if (document.Glossify.terms[i].checked) {');
-		cGovCheckboxWindow.document.write('					checkArray.push(document.Glossify.terms[i].value);');
-		cGovCheckboxWindow.document.write('				}');
-		cGovCheckboxWindow.document.write('			}');
-		cGovCheckboxWindow.document.write('		}');
-		cGovCheckboxWindow.document.write('	}');
-		cGovCheckboxWindow.document.write('window.opener.submitter(checkArray);');
-		cGovCheckboxWindow.document.write('window.close();');
-		cGovCheckboxWindow.document.write('}\n</' + 'script>');
-		cGovCheckboxWindow.document.write('<body>');
-		cGovCheckboxWindow.document.write('<form name="Glossify" id="Glossify" onSubmit="returnChecks();return(false)">');
-		cGovCheckboxWindow.document.write('<h2>Please check/uncheck the word(s) you want glossified</h2>');
-		cGovCheckboxWindow.document.write('<hr>\n' + cGovMassagedData + '<hr>\n');
-		cGovCheckboxWindow.document.write('<input type="submit" value="Submit Changes">');
-		cGovCheckboxWindow.document.write('</form>\n</body>\n</html>');
+function buildCheckArray(checkedItems) {
+	if(typeof(checkedItems) === 'undefined') {
+		closeGlossifier();
+	} 
+	else { 
+		var checkArr = checkedItems.split(',');
+		return checkArr;
 	}
-	//else alert("readyState=" + cGovReq.readyState + " status=" + cGovReq.status);
 }
 
 /**
-* Callback called when popup window is submitted
-* Gets array of checked checkbox values, modifies the text to go into the editor
-*
+* Close any open glossier windows and stop the 
+* cGovReq HTTP XML request if still running
 */
-function submitter(checkArray) {
-//TODO: delete dictionary preview URL once we add it
-//	if (!cGovCheckboxWindow.closed)
-//		cGovCheckboxWindow.close();
-	var rxCheckBox = new RegExp("<input type=checkbox name=terms.+?value=.+?>");
-	var rxFixLinks = new RegExp("<a __(?:new|old)term=\"(.+?)\"(.+?)>(.+?)</a>");
-	var rxKillFonts = new RegExp("<font __type=\"glossifyTemp\".+?>(.+?)</font>");
-	var rxFixCRs = new RegExp(cGovCRConst);
-	var rxFixLFs = new RegExp(cGovLFConst);
-	var finalText = cGovStripCheckboxes(rxCheckBox, cGovMassagedData);
-	finalText = cGovFixFinalLinks(rxFixLinks, finalText, checkArray);
-	finalText = cGovKillFonts(rxKillFonts, finalText);
-	finalText = cGovFixCRLF(rxFixCRs, finalText, "\r");
-	finalText = cGovFixCRLF(rxFixLFs, finalText, "\n");
-	//finish up by restoring text to editor
-	// _editLiveInstance.setContentForEditableSection(_getSectionDivNameByFieldName(cGovEditorName), finalText);
-	_glossifyEditor.setContent(finalText);
+function closeGlossifier() {
+	if(cGovReq) {
+		cGovReq.abort();
+	}
+	$('#checkbox-html, #loading-html, #massaged-data').remove();
 }
 
 /**
 * Strip checkbox markup from the final text
-*
 */
 function cGovStripCheckboxes(theRegExp, theText) {
 	var done = false;
@@ -234,13 +297,12 @@ function cGovStripCheckboxes(theRegExp, theText) {
 			}
 		}
 	}
-//alert("end of cGovStripCheckboxes, theText= " + theText);
+	//alert("end of cGovStripCheckboxes, theText= " + theText);
 	return theText;
 }
 
 /**
 * Fix up the links in the final text
-*
 */
 function cGovFixFinalLinks(theRegExp, theText, checkArray) {
 	var done = false;
@@ -251,11 +313,11 @@ function cGovFixFinalLinks(theRegExp, theText, checkArray) {
 			done = true;
 		}
 		else {
-//alert("temp= " + temp + " length= " + temp.length);
+			//alert("temp= " + temp + " length= " + temp.length);
 			var target = theRegExp.exec(temp);
-//alert("ran regexp");
+			//alert("ran regexp");
 			if (target == null) {
-//alert("done"); 
+				//alert("done"); 
 				done = true;
 			}
 			else {
@@ -279,13 +341,12 @@ function cGovFixFinalLinks(theRegExp, theText, checkArray) {
 			}
 		}
 	}
-//alert("end of cGovFixFinalLinks, theText= " + theText);
+	//alert("end of cGovFixFinalLinks, theText= " + theText);
 	return theText;
 }
 
 /**
 * Strip the special font markup from the final text
-*
 */
 function cGovKillFonts(theRegExp, theText) {
 	var done = false;
@@ -311,7 +372,6 @@ function cGovKillFonts(theRegExp, theText) {
 
 /**
 * Change CR and LF codes back to CRLF
-*
 */
 function cGovFixCRLF(theRegExp, theText, replacement) {
 	var done = false;
@@ -338,13 +398,12 @@ function cGovFixCRLF(theRegExp, theText, replacement) {
 
 /**
 * Build array of values from fetched terms
-*
 */
 function cGovBuildTermsArray(terms) {
 	var termsArray = [];	//array of term values
-//alert("terms count = " + terms.length);
+	//alert("terms count = " + terms.length);
 	for (i=0;i<terms.length;i++) {
-	// fetch the values for each Term returned by the service
+		// fetch the values for each Term returned by the service
 		var term = new termObject();
 		var start = getElementsByTagNameNS(terms[i], cGovWSNameSpace, cGovElementPrefix, "start");
 		term.start = start[0].childNodes[0].nodeValue;
@@ -365,7 +424,6 @@ function cGovBuildTermsArray(terms) {
 
 /**
 * Build the string with formatting and checkboxes for use in the term selection window
-*
 */
 function cGovBuildCBDisplayString(data, termsArray) {
 	// Go through the terms array in reverse order, insert terms links into massaged data with unique ids
@@ -377,7 +435,7 @@ function cGovBuildCBDisplayString(data, termsArray) {
 		var lastPart = data.substr(parseInt(tobj.start) + parseInt(tobj.length));
 		var language;
 		// Determine if we need to highlight the term
-		//Build the newterm string
+		// Build the newterm string
 		if (cGovLanguage == "es")
 			language = "Spanish";
 		else
@@ -390,17 +448,16 @@ function cGovBuildCBDisplayString(data, termsArray) {
 	// add checkbox (checked) to __oldterms
 	rxOldterm = new RegExp("<a __oldterm=\"(.+?)\"");
 	data = cGovDoRegExpAddChecks(rxOldterm, data);
-//alert("final data for display = \n" + data);
+	//alert("final data for display = \n" + data);
 	return data;
 }
 
 /**
 * Prepare the data for sending to web service. Replace cr and lf with code, mark old web service
 * provided URLs with __oldterm
-*
 */
 function cGovPrepareStr(data) {
-//alert("In cGovPrepareStr, data= " + data);
+	//alert("In cGovPrepareStr, data= " + data);
 	var tempData = data;
 	var result="";
 	// These expressions look for two specific styles of links and then change them from
@@ -414,7 +471,7 @@ function cGovPrepareStr(data) {
 	// a different order. No matter what order they are in in the editor, they always seem to come back the
 	// second way. If this turns out to not be the case, we'll have to run the first two expressions as well
 	// as the second.
-//	var rxDict1 = new RegExp("<a\\s+(href=.+dictionary/db_alpha.aspx.+</a>)","i");
+	// var rxDict1 = new RegExp("<a\\s+(href=.+dictionary/db_alpha.aspx.+</a>)","i");
 	var rxDef1 = new RegExp("<a\\s+(class=\"definition\".+?>.+?</a>)");
 	var rxDict2 = new RegExp("<a\\s+(onclick=\"javascript:popWindow.+?href=.+?dictionary/db_alpha.aspx.+?</a>)","i");
 	var rxDef2 = new RegExp("<a\\s+(onclick=\"javascript:popWindow.+?href=.+?popDefinition.aspx.+?</a>)");
@@ -450,13 +507,12 @@ function cGovPrepareStr(data) {
 			result += c;
 		}
 	}
-//alert("result = " + result);
+	//alert("result = " + result);
 	return result;
 }
 
 /**
 * Called for each regex, does the actual work of finding and editing the target link
-*
 */
 function cGovDoRegExp1(theRegExp, result) {
 	var done = false;
@@ -468,7 +524,7 @@ function cGovDoRegExp1(theRegExp, result) {
 		}
 		else {
 			var target = theRegExp.exec(temp);
-//alert("target = " + target);
+			//alert("target = " + target);
 			if (target == null) {
 				done = true;
 			}
@@ -476,7 +532,7 @@ function cGovDoRegExp1(theRegExp, result) {
 				offset += target.index;
 				var iDed = cGovAddUniqueID(target[1]);
 				result = result.replace(target[0],iDed);
-//alert("result = " + result);
+				//alert("result = " + result);
 				offset += iDed.length;
 			}
 		}
@@ -486,7 +542,6 @@ function cGovDoRegExp1(theRegExp, result) {
 
 /**
 * Run regex and add checkboxes to links marked with "__oldterm"
-*
 */
 function cGovDoRegExpAddChecks(theRegExp, data) {
 	var done = false;
@@ -514,7 +569,6 @@ function cGovDoRegExpAddChecks(theRegExp, data) {
 
 /**
 * Add highlighting font to first occurence of each term
-*
 */
 function cGovDoRegExpFonts(theRegExp, data) {
 	var done = false;
@@ -561,7 +615,6 @@ function cGovDoRegExpFonts(theRegExp, data) {
 
 /**
 * Add the __oldterm= to the old links
-*
 */
 function cGovAddUniqueID(data) {
 	cGovUniqueId++;
@@ -570,13 +623,27 @@ function cGovAddUniqueID(data) {
 }
 
 /**
-* Pass the correct Spanish characters to soap
-*
+* Replace Spanish-character entities with literal values
 */
-function fixSpanish(editorContent, entity, character) {
-	var fixedSpanish = editorContent.split(entity).join(character);
+function fixSpanish(editorContent) {
+	var fixedSpanish = editorContent;
+	fixedSpanish = fixedSpanish.split('&Aacute;').join('Á');
+	fixedSpanish = fixedSpanish.split('&aacute;').join('á');
+	fixedSpanish = fixedSpanish.split('&Eacute;').join('É');
+	fixedSpanish = fixedSpanish.split('&eacute;').join('é');
+	fixedSpanish = fixedSpanish.split('&Iacute;').join('Í');
+	fixedSpanish = fixedSpanish.split('&iacute;').join('í');
+	fixedSpanish = fixedSpanish.split('&Oacute;').join('Ó');
+	fixedSpanish = fixedSpanish.split('&oacute;').join('ó');
+	fixedSpanish = fixedSpanish.split('&Uacute;').join('Ú');
+	fixedSpanish = fixedSpanish.split('&uacute;').join('ú');
+	fixedSpanish = fixedSpanish.split('&Yacute;').join('Ý');
+	fixedSpanish = fixedSpanish.split('&yacute;').join('ý');
+	fixedSpanish = fixedSpanish.split('&Ntilde;').join('Ñ');
+	fixedSpanish = fixedSpanish.split('&ntilde;').join('ñ');	
 	return fixedSpanish;
 }
+
 
 /************************************
 * Percussion plugin function for    *
@@ -591,39 +658,27 @@ tinymce.PluginManager.add('glossifier', function(editor) {
 		// Get editor content
 		allContent = editor.getContent();
 		
-		// Replace HTML entities with characters 
-		allContent = fixSpanish(allContent, "&Aacute;", "Á");
-		allContent = fixSpanish(allContent, "&aacute;", "á");
-		allContent = fixSpanish(allContent, "&Eacute;", "É");
-		allContent = fixSpanish(allContent, "&eacute;", "é");
-		allContent = fixSpanish(allContent, "&Iacute;", "Í");
-		allContent = fixSpanish(allContent, "&iacute;", "í");
-		allContent = fixSpanish(allContent, "&Oacute;", "Ó");
-		allContent = fixSpanish(allContent, "&oacute;", "ó");
-		allContent = fixSpanish(allContent, "&Uacute;", "Ú");
-		allContent = fixSpanish(allContent, "&uacute;", "ú");
-		allContent = fixSpanish(allContent, "&Yacute;", "Ý");
-		allContent = fixSpanish(allContent, "&yacute;", "ý");
-		allContent = fixSpanish(allContent, "&Ntilde;", "Ñ");
-		allContent = fixSpanish(allContent, "&ntilde;", "ñ");
+        // Replace HTML entities with characters 
+		allContent = fixSpanish(allContent);
 		
 		// Set unique ID for checked/unchecked terms
 		cGovUniqueId = 0;
 		
 		// Set glossifier to use locale of content item rather than Percussion locale
-		if(settings.language == 'es')
-		{
+		if(settings.language == 'es') {
 			cGovLanguage = settings.language;
-		}
-		else
-		{
+		} else {
 			cGovLanguage = 'en';
 		}
 		
 		// Set editor as global variable
 		_glossifyEditor = editor;
 
-		cGovTinyMCEGlossify(allContent);
+		// Close any straggling glossifier windows
+		closeGlossifier();
+		
+		// Do all of the glossification magic
+		cGovTinyMCEGlossify(allContent);		
 	});
 
 	editor.addButton('glossifier', {
